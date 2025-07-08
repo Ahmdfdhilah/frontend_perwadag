@@ -2,10 +2,12 @@
 import { combineReducers } from '@reduxjs/toolkit';
 import authReducer from '@/redux/features/authSlice';
 import themeReducer from '@/redux/features/themeSlice';
+import roleReducer from '@/redux/features/roleSlice';
 
 export const rootReducer = combineReducers({
   auth: authReducer,
   theme: themeReducer,
+  role: roleReducer,
 });
 
 export type RootReducer = ReturnType<typeof rootReducer>;
