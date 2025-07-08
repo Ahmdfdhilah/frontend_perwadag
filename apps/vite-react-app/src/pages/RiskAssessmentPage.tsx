@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
 import Filtering from '@/components/common/Filtering';
 import SearchContainer from '@/components/common/SearchContainer';
@@ -23,6 +24,7 @@ import RiskAssessmentTable from '@/components/RiskAssesment/RiskAssessmentTable'
 import RiskAssessmentCards from '@/components/RiskAssesment/RiskAssessmentCards';
 
 const RiskAssessmentPage: React.FC = () => {
+  const navigate = useNavigate();
   const { isAdmin, isInspektorat } = useRole();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedYear, setSelectedYear] = useState<string>('all');
@@ -98,13 +100,11 @@ const RiskAssessmentPage: React.FC = () => {
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
   const handleView = (item: RiskAssessment) => {
-    console.log('View:', item);
-    // Implement view logic
+    navigate(`/penilaian-resiko/${item.id}`);
   };
 
   const handleEdit = (item: RiskAssessment) => {
-    console.log('Edit:', item);
-    // Implement edit logic
+    navigate(`/penilaian-resiko/${item.id}/edit`);
   };
 
   const handleDelete = (item: RiskAssessment) => {

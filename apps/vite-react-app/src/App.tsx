@@ -10,6 +10,7 @@ import { Toaster } from "@workspace/ui/components/sonner";
 import { AuthProvider } from './components/Auth/AuthProvider';
 import { DashboardLayout } from './components/layouts/DashboardLayout';
 import RiskAssessmentPage from './pages/RiskAssessmentPage';
+import RiskAssessmentInputPage from './pages/RiskAssessmentInputPage';
 
 
 function App() {
@@ -25,6 +26,8 @@ function App() {
                   <Route path="/" element={<DashboardLayout />}>
                     <Route index element={<RiskAssessmentPage />} />
                     <Route path="penilaian-resiko" element={<RiskAssessmentPage />} />
+                    <Route path="penilaian-resiko/:id" element={<RiskAssessmentInputPage />} />
+                    <Route path="penilaian-resiko/:id/edit" element={<RiskAssessmentInputPage />} />
                   </Route>
                 </Routes>
               </AuthProvider>
