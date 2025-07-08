@@ -1,11 +1,11 @@
 // apps/vite-react-app/src/components/Auth/AuthProvider.tsx
 import React, { createContext, useContext, useEffect, ReactNode } from 'react';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-import { 
+import {
   loginUser,
-  fetchCurrentUser, 
-  verifyToken, 
-  refreshToken, 
+  fetchCurrentUser,
+  verifyToken,
+  refreshToken,
   clearAuth,
   logoutUser,
   changePassword,
@@ -15,8 +15,6 @@ import {
 } from '@/redux/features/authSlice';
 import { useToast } from '@workspace/ui/components/sonner';
 import type { UserData } from '@/redux/features/authSlice';
-import { pushNotificationManager } from '@/utils/pushNotifications';
-import { pushNotificationService } from '@/services/pushService';
 
 interface LoginData {
   email: string;
@@ -38,14 +36,14 @@ interface AuthContextType {
   mfaRequired: boolean;
   mfaVerified: boolean;
   sessionId: string | null;
-  
+
   // Actions
   login: (loginData: LoginData) => Promise<void>;
   logout: (sessionId?: string) => Promise<void>;
   checkAuth: () => Promise<void>;
   changeUserPassword: (passwordData: PasswordChangeData) => Promise<void>;
   clearAuthError: () => void;
-  
+
   // Token management
   isTokenValid: () => boolean;
   getAccessToken: () => string | null;
@@ -60,11 +58,11 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const dispatch = useAppDispatch();
   const { toast } = useToast();
-  const { 
-    isAuthenticated, 
-    user, 
-    loading, 
-    error, 
+  const {
+    isAuthenticated,
+    user,
+    loading,
+    error,
     accessToken,
     refreshToken: refreshTokenValue,
     tokenExpiration,
@@ -97,7 +95,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (loginData: LoginData): Promise<void> => {
     try {
       const result = await dispatch(loginUser(loginData)).unwrap();
-      
+
       // If login successful and no MFA required, fetch user data
       if (result.mfa_verified || !result.requires_mfa) {
         await dispatch(fetchCurrentUser()).unwrap();
@@ -133,10 +131,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           return;
         }
       }
-      
+
       // Verify token is still valid
       await dispatch(verifyToken()).unwrap();
-      
+
       // Fetch user data if not available
       if (!user && isAuthenticated) {
         await dispatch(fetchCurrentUser()).unwrap();
@@ -164,7 +162,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!accessToken || !tokenExpiration) {
       return false;
     }
-    
+
     // Check if token expires in the next 5 minutes
     const fiveMinutesFromNow = Date.now() + (5 * 60 * 1000);
     return tokenExpiration > fiveMinutesFromNow;
@@ -213,54 +211,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [isAuthenticated, accessToken]);
 
-  // Handle push notifications when user is authenticated
-  useEffect(() => {
-    const setupPushNotifications = async () => {
-      if (isAuthenticated && user && pushNotificationManager.isSupported()) {
-        try {
-          // Check if already subscribed
-          const existingSubscription = await pushNotificationManager.getExistingSubscription();
-          
-          if (!existingSubscription) {
-            // Request permission and subscribe
-            const permission = await pushNotificationManager.requestPermission();
-            if (permission === 'granted') {
-              const subscription = await pushNotificationManager.subscribeToPush();
-              if (subscription) {
-                // Send subscription to backend
-                await pushNotificationService.subscribe(
-                  pushNotificationManager.convertToPushSubscriptionCreate(subscription)
-                );
-                console.log('Push notification subscription successful');
-              }
-            }
-          } else {
-            // Verify existing subscription is still valid with backend
-            try {
-              await pushNotificationService.getSubscriptions();
-            } catch (error) {
-              // If subscription is invalid, try to resubscribe
-              console.log('Resubscribing to push notifications...');
-              const permission = await pushNotificationManager.requestPermission();
-              if (permission === 'granted') {
-                const subscription = await pushNotificationManager.subscribeToPush();
-                if (subscription) {
-                  await pushNotificationService.subscribe(
-                    pushNotificationManager.convertToPushSubscriptionCreate(subscription)
-                  );
-                }
-              }
-            }
-          }
-        } catch (error) {
-          console.error('Push notification setup failed:', error);
-        }
-      }
-    };
-
-    setupPushNotifications();
-  }, [isAuthenticated, user]);
-
   const value: AuthContextType = {
     // State
     isAuthenticated,
@@ -270,14 +220,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     mfaRequired,
     mfaVerified,
     sessionId,
-    
+
     // Actions
     login,
     logout,
     checkAuth,
     changeUserPassword,
     clearAuthError,
-    
+
     // Token management
     isTokenValid,
     getAccessToken

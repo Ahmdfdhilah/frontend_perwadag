@@ -1,7 +1,7 @@
 // apps/vite-react-app/src/components/layouts/DashboardLayout/UserDropdown.tsx
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@workspace/ui/components/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@workspace/ui/components/avatar';
+import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,7 +21,6 @@ import {
 import { cn } from '@workspace/ui/lib/utils';
 import { useState } from 'react';
 import { useAuth } from '@/components/Auth/AuthProvider';
-import { fileUtils } from '@/utils/fileUtils';
 
 interface UserDropdownProps {
   collapsed?: boolean;
@@ -95,7 +94,7 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
           >
             <div className="relative">
               <Avatar className="h-6 w-6 flex-shrink-0">
-                <AvatarImage src={fileUtils.getFullFileUrl(user?.avatar_file?.file_url || '')} alt={getUserDisplayName()} />
+                {/* <AvatarImage src={fileUtils.getFullFileUrl(user?.avatar_file?.file_url || '')} alt={getUserDisplayName()} /> */}
                 <AvatarFallback className="text-xs">
                   {getUserInitials()}
                 </AvatarFallback>
