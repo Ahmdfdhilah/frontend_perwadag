@@ -14,6 +14,7 @@ import RiskAssessmentInputPage from './pages/RiskAssesment/RiskAssessmentInputPa
 import SuratTugasPage from './pages/SuratTugasPage';
 import SuratPemberitahuanPage from './pages/SuratPemberitahuanPage';
 import EntryMeetingPage from './pages/EntryMeetingPage';
+import ExitMeetingPage from './pages/ExitMeetingPage';
 
 
 function App() {
@@ -34,6 +35,7 @@ function App() {
                     <Route path="surat-tugas" element={<SuratTugasPage />} />
                     <Route path="surat-pemberitahuan" element={<SuratPemberitahuanPage />} />
                     <Route path="entry-meeting" element={<EntryMeetingPage />} />
+                    <Route path="exit-meeting" element={<ExitMeetingPage />} />
                   </Route>
                 </Routes>
               </AuthProvider>

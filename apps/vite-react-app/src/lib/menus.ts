@@ -1,4 +1,4 @@
-import { AlertTriangle, Mail, MailWarningIcon, PhoneIncoming, UserPlus, Users } from "lucide-react";
+import { AlertTriangle, Mail, MailWarningIcon, PhoneIncoming, PhoneOutgoing, UserPlus, Users } from "lucide-react";
 
 // Role definitions
 export type UserRole =
@@ -45,6 +45,13 @@ export const menuItems: SidebarItem[] = [
     title: 'Entry Meeting',
     href: '/entry-meeting',
     icon: PhoneIncoming,
+    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
+  },
+  // Exit Meeting - Only admin and inspektorat, perwadag
+  {
+    title: 'Exit Meeting',
+    href: '/exit-meeting',
+    icon: PhoneOutgoing,
     allowedRoles: ['admin', 'inspektorat', 'perwadag'],
   },
 
