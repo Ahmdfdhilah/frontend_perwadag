@@ -24,3 +24,7 @@ node_modules
 *.sw?
 
 .vercel
+
+./claude
+claude
+*claude
