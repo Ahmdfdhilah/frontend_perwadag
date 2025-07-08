@@ -1,30 +1,8 @@
-import {
-  Users,
-  BarChart3,
-  Calendar,
-  Clock,
-  UserPlus,
-  Building2,
-  Briefcase,
-  ClipboardList,
-  BookOpen,
-  PlaneTakeoff,
-  DollarSign,
-  Activity,
-  TrendingUp,
-  Plus,
-  ClockIcon,
-  Target,
-  Receipt,
-  Kanban,
-  AlertTriangle,
-} from 'lucide-react';
+import { AlertTriangle, UserPlus, Users } from "lucide-react";
 
 // Role definitions
 export type UserRole =
-  | 'master_admin'
   | 'admin'
-  | 'user'
   | 'inspektorat'
   | 'perwadag';
 
@@ -39,14 +17,7 @@ export interface SidebarItem {
 }
 
 
-export const hrisMenuItems: SidebarItem[] = [
-  // Dashboard - Accessible to all authenticated users
-  {
-    title: 'Dashboard',
-    href: '/dashboard',
-    icon: Kanban,
-    allowedRoles: ['master_admin', 'admin', 'user', 'inspektorat', 'perwadag'],
-  },
+export const menuItems: SidebarItem[] = [
 
   // Risk Assessment - Only admin and inspektorat
   {
@@ -56,276 +27,34 @@ export const hrisMenuItems: SidebarItem[] = [
     allowedRoles: ['admin', 'inspektorat'],
   },
 
-  // Activities & Events - All users can view, certain roles can create
-  {
-    title: 'Activities',
-    icon: Activity,
-    isPlaceholder: true,
-    allowedRoles: ['master_admin', 'admin', 'user'],
-    children: [
-      {
-        title: 'All Activities',
-        href: '/activities',
-        icon: Activity,
-        allowedRoles: ['master_admin', 'admin', 'user'],
-      },
-      {
-        title: 'Create Activity',
-        href: '/activities/create',
-        icon: Plus,
-        allowedRoles: ['master_admin', 'admin', 'user'],
-      },
-    ],
-  },
-
-  // Time & Attendance - Role-based access
-  {
-    title: 'Attendance',
-    icon: Clock,
-    isPlaceholder: true,
-    allowedRoles: ['master_admin', 'admin', 'user'],
-    children: [
-      {
-        title: 'Check In/Out',
-        href: '/attendance/checkin',
-        icon: ClockIcon,
-        allowedRoles: ['user'], // Only regular users can check in/out
-      },
-      {
-        title: 'My Attendance',
-        href: '/attendance',
-        icon: Calendar,
-        allowedRoles: ['user'], // Only regular users have personal attendance
-      },
-      {
-        title: 'Monthly Summary',
-        href: '/attendance/summary',
-        icon: BarChart3,
-        allowedRoles: ['user'], // Only regular users have personal summary
-      },
-      {
-        title: 'Attendance Monitoring',
-        href: '/attendance/monitoring',
-        icon: Building2,
-        allowedRoles: ['master_admin', 'admin'],
-      },
-    ],
-  },
-
-  // Work Planning - All users can create plans, supervisors+ can approve
-  {
-    title: 'Work Planning',
-    icon: Target,
-    isPlaceholder: true,
-    allowedRoles: ['master_admin', 'admin', 'user'],
-    children: [
-      {
-        title: 'Create Plan',
-        href: '/work-plans/create',
-        icon: Plus,
-        allowedRoles: ['user'],
-      },
-      {
-        title: 'My Work Plans',
-        href: '/work-plans',
-        icon: Briefcase,
-        allowedRoles: ['user'],
-      },
-      {
-        title: 'Plan Summary',
-        href: '/work-plans/summary',
-        icon: TrendingUp,
-        allowedRoles: ['user'],
-      },
-      {
-        title: 'Monitoring',
-        href: '/work-plans/monitoring',
-        icon: BarChart3,
-        allowedRoles: ['master_admin', 'admin'],
-      },
-    ],
-  },
-
-  // Logbook - Users can create/view their own, admin/master admin can monitor
-  {
-    title: 'Daily Logbook',
-    icon: BookOpen,
-    isPlaceholder: true,
-    allowedRoles: ['master_admin', 'admin', 'user'],
-    children: [
-      {
-        title: 'Create Entry',
-        href: '/logbook/create',
-        icon: Plus,
-        allowedRoles: ['user'],
-      },
-      {
-        title: 'My Logbook',
-        href: '/logbook',
-        icon: BookOpen,
-        allowedRoles: ['user'],
-      },
-      {
-        title: 'Summary & Analytics',
-        href: '/logbook/summary',
-        icon: BarChart3,
-        allowedRoles: ['user'],
-      },
-      {
-        title: 'Monitoring',
-        href: '/logbook/monitoring',
-        icon: BarChart3,
-        allowedRoles: ['master_admin', 'admin'],
-      },
-    ],
-  },
-
-  // Payroll
-  {
-    title: 'Payroll',
-    icon: DollarSign,
-    isPlaceholder: true,
-    allowedRoles: ['master_admin', 'user'],
-    children: [
-      {
-        title: 'My Payroll',
-        href: '/payroll/my-payroll',
-        icon: Receipt,
-        allowedRoles: ['user'],
-      },
-      {
-        title: 'Create Payroll',
-        href: '/payroll/create',
-        icon: Plus,
-        allowedRoles: ['master_admin'],
-      },
-      {
-        title: 'Payroll Monitoring',
-        href: '/payroll/monitoring',
-        icon: BarChart3,
-        allowedRoles: ['master_admin'],
-      },
-    ],
-  },
-
-  // Leave Management - All users can request, supervisors+ can approve
-  {
-    title: 'Leave Requests',
-    icon: PlaneTakeoff,
-    isPlaceholder: true,
-    allowedRoles: ['master_admin', 'admin', 'user'],
-    children: [
-      {
-        title: 'Create Request',
-        href: '/leave-requests/create',
-        icon: Plus,
-        allowedRoles: ['user'],
-      },
-      {
-        title: 'My Requests',
-        href: '/leave-requests',
-        icon: ClipboardList,
-        allowedRoles: ['user'],
-      },
-      {
-        title: 'Leave Request Monitoring',
-        href: '/leave-requests/monitoring',
-        icon: BarChart3,
-        allowedRoles: ['admin', 'master_admin'],
-      }
-    ],
-  },
-
-  // Organization Management - Admin and above
-  {
-    title: 'Organization',
-    icon: Building2,
-    isPlaceholder: true,
-    allowedRoles: ['master_admin', 'admin',],
-    children: [
-      {
-        title: 'Organization Units',
-        href: '/organization-units',
-        icon: Building2,
-        allowedRoles: ['admin', 'master_admin'],
-      },
-      {
-        title: 'Create Unit',
-        href: '/organization-units/create',
-        icon: Plus,
-        allowedRoles: ['master_admin'],
-      },
-    ],
-  },
-
   // User Management - Admin and Master Admin
   {
     title: 'User Management',
     icon: Users,
     isPlaceholder: true,
-    allowedRoles: ['admin', 'master_admin'],
+    allowedRoles: ['admin'],
     children: [
       {
         title: 'All Users',
         href: '/users',
         icon: Users,
-        allowedRoles: ['admin', 'master_admin'],
+        allowedRoles: ['admin'],
       },
       {
         title: 'Add User',
         href: '/users/create',
         icon: UserPlus,
-        allowedRoles: ['master_admin'],
+        allowedRoles: ['admin'],
       },
     ],
   },
-
-  // Reports & Analytics - Admin and above
-  {
-    title: 'Reports',
-    icon: BarChart3,
-    isPlaceholder: true,
-    allowedRoles: ['master_admin', 'admin',],
-    children: [
-      {
-        title: 'Attendance Reports',
-        href: '/reports/attendance',
-        icon: Clock,
-        allowedRoles: ['master_admin', 'admin',],
-      },
-      {
-        title: 'Leave Reports',
-        href: '/reports/leave',
-        icon: PlaneTakeoff,
-        allowedRoles: ['master_admin', 'admin',],
-      },
-      {
-        title: 'Payroll Reports',
-        href: '/reports/payroll',
-        icon: DollarSign,
-        allowedRoles: ['master_admin'],
-      },
-      {
-        title: 'Workplan Reports',
-        href: '/reports/work-plans',
-        icon: Target,
-        allowedRoles: ['master_admin', 'admin',],
-      },
-      {
-        title: 'Logbook Reports',
-        href: '/reports/logbook',
-        icon: TrendingUp,
-        allowedRoles: ['master_admin', 'admin',],
-      },
-    ],
-  }
 ];
 
 // Helper function to get appropriate menu items based on user roles
 export const getMenuItemsForUser = (userRoles: string[]): SidebarItem[] => {
-  // If user has roles, combine basic items with filtered HRIS items
-  const hrisItems = filterMenuByRoles(hrisMenuItems, userRoles);
-  return [...hrisItems];
+  // If user has roles, combine basic items with filtered items
+  const items = filterMenuByRoles(menuItems, userRoles);
+  return [...items];
 };
 
 // Helper function to filter menu items based on user roles
@@ -367,7 +96,7 @@ export const filterMenuByRoles = (
 export const hasRouteAccess = (
   path: string,
   userRoles: string[],
-  menuItems: SidebarItem[] = hrisMenuItems
+  menuItems: SidebarItem[]
 ): boolean => {
   for (const item of menuItems) {
     // Check direct match
@@ -389,4 +118,4 @@ export const hasRouteAccess = (
 };
 
 // Default export for backward compatibility
-export default hrisMenuItems;
+export default menuItems;

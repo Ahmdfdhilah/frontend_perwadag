@@ -1,5 +1,5 @@
 // apps/vite-react-app/src/components/layouts/DashboardLayout/UserDropdown.tsx
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Button } from '@workspace/ui/components/button';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import {
@@ -7,6 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@workspace/ui/components/dropdown-menu';
 import { Separator } from '@workspace/ui/components/separator';
@@ -16,11 +17,13 @@ import {
   LogOut,
   User,
   Shield,
-  Loader2
+  Loader2,
+  UserCheck,
+  Building2
 } from 'lucide-react';
 import { cn } from '@workspace/ui/lib/utils';
 import { useState } from 'react';
-import { useAuth } from '@/components/Auth/AuthProvider';
+import { useRole } from '@/hooks/useRole';
 
 interface UserDropdownProps {
   collapsed?: boolean;
@@ -28,57 +31,78 @@ interface UserDropdownProps {
 }
 
 export function UserDropdown({ collapsed = false, className }: UserDropdownProps) {
-  const { user, logout, loading } = useAuth();
+  // const { user, logout, loading } = useAuth();
+  const { currentRole, availableRoles, changeRole } = useRole();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const navigate = useNavigate();
+
+  // Dummy user data for prototyping
+  const dummyUser = {
+    first_name: 'John',
+    last_name: 'Doe',
+    email: 'john.doe@example.com',
+    employee_id: 'EMP001',
+    mfa_enabled: true,
+    is_verified: true
+  };
 
   // Get user initials for avatar fallback
   const getUserInitials = () => {
-    if (!user) return 'U';
-    const firstName = user.first_name || '';
-    const lastName = user.last_name || '';
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || user.email.charAt(0).toUpperCase();
+    const firstName = dummyUser.first_name || '';
+    const lastName = dummyUser.last_name || '';
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || dummyUser.email.charAt(0).toUpperCase();
   };
 
   // Get user display name
   const getUserDisplayName = () => {
-    if (!user) return 'User';
-    return `${user.first_name} ${user.last_name || ''}`.trim() || user.email;
+    return `${dummyUser.first_name} ${dummyUser.last_name || ''}`.trim() || dummyUser.email;
   };
 
   // Get user role display
   const getUserRole = () => {
-    if (!user?.roles || user.roles.length === 0) return 'User';
-    // Show the highest priority role (assuming admin > user)
-    const roles = user.roles.map(r => r.name);
-    if (roles.includes('admin')) return 'Admin';
-    if (roles.includes('user')) return 'User';
-    return roles[0] || 'User';
+    return currentRole.label;
   };
 
   const handleLogout = async () => {
     try {
       setIsLoggingOut(true);
-      await logout();
-      navigate('/login', { replace: true });
+      // await logout();
+      // For prototyping, just simulate logout
+      console.log('Logout clicked');
+      // navigate('/login', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
-      // Force navigation even if logout fails
-      navigate('/login', { replace: true });
     } finally {
       setIsLoggingOut(false);
     }
   };
 
-  if (!user) {
-    return (
-      <div className={cn("flex", collapsed ? "justify-center" : "justify-start", className)}>
-        <div className="animate-pulse">
-          <div className="h-8 w-8 bg-muted rounded-full"></div>
-        </div>
-      </div>
-    );
-  }
+  const handleRoleChange = (roleId: string) => {
+    changeRole(roleId);
+  };
+
+  const getRoleIcon = (roleId: string) => {
+    switch (roleId) {
+      case 'admin':
+        return <Shield className="mr-2 h-4 w-4" />;
+      case 'inspektorat':
+        return <UserCheck className="mr-2 h-4 w-4" />;
+      case 'perwadag':
+        return <Building2 className="mr-2 h-4 w-4" />;
+      default:
+        return null;
+    }
+  };
+
+  // Remove loading state for prototyping
+  // if (!user) {
+  //   return (
+  //     <div className={cn("flex", collapsed ? "justify-center" : "justify-start", className)}>
+  //       <div className="animate-pulse">
+  //         <div className="h-8 w-8 bg-muted rounded-full"></div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className={cn("flex", collapsed ? "justify-center" : "justify-start", className)}>
@@ -90,7 +114,7 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
               "p-2 hover:bg-transparent",
               collapsed ? "flex items-center justify-center" : "flex items-center space-x-2 w-full"
             )}
-            disabled={loading || isLoggingOut}
+            disabled={isLoggingOut}
           >
             <div className="relative">
               <Avatar className="h-6 w-6 flex-shrink-0">
@@ -100,7 +124,7 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
                 </AvatarFallback>
               </Avatar>
               {/* MFA indicator */}
-              {user.mfa_enabled && (
+              {dummyUser.mfa_enabled && (
                 <div className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full border border-background flex items-center justify-center">
                   <Shield className="h-2 w-2 text-white" />
                 </div>
@@ -116,10 +140,10 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
                     <span className="text-xs text-muted-foreground truncate">
                       {getUserRole()}
                     </span>
-                    {user.mfa_enabled && (
+                    {dummyUser.mfa_enabled && (
                       <Shield className="h-3 w-3 text-green-500" />
                     )}
-                    {!user.is_verified && (
+                    {!dummyUser.is_verified && (
                       <Badge variant="outline" className="text-xs py-0 px-1">
                         Unverified
                       </Badge>
@@ -136,14 +160,39 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
           <DropdownMenuLabel>
             <div className="flex flex-col space-y-1">
               <span className="font-medium">{getUserDisplayName()}</span>
-              <span className="text-xs text-muted-foreground">{user.email}</span>
-              {user.employee_id && (
-                <span className="text-xs text-muted-foreground">{user.employee_id}</span>
+              <span className="text-xs text-muted-foreground">{dummyUser.email}</span>
+              {dummyUser.employee_id && (
+                <span className="text-xs text-muted-foreground">{dummyUser.employee_id}</span>
               )}
             </div>
           </DropdownMenuLabel>
 
           <Separator />
+
+          <DropdownMenuLabel className="text-xs font-medium text-muted-foreground">
+            Switch Role
+          </DropdownMenuLabel>
+          
+          {availableRoles.map((role) => (
+            <DropdownMenuItem
+              key={role.id}
+              onClick={() => handleRoleChange(role.id)}
+              className={cn(
+                "flex items-center",
+                currentRole.id === role.id && "bg-accent"
+              )}
+            >
+              {getRoleIcon(role.id)}
+              <span>{role.label}</span>
+              {currentRole.id === role.id && (
+                <Badge variant="secondary" className="ml-auto text-xs">
+                  Active
+                </Badge>
+              )}
+            </DropdownMenuItem>
+          ))}
+
+          <DropdownMenuSeparator />
 
           <DropdownMenuItem asChild>
             <Link to="/profile" className="flex items-center">

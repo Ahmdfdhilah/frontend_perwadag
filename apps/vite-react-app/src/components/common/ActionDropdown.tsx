@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit2, MoreHorizontal, Eye, Trash2 } from 'lucide-react';
+import { Edit, Eye, Trash2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,7 +29,7 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-8 w-8 p-0">
-          <Edit2 className="h-4 w-4" />
+          <Edit className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -41,7 +41,7 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
         )}
         {showEdit && (
           <DropdownMenuItem onClick={onEdit}>
-            <Edit2 className="mr-2 h-4 w-4" />
+            <Edit className="mr-2 h-4 w-4" />
             Edit
           </DropdownMenuItem>
         )}

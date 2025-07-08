@@ -76,7 +76,7 @@ const TableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "p-4 text-left align-middle font-medium text-secondary hover:cursor-default",
+      "p-4 text-left align-middle font-medium text-popover hover:cursor-default",
       className
     )}
     {...props}
