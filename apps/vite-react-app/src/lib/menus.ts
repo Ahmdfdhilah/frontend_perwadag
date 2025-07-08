@@ -1,4 +1,4 @@
-import { AlertTriangle, Mail, UserPlus, Users } from "lucide-react";
+import { AlertTriangle, Mail, MailWarningIcon, UserPlus, Users } from "lucide-react";
 
 // Role definitions
 export type UserRole =
@@ -31,6 +31,13 @@ export const menuItems: SidebarItem[] = [
     title: 'Surat Tugas',
     href: '/surat-tugas',
     icon: Mail,
+    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
+  },
+  // Surat Pemberitahuan - Only admin and inspektorat, perwadag
+  {
+    title: 'Surat Pemberitahuan',
+    href: '/surat-pemberitahuan',
+    icon: MailWarningIcon,
     allowedRoles: ['admin', 'inspektorat', 'perwadag'],
   },
 

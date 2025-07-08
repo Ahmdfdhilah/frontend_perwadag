@@ -4,7 +4,6 @@ import Filtering from '@/components/common/Filtering';
 import SearchContainer from '@/components/common/SearchContainer';
 import Pagination from '@/components/common/Pagination';
 import { Card, CardContent } from '@workspace/ui/components/card';
-import { Button } from '@workspace/ui/components/button';
 import {
   Select,
   SelectContent,
@@ -13,21 +12,19 @@ import {
   SelectValue
 } from '@workspace/ui/components/select';
 import { Label } from '@workspace/ui/components/label';
-import { Plus } from 'lucide-react';
 import {
-  SURAT_TUGAS_DATA,
-  YEARS_SURAT_TUGAS,
-  SuratTugas
-} from '@/mocks/suratTugas';
+  SURAT_PEMBERITAHUAN_DATA,
+  YEARS_SURAT_PEMBERITAHUAN,
+  SuratPemberitahuan
+} from '@/mocks/suratPemberitahuan';
 import { PERWADAG_DATA } from '@/mocks/perwadag';
 import { INSPEKTORATS } from '@/mocks/riskAssessment';
 import { PageHeader } from '@/components/common/PageHeader';
-import SuratTugasTable from '@/components/SuratTugas/SuratTugasTable';
-import SuratTugasCards from '@/components/SuratTugas/SuratTugasCards';
-import SuratTugasDialog from '@/components/SuratTugas/SuratTugasDialog';
-import SuratTugasViewDialog from '@/components/SuratTugas/SuratTugasViewDialog';
+import SuratPemberitahuanTable from '@/components/SuratPemberitahuan/SuratPemberitahuanTable';
+import SuratPemberitahuanCards from '@/components/SuratPemberitahuan/SuratPemberitahuanCards';
+import SuratPemberitahuanDialog from '@/components/SuratPemberitahuan/SuratPemberitahuanDialog';
 
-const SuratTugasPage: React.FC = () => {
+const SuratPemberitahuanPage: React.FC = () => {
   const { isAdmin, isInspektorat, isPerwadag } = useRole();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedYear, setSelectedYear] = useState<string>('all');
@@ -36,11 +33,10 @@ const SuratTugasPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<SuratTugas | null>(null);
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
-  const [viewingItem, setViewingItem] = useState<SuratTugas | null>(null);
+  const [selectedItem, setSelectedItem] = useState<SuratPemberitahuan | null>(null);
+  const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
 
-  // Check access - only admin, inspektorat, and perwadag can access this page
+  // Check access - admin, inspektorat, and perwadag can access this page
   if (!isAdmin() && !isInspektorat() && !isPerwadag()) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -72,16 +68,12 @@ const SuratTugasPage: React.FC = () => {
 
   // Filter and sort data
   const filteredData = useMemo(() => {
-    let filtered = [...SURAT_TUGAS_DATA];
+    let filtered = [...SURAT_PEMBERITAHUAN_DATA];
 
     // Filter by search query
     if (searchQuery) {
       filtered = filtered.filter(item =>
-        item.perwadagName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.nomor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.pengendaliMutu.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.pengendaliTeknis.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.ketuaTim.toLowerCase().includes(searchQuery.toLowerCase())
+        item.perwadagName.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -122,31 +114,37 @@ const SuratTugasPage: React.FC = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
-  const handleView = (item: SuratTugas) => {
-    setViewingItem(item);
-    setIsViewDialogOpen(true);
-  };
-
-  const handleEdit = (item: SuratTugas) => {
-    setEditingItem(item);
+  const handleView = (item: SuratPemberitahuan) => {
+    setSelectedItem(item);
+    setDialogMode('view');
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (item: SuratTugas) => {
-    console.log('Delete:', item);
-    // Implement delete logic
-  };
-
-  const handleCreate = () => {
-    setEditingItem(null);
+  const handleEdit = (item: SuratPemberitahuan) => {
+    setSelectedItem(item);
+    setDialogMode('edit');
     setIsDialogOpen(true);
   };
 
-  const handleSave = (data: Partial<SuratTugas>) => {
+  const handleSave = (data: Partial<SuratPemberitahuan>) => {
     console.log('Save:', data);
     // Implement save logic
     setIsDialogOpen(false);
-    setEditingItem(null);
+    setSelectedItem(null);
+  };
+
+  // Check if user can edit this item based on role
+  const canEdit = (item: SuratPemberitahuan) => {
+    if (isAdmin()) return true;
+    if (isInspektorat()) {
+      // For demo, assume inspektorat 1
+      return item.inspektorat === 1;
+    }
+    if (isPerwadag()) {
+      // For demo, assume current user is PWD001
+      return item.perwadagId === 'PWD001';
+    }
+    return false;
   };
 
   const handleItemsPerPageChange = (value: string) => {
@@ -154,21 +152,11 @@ const SuratTugasPage: React.FC = () => {
     setCurrentPage(1);
   };
 
-  const canCreateEdit = isAdmin() || isInspektorat();
-
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Surat Tugas"
-        description="Kelola data surat tugas audit"
-        actions={
-          canCreateEdit && (
-            <Button onClick={handleCreate}>
-              <Plus className="w-4 h-4 mr-2" />
-              Tambah Surat Tugas
-            </Button>
-          )
-        }
+        title="Surat Pemberitahuan"
+        description="Kelola data surat pemberitahuan audit"
       />
 
       <Filtering>
@@ -180,7 +168,7 @@ const SuratTugasPage: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Tahun</SelectItem>
-              {YEARS_SURAT_TUGAS.map(year => (
+              {YEARS_SURAT_PEMBERITAHUAN.map(year => (
                 <SelectItem key={year} value={year.toString()}>
                   {year}
                 </SelectItem>
@@ -236,28 +224,26 @@ const SuratTugasPage: React.FC = () => {
             <SearchContainer
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
-              placeholder="Cari nomor surat, nama perwadag, atau nama petugas..."
+              placeholder="Cari nama perwadag..."
             />
 
             {/* Desktop Table */}
             <div className="hidden md:block">
-              <SuratTugasTable
+              <SuratPemberitahuanTable
                 data={paginatedData}
                 onView={handleView}
-                onEdit={canCreateEdit ? handleEdit : undefined}
-                onDelete={canCreateEdit ? handleDelete : undefined}
-                isPerwadag={isPerwadag()}
+                onEdit={handleEdit}
+                canEdit={canEdit}
               />
             </div>
 
             {/* Mobile Cards */}
             <div className="md:hidden">
-              <SuratTugasCards
+              <SuratPemberitahuanCards
                 data={paginatedData}
                 onView={handleView}
-                onEdit={canCreateEdit ? handleEdit : undefined}
-                onDelete={canCreateEdit ? handleDelete : undefined}
-                isPerwadag={isPerwadag()}
+                onEdit={handleEdit}
+                canEdit={canEdit}
               />
             </div>
 
@@ -276,23 +262,16 @@ const SuratTugasPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Edit/Create Dialog */}
-      <SuratTugasDialog
+      {/* Dialog */}
+      <SuratPemberitahuanDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        editingItem={editingItem}
+        item={selectedItem}
         onSave={handleSave}
-        availablePerwadag={availablePerwadag}
-      />
-
-      {/* View Dialog */}
-      <SuratTugasViewDialog
-        open={isViewDialogOpen}
-        onOpenChange={setIsViewDialogOpen}
-        item={viewingItem}
+        mode={dialogMode}
       />
     </div>
   );
 };
 
-export default SuratTugasPage;
+export default SuratPemberitahuanPage;

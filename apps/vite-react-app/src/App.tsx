@@ -12,6 +12,7 @@ import { DashboardLayout } from './components/layouts/DashboardLayout';
 import RiskAssessmentPage from './pages/RiskAssesment/RiskAssessmentPage';
 import RiskAssessmentInputPage from './pages/RiskAssesment/RiskAssessmentInputPage';
 import SuratTugasPage from './pages/SuratTugasPage';
+import SuratPemberitahuanPage from './pages/SuratPemberitahuanPage';
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
                     <Route path="penilaian-resiko/:id" element={<RiskAssessmentInputPage />} />
                     <Route path="penilaian-resiko/:id/edit" element={<RiskAssessmentInputPage />} />
                     <Route path="surat-tugas" element={<SuratTugasPage />} />
+                    <Route path="surat-pemberitahuan" element={<SuratPemberitahuanPage />} />
                   </Route>
                 </Routes>
               </AuthProvider>
