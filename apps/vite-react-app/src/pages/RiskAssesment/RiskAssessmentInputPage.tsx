@@ -76,7 +76,7 @@ const RiskAssessmentInputPage: React.FC = () => {
   };
 
   const calculateTotalRisk = () => {
-    const totalValue = 
+    const totalValue =
       formData.trendValue +
       formData.budgetValue +
       formData.exportValue +
@@ -85,7 +85,7 @@ const RiskAssessmentInputPage: React.FC = () => {
       formData.exportRankingValue +
       formData.ikValue +
       formData.teiValue;
-    
+
     setFormData(prev => ({
       ...prev,
       totalRiskValue: totalValue
@@ -124,23 +124,21 @@ const RiskAssessmentInputPage: React.FC = () => {
       <PageHeader
         title={`Input Penilaian Risiko - ${basicAssessment.perwadagName}`}
         description={`Tahun ${basicAssessment.year} | Role: ${currentRole.label}`}
+        actions={
+          <Button
+            variant="outline"
+            onClick={() => navigate('/penilaian-resiko')}
+            className="mb-4"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Kembali ke Daftar
+          </Button>
+        }
       />
 
-      {/* Back Button */}
-      <div>
-        <Button
-          variant="outline"
-          onClick={() => navigate('/penilaian-resiko')}
-          className="mb-4"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Kembali ke Daftar
-        </Button>
-      </div>
-
       {/* Form Sections */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
+      <div className="grid grid-cols-1  gap-6">
+
         {/* Section 1: Tren Capaian */}
         <Card>
           <CardHeader>
@@ -374,8 +372,8 @@ const RiskAssessmentInputPage: React.FC = () => {
       </div>
 
       {/* Continue with more sections in next part */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
+      <div className="grid grid-cols-1  gap-6">
+
         {/* Section 5: Perjanjian Perdagangan */}
         <Card>
           <CardHeader>

@@ -9,8 +9,9 @@ import { store, persistor } from './redux/store';
 import { Toaster } from "@workspace/ui/components/sonner";
 import { AuthProvider } from './components/Auth/AuthProvider';
 import { DashboardLayout } from './components/layouts/DashboardLayout';
-import RiskAssessmentPage from './pages/RiskAssessmentPage';
-import RiskAssessmentInputPage from './pages/RiskAssessmentInputPage';
+import RiskAssessmentPage from './pages/RiskAssesment/RiskAssessmentPage';
+import RiskAssessmentInputPage from './pages/RiskAssesment/RiskAssessmentInputPage';
+import SuratTugasPage from './pages/SuratTugasPage';
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
                     <Route path="penilaian-resiko" element={<RiskAssessmentPage />} />
                     <Route path="penilaian-resiko/:id" element={<RiskAssessmentInputPage />} />
                     <Route path="penilaian-resiko/:id/edit" element={<RiskAssessmentInputPage />} />
+                    <Route path="surat-tugas" element={<SuratTugasPage />} />
                   </Route>
                 </Routes>
               </AuthProvider>
