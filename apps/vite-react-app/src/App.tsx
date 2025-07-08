@@ -15,6 +15,7 @@ import SuratTugasPage from './pages/SuratTugasPage';
 import SuratPemberitahuanPage from './pages/SuratPemberitahuanPage';
 import EntryMeetingPage from './pages/EntryMeetingPage';
 import ExitMeetingPage from './pages/ExitMeetingPage';
+import LaporanHasilEvaluasiPage from './pages/LaporanHasilEvaluasiPage';
 
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
                     <Route path="surat-pemberitahuan" element={<SuratPemberitahuanPage />} />
                     <Route path="entry-meeting" element={<EntryMeetingPage />} />
                     <Route path="exit-meeting" element={<ExitMeetingPage />} />
+                    <Route path="laporan-hasil" element={<LaporanHasilEvaluasiPage />} />
                   </Route>
                 </Routes>
               </AuthProvider>

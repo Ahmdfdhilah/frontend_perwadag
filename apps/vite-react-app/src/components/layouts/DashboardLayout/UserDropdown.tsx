@@ -140,14 +140,6 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
                     <span className="text-xs text-muted-foreground truncate">
                       {getUserRole()}
                     </span>
-                    {dummyUser.mfa_enabled && (
-                      <Shield className="h-3 w-3 text-green-500" />
-                    )}
-                    {!dummyUser.is_verified && (
-                      <Badge variant="outline" className="text-xs py-0 px-1">
-                        Unverified
-                      </Badge>
-                    )}
                   </div>
                 </div>
                 <ChevronDown className="h-4 w-4 flex-shrink-0" />
@@ -172,7 +164,7 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
           <DropdownMenuLabel className="text-xs font-medium text-muted-foreground">
             Switch Role
           </DropdownMenuLabel>
-          
+
           {availableRoles.map((role) => (
             <DropdownMenuItem
               key={role.id}
