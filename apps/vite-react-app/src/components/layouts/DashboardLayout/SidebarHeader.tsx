@@ -16,9 +16,9 @@ export function SidebarHeader({ collapsed, onToggleCollapse }: SidebarHeaderProp
       <div className={cn("flex h-16 items-center flex-shrink-0 border-b border-sidebar-border", collapsed ? "px-3 justify-center" : "px-6 justify-between")}>
         <Link to="/admin" className={cn("flex items-center", collapsed ? "justify-center" : "space-x-2")}>
           {!collapsed ? (
-            <img src={logo} className='w-20' alt="logo okoce" />
+            <img src={logo} className='w-10' alt="logo okoce" />
           ) : (
-            <img src={logoMini} className='w-20' alt="logo okoce" />
+            <img src={logoMini} className='w-10' alt="logo okoce" />
           )
           }
         </Link>

@@ -14,9 +14,8 @@ interface SidebarItem {
   badge?: string;
 }
 import { cn } from '@workspace/ui/lib/utils';
-import { useSelector } from 'react-redux';
-import { RootState } from '@/redux/store';
 import { useMemo } from 'react';
+import { useRole } from '@/hooks/useRole';
 
 interface SidebarContentProps {
   collapsed?: boolean;
@@ -35,19 +34,13 @@ export function SidebarContent({
   onMenuClick,
   onLinkClick 
 }: SidebarContentProps) {
-  // Get user roles from Redux store
-  const user = useSelector((state: RootState) => state.auth.user);
+  // Get current role
+  const { currentRole } = useRole();
   
-  // Extract role names from user roles
-  const userRoles = useMemo(() => {
-    if (!user?.roles) return [];
-    return user.roles.map(role => role.name);
-  }, [user?.roles]);
-  
-  // Get appropriate menu items based on user roles
+  // Get appropriate menu items based on current role
   const menuItems = useMemo(() => {
-    return getMenuItemsForUser(userRoles) as SidebarItem[];
-  }, [userRoles]);
+    return getMenuItemsForUser([currentRole.id]) as SidebarItem[];
+  }, [currentRole.id]);
 
   return (
     <div className="flex h-full flex-col">

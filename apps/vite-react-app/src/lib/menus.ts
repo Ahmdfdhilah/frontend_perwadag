@@ -17,13 +17,16 @@ import {
   Target,
   Receipt,
   Kanban,
+  AlertTriangle,
 } from 'lucide-react';
 
 // Role definitions
 export type UserRole =
   | 'master_admin'
   | 'admin'
-  | 'user';
+  | 'user'
+  | 'inspektorat'
+  | 'perwadag';
 
 export interface SidebarItem {
   title: string;
@@ -42,7 +45,15 @@ export const hrisMenuItems: SidebarItem[] = [
     title: 'Dashboard',
     href: '/dashboard',
     icon: Kanban,
-    allowedRoles: ['master_admin', 'admin', 'user'],
+    allowedRoles: ['master_admin', 'admin', 'user', 'inspektorat', 'perwadag'],
+  },
+
+  // Risk Assessment - Only admin and inspektorat
+  {
+    title: 'Penilaian Risiko',
+    href: '/penilaian-resiko',
+    icon: AlertTriangle,
+    allowedRoles: ['admin', 'inspektorat'],
   },
 
   // Activities & Events - All users can view, certain roles can create
