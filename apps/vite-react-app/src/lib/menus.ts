@@ -1,4 +1,4 @@
-import { AlertTriangle, FileInput, Grid2X2, Mail, MailWarningIcon, PhoneIncoming, PhoneOutgoing, UserPlus, Users } from "lucide-react";
+import { AlertTriangle, FileInput, Grid2X2, Mail, MailWarningIcon, PhoneIncoming, PhoneOutgoing, Users } from "lucide-react";
 
 // Role definitions
 export type UserRole =
@@ -81,13 +81,7 @@ export const menuItems: SidebarItem[] = [
         href: '/users',
         icon: Users,
         allowedRoles: ['admin'],
-      },
-      {
-        title: 'Add User',
-        href: '/users/create',
-        icon: UserPlus,
-        allowedRoles: ['admin'],
-      },
+      }
     ],
   },
 ];
