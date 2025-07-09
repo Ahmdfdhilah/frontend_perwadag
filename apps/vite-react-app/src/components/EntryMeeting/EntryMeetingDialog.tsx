@@ -23,7 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@workspace/ui/components/popover';
-import { CalendarIcon, ExternalLink } from 'lucide-react';
+import { CalendarIcon, Upload, Download, File, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
@@ -77,6 +77,25 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
 
   const handleCancel = () => {
     onOpenChange(false);
+  };
+
+  const handleFileUpload = (field: string, file: File) => {
+    const fileUrl = URL.createObjectURL(file);
+    const fileName = file.name;
+    setFormData({ 
+      ...formData, 
+      [field]: fileName,
+      [`${field}Url`]: fileUrl
+    });
+  };
+
+  const handleDownloadFile = (fileName: string, fileUrl: string) => {
+    if (fileUrl) {
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = fileName;
+      link.click();
+    }
   };
 
   const handleOpenLink = (url: string) => {
@@ -213,49 +232,105 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
             <div className="space-y-2">
               <Label htmlFor="daftarHadir">Daftar Hadir</Label>
               <div className="flex gap-2">
-                <Input
-                  id="daftarHadir"
-                  value={formData.daftarHadir || ''}
-                  onChange={(e) => setFormData({ ...formData, daftarHadir: e.target.value })}
-                  disabled={!canEditInspektoratFields}
-                  className={!canEditInspektoratFields ? "bg-muted" : ""}
-                  placeholder="https://drive.google.com/file/..."
-                />
-                {formData.daftarHadir && mode === 'view' && (
+                {canEditInspektoratFields ? (
+                  <>
+                    <input
+                      type="file"
+                      id="daftarHadir"
+                      accept=".pdf,.doc,.docx,.xls,.xlsx"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleFileUpload('daftarHadir', file);
+                        }
+                      }}
+                      className="hidden"
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={() => document.getElementById('daftarHadir')?.click()}
+                      className="flex-1"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      {formData.daftarHadir ? 'Ubah File' : 'Upload File'}
+                    </Button>
+                  </>
+                ) : (
+                  <Input
+                    value={formData.daftarHadir || 'Tidak ada file'}
+                    disabled
+                    className="bg-muted flex-1"
+                  />
+                )}
+                {formData.daftarHadir && (
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => handleOpenLink(formData.daftarHadir!)}
-                    title="Buka Daftar Hadir"
+                    onClick={() => handleDownloadFile(formData.daftarHadir!, formData.daftarHadirUrl!)}
+                    title="Download Daftar Hadir"
                   >
-                    <ExternalLink className="h-4 w-4" />
+                    <Download className="h-4 w-4" />
                   </Button>
                 )}
               </div>
+              {formData.daftarHadir && (
+                <div className="text-sm text-muted-foreground flex items-center gap-1">
+                  <File className="w-3 h-3" />
+                  File: {formData.daftarHadir}
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="buktiHadir">Bukti Hadir</Label>
               <div className="flex gap-2">
-                <Input
-                  id="buktiHadir"
-                  value={formData.buktiHadir || ''}
-                  onChange={(e) => setFormData({ ...formData, buktiHadir: e.target.value })}
-                  disabled={!canEditInspektoratFields}
-                  className={!canEditInspektoratFields ? "bg-muted" : ""}
-                  placeholder="https://drive.google.com/file/..."
-                />
-                {formData.buktiHadir && mode === 'view' && (
+                {canEditInspektoratFields ? (
+                  <>
+                    <input
+                      type="file"
+                      id="buktiHadir"
+                      accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleFileUpload('buktiHadir', file);
+                        }
+                      }}
+                      className="hidden"
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={() => document.getElementById('buktiHadir')?.click()}
+                      className="flex-1"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      {formData.buktiHadir ? 'Ubah File' : 'Upload File'}
+                    </Button>
+                  </>
+                ) : (
+                  <Input
+                    value={formData.buktiHadir || 'Tidak ada file'}
+                    disabled
+                    className="bg-muted flex-1"
+                  />
+                )}
+                {formData.buktiHadir && (
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => handleOpenLink(formData.buktiHadir!)}
-                    title="Buka Bukti Hadir"
+                    onClick={() => handleDownloadFile(formData.buktiHadir!, formData.buktiHadirUrl!)}
+                    title="Download Bukti Hadir"
                   >
-                    <ExternalLink className="h-4 w-4" />
+                    <Download className="h-4 w-4" />
                   </Button>
                 )}
               </div>
+              {formData.buktiHadir && (
+                <div className="text-sm text-muted-foreground flex items-center gap-1">
+                  <File className="w-3 h-3" />
+                  File: {formData.buktiHadir}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -275,18 +350,18 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
               {mode === 'view' && formData.daftarHadir && (
                 <Button
                   variant="outline"
-                  onClick={() => handleOpenLink(formData.daftarHadir!)}
+                  onClick={() => handleDownloadFile(formData.daftarHadir!, formData.daftarHadirUrl!)}
                 >
-                  <ExternalLink className="w-4 h-4 mr-2" />
+                  <Download className="w-4 h-4 mr-2" />
                   Daftar Hadir
                 </Button>
               )}
               {mode === 'view' && formData.buktiHadir && (
                 <Button
                   variant="outline"
-                  onClick={() => handleOpenLink(formData.buktiHadir!)}
+                  onClick={() => handleDownloadFile(formData.buktiHadir!, formData.buktiHadirUrl!)}
                 >
-                  <ExternalLink className="w-4 h-4 mr-2" />
+                  <Download className="w-4 h-4 mr-2" />
                   Bukti Hadir
                 </Button>
               )}

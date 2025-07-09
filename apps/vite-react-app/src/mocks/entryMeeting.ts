@@ -6,7 +6,9 @@ export interface EntryMeeting {
   rincian: string;
   linkZoom?: string;
   daftarHadir?: string;
+  daftarHadirUrl?: string;
   buktiHadir?: string;
+  buktiHadirUrl?: string;
   year: number;
   inspektorat: number;
 }
@@ -19,8 +21,10 @@ export const ENTRY_MEETING_DATA: EntryMeeting[] = [
     perwadagName: "Atdag Moscow – Rusia",
     rincian: "Entry Meeting Audit Kinerja 2024",
     linkZoom: "https://zoom.us/j/123456789",
-    daftarHadir: "https://drive.google.com/file/d/1abcd-daftar-hadir/view",
-    buktiHadir: "https://drive.google.com/file/d/1efgh-bukti-hadir/view",
+    daftarHadir: "daftar-hadir-atdag-moscow-2024.pdf",
+    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-atdag-moscow-2024.pdf",
+    buktiHadir: "bukti-hadir-atdag-moscow-2024.jpg",
+    buktiHadirUrl: "blob:http://localhost:3000/bukti-hadir-atdag-moscow-2024.jpg",
     year: 2024,
     inspektorat: 1
   },
@@ -31,8 +35,10 @@ export const ENTRY_MEETING_DATA: EntryMeeting[] = [
     perwadagName: "ITPC Vancouver – Canada",
     rincian: "Entry Meeting Audit Kinerja 2024",
     linkZoom: "https://zoom.us/j/987654321",
-    daftarHadir: "https://drive.google.com/file/d/2abcd-daftar-hadir/view",
-    buktiHadir: "https://drive.google.com/file/d/2efgh-bukti-hadir/view",
+    daftarHadir: "daftar-hadir-itpc-vancouver-2024.pdf",
+    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-itpc-vancouver-2024.pdf",
+    buktiHadir: "bukti-hadir-itpc-vancouver-2024.jpg",
+    buktiHadirUrl: "blob:http://localhost:3000/bukti-hadir-itpc-vancouver-2024.jpg",
     year: 2024,
     inspektorat: 1
   },
@@ -43,8 +49,10 @@ export const ENTRY_MEETING_DATA: EntryMeeting[] = [
     perwadagName: "Atdag Beijing – Tiongkok",
     rincian: "Entry Meeting Audit Kinerja 2024",
     linkZoom: "https://zoom.us/j/456789123",
-    daftarHadir: "https://drive.google.com/file/d/3abcd-daftar-hadir/view",
-    buktiHadir: "https://drive.google.com/file/d/3efgh-bukti-hadir/view",
+    daftarHadir: "daftar-hadir-atdag-beijing-2024.pdf",
+    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-atdag-beijing-2024.pdf",
+    buktiHadir: "bukti-hadir-atdag-beijing-2024.jpg",
+    buktiHadirUrl: "blob:http://localhost:3000/bukti-hadir-atdag-beijing-2024.jpg",
     year: 2024,
     inspektorat: 2
   },
@@ -55,8 +63,10 @@ export const ENTRY_MEETING_DATA: EntryMeeting[] = [
     perwadagName: "ITPC Osaka – Jepang",
     rincian: "Entry Meeting Audit Kinerja 2024",
     linkZoom: "https://zoom.us/j/789123456",
-    daftarHadir: "https://drive.google.com/file/d/4abcd-daftar-hadir/view",
-    buktiHadir: "https://drive.google.com/file/d/4efgh-bukti-hadir/view",
+    daftarHadir: "daftar-hadir-itpc-osaka-2024.pdf",
+    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-itpc-osaka-2024.pdf",
+    buktiHadir: "bukti-hadir-itpc-osaka-2024.jpg",
+    buktiHadirUrl: "blob:http://localhost:3000/bukti-hadir-itpc-osaka-2024.jpg",
     year: 2024,
     inspektorat: 2
   },
@@ -67,8 +77,10 @@ export const ENTRY_MEETING_DATA: EntryMeeting[] = [
     perwadagName: "Atdag New Delhi – India",
     rincian: "Entry Meeting Audit Kinerja 2024",
     linkZoom: "https://zoom.us/j/321654987",
-    daftarHadir: "https://drive.google.com/file/d/5abcd-daftar-hadir/view",
-    buktiHadir: "https://drive.google.com/file/d/5efgh-bukti-hadir/view",
+    daftarHadir: "daftar-hadir-atdag-newdelhi-2024.pdf",
+    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-atdag-newdelhi-2024.pdf",
+    buktiHadir: "bukti-hadir-atdag-newdelhi-2024.jpg",
+    buktiHadirUrl: "blob:http://localhost:3000/bukti-hadir-atdag-newdelhi-2024.jpg",
     year: 2024,
     inspektorat: 3
   },
@@ -79,8 +91,10 @@ export const ENTRY_MEETING_DATA: EntryMeeting[] = [
     perwadagName: "ITPC Mumbai – India",
     rincian: "Entry Meeting Audit Kinerja 2024",
     linkZoom: "https://zoom.us/j/654987321",
-    daftarHadir: "https://drive.google.com/file/d/6abcd-daftar-hadir/view",
-    buktiHadir: "https://drive.google.com/file/d/6efgh-bukti-hadir/view",
+    daftarHadir: "daftar-hadir-itpc-mumbai-2024.pdf",
+    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-itpc-mumbai-2024.pdf",
+    buktiHadir: "bukti-hadir-itpc-mumbai-2024.jpg",
+    buktiHadirUrl: "blob:http://localhost:3000/bukti-hadir-itpc-mumbai-2024.jpg",
     year: 2024,
     inspektorat: 3
   },
@@ -91,8 +105,10 @@ export const ENTRY_MEETING_DATA: EntryMeeting[] = [
     perwadagName: "Atdag Hamburg – Jerman",
     rincian: "Entry Meeting Audit Kinerja 2024",
     linkZoom: "https://zoom.us/j/147258369",
-    daftarHadir: "https://drive.google.com/file/d/7abcd-daftar-hadir/view",
-    buktiHadir: "https://drive.google.com/file/d/7efgh-bukti-hadir/view",
+    daftarHadir: "daftar-hadir-atdag-hamburg-2024.pdf",
+    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-atdag-hamburg-2024.pdf",
+    buktiHadir: "bukti-hadir-atdag-hamburg-2024.jpg",
+    buktiHadirUrl: "blob:http://localhost:3000/bukti-hadir-atdag-hamburg-2024.jpg",
     year: 2024,
     inspektorat: 4
   },
@@ -103,8 +119,10 @@ export const ENTRY_MEETING_DATA: EntryMeeting[] = [
     perwadagName: "ITPC Duesseldorf – Jerman",
     rincian: "Entry Meeting Audit Kinerja 2024",
     linkZoom: "https://zoom.us/j/369258147",
-    daftarHadir: "https://drive.google.com/file/d/8abcd-daftar-hadir/view",
-    buktiHadir: "https://drive.google.com/file/d/8efgh-bukti-hadir/view",
+    daftarHadir: "daftar-hadir-itpc-duesseldorf-2024.pdf",
+    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-itpc-duesseldorf-2024.pdf",
+    buktiHadir: "bukti-hadir-itpc-duesseldorf-2024.jpg",
+    buktiHadirUrl: "blob:http://localhost:3000/bukti-hadir-itpc-duesseldorf-2024.jpg",
     year: 2024,
     inspektorat: 4
   },
@@ -115,8 +133,10 @@ export const ENTRY_MEETING_DATA: EntryMeeting[] = [
     perwadagName: "Konsuldag Los Angeles – Amerika Serikat",
     rincian: "Entry Meeting Audit Kinerja 2023",
     linkZoom: "https://zoom.us/j/159357486",
-    daftarHadir: "https://drive.google.com/file/d/9abcd-daftar-hadir/view",
-    buktiHadir: "https://drive.google.com/file/d/9efgh-bukti-hadir/view",
+    daftarHadir: "daftar-hadir-konsuldag-losangeles-2023.pdf",
+    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-konsuldag-losangeles-2023.pdf",
+    buktiHadir: "bukti-hadir-konsuldag-losangeles-2023.jpg",
+    buktiHadirUrl: "blob:http://localhost:3000/bukti-hadir-konsuldag-losangeles-2023.jpg",
     year: 2023,
     inspektorat: 1
   },
@@ -127,8 +147,10 @@ export const ENTRY_MEETING_DATA: EntryMeeting[] = [
     perwadagName: "KDEI New York – Amerika Serikat",
     rincian: "Entry Meeting Audit Kinerja 2023",
     linkZoom: "https://zoom.us/j/486357159",
-    daftarHadir: "https://drive.google.com/file/d/10abcd-daftar-hadir/view",
-    buktiHadir: "https://drive.google.com/file/d/10efgh-bukti-hadir/view",
+    daftarHadir: "daftar-hadir-kdei-newyork-2023.pdf",
+    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-kdei-newyork-2023.pdf",
+    buktiHadir: "bukti-hadir-kdei-newyork-2023.jpg",
+    buktiHadirUrl: "blob:http://localhost:3000/bukti-hadir-kdei-newyork-2023.jpg",
     year: 2023,
     inspektorat: 1
   },
@@ -139,8 +161,10 @@ export const ENTRY_MEETING_DATA: EntryMeeting[] = [
     perwadagName: "Konsuldag Busan – Korea Selatan",
     rincian: "Entry Meeting Audit Kinerja 2023",
     linkZoom: "https://zoom.us/j/753951864",
-    daftarHadir: "https://drive.google.com/file/d/11abcd-daftar-hadir/view",
-    buktiHadir: "https://drive.google.com/file/d/11efgh-bukti-hadir/view",
+    daftarHadir: "daftar-hadir-konsuldag-busan-2023.pdf",
+    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-konsuldag-busan-2023.pdf",
+    buktiHadir: "bukti-hadir-konsuldag-busan-2023.jpg",
+    buktiHadirUrl: "blob:http://localhost:3000/bukti-hadir-konsuldag-busan-2023.jpg",
     year: 2023,
     inspektorat: 2
   },
@@ -151,8 +175,10 @@ export const ENTRY_MEETING_DATA: EntryMeeting[] = [
     perwadagName: "KDEI Seoul – Korea Selatan",
     rincian: "Entry Meeting Audit Kinerja 2023",
     linkZoom: "https://zoom.us/j/864951753",
-    daftarHadir: "https://drive.google.com/file/d/12abcd-daftar-hadir/view",
-    buktiHadir: "https://drive.google.com/file/d/12efgh-bukti-hadir/view",
+    daftarHadir: "daftar-hadir-kdei-seoul-2023.pdf",
+    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-kdei-seoul-2023.pdf",
+    buktiHadir: "bukti-hadir-kdei-seoul-2023.jpg",
+    buktiHadirUrl: "blob:http://localhost:3000/bukti-hadir-kdei-seoul-2023.jpg",
     year: 2023,
     inspektorat: 2
   },
@@ -163,8 +189,10 @@ export const ENTRY_MEETING_DATA: EntryMeeting[] = [
     perwadagName: "Konsuldag Karachi – Pakistan",
     rincian: "Entry Meeting Audit Kinerja 2022",
     linkZoom: "https://zoom.us/j/258147369",
-    daftarHadir: "https://drive.google.com/file/d/13abcd-daftar-hadir/view",
-    buktiHadir: "https://drive.google.com/file/d/13efgh-bukti-hadir/view",
+    daftarHadir: "daftar-hadir-konsuldag-karachi-2022.pdf",
+    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-konsuldag-karachi-2022.pdf",
+    buktiHadir: "bukti-hadir-konsuldag-karachi-2022.jpg",
+    buktiHadirUrl: "blob:http://localhost:3000/bukti-hadir-konsuldag-karachi-2022.jpg",
     year: 2022,
     inspektorat: 3
   },
@@ -175,8 +203,10 @@ export const ENTRY_MEETING_DATA: EntryMeeting[] = [
     perwadagName: "KDEI Islamabad – Pakistan",
     rincian: "Entry Meeting Audit Kinerja 2022",
     linkZoom: "https://zoom.us/j/369147258",
-    daftarHadir: "https://drive.google.com/file/d/14abcd-daftar-hadir/view",
-    buktiHadir: "https://drive.google.com/file/d/14efgh-bukti-hadir/view",
+    daftarHadir: "daftar-hadir-kdei-islamabad-2022.pdf",
+    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-kdei-islamabad-2022.pdf",
+    buktiHadir: "bukti-hadir-kdei-islamabad-2022.jpg",
+    buktiHadirUrl: "blob:http://localhost:3000/bukti-hadir-kdei-islamabad-2022.jpg",
     year: 2022,
     inspektorat: 3
   },
@@ -187,8 +217,10 @@ export const ENTRY_MEETING_DATA: EntryMeeting[] = [
     perwadagName: "Konsuldag Milan – Italia",
     rincian: "Entry Meeting Audit Kinerja 2022",
     linkZoom: "https://zoom.us/j/741852963",
-    daftarHadir: "https://drive.google.com/file/d/15abcd-daftar-hadir/view",
-    buktiHadir: "https://drive.google.com/file/d/15efgh-bukti-hadir/view",
+    daftarHadir: "daftar-hadir-konsuldag-milan-2022.pdf",
+    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-konsuldag-milan-2022.pdf",
+    buktiHadir: "bukti-hadir-konsuldag-milan-2022.jpg",
+    buktiHadirUrl: "blob:http://localhost:3000/bukti-hadir-konsuldag-milan-2022.jpg",
     year: 2022,
     inspektorat: 4
   }

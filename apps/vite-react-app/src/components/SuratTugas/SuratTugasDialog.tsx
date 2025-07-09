@@ -22,7 +22,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@workspace/ui/components/popover';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Upload, Download, File } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { SuratTugas } from '@/mocks/suratTugas';
@@ -50,7 +50,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
     pengendaliMutu: '',
     pengendaliTeknis: '',
     ketuaTim: '',
-    linkDrive: '',
+    fileName: '',
+    fileUrl: '',
   });
 
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -64,7 +65,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
         pengendaliMutu: editingItem.pengendaliMutu,
         pengendaliTeknis: editingItem.pengendaliTeknis,
         ketuaTim: editingItem.ketuaTim,
-        linkDrive: editingItem.linkDrive,
+        fileName: editingItem.fileName || '',
+        fileUrl: editingItem.fileUrl || '',
       });
     } else {
       setFormData({
@@ -74,7 +76,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
         pengendaliMutu: '',
         pengendaliTeknis: '',
         ketuaTim: '',
-        linkDrive: '',
+        fileName: '',
+        fileUrl: '',
       });
     }
   }, [editingItem, open]);
@@ -103,6 +106,25 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
 
   const handleCancel = () => {
     onOpenChange(false);
+  };
+
+  const handleFileUpload = (file: File) => {
+    const fileUrl = URL.createObjectURL(file);
+    const fileName = file.name;
+    setFormData({
+      ...formData,
+      fileName,
+      fileUrl,
+    });
+  };
+
+  const handleDownloadFile = () => {
+    if (formData.fileUrl && formData.fileName) {
+      const link = document.createElement('a');
+      link.href = formData.fileUrl;
+      link.download = formData.fileName;
+      link.click();
+    }
   };
 
   const isFormValid = formData.nomor && formData.perwadagId && formData.tanggal &&
@@ -211,20 +233,50 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
             <div className="space-y-2">
               <Label>Informasi Upload Surat Tugas</Label>
               <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
-                Silakan upload surat tugas ke Google Drive dan copy link share-nya di bawah ini.
-                Pastikan link dapat diakses oleh tim audit.
+                Silakan upload file surat tugas. File yang didukung: PDF, DOC, DOCX.
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="linkDrive">Link Drive Surat Tugas</Label>
-              <Input
-                id="linkDrive"
-                value={formData.linkDrive}
-                onChange={(e) => setFormData(prev => ({ ...prev, linkDrive: e.target.value }))}
-                placeholder="https://drive.google.com/file/d/..."
-                type="url"
-              />
+              <Label htmlFor="fileUpload">File Surat Tugas</Label>
+              <div className="flex gap-2">
+                <input
+                  type="file"
+                  id="fileUpload"
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      handleFileUpload(file);
+                    }
+                  }}
+                  className="hidden"
+                />
+                <Button
+                  variant="outline"
+                  onClick={() => document.getElementById('fileUpload')?.click()}
+                  className="flex-1"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  {formData.fileName ? 'Ubah File' : 'Upload File'}
+                </Button>
+                {formData.fileName && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={handleDownloadFile}
+                    title="Download File"
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              {formData.fileName && (
+                <div className="text-sm text-muted-foreground flex items-center gap-1">
+                  <File className="w-3 h-3" />
+                  File: {formData.fileName}
+                </div>
+              )}
             </div>
           </div>
         </div>

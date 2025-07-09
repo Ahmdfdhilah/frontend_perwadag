@@ -7,7 +7,8 @@ export interface SuratTugas {
   pengendaliMutu: string;
   pengendaliTeknis: string;
   ketuaTim: string;
-  linkDrive: string;
+  fileName: string;
+  fileUrl: string;
   year: number;
   inspektorat: number;
 }
@@ -22,7 +23,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
     pengendaliMutu: 'Dr. Ahmad Sutanto',
     pengendaliTeknis: 'Ir. Budi Setiawan',
     ketuaTim: 'Drs. Chandra Kusuma',
-    linkDrive: 'https://drive.google.com/file/d/1example1',
+    fileName: 'surat-tugas-atdag-moscow-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-tugas-atdag-moscow-2024.pdf',
     year: 2024,
     inspektorat: 1
   },
@@ -35,7 +37,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
     pengendaliMutu: 'Dr. Dewi Sartika',
     pengendaliTeknis: 'Ir. Eko Prasetyo',
     ketuaTim: 'Drs. Fajar Hidayat',
-    linkDrive: 'https://drive.google.com/file/d/1example2',
+    fileName: 'surat-tugas-atdag-washington-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-tugas-atdag-washington-2024.pdf',
     year: 2024,
     inspektorat: 1
   },
@@ -48,7 +51,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
     pengendaliMutu: 'Dr. Gita Maharani',
     pengendaliTeknis: 'Ir. Hadi Wijaya',
     ketuaTim: 'Drs. Indra Gunawan',
-    linkDrive: 'https://drive.google.com/file/d/1example3',
+    fileName: 'surat-tugas-itpc-vancouver-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-tugas-itpc-vancouver-2024.pdf',
     year: 2024,
     inspektorat: 1
   },
@@ -61,7 +65,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
     pengendaliMutu: 'Dr. Joko Santoso',
     pengendaliTeknis: 'Ir. Kartika Sari',
     ketuaTim: 'Drs. Lukman Hakim',
-    linkDrive: 'https://drive.google.com/file/d/1example4',
+    fileName: 'surat-tugas-atdag-paris-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-tugas-atdag-paris-2024.pdf',
     year: 2024,
     inspektorat: 2
   },
@@ -74,7 +79,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
     pengendaliMutu: 'Dr. Maya Sari',
     pengendaliTeknis: 'Ir. Nur Rahman',
     ketuaTim: 'Drs. Omar Bakri',
-    linkDrive: 'https://drive.google.com/file/d/1example5',
+    fileName: 'surat-tugas-itpc-lagos-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-tugas-itpc-lagos-2024.pdf',
     year: 2024,
     inspektorat: 2
   },
@@ -87,7 +93,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
     pengendaliMutu: 'Dr. Putri Andini',
     pengendaliTeknis: 'Ir. Qomar Zaman',
     ketuaTim: 'Drs. Rudi Hartono',
-    linkDrive: 'https://drive.google.com/file/d/1example6',
+    fileName: 'surat-tugas-itpc-saopaulo-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-tugas-itpc-saopaulo-2024.pdf',
     year: 2024,
     inspektorat: 3
   },
@@ -100,7 +107,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
     pengendaliMutu: 'Dr. Sari Melati',
     pengendaliTeknis: 'Ir. Taufik Hidayat',
     ketuaTim: 'Drs. Usman Ali',
-    linkDrive: 'https://drive.google.com/file/d/1example7',
+    fileName: 'surat-tugas-konsuldag-hongkong-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-tugas-konsuldag-hongkong-2024.pdf',
     year: 2024,
     inspektorat: 3
   },
@@ -113,7 +121,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
     pengendaliMutu: 'Dr. Vina Kumala',
     pengendaliTeknis: 'Ir. Wahyu Utomo',
     ketuaTim: 'Drs. Xavier Pratama',
-    linkDrive: 'https://drive.google.com/file/d/1example8',
+    fileName: 'surat-tugas-itpc-santiago-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-tugas-itpc-santiago-2024.pdf',
     year: 2024,
     inspektorat: 4
   },
@@ -126,7 +135,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
     pengendaliMutu: 'Dr. Yanti Susilo',
     pengendaliTeknis: 'Ir. Zainal Abidin',
     ketuaTim: 'Drs. Ali Mahmud',
-    linkDrive: 'https://drive.google.com/file/d/1example9',
+    fileName: 'surat-tugas-atdag-hanoi-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-tugas-atdag-hanoi-2024.pdf',
     year: 2024,
     inspektorat: 4
   },
@@ -139,7 +149,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
     pengendaliMutu: 'Dr. Bambang Irawan',
     pengendaliTeknis: 'Ir. Citra Dewi',
     ketuaTim: 'Drs. Dedi Kurniawan',
-    linkDrive: 'https://drive.google.com/file/d/1example10',
+    fileName: 'surat-tugas-atdag-madrid-2023.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-tugas-atdag-madrid-2023.pdf',
     year: 2023,
     inspektorat: 1
   },
@@ -152,7 +163,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
     pengendaliMutu: 'Dr. Eko Widodo',
     pengendaliTeknis: 'Ir. Fitri Handayani',
     ketuaTim: 'Drs. Gunawan Wijaya',
-    linkDrive: 'https://drive.google.com/file/d/1example11',
+    fileName: 'surat-tugas-itpc-barcelona-2023.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-tugas-itpc-barcelona-2023.pdf',
     year: 2023,
     inspektorat: 2
   },
@@ -165,7 +177,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
     pengendaliMutu: 'Dr. Hendra Pratama',
     pengendaliTeknis: 'Ir. Indira Sari',
     ketuaTim: 'Drs. Joko Santoso',
-    linkDrive: 'https://drive.google.com/file/d/1example12',
+    fileName: 'surat-tugas-atdag-tokyo-2023.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-tugas-atdag-tokyo-2023.pdf',
     year: 2023,
     inspektorat: 3
   },
@@ -178,7 +191,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
     pengendaliMutu: 'Dr. Kartika Dewi',
     pengendaliTeknis: 'Ir. Lukman Hakim',
     ketuaTim: 'Drs. Mulyadi Rahman',
-    linkDrive: 'https://drive.google.com/file/d/1example13',
+    fileName: 'surat-tugas-atdag-singapura-2023.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-tugas-atdag-singapura-2023.pdf',
     year: 2023,
     inspektorat: 4
   },
@@ -191,7 +205,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
     pengendaliMutu: 'Dr. Nuri Handayani',
     pengendaliTeknis: 'Ir. Omar Sutrisno',
     ketuaTim: 'Drs. Pandu Wibowo',
-    linkDrive: 'https://drive.google.com/file/d/1example14',
+    fileName: 'surat-tugas-itpc-johannesburg-2022.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-tugas-itpc-johannesburg-2022.pdf',
     year: 2022,
     inspektorat: 1
   },
@@ -204,7 +219,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
     pengendaliMutu: 'Dr. Qori Andini',
     pengendaliTeknis: 'Ir. Randi Kurniawan',
     ketuaTim: 'Drs. Satrio Nugroho',
-    linkDrive: 'https://drive.google.com/file/d/1example15',
+    fileName: 'surat-tugas-itpc-jeddah-2022.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-tugas-itpc-jeddah-2022.pdf',
     year: 2022,
     inspektorat: 2
   }

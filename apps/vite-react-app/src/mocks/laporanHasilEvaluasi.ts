@@ -5,7 +5,8 @@ export interface LaporanHasilEvaluasi {
   perwadagName: string;
   nomorEvaluasi: string;
   matriks: string;
-  uploadLink?: string;
+  uploadFile?: string;
+  uploadFileUrl?: string;
   year: number;
   inspektorat: number;
 }
@@ -18,7 +19,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "Atdag Moscow – Rusia",
     nomorEvaluasi: "LHE/001/2024",
     matriks: "Sangat Baik",
-    uploadLink: "https://drive.google.com/file/d/lhe001-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-atdag-moscow-2024.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-atdag-moscow-2024.pdf",
     year: 2024,
     inspektorat: 1
   },
@@ -29,7 +31,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "ITPC Vancouver – Canada",
     nomorEvaluasi: "LHE/002/2024",
     matriks: "Baik",
-    uploadLink: "https://drive.google.com/file/d/lhe002-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-itpc-vancouver-2024.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-itpc-vancouver-2024.pdf",
     year: 2024,
     inspektorat: 1
   },
@@ -40,7 +43,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "Atdag Beijing – Tiongkok",
     nomorEvaluasi: "LHE/003/2024",
     matriks: "Sangat Baik",
-    uploadLink: "https://drive.google.com/file/d/lhe003-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-atdag-beijing-2024.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-atdag-beijing-2024.pdf",
     year: 2024,
     inspektorat: 2
   },
@@ -51,7 +55,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "ITPC Osaka – Jepang",
     nomorEvaluasi: "LHE/004/2024",
     matriks: "Baik",
-    uploadLink: "https://drive.google.com/file/d/lhe004-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-itpc-osaka-2024.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-itpc-osaka-2024.pdf",
     year: 2024,
     inspektorat: 2
   },
@@ -62,7 +67,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "Atdag New Delhi – India",
     nomorEvaluasi: "LHE/005/2024",
     matriks: "Cukup",
-    uploadLink: "https://drive.google.com/file/d/lhe005-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-atdag-newdelhi-2024.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-atdag-newdelhi-2024.pdf",
     year: 2024,
     inspektorat: 3
   },
@@ -73,7 +79,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "ITPC Mumbai – India",
     nomorEvaluasi: "LHE/006/2024",
     matriks: "Baik",
-    uploadLink: "https://drive.google.com/file/d/lhe006-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-itpc-mumbai-2024.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-itpc-mumbai-2024.pdf",
     year: 2024,
     inspektorat: 3
   },
@@ -84,7 +91,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "Atdag Hamburg – Jerman",
     nomorEvaluasi: "LHE/007/2024",
     matriks: "Sangat Baik",
-    uploadLink: "https://drive.google.com/file/d/lhe007-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-atdag-hamburg-2024.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-atdag-hamburg-2024.pdf",
     year: 2024,
     inspektorat: 4
   },
@@ -95,7 +103,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "ITPC Duesseldorf – Jerman",
     nomorEvaluasi: "LHE/008/2024",
     matriks: "Baik",
-    uploadLink: "https://drive.google.com/file/d/lhe008-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-itpc-duesseldorf-2024.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-itpc-duesseldorf-2024.pdf",
     year: 2024,
     inspektorat: 4
   },
@@ -106,7 +115,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "Konsuldag Los Angeles – Amerika Serikat",
     nomorEvaluasi: "LHE/009/2023",
     matriks: "Baik",
-    uploadLink: "https://drive.google.com/file/d/lhe009-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-konsuldag-losangeles-2023.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-konsuldag-losangeles-2023.pdf",
     year: 2023,
     inspektorat: 1
   },
@@ -117,7 +127,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "KDEI New York – Amerika Serikat",
     nomorEvaluasi: "LHE/010/2023",
     matriks: "Sangat Baik",
-    uploadLink: "https://drive.google.com/file/d/lhe010-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-kdei-newyork-2023.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-kdei-newyork-2023.pdf",
     year: 2023,
     inspektorat: 1
   },
@@ -128,7 +139,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "Konsuldag Busan – Korea Selatan",
     nomorEvaluasi: "LHE/011/2023",
     matriks: "Cukup",
-    uploadLink: "https://drive.google.com/file/d/lhe011-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-konsuldag-busan-2023.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-konsuldag-busan-2023.pdf",
     year: 2023,
     inspektorat: 2
   },
@@ -139,7 +151,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "KDEI Seoul – Korea Selatan",
     nomorEvaluasi: "LHE/012/2023",
     matriks: "Baik",
-    uploadLink: "https://drive.google.com/file/d/lhe012-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-kdei-seoul-2023.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-kdei-seoul-2023.pdf",
     year: 2023,
     inspektorat: 2
   },
@@ -150,7 +163,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "Konsuldag Karachi – Pakistan",
     nomorEvaluasi: "LHE/013/2022",
     matriks: "Baik",
-    uploadLink: "https://drive.google.com/file/d/lhe013-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-konsuldag-karachi-2022.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-konsuldag-karachi-2022.pdf",
     year: 2022,
     inspektorat: 3
   },
@@ -161,7 +175,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "KDEI Islamabad – Pakistan",
     nomorEvaluasi: "LHE/014/2022",
     matriks: "Sangat Baik",
-    uploadLink: "https://drive.google.com/file/d/lhe014-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-kdei-islamabad-2022.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-kdei-islamabad-2022.pdf",
     year: 2022,
     inspektorat: 3
   },
@@ -172,7 +187,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "Konsuldag Milan – Italia",
     nomorEvaluasi: "LHE/015/2022",
     matriks: "Cukup",
-    uploadLink: "https://drive.google.com/file/d/lhe015-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-konsuldag-milan-2022.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-konsuldag-milan-2022.pdf",
     year: 2022,
     inspektorat: 4
   },
@@ -183,7 +199,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "Atdag London – Inggris",
     nomorEvaluasi: "LHE/016/2024",
     matriks: "Baik",
-    uploadLink: "https://drive.google.com/file/d/lhe016-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-atdag-london-2024.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-atdag-london-2024.pdf",
     year: 2024,
     inspektorat: 1
   },
@@ -194,7 +211,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "ITPC Birmingham – Inggris",
     nomorEvaluasi: "LHE/017/2024",
     matriks: "Sangat Baik",
-    uploadLink: "https://drive.google.com/file/d/lhe017-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-itpc-birmingham-2024.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-itpc-birmingham-2024.pdf",
     year: 2024,
     inspektorat: 1
   },
@@ -205,7 +223,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "Konsuldag Singapore – Singapura",
     nomorEvaluasi: "LHE/018/2024",
     matriks: "Baik",
-    uploadLink: "https://drive.google.com/file/d/lhe018-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-konsuldag-singapore-2024.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-konsuldag-singapore-2024.pdf",
     year: 2024,
     inspektorat: 2
   },
@@ -216,7 +235,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "KDEI Singapore – Singapura",
     nomorEvaluasi: "LHE/019/2024",
     matriks: "Sangat Baik",
-    uploadLink: "https://drive.google.com/file/d/lhe019-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-kdei-singapore-2024.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-kdei-singapore-2024.pdf",
     year: 2024,
     inspektorat: 2
   },
@@ -227,7 +247,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "Atdag Riyadh – Arab Saudi",
     nomorEvaluasi: "LHE/020/2024",
     matriks: "Cukup",
-    uploadLink: "https://drive.google.com/file/d/lhe020-laporan/view",
+    uploadFile: "laporan-hasil-evaluasi-atdag-riyadh-2024.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-atdag-riyadh-2024.pdf",
     year: 2024,
     inspektorat: 3
   }

@@ -22,7 +22,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@workspace/ui/components/popover';
-import { CalendarIcon, ExternalLink } from 'lucide-react';
+import { CalendarIcon, Upload, Download, File } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
@@ -76,9 +76,22 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
     onOpenChange(false);
   };
 
-  const handleOpenLink = () => {
-    if (formData.uploadLink) {
-      window.open(formData.uploadLink, '_blank');
+  const handleFileUpload = (field: string, file: File) => {
+    const fileUrl = URL.createObjectURL(file);
+    const fileName = file.name;
+    setFormData({ 
+      ...formData, 
+      [field]: fileName,
+      [`${field}Url`]: fileUrl
+    });
+  };
+
+  const handleDownloadFile = (fileName: string, fileUrl: string) => {
+    if (fileUrl) {
+      const link = document.createElement('a');
+      link.href = fileUrl;
+      link.download = fileName;
+      link.click();
     }
   };
 
@@ -207,34 +220,62 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="uploadLink">Upload Link</Label>
+              <Label htmlFor="uploadFile">Upload File</Label>
               <div className="flex gap-2">
-                <Input
-                  id="uploadLink"
-                  value={formData.uploadLink || ''}
-                  onChange={(e) => setFormData({ ...formData, uploadLink: e.target.value })}
-                  disabled={!isEditable}
-                  className={!isEditable ? "bg-muted" : ""}
-                  placeholder="https://drive.google.com/file/..."
-                />
-                {formData.uploadLink && mode === 'view' && (
+                {isEditable ? (
+                  <>
+                    <input
+                      type="file"
+                      id="uploadFile"
+                      accept=".pdf,.doc,.docx,.xls,.xlsx"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleFileUpload('uploadFile', file);
+                        }
+                      }}
+                      className="hidden"
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={() => document.getElementById('uploadFile')?.click()}
+                      className="flex-1"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      {formData.uploadFile ? 'Ubah File' : 'Upload File'}
+                    </Button>
+                  </>
+                ) : (
+                  <Input
+                    value={formData.uploadFile || 'Tidak ada file'}
+                    disabled
+                    className="bg-muted flex-1"
+                  />
+                )}
+                {formData.uploadFile && (
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={handleOpenLink}
-                    title="Buka Link"
+                    onClick={() => handleDownloadFile(formData.uploadFile!, formData.uploadFileUrl!)}
+                    title="Download File"
                   >
-                    <ExternalLink className="h-4 w-4" />
+                    <Download className="h-4 w-4" />
                   </Button>
                 )}
               </div>
+              {formData.uploadFile && (
+                <div className="text-sm text-muted-foreground flex items-center gap-1">
+                  <File className="w-3 h-3" />
+                  File: {formData.uploadFile}
+                </div>
+              )}
             </div>
 
             {mode === 'view' && (
               <div className="space-y-2">
                 <Label>Informasi Laporan</Label>
                 <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
-                  Klik tombol "Buka Link" di bawah untuk melihat laporan hasil evaluasi.
+                  Klik tombol "Download" di bawah untuk mengunduh laporan hasil evaluasi.
                 </div>
               </div>
             )}
@@ -245,10 +286,10 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
           <Button variant="outline" onClick={handleCancel}>
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
-          {mode === 'view' && formData.uploadLink && (
-            <Button onClick={handleOpenLink}>
-              <ExternalLink className="w-4 h-4 mr-2" />
-              Buka Link
+          {mode === 'view' && formData.uploadFile && (
+            <Button onClick={() => handleDownloadFile(formData.uploadFile!, formData.uploadFileUrl!)}>
+              <Download className="w-4 h-4 mr-2" />
+              Download File
             </Button>
           )}
           {mode === 'edit' && (

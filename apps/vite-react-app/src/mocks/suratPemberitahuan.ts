@@ -3,7 +3,8 @@ export interface SuratPemberitahuan {
   tanggal: string;
   perwadagId: string;
   perwadagName: string;
-  linkDrive: string;
+  fileName: string;
+  fileUrl: string;
   year: number;
   inspektorat: number;
 }
@@ -15,7 +16,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2024-01-10',
     perwadagId: 'PWD001',
     perwadagName: 'Atdag Moscow – Rusia',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan001',
+    fileName: 'surat-pemberitahuan-atdag-moscow-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-moscow-2024.pdf',
     year: 2024,
     inspektorat: 1
   },
@@ -24,7 +26,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2024-01-15',
     perwadagId: 'PWD002',
     perwadagName: 'Atdag Washington DC – AS',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan002',
+    fileName: 'surat-pemberitahuan-atdag-washington-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-washington-2024.pdf',
     year: 2024,
     inspektorat: 1
   },
@@ -33,7 +36,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2024-01-20',
     perwadagId: 'PWD003',
     perwadagName: 'ITPC Vancouver – Canada',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan003',
+    fileName: 'surat-pemberitahuan-itpc-vancouver-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-itpc-vancouver-2024.pdf',
     year: 2024,
     inspektorat: 1
   },
@@ -42,7 +46,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2024-02-05',
     perwadagId: 'PWD004',
     perwadagName: 'Atdag Madrid – Spanyol',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan004',
+    fileName: 'surat-pemberitahuan-atdag-madrid-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-madrid-2024.pdf',
     year: 2024,
     inspektorat: 1
   },
@@ -51,7 +56,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2024-02-10',
     perwadagId: 'PWD009',
     perwadagName: 'Atdag Paris – Perancis',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan005',
+    fileName: 'surat-pemberitahuan-atdag-paris-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-paris-2024.pdf',
     year: 2024,
     inspektorat: 2
   },
@@ -60,7 +66,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2024-02-15',
     perwadagId: 'PWD010',
     perwadagName: 'ITPC Lagos – Nigeria',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan006',
+    fileName: 'surat-pemberitahuan-itpc-lagos-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-itpc-lagos-2024.pdf',
     year: 2024,
     inspektorat: 2
   },
@@ -69,7 +76,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2024-02-20',
     perwadagId: 'PWD011',
     perwadagName: 'ITPC Barcelona – Spanyol',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan007',
+    fileName: 'surat-pemberitahuan-itpc-barcelona-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-itpc-barcelona-2024.pdf',
     year: 2024,
     inspektorat: 2
   },
@@ -78,7 +86,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2024-03-01',
     perwadagId: 'PWD013',
     perwadagName: 'Atdag Beijing – RRT',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan008',
+    fileName: 'surat-pemberitahuan-atdag-beijing-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-beijing-2024.pdf',
     year: 2024,
     inspektorat: 2
   },
@@ -87,7 +96,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2024-03-05',
     perwadagId: 'PWD018',
     perwadagName: 'ITPC Sao Paulo – Brasil',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan009',
+    fileName: 'surat-pemberitahuan-itpc-saopaulo-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-itpc-saopaulo-2024.pdf',
     year: 2024,
     inspektorat: 3
   },
@@ -96,7 +106,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2024-03-10',
     perwadagId: 'PWD019',
     perwadagName: 'Konsuldag Hongkong',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan010',
+    fileName: 'surat-pemberitahuan-konsuldag-hongkong-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-konsuldag-hongkong-2024.pdf',
     year: 2024,
     inspektorat: 3
   },
@@ -105,7 +116,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2024-03-15',
     perwadagId: 'PWD020',
     perwadagName: 'Atdag Tokyo – Jepang',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan011',
+    fileName: 'surat-pemberitahuan-atdag-tokyo-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-tokyo-2024.pdf',
     year: 2024,
     inspektorat: 3
   },
@@ -114,7 +126,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2024-04-01',
     perwadagId: 'PWD021',
     perwadagName: 'Atdag Seoul – Korea Selatan',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan012',
+    fileName: 'surat-pemberitahuan-atdag-seoul-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-seoul-2024.pdf',
     year: 2024,
     inspektorat: 3
   },
@@ -123,7 +136,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2024-04-05',
     perwadagId: 'PWD027',
     perwadagName: 'ITPC Santiago – Chile',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan013',
+    fileName: 'surat-pemberitahuan-itpc-santiago-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-itpc-santiago-2024.pdf',
     year: 2024,
     inspektorat: 4
   },
@@ -132,7 +146,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2024-04-10',
     perwadagId: 'PWD028',
     perwadagName: 'Atdag Hanoi – Vietnam',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan014',
+    fileName: 'surat-pemberitahuan-atdag-hanoi-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-hanoi-2024.pdf',
     year: 2024,
     inspektorat: 4
   },
@@ -141,7 +156,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2024-04-15',
     perwadagId: 'PWD029',
     perwadagName: 'Atdag Brussel – Belgia',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan015',
+    fileName: 'surat-pemberitahuan-atdag-brussel-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-brussel-2024.pdf',
     year: 2024,
     inspektorat: 4
   },
@@ -150,7 +166,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2024-04-20',
     perwadagId: 'PWD030',
     perwadagName: 'Atdag Singapura – Singapura',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan016',
+    fileName: 'surat-pemberitahuan-atdag-singapura-2024.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-singapura-2024.pdf',
     year: 2024,
     inspektorat: 4
   },
@@ -161,7 +178,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2023-01-12',
     perwadagId: 'PWD005',
     perwadagName: 'ITPC Johannesburg – Afrika Selatan',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan017',
+    fileName: 'surat-pemberitahuan-itpc-johannesburg-2023.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-itpc-johannesburg-2023.pdf',
     year: 2023,
     inspektorat: 1
   },
@@ -170,7 +188,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2023-01-18',
     perwadagId: 'PWD006',
     perwadagName: 'Atdag Kairo – Mesir',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan018',
+    fileName: 'surat-pemberitahuan-atdag-kairo-2023.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-kairo-2023.pdf',
     year: 2023,
     inspektorat: 1
   },
@@ -179,7 +198,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2023-02-08',
     perwadagId: 'PWD014',
     perwadagName: 'ITPC Jeddah – Arab Saudi',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan019',
+    fileName: 'surat-pemberitahuan-itpc-jeddah-2023.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-itpc-jeddah-2023.pdf',
     year: 2023,
     inspektorat: 2
   },
@@ -188,7 +208,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2023-02-14',
     perwadagId: 'PWD015',
     perwadagName: 'Atdag Ankara – Turki',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan020',
+    fileName: 'surat-pemberitahuan-atdag-ankara-2023.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-ankara-2023.pdf',
     year: 2023,
     inspektorat: 2
   },
@@ -197,7 +218,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2023-03-10',
     perwadagId: 'PWD022',
     perwadagName: 'ITPC Sydney – Australia',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan021',
+    fileName: 'surat-pemberitahuan-itpc-sydney-2023.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-itpc-sydney-2023.pdf',
     year: 2023,
     inspektorat: 3
   },
@@ -206,7 +228,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2023-03-16',
     perwadagId: 'PWD023',
     perwadagName: 'Atdag Denhaag – Belanda',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan022',
+    fileName: 'surat-pemberitahuan-atdag-denhaag-2023.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-denhaag-2023.pdf',
     year: 2023,
     inspektorat: 3
   },
@@ -215,7 +238,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2023-04-05',
     perwadagId: 'PWD031',
     perwadagName: 'Atdag Berlin – Jerman',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan023',
+    fileName: 'surat-pemberitahuan-atdag-berlin-2023.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-berlin-2023.pdf',
     year: 2023,
     inspektorat: 4
   },
@@ -224,7 +248,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2023-04-12',
     perwadagId: 'PWD032',
     perwadagName: 'ITPC Busan – Korea Selatan',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan024',
+    fileName: 'surat-pemberitahuan-itpc-busan-2023.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-itpc-busan-2023.pdf',
     year: 2023,
     inspektorat: 4
   },
@@ -235,7 +260,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2022-01-15',
     perwadagId: 'PWD007',
     perwadagName: 'ITPC Osaka – Jepang',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan025',
+    fileName: 'surat-pemberitahuan-itpc-osaka-2022.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-itpc-osaka-2022.pdf',
     year: 2022,
     inspektorat: 1
   },
@@ -244,7 +270,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2022-02-10',
     perwadagId: 'PWD016',
     perwadagName: 'Atdag Canberra – Australia',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan026',
+    fileName: 'surat-pemberitahuan-atdag-canberra-2022.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-canberra-2022.pdf',
     year: 2022,
     inspektorat: 2
   },
@@ -253,7 +280,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2022-03-08',
     perwadagId: 'PWD024',
     perwadagName: 'Atdag Jenewa – Swiss',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan027',
+    fileName: 'surat-pemberitahuan-atdag-jenewa-2022.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-jenewa-2022.pdf',
     year: 2022,
     inspektorat: 3
   },
@@ -262,7 +290,8 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
     tanggal: '2022-04-15',
     perwadagId: 'PWD033',
     perwadagName: 'Atdag Bangkok – Thailand',
-    linkDrive: 'https://drive.google.com/file/d/1pemberitahuan028',
+    fileName: 'surat-pemberitahuan-atdag-bangkok-2022.pdf',
+    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-bangkok-2022.pdf',
     year: 2022,
     inspektorat: 4
   }

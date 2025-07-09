@@ -15,7 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@workspace/ui/components/popover';
-import { CalendarIcon, ExternalLink } from 'lucide-react';
+import { CalendarIcon, Upload, Download, File } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { SuratPemberitahuan } from '@/mocks/suratPemberitahuan';
@@ -37,7 +37,8 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
 }) => {
   const [formData, setFormData] = useState({
     tanggal: undefined as Date | undefined,
-    linkDrive: '',
+    fileName: '',
+    fileUrl: '',
   });
 
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
@@ -46,12 +47,14 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
     if (item) {
       setFormData({
         tanggal: new Date(item.tanggal),
-        linkDrive: item.linkDrive,
+        fileName: item.fileName || '',
+        fileUrl: item.fileUrl || '',
       });
     } else {
       setFormData({
         tanggal: undefined,
-        linkDrive: '',
+        fileName: '',
+        fileUrl: '',
       });
     }
   }, [item, open]);
@@ -64,7 +67,8 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
     const saveData: Partial<SuratPemberitahuan> = {
       id: item.id,
       tanggal: formData.tanggal.toISOString().split('T')[0],
-      linkDrive: formData.linkDrive,
+      fileName: formData.fileName,
+      fileUrl: formData.fileUrl,
       year: formData.tanggal.getFullYear(),
     };
 
@@ -75,13 +79,26 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
     onOpenChange(false);
   };
 
-  const handleOpenLink = () => {
-    if (item?.linkDrive) {
-      window.open(item.linkDrive, '_blank');
+  const handleFileUpload = (file: File) => {
+    const fileUrl = URL.createObjectURL(file);
+    const fileName = file.name;
+    setFormData({
+      ...formData,
+      fileName,
+      fileUrl,
+    });
+  };
+
+  const handleDownloadFile = () => {
+    if (formData.fileUrl && formData.fileName) {
+      const link = document.createElement('a');
+      link.href = formData.fileUrl;
+      link.download = formData.fileName;
+      link.click();
     }
   };
 
-  const isFormValid = formData.tanggal && formData.linkDrive;
+  const isFormValid = formData.tanggal && formData.fileName;
   const isEditing = mode === 'edit';
 
   return (
@@ -146,7 +163,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
               <div className="space-y-2">
                 <Label>Informasi Surat Pemberitahuan</Label>
                 <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
-                  Klik tombol "Buka Link" di bawah untuk melihat surat pemberitahuan.
+                  Klik tombol "Download" di bawah untuk mengunduh surat pemberitahuan.
                 </div>
               </div>
             )}
@@ -155,35 +172,61 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
               <div className="space-y-2">
                 <Label>Informasi Upload Surat Pemberitahuan</Label>
                 <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
-                  Silakan upload surat pemberitahuan ke Google Drive dan copy link share-nya di bawah ini.
-                  Pastikan link dapat diakses oleh tim audit.
+                  Silakan upload file surat pemberitahuan. File yang didukung: PDF, DOC, DOCX.
                 </div>
               </div>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="linkDrive">Link Drive Surat Pemberitahuan {isEditing && '*'}</Label>
+              <Label htmlFor="fileUpload">File Surat Pemberitahuan {isEditing && '*'}</Label>
               <div className="flex gap-2">
-                <Input
-                  id="linkDrive"
-                  value={formData.linkDrive}
-                  onChange={(e) => setFormData(prev => ({ ...prev, linkDrive: e.target.value }))}
-                  placeholder="https://drive.google.com/file/d/..."
-                  type="url"
-                  disabled={!isEditing}
-                  className={!isEditing ? "bg-muted" : ""}
-                />
-                {!isEditing && item?.linkDrive && (
+                {isEditing ? (
+                  <>
+                    <input
+                      type="file"
+                      id="fileUpload"
+                      accept=".pdf,.doc,.docx"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleFileUpload(file);
+                        }
+                      }}
+                      className="hidden"
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={() => document.getElementById('fileUpload')?.click()}
+                      className="flex-1"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      {formData.fileName ? 'Ubah File' : 'Upload File'}
+                    </Button>
+                  </>
+                ) : (
+                  <Input
+                    value={formData.fileName || 'Tidak ada file'}
+                    disabled
+                    className="bg-muted flex-1"
+                  />
+                )}
+                {formData.fileName && (
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={handleOpenLink}
-                    title="Buka Link"
+                    onClick={handleDownloadFile}
+                    title="Download File"
                   >
-                    <ExternalLink className="h-4 w-4" />
+                    <Download className="h-4 w-4" />
                   </Button>
                 )}
               </div>
+              {formData.fileName && (
+                <div className="text-sm text-muted-foreground flex items-center gap-1">
+                  <File className="w-3 h-3" />
+                  File: {formData.fileName}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -197,10 +240,10 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
               Simpan
             </Button>
           )}
-          {!isEditing && item?.linkDrive && (
-            <Button onClick={handleOpenLink}>
-              <ExternalLink className="w-4 h-4 mr-2" />
-              Buka Link
+          {!isEditing && formData.fileName && (
+            <Button onClick={handleDownloadFile}>
+              <Download className="w-4 h-4 mr-2" />
+              Download File
             </Button>
           )}
         </DialogFooter>
