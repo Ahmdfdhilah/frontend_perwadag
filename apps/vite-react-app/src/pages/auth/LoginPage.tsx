@@ -13,7 +13,7 @@ import { Alert, AlertDescription } from '@workspace/ui/components/alert';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@workspace/ui/components/form';
 import { Checkbox } from '@workspace/ui/components/checkbox';
 
-import logo from '@/assets/logo.png';
+import logo from '@/assets/logoLightMode.png';
 import loginIcon from '@/assets/loginIcon.png';
 
 const loginSchema = z.object({

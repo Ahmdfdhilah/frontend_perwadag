@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@workspace/ui/components/alert';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@workspace/ui/components/form';
 
-import logo from '@/assets/logo.png';
+import logo from '@/assets/logoLightMode.png';
 import loginIcon from '@/assets/loginIcon.png';
 
 const forgotPasswordSchema = z.object({

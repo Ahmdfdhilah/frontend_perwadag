@@ -5,7 +5,7 @@ import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Alert, AlertDescription } from '@workspace/ui/components/alert';
 
-import logo from '@/assets/logo.png';
+import logo from '@/assets/logoLightMode.png';
 import loginIcon from '@/assets/loginIcon.png';
 
 export function EmailSentSuccessPage() {
