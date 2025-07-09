@@ -54,21 +54,6 @@ export const UserTable: React.FC<UserTableProps> = ({
     );
   };
 
-  const getActions = (user: User) => [
-    {
-      label: 'View Details',
-      onClick: () => onView(user),
-    },
-    {
-      label: 'Edit',
-      onClick: () => onEdit(user),
-    },
-    {
-      label: 'Delete',
-      onClick: () => onDelete(user),
-      destructive: true,
-    },
-  ];
 
   return (
     <div className="rounded-md border">
@@ -138,7 +123,11 @@ export const UserTable: React.FC<UserTableProps> = ({
                   )}
                 </TableCell>
                 <TableCell className="text-right">
-                  <ActionDropdown actions={getActions(user)} />
+                  <ActionDropdown
+                    onView={() => onView(user)}
+                    onEdit={() => onEdit(user)}
+                    onDelete={() => onDelete(user)}
+                  />
                 </TableCell>
               </TableRow>
             ))

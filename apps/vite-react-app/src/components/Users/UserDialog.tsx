@@ -30,12 +30,10 @@ export const UserDialog: React.FC<UserDialogProps> = ({
     setLoading(true);
 
     try {
-      // Transform roles from string IDs to Role objects
+      // Transform role from string ID to Role object
       const transformedData = {
         ...data,
-        roles: data.roles.map((roleId: string) =>
-          ROLES.find(role => role.id === roleId)!
-        ),
+        roles: [ROLES.find(role => role.id === data.roles)!],
         id: editingUser?.id || `USR${Date.now()}`,
         createdAt: editingUser?.createdAt || new Date(),
         updatedAt: new Date(),

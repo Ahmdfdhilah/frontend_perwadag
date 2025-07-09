@@ -17,6 +17,7 @@ import { Plus } from 'lucide-react';
 import { UserTable } from '@/components/Users/UserTable';
 import { UserCards } from '@/components/Users/UserCards';
 import { UserDialog } from '@/components/Users/UserDialog';
+import { UserViewDialog } from '@/components/Users/UserViewDialog';
 import { PageHeader } from '@/components/common/PageHeader';
 import SearchContainer from '@/components/common/SearchContainer';
 import Filtering from '@/components/common/Filtering';
@@ -42,7 +43,9 @@ const UsersPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [viewingUser, setViewingUser] = useState<User | null>(null);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   // Check access - only admin can access this page
@@ -99,8 +102,8 @@ const UsersPage: React.FC = () => {
   const paginatedUsers = filteredUsers.slice(startIndex, startIndex + itemsPerPage);
 
   const handleView = (user: User) => {
-    setEditingUser(user);
-    setIsDialogOpen(true);
+    setViewingUser(user);
+    setIsViewDialogOpen(true);
   };
 
   const handleEdit = (user: User) => {
@@ -252,6 +255,13 @@ const UsersPage: React.FC = () => {
         onOpenChange={setIsDialogOpen}
         editingUser={editingUser}
         onSave={handleSave}
+      />
+
+      {/* User View Dialog */}
+      <UserViewDialog
+        open={isViewDialogOpen}
+        onOpenChange={setIsViewDialogOpen}
+        user={viewingUser}
       />
 
       {/* Delete Confirmation Dialog */}

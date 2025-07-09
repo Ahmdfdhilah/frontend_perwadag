@@ -55,21 +55,6 @@ export const UserCards: React.FC<UserCardsProps> = ({
     );
   };
 
-  const getActions = (user: User) => [
-    {
-      label: 'View Details',
-      onClick: () => onView(user),
-    },
-    {
-      label: 'Edit',
-      onClick: () => onEdit(user),
-    },
-    {
-      label: 'Delete',
-      onClick: () => onDelete(user),
-      destructive: true,
-    },
-  ];
 
   if (users.length === 0) {
     return (
@@ -103,7 +88,11 @@ export const UserCards: React.FC<UserCardsProps> = ({
                   </div>
                 </div>
               </div>
-              <ActionDropdown actions={getActions(user)} />
+              <ActionDropdown
+                onView={() => onView(user)}
+                onEdit={() => onEdit(user)}
+                onDelete={() => onDelete(user)}
+              />
             </div>
 
             {/* NIP */}

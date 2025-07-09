@@ -3,11 +3,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { User } from '@/mocks/users';
-import { ROLES, Role } from '@/mocks/roles';
+import { ROLES } from '@/mocks/roles';
 import { PERWADAG_DATA } from '@/mocks/perwadag';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
-import { Label } from '@workspace/ui/components/label';
 import { Textarea } from '@workspace/ui/components/textarea';
 import {
   Select,
@@ -16,7 +15,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@workspace/ui/components/select';
-import { Checkbox } from '@workspace/ui/components/checkbox';
 import { Switch } from '@workspace/ui/components/switch';
 import {
   Form,
@@ -26,8 +24,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@workspace/ui/components/form';
-import { Avatar, AvatarImage, AvatarFallback } from '@workspace/ui/components/avatar';
-import { Upload, X } from 'lucide-react';
 
 const userSchema = z.object({
   email: z.string().email('Please enter a valid email address').min(1, 'Email is required'),
@@ -35,10 +31,9 @@ const userSchema = z.object({
   name: z.string().min(1, 'Name is required').min(2, 'Name must be at least 2 characters'),
   phone: z.string().min(1, 'Phone is required').regex(/^\+?\d{10,15}$/, 'Please enter a valid phone number'),
   address: z.string().min(1, 'Address is required'),
-  avatar: z.string().optional(),
-  roles: z.array(z.string()).min(1, 'At least one role must be selected'),
+  roles: z.string().min(1, 'Please select a role'),
   perwadagId: z.string().optional(),
-  isActive: z.boolean().default(true),
+  isActive: z.boolean(),
 });
 
 type UserFormData = z.infer<typeof userSchema>;
@@ -56,10 +51,6 @@ export const UserForm: React.FC<UserFormProps> = ({
   onCancel,
   loading = false
 }) => {
-  const [selectedRoles, setSelectedRoles] = useState<string[]>(
-    initialData?.roles?.map(role => role.id) || []
-  );
-  const [avatarPreview, setAvatarPreview] = useState<string | undefined>(initialData?.avatar);
   const [showPerwadagSelect, setShowPerwadagSelect] = useState(
     initialData?.roles?.some(role => role.name === 'perwadag') || false
   );
@@ -72,18 +63,15 @@ export const UserForm: React.FC<UserFormProps> = ({
       name: initialData?.name || '',
       phone: initialData?.phone || '',
       address: initialData?.address || '',
-      avatar: initialData?.avatar || '',
-      roles: initialData?.roles?.map(role => role.id) || [],
+      roles: initialData?.roles?.[0]?.id || '',
       perwadagId: initialData?.perwadagId || '',
-      isActive: initialData?.isActive ?? true,
+      isActive: initialData?.isActive !== undefined ? initialData.isActive : true,
     }
   });
 
   useEffect(() => {
-    const roles = form.watch('roles');
-    const hasPerwadagRole = roles?.some(roleId => 
-      ROLES.find(role => role.id === roleId)?.name === 'perwadag'
-    );
+    const roleId = form.watch('roles');
+    const hasPerwadagRole = ROLES.find(role => role.id === roleId)?.name === 'perwadag';
     setShowPerwadagSelect(hasPerwadagRole);
     
     if (!hasPerwadagRole) {
@@ -91,34 +79,6 @@ export const UserForm: React.FC<UserFormProps> = ({
     }
   }, [form.watch('roles')]);
 
-  const handleRoleChange = (roleId: string, checked: boolean) => {
-    let newRoles: string[];
-    if (checked) {
-      newRoles = [...selectedRoles, roleId];
-    } else {
-      newRoles = selectedRoles.filter(id => id !== roleId);
-    }
-    setSelectedRoles(newRoles);
-    form.setValue('roles', newRoles);
-  };
-
-  const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setAvatarPreview(result);
-        form.setValue('avatar', result);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const removeAvatar = () => {
-    setAvatarPreview(undefined);
-    form.setValue('avatar', '');
-  };
 
   const handleSubmit = (data: UserFormData) => {
     onSubmit(data);
@@ -127,47 +87,6 @@ export const UserForm: React.FC<UserFormProps> = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-        {/* Avatar Upload */}
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <Avatar className="w-20 h-20">
-              {avatarPreview ? (
-                <AvatarImage src={avatarPreview} alt="User avatar" />
-              ) : (
-                <AvatarFallback className="text-lg">
-                  {form.watch('name')?.charAt(0)?.toUpperCase() || '?'}
-                </AvatarFallback>
-              )}
-            </Avatar>
-            {avatarPreview && (
-              <Button
-                type="button"
-                variant="destructive"
-                size="sm"
-                className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
-                onClick={removeAvatar}
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="avatar-upload" className="cursor-pointer">
-              <div className="flex items-center space-x-2 px-4 py-2 border border-dashed border-gray-300 rounded-lg hover:bg-gray-50">
-                <Upload className="h-4 w-4" />
-                <span>Upload Avatar</span>
-              </div>
-            </Label>
-            <input
-              id="avatar-upload"
-              type="file"
-              accept="image/*"
-              onChange={handleAvatarUpload}
-              className="hidden"
-              disabled={loading}
-            />
-          </div>
-        </div>
 
         {/* Basic Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -242,28 +161,31 @@ export const UserForm: React.FC<UserFormProps> = ({
           )}
         />
 
-        {/* Roles */}
-        <div className="space-y-3">
-          <Label>Roles</Label>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {ROLES.map((role) => (
-              <div key={role.id} className="flex items-center space-x-2">
-                <Checkbox
-                  id={role.id}
-                  checked={selectedRoles.includes(role.id)}
-                  onCheckedChange={(checked) => handleRoleChange(role.id, checked as boolean)}
-                  disabled={loading}
-                />
-                <Label htmlFor={role.id} className="text-sm font-normal">
-                  {role.label}
-                </Label>
-              </div>
-            ))}
-          </div>
-          {form.formState.errors.roles && (
-            <p className="text-sm text-red-500">{form.formState.errors.roles.message}</p>
+        {/* Role Selection */}
+        <FormField
+          control={form.control}
+          name="roles"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Role</FormLabel>
+              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a role" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {ROLES.map((role) => (
+                    <SelectItem key={role.id} value={role.id}>
+                      {role.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
           )}
-        </div>
+        />
 
         {/* Perwadag Selection */}
         {showPerwadagSelect && (
