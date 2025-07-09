@@ -19,6 +19,8 @@ import LaporanHasilEvaluasiPage from './pages/LaporanHasilEvaluasiPage';
 import MatriksPage from './pages/MatriksPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { DefaultLayout } from './components/layouts';
+import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
+import { EmailSentSuccessPage } from './pages/auth/EmailSentSuccessPage';
 
 
 function App() {
@@ -33,6 +35,8 @@ function App() {
                 <Routes>
                   <Route path="/" element={<DefaultLayout />}>
                     <Route path='login' element={<LoginPage />} />
+                    <Route path='forgot-password' element={<ForgotPasswordPage />} />
+                    <Route path='callback' element={<EmailSentSuccessPage />} />
                   </Route>
                   <Route path="/" element={<DashboardLayout />}>
                     <Route index element={<RiskAssessmentPage />} />
