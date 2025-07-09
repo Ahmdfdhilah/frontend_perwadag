@@ -17,7 +17,7 @@ export interface SidebarItem {
 }
 
 
-export const menuItems: SidebarItem[] = [
+export const appMenuItems: SidebarItem[] = [
 
   // Risk Assessment - Only admin and inspektorat
   {
@@ -96,7 +96,7 @@ export const menuItems: SidebarItem[] = [
 // Helper function to get appropriate menu items based on user roles
 export const getMenuItemsForUser = (userRoles: string[]): SidebarItem[] => {
   // If user has roles, combine basic items with filtered items
-  const items = filterMenuByRoles(menuItems, userRoles);
+  const items = filterMenuByRoles(appMenuItems, userRoles);
   return [...items];
 };
 
@@ -139,7 +139,7 @@ export const filterMenuByRoles = (
 export const hasRouteAccess = (
   path: string,
   userRoles: string[],
-  menuItems: SidebarItem[]
+  menuItems: SidebarItem[] = appMenuItems
 ): boolean => {
   for (const item of menuItems) {
     // Check direct match
@@ -161,4 +161,4 @@ export const hasRouteAccess = (
 };
 
 // Default export for backward compatibility
-export default menuItems;
+export default appMenuItems;

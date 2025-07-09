@@ -1,6 +1,6 @@
 import api from "@/utils/api";
 import { useToast } from "@workspace/ui/components/sonner";
-import { FileUploadResponse } from "./fileService";
+// import { FileUploadResponse } from "./fileService";
 
 // Updated interfaces to match backend schemas exactly
 export interface RoleResponse {
@@ -44,7 +44,7 @@ export interface UserResponse {
     // Relationships
     roles: RoleResponse[];
     org_unit?: OrgUnitResponse;
-    avatar_file?: FileUploadResponse;
+    avatar_file?: any;
 }
 
 export interface UserSearchResponse {

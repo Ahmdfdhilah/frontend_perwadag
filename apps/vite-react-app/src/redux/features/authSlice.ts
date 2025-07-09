@@ -4,7 +4,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { API_BASE_URL } from '@/config/api';
 import { jwtDecode } from 'jwt-decode';
-import { FileUploadResponse } from '@/services/fileService';
+// import { FileUploadResponse } from '@/services/fileService';
 // Types based on backend schemas
 export interface Role {
   id: number;
@@ -40,7 +40,7 @@ export interface UserData {
   locked_until?: string | null;
   roles: Role[];
   org_unit?: OrgUnit;
-  avatar_file?: FileUploadResponse;
+  avatar_file?: any;
 }
 
 interface TokenData {

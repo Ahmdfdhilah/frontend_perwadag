@@ -27,7 +27,7 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
 import { LaporanHasilEvaluasi, MATRIKS_OPTIONS } from '@/mocks/laporanHasilEvaluasi';
-import { PeridagData } from '@/mocks/perwadag';
+import { Perwadag } from '@/mocks/perwadag';
 
 interface LaporanHasilEvaluasiDialogProps {
   open: boolean;
@@ -35,7 +35,7 @@ interface LaporanHasilEvaluasiDialogProps {
   item: LaporanHasilEvaluasi | null;
   mode: 'view' | 'edit';
   onSave: (data: Partial<LaporanHasilEvaluasi>) => void;
-  availablePerwadag: PeridagData[];
+  availablePerwadag: Perwadag[];
 }
 
 const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({

@@ -28,8 +28,8 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
 import { EntryMeeting } from '@/mocks/entryMeeting';
-import { PeridagData } from '@/mocks/perwadag';
 import { useRole } from '@/hooks/useRole';
+import { Perwadag } from '@/mocks/perwadag';
 
 interface EntryMeetingDialogProps {
   open: boolean;
@@ -37,7 +37,7 @@ interface EntryMeetingDialogProps {
   item: EntryMeeting | null;
   mode: 'view' | 'edit';
   onSave: (data: Partial<EntryMeeting>) => void;
-  availablePerwadag: PeridagData[];
+  availablePerwadag: Perwadag[];
 }
 
 const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({

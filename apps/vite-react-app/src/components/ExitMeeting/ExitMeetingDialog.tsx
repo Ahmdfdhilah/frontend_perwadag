@@ -28,7 +28,7 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
 import { ExitMeeting } from '@/mocks/exitMeeting';
-import { PeridagData } from '@/mocks/perwadag';
+import { Perwadag } from '@/mocks/perwadag';
 import { useRole } from '@/hooks/useRole';
 
 interface ExitMeetingDialogProps {
@@ -37,7 +37,7 @@ interface ExitMeetingDialogProps {
   item: ExitMeeting | null;
   mode: 'view' | 'edit';
   onSave: (data: Partial<ExitMeeting>) => void;
-  availablePerwadag: PeridagData[];
+  availablePerwadag: Perwadag[];
 }
 
 const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({

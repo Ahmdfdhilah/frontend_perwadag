@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import { RootState } from '@/redux/store';
-import { hasRouteAccess, type UserRole } from '@/lib/menus';
+import { type UserRole } from '@/lib/menus';
 
 interface RoleProtectedRouteProps {
   children: ReactNode;
@@ -135,13 +135,13 @@ export function useRoleAccess() {
     return roles.every(role => userRoles.includes(role));
   };
 
-  const canAccessRoute = (path: string) => {
-    return hasRouteAccess(path, userRoles);
-  };
+  // const canAccessRoute = (path: string) => {
+  //   return hasRouteAccess(path, userRoles);
+  // };
 
-  const isMasterAdmin = hasRole('master_admin');
-  const isAdmin = hasRole('admin');
-  const isUser = hasRole('user');
+  // const isMasterAdmin = hasRole('master_admin');
+  // const isAdmin = hasRole('admin');
+  // const isUser = hasRole('user');
 
   return {
     userRoles,
@@ -149,9 +149,9 @@ export function useRoleAccess() {
     hasRole,
     hasAnyRole,
     hasAllRoles,
-    canAccessRoute,
-    isMasterAdmin,
-    isAdmin,
-    isUser,
+    // canAccessRoute,
+    // isMasterAdmin,
+    // isAdmin,
+    // isUser,
   };
 }

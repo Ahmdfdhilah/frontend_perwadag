@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useRole } from '@/hooks/useRole';
 import {
   Dialog,
   DialogContent,
@@ -27,7 +28,7 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
 import { Kuesioner } from '@/mocks/kuesioner';
-import { PeridagData } from '@/mocks/perwadag';
+import { Perwadag } from '@/mocks/perwadag';
 
 interface KuesionerDialogProps {
   open: boolean;
@@ -35,7 +36,7 @@ interface KuesionerDialogProps {
   item: Kuesioner | null;
   mode: 'view' | 'edit';
   onSave: (data: Partial<Kuesioner>) => void;
-  availablePerwadag: PeridagData[];
+  availablePerwadag: Perwadag[];
 }
 
 const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
@@ -46,6 +47,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   onSave,
   availablePerwadag,
 }) => {
+  const { isAdmin, isInspektorat, isPerwadag } = useRole();
   const [formData, setFormData] = useState<Partial<Kuesioner>>({});
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -63,6 +65,29 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   }, [item, open]);
 
   const handleSave = () => {
+    // Role-based validation
+    if (isPerwadag()) {
+      // Perwadag can only edit tanggal and linkDokumen
+      if (!selectedDate) {
+        alert('Tanggal harus diisi');
+        return;
+      }
+      if (!formData.linkDokumen) {
+        alert('Link dokumen harus diisi');
+        return;
+      }
+    } else if (isAdmin() || isInspektorat()) {
+      // Admin/Inspektorat can only edit perwadagId and aspek
+      if (!formData.perwadagId) {
+        alert('Nama perwadag harus dipilih');
+        return;
+      }
+      if (!formData.aspek) {
+        alert('Aspek harus diisi');
+        return;
+      }
+    }
+
     if (selectedDate) {
       const dataToSave = {
         ...formData,
@@ -85,6 +110,12 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
 
   const isEditable = mode === 'edit';
 
+  // Role-based field permissions
+  const canEditDate = isEditable && isPerwadag();
+  const canEditPerwadag = isEditable && (isAdmin() || isInspektorat());
+  const canEditAspek = isEditable && (isAdmin() || isInspektorat());
+  const canEditLinkDokumen = isEditable && isPerwadag();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
@@ -105,9 +136,9 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
                     className={cn(
                       "w-full justify-start text-left font-normal",
                       !selectedDate && "text-muted-foreground",
-                      !isEditable && "bg-muted cursor-not-allowed"
+                      !canEditDate && "bg-muted cursor-not-allowed"
                     )}
-                    disabled={!isEditable}
+                    disabled={!canEditDate}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                     {selectedDate ? (
@@ -117,7 +148,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
                     )}
                   </Button>
                 </PopoverTrigger>
-                {isEditable && (
+                {canEditDate && (
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
@@ -136,7 +167,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
 
             <div className="space-y-2">
               <Label htmlFor="perwadag">Nama Perwadag</Label>
-              {isEditable ? (
+              {canEditPerwadag ? (
                 <Select
                   value={formData.perwadagId || ''}
                   onValueChange={(value) => {
@@ -174,8 +205,8 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
                 id="aspek"
                 value={formData.aspek || ''}
                 onChange={(e) => setFormData({ ...formData, aspek: e.target.value })}
-                disabled={!isEditable}
-                className={!isEditable ? "bg-muted" : ""}
+                disabled={!canEditAspek}
+                className={!canEditAspek ? "bg-muted" : ""}
                 placeholder="Masukkan aspek"
               />
             </div>
@@ -187,8 +218,8 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
                   id="linkDokumen"
                   value={formData.linkDokumen || ''}
                   onChange={(e) => setFormData({ ...formData, linkDokumen: e.target.value })}
-                  disabled={!isEditable}
-                  className={!isEditable ? "bg-muted" : ""}
+                  disabled={!canEditLinkDokumen}
+                  className={!canEditLinkDokumen ? "bg-muted" : ""}
                   placeholder="https://drive.google.com/file/..."
                 />
                 {formData.linkDokumen && mode === 'view' && (
@@ -204,14 +235,6 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
               </div>
             </div>
 
-            {mode === 'view' && (
-              <div className="space-y-2">
-                <Label>Informasi Kuesioner</Label>
-                <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
-                  Klik tombol "Buka Link" di bawah untuk melihat dokumen kuesioner.
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
