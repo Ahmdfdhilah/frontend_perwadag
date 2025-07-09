@@ -20,6 +20,7 @@ import {
   RiskAssessment
 } from '@/mocks/riskAssessment';
 import { PageHeader } from '@/components/common/PageHeader';
+import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import RiskAssessmentTable from '@/components/RiskAssesment/RiskAssessmentTable';
 import RiskAssessmentCards from '@/components/RiskAssesment/RiskAssessmentCards';
 
@@ -108,6 +109,28 @@ const RiskAssessmentPage: React.FC = () => {
     setCurrentPage(1); // Reset to first page when changing items per page
   };
 
+  // Generate composite title
+  const getCompositeTitle = () => {
+    let title = "Daftar Penilaian Risiko";
+    const filters = [];
+    
+    if (userIsInspektorat) {
+      filters.push("Inspektorat I");
+    } else if (userIsAdmin && selectedInspektorat !== 'all') {
+      filters.push(`Inspektorat ${selectedInspektorat}`);
+    }
+    
+    if (selectedYear !== 'all') {
+      filters.push(selectedYear);
+    }
+    
+    if (filters.length > 0) {
+      title += " - " + filters.join(" - ");
+    }
+    
+    return title;
+  };
+
   // Check access after all hooks have been called
   if (!hasAccess) {
     return (
@@ -184,8 +207,13 @@ const RiskAssessmentPage: React.FC = () => {
       </Filtering>
 
       <Card>
-        <CardContent className="p-6">
+        <CardContent>
           <div className="space-y-4">
+            <ListHeaderComposite
+              title={getCompositeTitle()}
+              subtitle="Kelola data penilaian risiko berdasarkan filter yang dipilih"
+            />
+
             <SearchContainer
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}

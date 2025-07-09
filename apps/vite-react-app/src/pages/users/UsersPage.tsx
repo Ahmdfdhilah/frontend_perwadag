@@ -19,6 +19,7 @@ import { UserCards } from '@/components/Users/UserCards';
 import { UserDialog } from '@/components/Users/UserDialog';
 import { UserViewDialog } from '@/components/Users/UserViewDialog';
 import { PageHeader } from '@/components/common/PageHeader';
+import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import SearchContainer from '@/components/common/SearchContainer';
 import Filtering from '@/components/common/Filtering';
 import Pagination from '@/components/common/Pagination';
@@ -148,6 +149,27 @@ const UsersPage: React.FC = () => {
     setCurrentPage(1);
   };
 
+  // Generate composite title
+  const getCompositeTitle = () => {
+    let title = "Daftar Pengguna";
+    const filters = [];
+    
+    if (selectedRole !== 'all') {
+      const role = ROLES.find(r => r.id === selectedRole);
+      if (role) filters.push(role.label);
+    }
+    
+    if (selectedStatus !== 'all') {
+      filters.push(selectedStatus === 'active' ? 'Aktif' : 'Tidak Aktif');
+    }
+    
+    if (filters.length > 0) {
+      title += " - " + filters.join(" - ");
+    }
+    
+    return title;
+  };
+
   // Check access after all hooks have been called
   if (!hasAccess) {
     return (
@@ -209,8 +231,13 @@ const UsersPage: React.FC = () => {
       </Filtering>
 
       <Card>
-        <CardContent className="p-6">
+        <CardContent>
           <div className="space-y-4">
+            <ListHeaderComposite
+              title={getCompositeTitle()}
+              subtitle="Kelola pengguna sistem, peran, dan hak akses"
+            />
+
             <SearchContainer
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}

@@ -214,7 +214,7 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
       </Filtering>
 
       <Card>
-        <CardContent className="p-6">
+        <CardContent>
           <div className="space-y-4">
             <SearchContainer
               searchQuery={searchQuery}

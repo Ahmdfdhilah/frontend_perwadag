@@ -22,6 +22,7 @@ import {
 import { PERWADAG_DATA } from '@/mocks/perwadag';
 import { INSPEKTORATS } from '@/mocks/riskAssessment';
 import { PageHeader } from '@/components/common/PageHeader';
+import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import SuratTugasTable from '@/components/SuratTugas/SuratTugasTable';
 import SuratTugasCards from '@/components/SuratTugas/SuratTugasCards';
 import SuratTugasDialog from '@/components/SuratTugas/SuratTugasDialog';
@@ -154,6 +155,33 @@ const SuratTugasPage: React.FC = () => {
     setCurrentPage(1);
   };
 
+  // Generate composite title
+  const getCompositeTitle = () => {
+    let title = "Daftar Surat Tugas";
+    const filters = [];
+    
+    if (isInspektorat()) {
+      filters.push("Inspektorat I");
+    } else if (isAdmin() && selectedInspektorat !== 'all') {
+      filters.push(`Inspektorat ${selectedInspektorat}`);
+    }
+    
+    if (selectedYear !== 'all') {
+      filters.push(selectedYear);
+    }
+    
+    if (selectedPerwadag !== 'all') {
+      const perwadag = PERWADAG_DATA.find(p => p.id === selectedPerwadag);
+      if (perwadag) filters.push(perwadag.name);
+    }
+    
+    if (filters.length > 0) {
+      title += " - " + filters.join(" - ");
+    }
+    
+    return title;
+  };
+
   const canCreateEdit = isAdmin() || isInspektorat();
 
   return (
@@ -231,8 +259,13 @@ const SuratTugasPage: React.FC = () => {
       </Filtering>
 
       <Card>
-        <CardContent className="p-6">
+        <CardContent>
           <div className="space-y-4">
+            <ListHeaderComposite
+              title={getCompositeTitle()}
+              subtitle="Kelola data surat tugas audit berdasarkan filter yang dipilih"
+            />
+
             <SearchContainer
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
