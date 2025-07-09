@@ -215,12 +215,3 @@ export const KUESIONER_DATA: Kuesioner[] = [
 export const YEARS_KUESIONER = Array.from(
   new Set(KUESIONER_DATA.map(item => item.year))
 ).sort((a, b) => b - a);
-
-export const ASPEK_OPTIONS = [
-  "Tata Kelola Keuangan",
-  "Manajemen SDM",
-  "Promosi Dagang",
-  "Fasilitasi Ekspor",
-  "Pelayanan Konsular",
-  "Administrasi Umum"
-] as const;

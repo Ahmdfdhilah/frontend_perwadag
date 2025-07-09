@@ -264,7 +264,6 @@ const KuesionerPage: React.FC = () => {
         mode={dialogMode}
         onSave={handleSave}
         availablePerwadag={availablePerwadag}
-        canEdit={editingItem ? canEdit(editingItem) : false}
       />
     </div>
   );

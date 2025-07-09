@@ -7,7 +7,6 @@ import {
   TableHeader,
   TableRow,
 } from '@workspace/ui/components/table';
-import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { Kuesioner } from '@/mocks/kuesioner';
 
@@ -32,24 +31,6 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
     });
   };
 
-  const getAspekBadgeVariant = (aspek: string) => {
-    switch (aspek) {
-      case 'Tata Kelola Keuangan':
-        return 'default';
-      case 'Manajemen SDM':
-        return 'secondary';
-      case 'Promosi Dagang':
-        return 'outline';
-      case 'Fasilitasi Ekspor':
-        return 'destructive';
-      case 'Pelayanan Konsular':
-        return 'default';
-      case 'Administrasi Umum':
-        return 'secondary';
-      default:
-        return 'secondary';
-    }
-  };
 
   return (
     <div className="rounded-md border">
@@ -77,11 +58,7 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
                 <TableCell className="font-medium">{index + 1}</TableCell>
                 <TableCell>{formatDate(item.tanggal)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
-                <TableCell>
-                  <Badge variant={getAspekBadgeVariant(item.aspek)}>
-                    {item.aspek}
-                  </Badge>
-                </TableCell>
+                <TableCell>{item.aspek}</TableCell>
                 <TableCell>
                   {item.linkDokumen ? (
                     <a

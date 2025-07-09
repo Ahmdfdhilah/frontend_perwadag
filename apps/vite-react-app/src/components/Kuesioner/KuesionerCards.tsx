@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { Badge } from '@workspace/ui/components/badge';
 import { Kuesioner } from '@/mocks/kuesioner';
 import ActionDropdown from '@/components/common/ActionDropdown';
 
@@ -25,24 +24,6 @@ const KuesionerCards: React.FC<KuesionerCardsProps> = ({
     });
   };
 
-  const getAspekBadgeVariant = (aspek: string) => {
-    switch (aspek) {
-      case 'Tata Kelola Keuangan':
-        return 'default';
-      case 'Manajemen SDM':
-        return 'secondary';
-      case 'Promosi Dagang':
-        return 'outline';
-      case 'Fasilitasi Ekspor':
-        return 'destructive';
-      case 'Pelayanan Konsular':
-        return 'default';
-      case 'Administrasi Umum':
-        return 'secondary';
-      default:
-        return 'secondary';
-    }
-  };
 
   if (data.length === 0) {
     return (
@@ -82,12 +63,7 @@ const KuesionerCards: React.FC<KuesionerCardsProps> = ({
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Aspek:</span>
-                <Badge 
-                  variant={getAspekBadgeVariant(item.aspek)}
-                  className="ml-2"
-                >
-                  {item.aspek}
-                </Badge>
+                <span className="ml-2">{item.aspek}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Link Dokumen:</span>

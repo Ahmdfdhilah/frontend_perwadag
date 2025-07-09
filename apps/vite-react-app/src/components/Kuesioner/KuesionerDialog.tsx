@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
   DialogContent,
@@ -27,7 +26,7 @@ import { CalendarIcon, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
-import { Kuesioner, ASPEK_OPTIONS } from '@/mocks/kuesioner';
+import { Kuesioner } from '@/mocks/kuesioner';
 import { PeridagData } from '@/mocks/perwadag';
 
 interface KuesionerDialogProps {
@@ -37,7 +36,6 @@ interface KuesionerDialogProps {
   mode: 'view' | 'edit';
   onSave: (data: Partial<Kuesioner>) => void;
   availablePerwadag: PeridagData[];
-  canEdit?: boolean;
 }
 
 const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
@@ -47,9 +45,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   mode,
   onSave,
   availablePerwadag,
-  canEdit = false,
 }) => {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState<Partial<Kuesioner>>({});
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -86,11 +82,6 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
     }
   };
 
-  const handleEditClick = () => {
-    if (item) {
-      navigate(`/kuesioner/${item.id}/edit`);
-    }
-  };
 
   const isEditable = mode === 'edit';
 
@@ -179,29 +170,14 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
 
             <div className="space-y-2">
               <Label htmlFor="aspek">Aspek</Label>
-              {isEditable ? (
-                <Select
-                  value={formData.aspek || ''}
-                  onValueChange={(value) => setFormData({ ...formData, aspek: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih aspek" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {ASPEK_OPTIONS.map((aspek) => (
-                      <SelectItem key={aspek} value={aspek}>
-                        {aspek}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Input
-                  value={formData.aspek || ''}
-                  disabled
-                  className="bg-muted"
-                />
-              )}
+              <Input
+                id="aspek"
+                value={formData.aspek || ''}
+                onChange={(e) => setFormData({ ...formData, aspek: e.target.value })}
+                disabled={!isEditable}
+                className={!isEditable ? "bg-muted" : ""}
+                placeholder="Masukkan aspek"
+              />
             </div>
 
             <div className="space-y-2">
@@ -241,17 +217,17 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
           <Button variant="outline" onClick={handleCancel}>
-            Tutup
+            {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
-          {formData.linkDokumen && (
+          {mode === 'view' && formData.linkDokumen && (
             <Button onClick={handleOpenLink}>
               <ExternalLink className="w-4 h-4 mr-2" />
               Buka Link
             </Button>
           )}
-          {canEdit && (
-            <Button onClick={handleEditClick}>
-              Edit
+          {mode === 'edit' && (
+            <Button onClick={handleSave}>
+              Simpan
             </Button>
           )}
         </DialogFooter>
