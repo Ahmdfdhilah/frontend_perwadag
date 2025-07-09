@@ -39,7 +39,7 @@ export function useInfiniteSearch<T>({
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState<number | undefined>();
   
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const debounceTimeoutRef = useRef<any | undefined>(undefined);
   const abortControllerRef = useRef<AbortController | undefined>(undefined);
 
   const search = useCallback(async (searchQuery: string, pageNum: number, isLoadMore = false) => {
