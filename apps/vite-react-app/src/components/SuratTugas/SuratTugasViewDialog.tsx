@@ -9,7 +9,7 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
-import { ExternalLink } from 'lucide-react';
+import { Download, File } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { SuratTugas } from '@/mocks/suratTugas';
@@ -25,9 +25,12 @@ const SuratTugasViewDialog: React.FC<SuratTugasViewDialogProps> = ({
   onOpenChange,
   item,
 }) => {
-  const handleOpenLink = () => {
-    if (item?.linkDrive) {
-      window.open(item.linkDrive, '_blank');
+  const handleDownloadFile = () => {
+    if (item?.fileUrl && item?.fileName) {
+      const link = document.createElement('a');
+      link.href = item.fileUrl;
+      link.download = item.fileName;
+      link.click();
     }
   };
 
@@ -101,29 +104,35 @@ const SuratTugasViewDialog: React.FC<SuratTugasViewDialogProps> = ({
             <div className="space-y-2">
               <Label>Informasi Surat Tugas</Label>
               <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
-                Klik tombol "Buka Link" di bawah untuk melihat surat tugas.
+                Klik tombol "Download" di bawah untuk mengunduh surat tugas.
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label>Link Drive Surat Tugas</Label>
+              <Label>File Surat Tugas</Label>
               <div className="flex gap-2">
                 <Input
-                  value={item?.linkDrive || ''}
+                  value={item?.fileName || 'Tidak ada file'}
                   disabled
-                  className="bg-muted"
+                  className="bg-muted flex-1"
                 />
-                {item?.linkDrive && (
+                {item?.fileName && (
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={handleOpenLink}
-                    title="Buka Link"
+                    onClick={handleDownloadFile}
+                    title="Download File"
                   >
-                    <ExternalLink className="h-4 w-4" />
+                    <Download className="h-4 w-4" />
                   </Button>
                 )}
               </div>
+              {item?.fileName && (
+                <div className="text-sm text-muted-foreground flex items-center gap-1">
+                  <File className="w-3 h-3" />
+                  File: {item.fileName}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -132,10 +141,10 @@ const SuratTugasViewDialog: React.FC<SuratTugasViewDialogProps> = ({
           <Button variant="outline" onClick={handleCancel}>
             Tutup
           </Button>
-          {item?.linkDrive && (
-            <Button onClick={handleOpenLink}>
-              <ExternalLink className="w-4 h-4 mr-2" />
-              Buka Link
+          {item?.fileName && (
+            <Button onClick={handleDownloadFile}>
+              <Download className="w-4 h-4 mr-2" />
+              Download File
             </Button>
           )}
         </DialogFooter>
