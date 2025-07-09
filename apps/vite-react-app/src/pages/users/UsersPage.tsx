@@ -48,19 +48,8 @@ const UsersPage: React.FC = () => {
   const [viewingUser, setViewingUser] = useState<User | null>(null);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
-  // Check access - only admin can access this page
-  if (!isAdmin()) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Akses Ditolak</h2>
-          <p className="text-muted-foreground">
-            Anda tidak memiliki akses untuk melihat halaman ini.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // Calculate access control
+  const hasAccess = isAdmin();
 
   // Filter and search users
   const filteredUsers = useMemo(() => {
@@ -158,6 +147,20 @@ const UsersPage: React.FC = () => {
     setItemsPerPage(parseInt(value));
     setCurrentPage(1);
   };
+
+  // Check access after all hooks have been called
+  if (!hasAccess) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Akses Ditolak</h2>
+          <p className="text-muted-foreground">
+            Anda tidak memiliki akses untuk melihat halaman ini.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
