@@ -16,6 +16,9 @@ import SuratPemberitahuanPage from './pages/SuratPemberitahuanPage';
 import EntryMeetingPage from './pages/EntryMeetingPage';
 import ExitMeetingPage from './pages/ExitMeetingPage';
 import LaporanHasilEvaluasiPage from './pages/LaporanHasilEvaluasiPage';
+import MatriksPage from './pages/MatriksPage';
+import { LoginPage } from './pages/auth/LoginPage';
+import { DefaultLayout } from './components/layouts';
 
 
 function App() {
@@ -28,6 +31,9 @@ function App() {
               <AuthProvider>
                 <Toaster />
                 <Routes>
+                  <Route path="/" element={<DefaultLayout />}>
+                    <Route path='login' element={<LoginPage />} />
+                  </Route>
                   <Route path="/" element={<DashboardLayout />}>
                     <Route index element={<RiskAssessmentPage />} />
                     <Route path="penilaian-resiko" element={<RiskAssessmentPage />} />
@@ -35,6 +41,7 @@ function App() {
                     <Route path="penilaian-resiko/:id/edit" element={<RiskAssessmentInputPage />} />
                     <Route path="surat-tugas" element={<SuratTugasPage />} />
                     <Route path="surat-pemberitahuan" element={<SuratPemberitahuanPage />} />
+                    <Route path="matriks" element={<MatriksPage />} />
                     <Route path="entry-meeting" element={<EntryMeetingPage />} />
                     <Route path="exit-meeting" element={<ExitMeetingPage />} />
                     <Route path="laporan-hasil" element={<LaporanHasilEvaluasiPage />} />

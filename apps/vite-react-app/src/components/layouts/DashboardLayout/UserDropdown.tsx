@@ -1,5 +1,5 @@
 // apps/vite-react-app/src/components/layouts/DashboardLayout/UserDropdown.tsx
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@workspace/ui/components/button';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import {
@@ -35,6 +35,7 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
   const { currentRole, availableRoles, changeRole } = useRole();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
+  const navigate = useNavigate();
   // Dummy user data for prototyping
   const dummyUser = {
     first_name: 'John',
@@ -68,7 +69,7 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
       // await logout();
       // For prototyping, just simulate logout
       console.log('Logout clicked');
-      // navigate('/login', { replace: true });
+      navigate('/login', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
