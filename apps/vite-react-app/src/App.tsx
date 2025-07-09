@@ -11,6 +11,7 @@ import { AuthProvider } from './components/Auth/AuthProvider';
 import { DashboardLayout } from './components/layouts/DashboardLayout';
 import RiskAssessmentPage from './pages/RiskAssesment/RiskAssessmentPage';
 import RiskAssessmentInputPage from './pages/RiskAssesment/RiskAssessmentInputPage';
+import RiskAssessmentDetailPage from './pages/RiskAssesment/RiskAssessmentDetailPage';
 import SuratTugasPage from './pages/SuratTugasPage';
 import SuratPemberitahuanPage from './pages/SuratPemberitahuanPage';
 import EntryMeetingPage from './pages/EntryMeetingPage';
@@ -44,7 +45,7 @@ function App() {
                   <Route path="/" element={<DashboardLayout />}>
                     <Route index element={<RiskAssessmentPage />} />
                     <Route path="penilaian-resiko" element={<RiskAssessmentPage />} />
-                    <Route path="penilaian-resiko/:id" element={<RiskAssessmentInputPage />} />
+                    <Route path="penilaian-resiko/:id" element={<RiskAssessmentDetailPage />} />
                     <Route path="penilaian-resiko/:id/edit" element={<RiskAssessmentInputPage />} />
                     <Route path="surat-tugas" element={<SuratTugasPage />} />
                     <Route path="surat-pemberitahuan" element={<SuratPemberitahuanPage />} />
