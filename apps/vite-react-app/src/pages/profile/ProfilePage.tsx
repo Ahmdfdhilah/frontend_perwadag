@@ -143,8 +143,8 @@ const ProfilePage: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                <CreditCard className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">Kode: {user.nip}</span>
+                <Shield className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm">{user.roles.map(role => role.label).join(', ')}</span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -184,8 +184,8 @@ const ProfilePage: React.FC = () => {
                     <p className="text-sm text-muted-foreground">{user.phone}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Kode</label>
-                    <p className="text-sm text-muted-foreground">{user.nip}</p>
+                    <label className="text-sm font-medium">Jabatan</label>
+                    <p className="text-sm text-muted-foreground">{user.roles.map(role => role.label).join(', ')}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium">Alamat</label>

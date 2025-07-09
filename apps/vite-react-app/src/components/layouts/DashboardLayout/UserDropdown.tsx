@@ -41,7 +41,6 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
     first_name: 'John',
     last_name: 'Doe',
     email: 'john.doe@example.com',
-    employee_id: 'EMP001',
     mfa_enabled: true,
     is_verified: true,
     roles: [{ id: 'perwadag', name: 'perwadag', label: 'Atdag Tokyo', description: 'Trade supervision and regulation role' }]
@@ -155,9 +154,7 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
             <div className="flex flex-col space-y-1">
               <span className="font-medium">{getUserDisplayName()}</span>
               <span className="text-xs text-muted-foreground">{dummyUser.email}</span>
-              {dummyUser.employee_id && (
-                <span className="text-xs text-muted-foreground">Kode: {dummyUser.employee_id}</span>
-              )}
+              <span className="text-xs text-muted-foreground">{getUserRole()}</span>
             </div>
           </DropdownMenuLabel>
 
