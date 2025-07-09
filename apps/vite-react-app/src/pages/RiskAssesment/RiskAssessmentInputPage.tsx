@@ -29,6 +29,7 @@ import {
   IK_CHOICES,
   TEI_CHOICES,
 } from '@/mocks';
+import { formatNumber, handleNumberInput, parseFormattedNumber } from '@/utils/numberUtils';
 
 const RiskAssessmentInputPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -36,6 +37,14 @@ const RiskAssessmentInputPage: React.FC = () => {
   const { currentRole } = useRole();
   const [formData, setFormData] = useState<RiskAssessmentDetail>(DUMMY_RISK_ASSESSMENT_DETAIL);
   const [isLoading, setIsLoading] = useState(false);
+  const [formattedValues, setFormattedValues] = useState({
+    budgetRealization2024: formatNumber(DUMMY_RISK_ASSESSMENT_DETAIL.budgetRealization2024),
+    budgetPagu2024: formatNumber(DUMMY_RISK_ASSESSMENT_DETAIL.budgetPagu2024),
+    teiRealizationValue: formatNumber(DUMMY_RISK_ASSESSMENT_DETAIL.teiRealizationValue),
+    teiPotentialValue: formatNumber(DUMMY_RISK_ASSESSMENT_DETAIL.teiPotentialValue),
+    ikNotAchieved: formatNumber(DUMMY_RISK_ASSESSMENT_DETAIL.ikNotAchieved),
+    ikTotal: formatNumber(DUMMY_RISK_ASSESSMENT_DETAIL.ikTotal),
+  });
 
   // Calculate role values once to avoid hooks being called conditionally
   const userIsAdmin = currentRole.id === 'admin';
@@ -64,6 +73,19 @@ const RiskAssessmentInputPage: React.FC = () => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleNumberInputChange = (field: keyof RiskAssessmentDetail, value: string) => {
+    handleNumberInput(value, (formattedValue) => {
+      setFormattedValues(prev => ({
+        ...prev,
+        [field]: formattedValue
+      }));
+      setFormData(prev => ({
+        ...prev,
+        [field]: parseFormattedNumber(formattedValue)
+      }));
+    });
   };
 
   const calculateTotalRisk = () => {
@@ -222,17 +244,19 @@ const RiskAssessmentInputPage: React.FC = () => {
             <div>
               <Label>Realisasi 2024 (Rp)</Label>
               <Input
-                type="number"
-                value={formData.budgetRealization2024}
-                onChange={(e) => handleInputChange('budgetRealization2024', parseFloat(e.target.value))}
+                type="text"
+                value={formattedValues.budgetRealization2024}
+                onChange={(e) => handleNumberInputChange('budgetRealization2024', e.target.value)}
+                placeholder="0"
               />
             </div>
             <div>
               <Label>Pagu 2024 (Rp)</Label>
               <Input
-                type="number"
-                value={formData.budgetPagu2024}
-                onChange={(e) => handleInputChange('budgetPagu2024', parseFloat(e.target.value))}
+                type="text"
+                value={formattedValues.budgetPagu2024}
+                onChange={(e) => handleNumberInputChange('budgetPagu2024', e.target.value)}
+                placeholder="0"
               />
             </div>
             <div>
@@ -485,17 +509,19 @@ const RiskAssessmentInputPage: React.FC = () => {
               <div>
                 <Label>IK Tidak Tercapai</Label>
                 <Input
-                  type="number"
-                  value={formData.ikNotAchieved}
-                  onChange={(e) => handleInputChange('ikNotAchieved', parseInt(e.target.value))}
+                  type="text"
+                  value={formattedValues.ikNotAchieved}
+                  onChange={(e) => handleNumberInputChange('ikNotAchieved', e.target.value)}
+                  placeholder="0"
                 />
               </div>
               <div>
                 <Label>Total IK</Label>
                 <Input
-                  type="number"
-                  value={formData.ikTotal}
-                  onChange={(e) => handleInputChange('ikTotal', parseInt(e.target.value))}
+                  type="text"
+                  value={formattedValues.ikTotal}
+                  onChange={(e) => handleNumberInputChange('ikTotal', e.target.value)}
+                  placeholder="0"
                 />
               </div>
             </div>
@@ -550,19 +576,21 @@ const RiskAssessmentInputPage: React.FC = () => {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Nilai Realisasi</Label>
+                <Label>Nilai Realisasi (Rp)</Label>
                 <Input
-                  type="number"
-                  value={formData.teiRealizationValue}
-                  onChange={(e) => handleInputChange('teiRealizationValue', parseFloat(e.target.value))}
+                  type="text"
+                  value={formattedValues.teiRealizationValue}
+                  onChange={(e) => handleNumberInputChange('teiRealizationValue', e.target.value)}
+                  placeholder="0"
                 />
               </div>
               <div>
-                <Label>Nilai Potensi</Label>
+                <Label>Nilai Potensi (Rp)</Label>
                 <Input
-                  type="number"
-                  value={formData.teiPotentialValue}
-                  onChange={(e) => handleInputChange('teiPotentialValue', parseFloat(e.target.value))}
+                  type="text"
+                  value={formattedValues.teiPotentialValue}
+                  onChange={(e) => handleNumberInputChange('teiPotentialValue', e.target.value)}
+                  placeholder="0"
                 />
               </div>
             </div>

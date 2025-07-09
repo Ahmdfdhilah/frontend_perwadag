@@ -43,7 +43,8 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
     email: 'john.doe@example.com',
     employee_id: 'EMP001',
     mfa_enabled: true,
-    is_verified: true
+    is_verified: true,
+    roles: [{ id: 'perwadag', name: 'perwadag', label: 'Atdag Tokyo', description: 'Trade supervision and regulation role' }]
   };
 
   // Get user initials for avatar fallback
@@ -60,7 +61,7 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
 
   // Get user role display
   const getUserRole = () => {
-    return currentRole.label;
+    return dummyUser.roles.length > 0 ? dummyUser.roles[0].label : currentRole.label;
   };
 
   const handleLogout = async () => {
@@ -155,7 +156,7 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
               <span className="font-medium">{getUserDisplayName()}</span>
               <span className="text-xs text-muted-foreground">{dummyUser.email}</span>
               {dummyUser.employee_id && (
-                <span className="text-xs text-muted-foreground">{dummyUser.employee_id}</span>
+                <span className="text-xs text-muted-foreground">Kode: {dummyUser.employee_id}</span>
               )}
             </div>
           </DropdownMenuLabel>

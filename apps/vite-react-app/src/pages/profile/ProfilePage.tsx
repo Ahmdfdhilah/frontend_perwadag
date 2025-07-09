@@ -144,7 +144,7 @@ const ProfilePage: React.FC = () => {
 
               <div className="flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">NIP: {user.nip}</span>
+                <span className="text-sm">Kode: {user.nip}</span>
               </div>
 
               <div className="flex items-center gap-2">
@@ -184,7 +184,7 @@ const ProfilePage: React.FC = () => {
                     <p className="text-sm text-muted-foreground">{user.phone}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium">NIP</label>
+                    <label className="text-sm font-medium">Kode</label>
                     <p className="text-sm text-muted-foreground">{user.nip}</p>
                   </div>
                   <div>
