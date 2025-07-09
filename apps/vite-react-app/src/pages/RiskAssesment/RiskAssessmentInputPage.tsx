@@ -33,29 +33,20 @@ import {
 const RiskAssessmentInputPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { isAdmin, isInspektorat, currentRole } = useRole();
+  const { currentRole } = useRole();
   const [formData, setFormData] = useState<RiskAssessmentDetail>(DUMMY_RISK_ASSESSMENT_DETAIL);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Check access
-  if (!isAdmin() && !isInspektorat()) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Akses Ditolak</h2>
-          <p className="text-muted-foreground">
-            Anda tidak memiliki akses untuk melihat halaman ini.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // Calculate role values once to avoid hooks being called conditionally
+  const userIsAdmin = currentRole.id === 'admin';
+  const userIsInspektorat = currentRole.id === 'inspektorat';
+  const hasAccess = userIsAdmin || userIsInspektorat;
 
   // Check if user can access this specific assessment
   useEffect(() => {
-    if (id && !isAdmin()) {
+    if (id && !userIsAdmin) {
       const assessment = RISK_ASSESSMENTS.find(item => item.id === id);
-      if (assessment && isInspektorat()) {
+      if (assessment && userIsInspektorat) {
         // For inspektorat, only allow access to inspektorat 1 data (as example)
         if (assessment.inspektorat !== 1) {
           navigate('/penilaian-resiko');
@@ -63,7 +54,7 @@ const RiskAssessmentInputPage: React.FC = () => {
         }
       }
     }
-  }, [id, isAdmin, isInspektorat, navigate]);
+  }, [id, userIsAdmin, userIsInspektorat, navigate]);
 
   // Get basic assessment info
   const basicAssessment = RISK_ASSESSMENTS.find(item => item.id === id);
@@ -105,6 +96,20 @@ const RiskAssessmentInputPage: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  // Check access after all hooks have been called
+  if (!hasAccess) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Akses Ditolak</h2>
+          <p className="text-muted-foreground">
+            Anda tidak memiliki akses untuk melihat halaman ini.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (!basicAssessment) {
     return (

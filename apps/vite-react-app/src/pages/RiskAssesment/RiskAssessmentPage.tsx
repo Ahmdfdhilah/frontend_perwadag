@@ -25,7 +25,7 @@ import RiskAssessmentCards from '@/components/RiskAssesment/RiskAssessmentCards'
 
 const RiskAssessmentPage: React.FC = () => {
   const navigate = useNavigate();
-  const { isAdmin, isInspektorat } = useRole();
+  const { currentRole } = useRole();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [selectedInspektorat, setSelectedInspektorat] = useState<string>('all');
@@ -33,21 +33,12 @@ const RiskAssessmentPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Check access - only admin and inspektorat can access this page
-  if (!isAdmin() && !isInspektorat()) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-2">Akses Ditolak</h2>
-          <p className="text-muted-foreground">
-            Anda tidak memiliki akses untuk melihat halaman ini.
-          </p>
-        </div>
-      </div>
-    );
-  }
+  // Calculate role values once to avoid any potential issues
+  const userIsAdmin = currentRole.id === 'admin';
+  const userIsInspektorat = currentRole.id === 'inspektorat';
+  const hasAccess = userIsAdmin || userIsInspektorat;
 
-  // Filter and sort data
+  // Filter and sort data - always run this hook regardless of access
   const filteredData = useMemo(() => {
     let filtered = [...RISK_ASSESSMENTS];
 
@@ -64,12 +55,12 @@ const RiskAssessmentPage: React.FC = () => {
     }
 
     // Filter by inspektorat (only for admin)
-    if (isAdmin() && selectedInspektorat !== 'all') {
+    if (userIsAdmin && selectedInspektorat !== 'all') {
       filtered = filtered.filter(item => item.inspektorat === parseInt(selectedInspektorat));
     }
 
     // For inspektorat role, only show data for their own inspektorat
-    if (isInspektorat()) {
+    if (userIsInspektorat) {
       // In a real app, you would get the user's inspektorat from auth context
       // For now, we'll show inspektorat 1 data as example
       filtered = filtered.filter(item => item.inspektorat === 1);
@@ -92,7 +83,7 @@ const RiskAssessmentPage: React.FC = () => {
     });
 
     return filtered;
-  }, [searchQuery, selectedYear, selectedInspektorat, sortBy, isAdmin, isInspektorat]);
+  }, [searchQuery, selectedYear, selectedInspektorat, sortBy, userIsAdmin, userIsInspektorat]);
 
   // Pagination
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -116,6 +107,20 @@ const RiskAssessmentPage: React.FC = () => {
     setItemsPerPage(parseInt(value));
     setCurrentPage(1); // Reset to first page when changing items per page
   };
+
+  // Check access after all hooks have been called
+  if (!hasAccess) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Akses Ditolak</h2>
+          <p className="text-muted-foreground">
+            Anda tidak memiliki akses untuk melihat halaman ini.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -143,7 +148,7 @@ const RiskAssessmentPage: React.FC = () => {
         </div>
 
         {/* Only show inspektorat filter for admin */}
-        {isAdmin() && (
+        {userIsAdmin && (
           <div className="space-y-2">
             <Label htmlFor="inspektorat-filter">Inspektorat</Label>
             <Select value={selectedInspektorat} onValueChange={setSelectedInspektorat}>

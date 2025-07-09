@@ -41,7 +41,9 @@ const MatriksPage: React.FC = () => {
   const [viewingItem, setViewingItem] = useState<Matriks | null>(null);
 
   // Check access - only admin, inspektorat, and perwadag can access this page
-  if (!isAdmin() && !isInspektorat() && !isPerwadag()) {
+  const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
+
+  if (!hasAccess) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
