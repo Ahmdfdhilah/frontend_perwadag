@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Alert, AlertDescription, AlertTitle } from "@workspace/ui/components/alert";
-import { Info, Filter, ChevronDown, ChevronUp } from "lucide-react";
+import { Filter, ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardHeader, CardContent, CardTitle } from "@workspace/ui/components/card";
 import { ReactNode } from "react";
 
@@ -48,22 +47,10 @@ function Filtering({
 
             {/* Render konten filter secara kondisional */}
             {isFilterVisible && (
-                <CardContent className="pt-6">
-                    <div className="w-full space-y-6">
-                        <Alert className="bg-secondary/10 dark:bg-secondary/5 border-primary dark:border-primary/60">
-                            <Info className="h-5 w-5 text-primary dark:text-primary/80" />
-                            <AlertTitle className="text-primary dark:text-primary/80 font-semibold">
-                                Petunjuk Filter
-                            </AlertTitle>
-                            <AlertDescription className="text-gray-700 dark:text-gray-300">
-                                Pilih filter untuk menampilkan data yang sesuai. Gabungkan beberapa filter untuk hasil yang lebih akurat.
-                            </AlertDescription>
-                        </Alert>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-                            {/* Render children filter */}
-                            {children}
-                        </div>
+                <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                        {/* Render children filter */}
+                        {children}
                     </div>
                 </CardContent>
             )}

@@ -4,12 +4,12 @@ A.	Umum
 
 
 B.	Penilaian Risiko: apps\vite-react-app\src\pages\RiskAssesment\*
-    1.	Menghilangkan filter urutkan tahun terbaru dan tahun terlama
-    2.	Menambahkan kolom Inspektorat xx
-    3.	Menghilangkan kolom total
-    4.	Setting pilihan kategori dalam penilaian risiko menjadi automatic dan dilock \\hitung otomatis
+    1.	Menghilangkan filter urutkan tahun terbaru dan tahun terlama: apps\vite-react-app\src\pages\RiskAssesment\RiskAssessmentPage.tsx
+    2.	Menambahkan kolom Inspektorat xx: apps\vite-react-app\src\pages\RiskAssesment\RiskAssessmentPage.tsx
+    3.	Menghilangkan kolom total: apps\vite-react-app\src\pages\RiskAssesment\RiskAssessmentPage.tsx
+    4.	Setting pilihan kategori dalam penilaian risiko menjadi automatic dan di disable \\hitung otomatis apps\vite-react-app\src\pages\RiskAssesment\RiskAssessmentInputPage.tsx
     5.	Menambahkan separator ribuan untuk semua input number (entah best practice nya bagaimana)
-    6.	Menambahkan keterangan (Rp) pada Indikator 8
+    6.	Menambahkan keterangan (Rp) pada Indikator 8 ini belum di apps\vite-react-app\src\pages\RiskAssesment\RiskAssessmentInputPage.tsx dan apps\vite-react-app\src\pages\RiskAssesment\RiskAssessmentDetailPage.tsx
 
 C.	Surat Tugas apps\vite-react-app\src\pages\SuratTugasPage.tsx
     1.	Tanggal disesuaikan menjadi tanggal pelaksanaan evaluasi.

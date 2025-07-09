@@ -20,6 +20,7 @@ import {
 import { PERWADAG_DATA } from '@/mocks/perwadag';
 import { INSPEKTORATS } from '@/mocks/riskAssessment';
 import { PageHeader } from '@/components/common/PageHeader';
+import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import LaporanHasilEvaluasiTable from '@/components/LaporanHasilEvaluasi/LaporanHasilEvaluasiTable';
 import LaporanHasilEvaluasiCards from '@/components/LaporanHasilEvaluasi/LaporanHasilEvaluasiCards';
 import LaporanHasilEvaluasiDialog from '@/components/LaporanHasilEvaluasi/LaporanHasilEvaluasiDialog';
@@ -140,6 +141,33 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
     setCurrentPage(1);
   };
 
+  // Generate composite title
+  const getCompositeTitle = () => {
+    let title = "Daftar Laporan Hasil Evaluasi";
+    const filters = [];
+    
+    if (isInspektorat()) {
+      filters.push("Inspektorat I");
+    } else if (isAdmin() && selectedInspektorat !== 'all') {
+      filters.push(`Inspektorat ${selectedInspektorat}`);
+    }
+    
+    if (selectedYear !== 'all') {
+      filters.push(selectedYear);
+    }
+    
+    if (selectedPerwadag !== 'all') {
+      const perwadag = PERWADAG_DATA.find(p => p.id === selectedPerwadag);
+      if (perwadag) filters.push(perwadag.name);
+    }
+    
+    if (filters.length > 0) {
+      title += " - " + filters.join(" - ");
+    }
+    
+    return title;
+  };
+
   const canEdit = (item: LaporanHasilEvaluasi) => {
     if (isAdmin()) return true;
     if (isInspektorat()) return item.inspektorat === 1;
@@ -216,6 +244,11 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
       <Card>
         <CardContent>
           <div className="space-y-4">
+            <ListHeaderComposite
+              title={getCompositeTitle()}
+              subtitle="Kelola data laporan hasil evaluasi berdasarkan filter yang dipilih"
+            />
+
             <SearchContainer
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
