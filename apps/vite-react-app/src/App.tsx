@@ -16,6 +16,8 @@ import SuratPemberitahuanPage from './pages/SuratPemberitahuanPage';
 import EntryMeetingPage from './pages/EntryMeetingPage';
 import ExitMeetingPage from './pages/ExitMeetingPage';
 import LaporanHasilEvaluasiPage from './pages/LaporanHasilEvaluasiPage';
+import KuesionerPage from './pages/KuesionerPage';
+import KuesionerEditPage from './pages/KuesionerEditPage';
 import MatriksPage from './pages/MatriksPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { DefaultLayout } from './components/layouts';
@@ -51,6 +53,8 @@ function App() {
                     <Route path="entry-meeting" element={<EntryMeetingPage />} />
                     <Route path="exit-meeting" element={<ExitMeetingPage />} />
                     <Route path="laporan-hasil" element={<LaporanHasilEvaluasiPage />} />
+                    <Route path="kuesioner" element={<KuesionerPage />} />
+                    <Route path="kuesioner/:id/edit" element={<KuesionerEditPage />} />
                     <Route path="users" element={<UsersPage />} />
                     <Route path="profile" element={<ProfilePage />} />
                   </Route>

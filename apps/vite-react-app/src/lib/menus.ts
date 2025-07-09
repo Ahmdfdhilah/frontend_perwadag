@@ -1,4 +1,4 @@
-import { AlertTriangle, FileInput, Grid2X2, Mail, MailWarningIcon, PhoneIncoming, PhoneOutgoing, Users } from "lucide-react";
+import { AlertTriangle, FileInput, Grid2X2, Mail, MailWarningIcon, PhoneIncoming, PhoneOutgoing, Users, ClipboardList } from "lucide-react";
 
 // Role definitions
 export type UserRole =
@@ -66,6 +66,13 @@ export const menuItems: SidebarItem[] = [
     title: 'Laporan Hasil',
     href: '/laporan-hasil',
     icon: FileInput,
+    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
+  },
+  // Kuesioner - Only admin and inspektorat, perwadag
+  {
+    title: 'Kuesioner',
+    href: '/kuesioner',
+    icon: ClipboardList,
     allowedRoles: ['admin', 'inspektorat', 'perwadag'],
   },
 
