@@ -11,7 +11,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@workspace/ui/components/alert';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@workspace/ui/components/form';
 
-import logo from '@/assets/logoLightMode.png';
+import { useTheme } from '@/hooks/useTheme';
+import logoLightMode from '@/assets/logoLightMode.png';
+import logoDarkMode from '@/assets/logoDarkMode.png';
 import loginIcon from '@/assets/loginIcon.png';
 
 const forgotPasswordSchema = z.object({
@@ -21,6 +23,7 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 export function ForgotPasswordPage() {
+  const { isDarkMode } = useTheme();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
 
@@ -61,7 +64,7 @@ export function ForgotPasswordPage() {
       {/* Desktop Layout */}
       <div className="hidden md:flex max-h-screen">
         {/* Left Side - Banner Image */}
-        <div className="flex-[2] relative bg-gray-100">
+        <div className="flex-[2] relative bg-gray-100 dark:bg-gray-900">
           <img 
             src={loginIcon} 
             alt="Login Banner" 
@@ -76,7 +79,7 @@ export function ForgotPasswordPage() {
             {/* Logo and Header */}
             <div className="text-center space-y-4">
               <div className="flex justify-center">
-                <img src={logo} alt="OKOCE HRIS" className="h-12 w-auto" />
+                <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="OKOCE HRIS" className="h-12 w-auto" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">Lupa Password</h1>
@@ -168,7 +171,7 @@ export function ForgotPasswordPage() {
           {/* Logo and Header */}
           <div className="text-center space-y-4">
             <div className="flex justify-center">
-              <img src={logo} alt="OKOCE HRIS" className="h-12 w-auto" />
+              <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="OKOCE HRIS" className="h-12 w-auto" />
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-white">Lupa Password</h1>

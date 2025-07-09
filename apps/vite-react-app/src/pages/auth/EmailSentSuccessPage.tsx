@@ -5,10 +5,13 @@ import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Alert, AlertDescription } from '@workspace/ui/components/alert';
 
-import logo from '@/assets/logoLightMode.png';
+import { useTheme } from '@/hooks/useTheme';
+import logoLightMode from '@/assets/logoLightMode.png';
+import logoDarkMode from '@/assets/logoDarkMode.png';
 import loginIcon from '@/assets/loginIcon.png';
 
 export function EmailSentSuccessPage() {
+  const { isDarkMode } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -29,7 +32,7 @@ export function EmailSentSuccessPage() {
       {/* Desktop Layout */}
       <div className="hidden md:flex max-h-screen">
         {/* Left Side - Banner Image */}
-        <div className="flex-[2] relative bg-gray-100">
+        <div className="flex-[2] relative bg-gray-100 dark:bg-gray-900">
           <img 
             src={loginIcon} 
             alt="Login Banner" 
@@ -44,7 +47,7 @@ export function EmailSentSuccessPage() {
             {/* Logo and Header */}
             <div className="text-center space-y-4">
               <div className="flex justify-center">
-                <img src={logo} alt="OKOCE HRIS" className="h-12 w-auto" />
+                <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="OKOCE HRIS" className="h-12 w-auto" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">Email Terkirim!</h1>
@@ -114,7 +117,7 @@ export function EmailSentSuccessPage() {
           {/* Logo and Header */}
           <div className="text-center space-y-4">
             <div className="flex justify-center">
-              <img src={logo} alt="OKOCE HRIS" className="h-12 w-auto" />
+              <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="OKOCE HRIS" className="h-12 w-auto" />
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-white">Email Terkirim!</h1>

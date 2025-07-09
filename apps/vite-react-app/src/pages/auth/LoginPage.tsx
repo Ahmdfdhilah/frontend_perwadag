@@ -13,7 +13,9 @@ import { Alert, AlertDescription } from '@workspace/ui/components/alert';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@workspace/ui/components/form';
 import { Checkbox } from '@workspace/ui/components/checkbox';
 
-import logo from '@/assets/logoLightMode.png';
+import { useTheme } from '@/hooks/useTheme';
+import logoLightMode from '@/assets/logoLightMode.png';
+import logoDarkMode from '@/assets/logoDarkMode.png';
 import loginIcon from '@/assets/loginIcon.png';
 
 const loginSchema = z.object({
@@ -25,6 +27,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginPage() {
+  const { isDarkMode } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState<string>('');
@@ -88,7 +91,7 @@ export function LoginPage() {
       {/* Desktop Layout */}
       <div className="hidden md:flex max-h-screen">
         {/* Left Side - Banner Image */}
-        <div className="flex-[2] relative bg-gray-100">
+        <div className="flex-[2] relative bg-gray-100 dark:bg-gray-900">
           <img 
             src={loginIcon} 
             alt="Login Banner" 
@@ -103,7 +106,7 @@ export function LoginPage() {
             {/* Logo and Header */}
             <div className="text-center space-y-4">
               <div className="flex justify-center">
-                <img src={logo} alt="OKOCE HRIS" className="h-12 w-auto" />
+                <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="OKOCE HRIS" className="h-12 w-auto" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">Selamat Datang</h1>
@@ -255,7 +258,7 @@ export function LoginPage() {
           {/* Logo and Header */}
           <div className="text-center space-y-4">
             <div className="flex justify-center">
-              <img src={logo} alt="OKOCE HRIS" className="h-12 w-auto" />
+              <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="OKOCE HRIS" className="h-12 w-auto" />
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-white">Selamat Datang</h1>
