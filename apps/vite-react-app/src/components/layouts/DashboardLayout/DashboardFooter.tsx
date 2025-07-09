@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 
 export function DashboardFooter() {
   return (
@@ -10,7 +10,7 @@ export function DashboardFooter() {
               © 2025 Kementrian Perdagangan RI. All rights reserved.
             </p>
           </div>
-          <div className="flex items-center space-x-6">
+          {/* <div className="flex items-center space-x-6">
             <Link
               to="/help"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -29,7 +29,7 @@ export function DashboardFooter() {
             >
               Terms
             </Link>
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>

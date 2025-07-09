@@ -22,6 +22,7 @@ import { DefaultLayout } from './components/layouts';
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
 import { EmailSentSuccessPage } from './pages/auth/EmailSentSuccessPage';
 import UsersPage from './pages/users/UsersPage';
+import ProfilePage from './pages/profile/ProfilePage';
 
 
 function App() {
@@ -51,6 +52,7 @@ function App() {
                     <Route path="exit-meeting" element={<ExitMeetingPage />} />
                     <Route path="laporan-hasil" element={<LaporanHasilEvaluasiPage />} />
                     <Route path="users" element={<UsersPage />} />
+                    <Route path="profile" element={<ProfilePage />} />
                   </Route>
                 </Routes>
               </AuthProvider>
