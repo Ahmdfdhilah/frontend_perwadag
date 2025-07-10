@@ -21,7 +21,7 @@ import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
 import { KonfirmasiMeeting } from '@/mocks/konfirmasiMeeting';
 import { Perwadag } from '@/mocks/perwadag';
-import { useRole } from '@/hooks/useRole';
+import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
 import FileUpload from '@/components/common/FileUpload';
@@ -43,7 +43,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
   onSave,
   availablePerwadag,
 }) => {
-  const { isAdmin, isInspektorat } = useRole();
+  const { canEditForm } = useFormPermissions();
   const [formData, setFormData] = useState<Partial<KonfirmasiMeeting>>({});
   const [selectedKonfirmasiDate, setSelectedKonfirmasiDate] = useState<Date>();
   const [isKonfirmasiDatePickerOpen, setIsKonfirmasiDatePickerOpen] = useState(false);
@@ -93,7 +93,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
 
 
   const isEditable = mode === 'edit';
-  const canEdit = (isAdmin() || isInspektorat()) && isEditable;
+  const canEdit = canEditForm('konfirmasi_meeting') && isEditable;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -141,6 +141,14 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
               </div>
             </div>
 
+            
+            <div className="space-y-2">
+              <Label>Periode Evaluasi</Label>
+              <div className="p-3 bg-muted rounded-md">
+                {item ? formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi) : '-'}
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label>Tanggal Konfirmasi</Label>
               {canEdit ? (
@@ -179,13 +187,6 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
                   {item ? format(new Date(item.tanggalKonfirmasi), "dd MMMM yyyy", { locale: id }) : '-'}
                 </div>
               )}
-            </div>
-
-            <div className="space-y-2">
-              <Label>Periode Evaluasi</Label>
-              <div className="p-3 bg-muted rounded-md">
-                {item ? formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi) : '-'}
-              </div>
             </div>
 
             {/* Link Zoom - Editable */}

@@ -8,12 +8,14 @@ import {
 } from '@workspace/ui/components/dialog';
 import { Button } from '@workspace/ui/components/button';
 import { Matriks } from '@/mocks/matriks';
+import { useFormPermissions } from '@/hooks/useFormPermissions';
 import FileUpload from '@/components/common/FileUpload';
 
 interface MatriksDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   item: Matriks | null;
+  mode?: 'view' | 'edit' | 'create';
   onSave: (data: Partial<Matriks>) => void;
 }
 
@@ -21,8 +23,12 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   open,
   onOpenChange,
   item,
+  mode = item ? 'edit' : 'create',
   onSave,
 }) => {
+  const { canEditForm } = useFormPermissions();
+  const isEditable = mode !== 'view';
+  const canEdit = canEditForm('matriks') && isEditable;
   const [formData, setFormData] = useState<Partial<Matriks>>({});
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string }>>([]);
@@ -77,7 +83,8 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
               maxFiles={1}
               files={uploadFiles}
               existingFiles={existingFiles}
-              mode="edit"
+              mode={canEdit ? 'edit' : 'view'}
+              disabled={!canEdit}
               onFilesChange={handleUploadFilesChange}
               onExistingFileRemove={handleExistingFileRemove}
               description="Format yang didukung: PDF, DOC, DOCX, XLS, XLSX (Max 10MB)"
@@ -89,9 +96,11 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
           <Button variant="outline" onClick={handleCancel}>
             Batal
           </Button>
-          <Button onClick={handleSave}>
-            Simpan
-          </Button>
+          {canEdit && (
+            <Button onClick={handleSave}>
+              Simpan
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

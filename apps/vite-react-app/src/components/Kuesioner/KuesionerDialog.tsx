@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRole } from '@/hooks/useRole';
+import { useFormPermissions } from '@/hooks/useFormPermissions';
 import {
   Dialog,
   DialogContent,
@@ -48,6 +49,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   onSave,
   availablePerwadag,
 }) => {
+  const { canEditForm } = useFormPermissions();
   const { isAdmin, isInspektorat, isPerwadag } = useRole();
   const [formData, setFormData] = useState<Partial<Kuesioner>>({});
   const [selectedDate, setSelectedDate] = useState<Date>();
@@ -124,9 +126,10 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   const isEditable = mode === 'edit';
 
   // Role-based field permissions
-  const canEditDate = isEditable && (isAdmin() || isInspektorat() || isPerwadag());
-  const canEditPerwadag = isEditable && (isAdmin() || isInspektorat());
-  const canEditDokumen = isEditable && (isAdmin() || isInspektorat() || isPerwadag());
+  const baseCanEdit = canEditForm('kuesioner') && isEditable;
+  const canEditDate = baseCanEdit && (isAdmin() || isInspektorat() || isPerwadag());
+  const canEditPerwadag = baseCanEdit && (isAdmin() || isInspektorat());
+  const canEditDokumen = baseCanEdit && (isAdmin() || isInspektorat() || isPerwadag());
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -240,7 +243,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
               Download Dokumen
             </Button>
           )}
-          {mode === 'edit' && (
+          {baseCanEdit && (
             <Button onClick={handleSave}>
               Simpan
             </Button>

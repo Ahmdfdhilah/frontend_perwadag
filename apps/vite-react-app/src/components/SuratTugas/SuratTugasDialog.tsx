@@ -27,12 +27,14 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { SuratTugas } from '@/mocks/suratTugas';
 import { Perwadag } from '@/mocks/perwadag';
+import { useFormPermissions } from '@/hooks/useFormPermissions';
 import FileUpload from '@/components/common/FileUpload';
 
 interface SuratTugasDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editingItem: SuratTugas | null;
+  mode?: 'view' | 'edit' | 'create';
   onSave: (data: Partial<SuratTugas>) => void;
   availablePerwadag: Perwadag[];
 }
@@ -41,9 +43,11 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   open,
   onOpenChange,
   editingItem,
+  mode = editingItem ? 'edit' : 'create',
   onSave,
   availablePerwadag,
 }) => {
+  const { canEditForm } = useFormPermissions();
   const [formData, setFormData] = useState({
     nomor: '',
     perwadagId: '',
@@ -132,6 +136,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
 
   const isFormValid = formData.nomor && formData.perwadagId && formData.tanggalPelaksanaanEvaluasi &&
     formData.pengendaliMutu && formData.pengendaliTeknis && formData.ketuaTim;
+  const isEditable = mode !== 'view';
+  const canEdit = canEditForm('surat_tugas') && isEditable;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -151,6 +157,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                 value={formData.nomor}
                 onChange={(e) => setFormData(prev => ({ ...prev, nomor: e.target.value }))}
                 placeholder="Contoh: ST/001/I/2024"
+                disabled={!canEdit}
               />
             </div>
 
@@ -159,6 +166,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
               <Select
                 value={formData.perwadagId}
                 onValueChange={(value) => setFormData(prev => ({ ...prev, perwadagId: value }))}
+                disabled={!canEdit}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Pilih perwadag" />
@@ -181,6 +189,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                     <Button
                       variant="outline"
                       className="w-full justify-start text-left font-normal"
+                      disabled={!canEdit}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {formData.tanggalPelaksanaanEvaluasi ? (
@@ -211,6 +220,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                     <Button
                       variant="outline"
                       className="w-full justify-start text-left font-normal"
+                      disabled={!canEdit}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {formData.tanggalSelesaiEvaluasi ? (
@@ -246,6 +256,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                 value={formData.pengendaliMutu}
                 onChange={(e) => setFormData(prev => ({ ...prev, pengendaliMutu: e.target.value }))}
                 placeholder="Contoh: Dr. Ahmad Sutanto"
+                disabled={!canEdit}
               />
             </div>
 
@@ -256,6 +267,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                 value={formData.pengendaliTeknis}
                 onChange={(e) => setFormData(prev => ({ ...prev, pengendaliTeknis: e.target.value }))}
                 placeholder="Contoh: Ir. Budi Setiawan"
+                disabled={!canEdit}
               />
             </div>
 
@@ -266,6 +278,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                 value={formData.ketuaTim}
                 onChange={(e) => setFormData(prev => ({ ...prev, ketuaTim: e.target.value }))}
                 placeholder="Contoh: Drs. Chandra Kusuma"
+                disabled={!canEdit}
               />
             </div>
 
@@ -284,7 +297,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
               maxFiles={1}
               files={uploadFiles}
               existingFiles={existingFiles}
-              mode="edit"
+              mode={canEdit ? 'edit' : 'view'}
+              disabled={!canEdit}
               onFilesChange={handleUploadFilesChange}
               onExistingFileRemove={handleExistingFileRemove}
               description="Format yang didukung: PDF, DOC, DOCX (Max 10MB)"
@@ -296,9 +310,11 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
           <Button variant="outline" onClick={handleCancel}>
             Batal
           </Button>
-          <Button onClick={handleSave} disabled={!isFormValid}>
-            {editingItem ? 'Simpan' : 'Buat'}
-          </Button>
+          {canEdit && (
+            <Button onClick={handleSave} disabled={!isFormValid}>
+              {editingItem ? 'Simpan' : 'Buat'}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

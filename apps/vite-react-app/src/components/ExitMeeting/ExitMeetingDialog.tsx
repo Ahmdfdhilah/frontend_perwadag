@@ -9,9 +9,18 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
-import { ExternalLink } from 'lucide-react';
+import { Calendar } from '@workspace/ui/components/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@workspace/ui/components/popover';
+import { CalendarIcon, ExternalLink } from 'lucide-react';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
+import { cn } from '@workspace/ui/lib/utils';
 import { ExitMeeting } from '@/mocks/exitMeeting';
-import { useRole } from '@/hooks/useRole';
+import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDate, formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 
@@ -30,8 +39,10 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   mode,
   onSave,
 }) => {
-  const { isAdmin, isInspektorat } = useRole();
+  const { canEditForm } = useFormPermissions();
   const [formData, setFormData] = useState<Partial<ExitMeeting>>({});
+  const [selectedExitDate, setSelectedExitDate] = useState<Date>();
+  const [isExitDatePickerOpen, setIsExitDatePickerOpen] = useState(false);
   const [daftarHadirFiles, setDaftarHadirFiles] = useState<File[]>([]);
   const [buktiHadirFiles, setBuktiHadirFiles] = useState<File[]>([]);
   const [existingDaftarHadir, setExistingDaftarHadir] = useState<Array<{ name: string; url?: string }>>([]);
@@ -40,12 +51,14 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   useEffect(() => {
     if (item && open) {
       setFormData({ ...item });
+      setSelectedExitDate(item.tanggal ? new Date(item.tanggal) : undefined);
       
       // Set existing files for display
       setExistingDaftarHadir(item.linkDaftarHadir ? [{ name: 'Daftar Hadir', url: item.linkDaftarHadir }] : []);
       setExistingBuktiHadir(item.buktiImageUrls ? item.buktiImageUrls.map((url, index) => ({ name: `Bukti ${index + 1}`, url })) : []);
     } else {
       setFormData({});
+      setSelectedExitDate(undefined);
       setDaftarHadirFiles([]);
       setBuktiHadirFiles([]);
       setExistingDaftarHadir([]);
@@ -56,6 +69,7 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   const handleSave = () => {
     const dataToSave = {
       ...formData,
+      tanggal: selectedExitDate ? selectedExitDate.toISOString().split('T')[0] : formData.tanggal,
       daftarHadirFiles,
       buktiHadirFiles,
     };
@@ -90,7 +104,7 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   };
 
   const isEditable = mode === 'edit';
-  const canEdit = (isAdmin() || isInspektorat()) && isEditable;
+  const canEdit = canEditForm('exit_meeting') && isEditable;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -113,7 +127,7 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
                 <Label>Tanggal Evaluasi</Label>
                 <div className="p-3 bg-muted rounded-md">
@@ -122,9 +136,42 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
               </div>
               <div className="space-y-2">
                 <Label>Tanggal Exit Meeting</Label>
-                <div className="p-3 bg-muted rounded-md">
-                  {item ? formatIndonesianDate(item.tanggal) : '-'}
-                </div>
+                {canEdit ? (
+                  <Popover open={isExitDatePickerOpen} onOpenChange={setIsExitDatePickerOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !selectedExitDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {selectedExitDate ? (
+                          format(selectedExitDate, "dd MMMM yyyy", { locale: id })
+                        ) : (
+                          <span>Pilih tanggal</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={selectedExitDate}
+                        onSelect={(date) => {
+                          setSelectedExitDate(date);
+                          setIsExitDatePickerOpen(false);
+                        }}
+                        initialFocus
+                        locale={id}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                ) : (
+                  <div className="p-3 bg-muted rounded-md">
+                    {item ? formatIndonesianDate(item.tanggal) : '-'}
+                  </div>
+                )}
               </div>
             </div>
 

@@ -8,12 +8,14 @@ import {
 } from '@workspace/ui/components/dialog';
 import { User } from '@/mocks/users';
 import { ROLES } from '@/mocks/roles';
+import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { UserForm } from './UserForm';
 
 interface UserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editingUser: User | null;
+  mode?: 'view' | 'edit' | 'create';
   onSave: (userData: any) => void;
 }
 
@@ -21,8 +23,12 @@ export const UserDialog: React.FC<UserDialogProps> = ({
   open,
   onOpenChange,
   editingUser,
+  mode = editingUser ? 'edit' : 'create',
   onSave
 }) => {
+  const { canEditForm } = useFormPermissions();
+  const isEditable = mode !== 'view';
+  const canEdit = canEditForm('user_management') && isEditable;
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -80,6 +86,8 @@ export const UserDialog: React.FC<UserDialogProps> = ({
           onSubmit={handleSubmit}
           onCancel={handleCancel}
           loading={loading}
+          disabled={!canEdit}
+          mode={mode}
         />
       </DialogContent>
     </Dialog>

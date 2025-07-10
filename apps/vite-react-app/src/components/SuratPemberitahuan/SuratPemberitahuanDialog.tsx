@@ -19,6 +19,7 @@ import { CalendarIcon, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { SuratPemberitahuan } from '@/mocks/suratPemberitahuan';
+import { useFormPermissions } from '@/hooks/useFormPermissions';
 import FileUpload from '@/components/common/FileUpload';
 
 interface SuratPemberitahuanDialogProps {
@@ -36,6 +37,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
   onSave,
   mode,
 }) => {
+  const { canEditForm } = useFormPermissions();
   const [formData, setFormData] = useState({
     tanggalEvaluasi: undefined as Date | undefined,
     tanggalSuratPemberitahuan: undefined as Date | undefined,
@@ -115,14 +117,15 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
   };
 
   const isFormValid = formData.tanggalEvaluasi && formData.tanggalSuratPemberitahuan && formData.fileName;
-  const isEditing = mode === 'edit';
+  const isEditable = mode === 'edit';
+  const canEdit = canEditForm('surat_pemberitahuan') && isEditable;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0 border-b pb-4">
           <DialogTitle>
-            {isEditing ? 'Edit Surat Pemberitahuan' : 'Lihat Surat Pemberitahuan'}
+            {canEdit ? 'Edit Surat Pemberitahuan' : 'Lihat Surat Pemberitahuan'}
           </DialogTitle>
         </DialogHeader>
 
@@ -139,8 +142,8 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
 
             <div>
               <div className="space-y-2">
-                <Label>Tanggal Surat {isEditing && '*'}</Label>
-                {isEditing ? (
+                <Label>Tanggal Surat {canEdit && '*'}</Label>
+                {canEdit ? (
                   <Popover open={isSuratCalendarOpen} onOpenChange={setIsSuratCalendarOpen}>
                     <PopoverTrigger asChild>
                       <Button
@@ -177,7 +180,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
               </div>
             </div>
 
-            {!isEditing && (
+            {!canEdit && (
               <div className="space-y-2">
                 <Label>Informasi Surat Pemberitahuan</Label>
                 <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
@@ -186,7 +189,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
               </div>
             )}
 
-            {isEditing && (
+            {canEdit && (
               <div className="space-y-2">
                 <Label>Informasi Upload Surat Pemberitahuan</Label>
                 <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
@@ -196,11 +199,12 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
             )}
 
             <FileUpload
-              label={`File Surat Pemberitahuan ${isEditing ? '*' : ''}`}
+              label={`File Surat Pemberitahuan ${canEdit ? '*' : ''}`}
               accept=".pdf,.doc,.docx"
               maxSize={10 * 1024 * 1024}
               multiple={false}
-              mode={isEditing ? 'edit' : 'view'}
+              mode={canEdit ? 'edit' : 'view'}
+              disabled={!canEdit}
               files={uploadedFiles}
               existingFiles={formData.fileName ? [{ name: formData.fileName, url: formData.fileUrl }] : []}
               onFilesChange={handleFilesChange}
@@ -212,14 +216,14 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
           <Button variant="outline" onClick={handleCancel}>
-            {isEditing ? 'Batal' : 'Tutup'}
+{canEdit ? 'Batal' : 'Tutup'}
           </Button>
-          {isEditing && (
+          {canEdit && (
             <Button onClick={handleSave} disabled={!isFormValid}>
               Simpan
             </Button>
           )}
-          {!isEditing && formData.fileName && (
+          {!canEdit && formData.fileName && (
             <Button onClick={handleDownloadFile}>
               <Download className="w-4 h-4 mr-2" />
               Download File

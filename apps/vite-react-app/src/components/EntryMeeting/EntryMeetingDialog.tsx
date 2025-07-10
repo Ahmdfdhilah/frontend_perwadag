@@ -9,9 +9,18 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
-import { ExternalLink } from 'lucide-react';
+import { Calendar } from '@workspace/ui/components/calendar';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@workspace/ui/components/popover';
+import { CalendarIcon, ExternalLink } from 'lucide-react';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
+import { cn } from '@workspace/ui/lib/utils';
 import { EntryMeeting } from '@/mocks/entryMeeting';
-import { useRole } from '@/hooks/useRole';
+import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDate, formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 
@@ -30,8 +39,10 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
   mode,
   onSave,
 }) => {
-  const { isAdmin, isInspektorat } = useRole();
+  const { canEditForm } = useFormPermissions();
   const [formData, setFormData] = useState<Partial<EntryMeeting>>({});
+  const [selectedEntryDate, setSelectedEntryDate] = useState<Date>();
+  const [isEntryDatePickerOpen, setIsEntryDatePickerOpen] = useState(false);
   const [daftarHadirFiles, setDaftarHadirFiles] = useState<File[]>([]);
   const [buktiHadirFiles, setBuktiHadirFiles] = useState<File[]>([]);
   const [existingDaftarHadir, setExistingDaftarHadir] = useState<Array<{ name: string; url?: string }>>([]);
@@ -40,12 +51,14 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
   useEffect(() => {
     if (item && open) {
       setFormData({ ...item });
+      setSelectedEntryDate(item.tanggal ? new Date(item.tanggal) : undefined);
       
       // Set existing files for display
       setExistingDaftarHadir(item.linkDaftarHadir ? [{ name: 'Daftar Hadir', url: item.linkDaftarHadir }] : []);
       setExistingBuktiHadir(item.buktiImageUrls ? item.buktiImageUrls.map((url, index) => ({ name: `Bukti ${index + 1}`, url })) : []);
     } else {
       setFormData({});
+      setSelectedEntryDate(undefined);
       setDaftarHadirFiles([]);
       setBuktiHadirFiles([]);
       setExistingDaftarHadir([]);
@@ -56,6 +69,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
   const handleSave = () => {
     const dataToSave = {
       ...formData,
+      tanggal: selectedEntryDate ? selectedEntryDate.toISOString().split('T')[0] : formData.tanggal,
       daftarHadirFiles,
       buktiHadirFiles,
     };
@@ -90,7 +104,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
   };
 
   const isEditable = mode === 'edit';
-  const canEdit = (isAdmin() || isInspektorat()) && isEditable;
+  const canEdit = canEditForm('entry_meeting') && isEditable;
 
 
   return (
@@ -114,7 +128,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
                 <Label>Tanggal Evaluasi</Label>
                 <div className="p-3 bg-muted rounded-md">
@@ -123,9 +137,42 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
               </div>
               <div className="space-y-2">
                 <Label>Tanggal Entry Meeting</Label>
-                <div className="p-3 bg-muted rounded-md">
-                  {item ? formatIndonesianDate(item.tanggal) : '-'}
-                </div>
+                {canEdit ? (
+                  <Popover open={isEntryDatePickerOpen} onOpenChange={setIsEntryDatePickerOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !selectedEntryDate && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {selectedEntryDate ? (
+                          format(selectedEntryDate, "dd MMMM yyyy", { locale: id })
+                        ) : (
+                          <span>Pilih tanggal</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={selectedEntryDate}
+                        onSelect={(date) => {
+                          setSelectedEntryDate(date);
+                          setIsEntryDatePickerOpen(false);
+                        }}
+                        initialFocus
+                        locale={id}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                ) : (
+                  <div className="p-3 bg-muted rounded-md">
+                    {item ? formatIndonesianDate(item.tanggal) : '-'}
+                  </div>
+                )}
               </div>
             </div>
 

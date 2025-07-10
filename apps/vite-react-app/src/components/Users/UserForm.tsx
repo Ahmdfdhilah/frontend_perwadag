@@ -43,13 +43,17 @@ interface UserFormProps {
   onSubmit: (data: UserFormData) => void;
   onCancel: () => void;
   loading?: boolean;
+  disabled?: boolean;
+  mode?: 'view' | 'edit' | 'create';
 }
 
 export const UserForm: React.FC<UserFormProps> = ({
   initialData,
   onSubmit,
   onCancel,
-  loading = false
+  loading = false,
+  disabled = false,
+  mode = 'create'
 }) => {
   const [showPerwadagSelect, setShowPerwadagSelect] = useState(
     initialData?.roles?.some(role => role.name === 'perwadag') || false
@@ -105,7 +109,7 @@ export const UserForm: React.FC<UserFormProps> = ({
               <FormItem>
                 <FormLabel>Full Name</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter full name" disabled={loading} {...field} />
+                  <Input placeholder="Enter full name" disabled={loading || disabled} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -119,7 +123,7 @@ export const UserForm: React.FC<UserFormProps> = ({
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="Enter email address" disabled={loading} {...field} />
+                  <Input type="email" placeholder="Enter email address" disabled={loading || disabled} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -133,7 +137,7 @@ export const UserForm: React.FC<UserFormProps> = ({
               <FormItem>
                 <FormLabel>NIP</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter 18-digit NIP" disabled={loading} {...field} />
+                  <Input placeholder="Enter 18-digit NIP" disabled={loading || disabled} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -147,7 +151,7 @@ export const UserForm: React.FC<UserFormProps> = ({
               <FormItem>
                 <FormLabel>Phone</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter phone number" disabled={loading} {...field} />
+                  <Input placeholder="Enter phone number" disabled={loading || disabled} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -162,7 +166,7 @@ export const UserForm: React.FC<UserFormProps> = ({
             <FormItem>
               <FormLabel>Address</FormLabel>
               <FormControl>
-                <Textarea placeholder="Enter address" disabled={loading} {...field} />
+                <Textarea placeholder="Enter address" disabled={loading || disabled} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -176,7 +180,7 @@ export const UserForm: React.FC<UserFormProps> = ({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Role</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
+              <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading || disabled}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a role" />
@@ -206,7 +210,7 @@ export const UserForm: React.FC<UserFormProps> = ({
                 <FormControl>
                   <Input 
                     placeholder="Enter perwadag name" 
-                    disabled={loading} 
+                    disabled={loading || disabled} 
                     {...field} 
                   />
                 </FormControl>
@@ -224,7 +228,7 @@ export const UserForm: React.FC<UserFormProps> = ({
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Inspektorat</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
+                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading || disabled}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select inspektorat" />
@@ -259,7 +263,7 @@ export const UserForm: React.FC<UserFormProps> = ({
                 <Switch
                   checked={field.value}
                   onCheckedChange={field.onChange}
-                  disabled={loading}
+                  disabled={loading || disabled}
                 />
               </FormControl>
             </FormItem>
@@ -268,10 +272,10 @@ export const UserForm: React.FC<UserFormProps> = ({
 
         {/* Form Actions */}
         <div className="flex justify-end space-x-4 pt-4">
-          <Button type="button" variant="outline" onClick={onCancel} disabled={loading}>
+          <Button type="button" variant="outline" onClick={onCancel} disabled={loading || disabled}>
             Cancel
           </Button>
-          <Button type="submit" disabled={loading}>
+          <Button type="submit" disabled={loading || disabled}>
             {loading ? 'Saving...' : initialData ? 'Update User' : 'Create User'}
           </Button>
         </div>
