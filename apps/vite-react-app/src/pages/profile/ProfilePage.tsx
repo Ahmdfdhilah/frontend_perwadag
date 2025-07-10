@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useToast } from '@workspace/ui/components/sonner';
 import { USERS_DATA } from '@/mocks/users';
+import { useRole } from '@/hooks/useRole';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
@@ -25,9 +26,26 @@ import {
 const ProfilePage: React.FC = () => {
   // Using dummy data - in real app this would come from auth context
   const user = USERS_DATA[0]; // Using first user as current user
+  const { currentRole } = useRole();
   const { toast } = useToast();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  
+  // Get current user info - in real app this would come from auth context
+  const currentUser = {
+    first_name: user.name.split(' ')[0],
+    last_name: user.name.split(' ').slice(1).join(' ') || '',
+    email: user.email,
+    role: currentRole.label,
+    phone: user.phone,
+    address: user.address,
+    avatar: user.avatar,
+    isActive: user.isActive,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+    lastLogin: user.lastLogin,
+    perwadagId: user.perwadagId
+  };
 
   if (!user) {
     return (
@@ -41,7 +59,7 @@ const ProfilePage: React.FC = () => {
   }
 
   const getFullName = () => {
-    return user.name;
+    return `${currentUser.first_name} ${currentUser.last_name}`.trim();
   };
 
   const getStatusIcon = () => {
@@ -112,11 +130,11 @@ const ProfilePage: React.FC = () => {
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <Avatar className="w-24 h-24">
-                {user.avatar ? (
-                  <AvatarImage src={user.avatar} alt={getFullName()} />
+                {currentUser.avatar ? (
+                  <AvatarImage src={currentUser.avatar} alt={getFullName()} />
                 ) : (
                   <AvatarFallback className="text-2xl">
-                    {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                    {currentUser.first_name[0]}{currentUser.last_name ? currentUser.last_name[0] : ''}
                   </AvatarFallback>
                 )}
               </Avatar>
@@ -133,22 +151,22 @@ const ProfilePage: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">{user.email}</span>
+                <span className="text-sm">{currentUser.email}</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">{user.phone}</span>
+                <span className="text-sm">{currentUser.phone}</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">{user.roles.map(role => role.label).join(', ')}</span>
+                <span className="text-sm">{currentUser.role}</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <Building className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">Alamat: {user.address}</span>
+                <span className="text-sm">Alamat: {currentUser.address}</span>
               </div>
             </div>
           </CardContent>
@@ -176,24 +194,24 @@ const ProfilePage: React.FC = () => {
                   </div>
                   <div>
                     <label className="text-sm font-medium">Email</label>
-                    <p className="text-sm text-muted-foreground">{user.email}</p>
+                    <p className="text-sm text-muted-foreground">{currentUser.email}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium">Telepon</label>
-                    <p className="text-sm text-muted-foreground">{user.phone}</p>
+                    <p className="text-sm text-muted-foreground">{currentUser.phone}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium">Jabatan</label>
-                    <p className="text-sm text-muted-foreground">{user.roles.map(role => role.label).join(', ')}</p>
+                    <p className="text-sm text-muted-foreground">{currentUser.role}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium">Alamat</label>
-                    <p className="text-sm text-muted-foreground">{user.address}</p>
+                    <p className="text-sm text-muted-foreground">{currentUser.address}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium">Tanggal Bergabung</label>
                     <p className="text-sm text-muted-foreground">
-                      {format(user.createdAt, 'dd MMMM yyyy', { locale: id })}
+                      {format(currentUser.createdAt, 'dd MMMM yyyy', { locale: id })}
                     </p>
                   </div>
                 </div>
@@ -208,31 +226,29 @@ const ProfilePage: React.FC = () => {
                   <div>
                     <label className="text-sm font-medium">Peran</label>
                     <div className="flex flex-wrap gap-1 mt-1">
-                      {user.roles.map((role) => (
-                        <Badge key={role.id} variant="secondary" className="text-xs">
-                          {role.label}
-                        </Badge>
-                      ))}
+                      <Badge variant="secondary" className="text-xs">
+                        {currentUser.role}
+                      </Badge>
                     </div>
                   </div>
-                  {user.perwadagId && (
+                  {currentUser.perwadagId && (
                     <div>
                       <label className="text-sm font-medium">Perwadag ID</label>
-                      <p className="text-sm text-muted-foreground">{user.perwadagId}</p>
+                      <p className="text-sm text-muted-foreground">{currentUser.perwadagId}</p>
                     </div>
                   )}
-                  {user.lastLogin && (
+                  {currentUser.lastLogin && (
                     <div>
                       <label className="text-sm font-medium">Login Terakhir</label>
                       <p className="text-sm text-muted-foreground">
-                        {format(user.lastLogin, 'dd MMMM yyyy, HH:mm', { locale: id })}
+                        {format(currentUser.lastLogin, 'dd MMMM yyyy, HH:mm', { locale: id })}
                       </p>
                     </div>
                   )}
                   <div>
                     <label className="text-sm font-medium">Password Terakhir Diubah</label>
                     <p className="text-sm text-muted-foreground">
-                      {format(user.updatedAt, 'dd MMMM yyyy, HH:mm', { locale: id })}
+                      {format(currentUser.updatedAt, 'dd MMMM yyyy, HH:mm', { locale: id })}
                     </p>
                   </div>
                 </div>
