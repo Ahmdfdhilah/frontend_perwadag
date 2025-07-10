@@ -48,8 +48,8 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
   useEffect(() => {
     if (item) {
       setFormData({
-        tanggalEvaluasi: new Date(item.tanggalEvaluasi),
-        tanggalSuratPemberitahuan: new Date(item.tanggalSuratPemberitahuan),
+        tanggalEvaluasi: item.tanggalEvaluasi ? new Date(item.tanggalEvaluasi) : undefined,
+        tanggalSuratPemberitahuan: item.tanggalSuratPemberitahuan ? new Date(item.tanggalSuratPemberitahuan) : undefined,
         fileName: item.fileName || '',
         fileUrl: item.fileUrl || '',
       });
@@ -159,7 +159,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
                   </Popover>
                 ) : (
                   <Input
-                    value={item ? format(new Date(item.tanggalEvaluasi), 'dd MMM yyyy', { locale: id }) : ''}
+                    value={item?.tanggalEvaluasi ? format(new Date(item.tanggalEvaluasi), 'dd MMM yyyy', { locale: id }) : 'Tidak ada data'}
                     disabled
                     className="bg-muted"
                   />
@@ -197,7 +197,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
                   </Popover>
                 ) : (
                   <Input
-                    value={item ? format(new Date(item.tanggalSuratPemberitahuan), 'dd MMM yyyy', { locale: id }) : ''}
+                    value={item?.tanggalSuratPemberitahuan ? format(new Date(item.tanggalSuratPemberitahuan), 'dd MMM yyyy', { locale: id }) : 'Tidak ada data'}
                     disabled
                     className="bg-muted"
                   />
