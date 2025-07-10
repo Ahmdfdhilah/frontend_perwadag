@@ -1,7 +1,8 @@
 export interface SuratTugas {
   id: string;
   nomor: string;
-  tanggal: string;
+  tanggalPelaksanaanEvaluasi: string;
+  tanggalSelesaiEvaluasi?: string;
   perwadagId: string;
   perwadagName: string;
   pengendaliMutu: string;
@@ -17,7 +18,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
   {
     id: 'ST001',
     nomor: 'ST/001/I/2024',
-    tanggal: '2024-01-15',
+    tanggalPelaksanaanEvaluasi: '2024-01-15',
+    tanggalSelesaiEvaluasi: '2024-01-25',
     perwadagId: 'PWD001',
     perwadagName: 'Atdag Moscow – Rusia',
     pengendaliMutu: 'Dr. Ahmad Sutanto',
@@ -31,7 +33,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
   {
     id: 'ST002',
     nomor: 'ST/002/I/2024',
-    tanggal: '2024-01-20',
+    tanggalPelaksanaanEvaluasi: '2024-01-20',
+    tanggalSelesaiEvaluasi: '2024-01-30',
     perwadagId: 'PWD002',
     perwadagName: 'Atdag Washington DC – AS',
     pengendaliMutu: 'Dr. Dewi Sartika',
@@ -45,7 +48,8 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
   {
     id: 'ST003',
     nomor: 'ST/003/I/2024',
-    tanggal: '2024-01-25',
+    tanggalPelaksanaanEvaluasi: '2024-01-25',
+    tanggalSelesaiEvaluasi: '2024-02-05',
     perwadagId: 'PWD003',
     perwadagName: 'ITPC Vancouver – Canada',
     pengendaliMutu: 'Dr. Gita Maharani',
@@ -59,7 +63,7 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
   {
     id: 'ST004',
     nomor: 'ST/004/II/2024',
-    tanggal: '2024-02-15',
+    tanggalPelaksanaanEvaluasi: '2024-02-15',
     perwadagId: 'PWD009',
     perwadagName: 'Atdag Paris – Perancis',
     pengendaliMutu: 'Dr. Joko Santoso',
@@ -73,7 +77,7 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
   {
     id: 'ST005',
     nomor: 'ST/005/II/2024',
-    tanggal: '2024-02-20',
+    tanggalPelaksanaanEvaluasi: '2024-02-20',
     perwadagId: 'PWD010',
     perwadagName: 'ITPC Lagos – Nigeria',
     pengendaliMutu: 'Dr. Maya Sari',
@@ -87,7 +91,7 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
   {
     id: 'ST006',
     nomor: 'ST/006/III/2024',
-    tanggal: '2024-03-12',
+    tanggalPelaksanaanEvaluasi: '2024-03-12',
     perwadagId: 'PWD018',
     perwadagName: 'ITPC Sao Paulo – Brasil',
     pengendaliMutu: 'Dr. Putri Andini',
@@ -101,7 +105,7 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
   {
     id: 'ST007',
     nomor: 'ST/007/III/2024',
-    tanggal: '2024-03-18',
+    tanggalPelaksanaanEvaluasi: '2024-03-18',
     perwadagId: 'PWD019',
     perwadagName: 'Konsuldag Hongkong',
     pengendaliMutu: 'Dr. Sari Melati',
@@ -115,7 +119,7 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
   {
     id: 'ST008',
     nomor: 'ST/008/IV/2024',
-    tanggal: '2024-04-08',
+    tanggalPelaksanaanEvaluasi: '2024-04-08',
     perwadagId: 'PWD027',
     perwadagName: 'ITPC Santiago – Chile',
     pengendaliMutu: 'Dr. Vina Kumala',
@@ -129,7 +133,7 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
   {
     id: 'ST009',
     nomor: 'ST/009/IV/2024',
-    tanggal: '2024-04-18',
+    tanggalPelaksanaanEvaluasi: '2024-04-18',
     perwadagId: 'PWD028',
     perwadagName: 'Atdag Hanoi – Vietnam',
     pengendaliMutu: 'Dr. Yanti Susilo',
@@ -143,7 +147,7 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
   {
     id: 'ST010',
     nomor: 'ST/010/I/2023',
-    tanggal: '2023-01-25',
+    tanggalPelaksanaanEvaluasi: '2023-01-25',
     perwadagId: 'PWD004',
     perwadagName: 'Atdag Madrid – Spanyol',
     pengendaliMutu: 'Dr. Bambang Irawan',
@@ -157,7 +161,7 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
   {
     id: 'ST011',
     nomor: 'ST/011/II/2023',
-    tanggal: '2023-02-20',
+    tanggalPelaksanaanEvaluasi: '2023-02-20',
     perwadagId: 'PWD011',
     perwadagName: 'ITPC Barcelona – Spanyol',
     pengendaliMutu: 'Dr. Eko Widodo',
@@ -171,7 +175,7 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
   {
     id: 'ST012',
     nomor: 'ST/012/III/2023',
-    tanggal: '2023-03-15',
+    tanggalPelaksanaanEvaluasi: '2023-03-15',
     perwadagId: 'PWD020',
     perwadagName: 'Atdag Tokyo – Jepang',
     pengendaliMutu: 'Dr. Hendra Pratama',
@@ -185,7 +189,7 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
   {
     id: 'ST013',
     nomor: 'ST/013/IV/2023',
-    tanggal: '2023-04-10',
+    tanggalPelaksanaanEvaluasi: '2023-04-10',
     perwadagId: 'PWD030',
     perwadagName: 'Atdag Singapura – Singapura',
     pengendaliMutu: 'Dr. Kartika Dewi',
@@ -199,7 +203,7 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
   {
     id: 'ST014',
     nomor: 'ST/014/I/2022',
-    tanggal: '2022-01-12',
+    tanggalPelaksanaanEvaluasi: '2022-01-12',
     perwadagId: 'PWD005',
     perwadagName: 'ITPC Johannesburg – Afrika Selatan',
     pengendaliMutu: 'Dr. Nuri Handayani',
@@ -213,7 +217,7 @@ export const SURAT_TUGAS_DATA: SuratTugas[] = [
   {
     id: 'ST015',
     nomor: 'ST/015/II/2022',
-    tanggal: '2022-02-18',
+    tanggalPelaksanaanEvaluasi: '2022-02-18',
     perwadagId: 'PWD014',
     perwadagName: 'ITPC Jeddah – Arab Saudi',
     pengendaliMutu: 'Dr. Qori Andini',

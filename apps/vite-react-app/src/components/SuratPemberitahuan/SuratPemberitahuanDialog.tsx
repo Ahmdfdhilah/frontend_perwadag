@@ -36,23 +36,27 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
   mode,
 }) => {
   const [formData, setFormData] = useState({
-    tanggal: undefined as Date | undefined,
+    tanggalEvaluasi: undefined as Date | undefined,
+    tanggalSuratPemberitahuan: undefined as Date | undefined,
     fileName: '',
     fileUrl: '',
   });
 
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isEvaluasiCalendarOpen, setIsEvaluasiCalendarOpen] = useState(false);
+  const [isSuratCalendarOpen, setIsSuratCalendarOpen] = useState(false);
 
   useEffect(() => {
     if (item) {
       setFormData({
-        tanggal: new Date(item.tanggal),
+        tanggalEvaluasi: new Date(item.tanggalEvaluasi),
+        tanggalSuratPemberitahuan: new Date(item.tanggalSuratPemberitahuan),
         fileName: item.fileName || '',
         fileUrl: item.fileUrl || '',
       });
     } else {
       setFormData({
-        tanggal: undefined,
+        tanggalEvaluasi: undefined,
+        tanggalSuratPemberitahuan: undefined,
         fileName: '',
         fileUrl: '',
       });
@@ -60,16 +64,18 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
   }, [item, open]);
 
   const handleSave = () => {
-    if (!formData.tanggal || !item) {
+    if (!formData.tanggalEvaluasi || !formData.tanggalSuratPemberitahuan || !item) {
       return;
     }
 
     const saveData: Partial<SuratPemberitahuan> = {
       id: item.id,
-      tanggal: formData.tanggal.toISOString().split('T')[0],
+      tanggalEvaluasi: formData.tanggalEvaluasi.toISOString().split('T')[0],
+      tanggalSuratPemberitahuan: formData.tanggalSuratPemberitahuan.toISOString().split('T')[0],
       fileName: formData.fileName,
       fileUrl: formData.fileUrl,
-      year: formData.tanggal.getFullYear(),
+      status: formData.fileName ? 'uploaded' : 'not_uploaded',
+      year: formData.tanggalEvaluasi.getFullYear(),
     };
 
     onSave?.(saveData);
@@ -98,7 +104,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
     }
   };
 
-  const isFormValid = formData.tanggal && formData.fileName;
+  const isFormValid = formData.tanggalEvaluasi && formData.tanggalSuratPemberitahuan && formData.fileName;
   const isEditing = mode === 'edit';
 
   return (
@@ -121,42 +127,82 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
               />
             </div>
 
-            <div className="space-y-2">
-              <Label>Tanggal {isEditing && '*'}</Label>
-              {isEditing ? (
-                <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start text-left font-normal"
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {formData.tanggal ? (
-                        format(formData.tanggal, 'dd MMMM yyyy', { locale: id })
-                      ) : (
-                        <span>Pilih tanggal</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={formData.tanggal}
-                      onSelect={(date) => {
-                        setFormData(prev => ({ ...prev, tanggal: date }));
-                        setIsCalendarOpen(false);
-                      }}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              ) : (
-                <Input
-                  value={item ? format(new Date(item.tanggal), 'dd MMMM yyyy', { locale: id }) : ''}
-                  disabled
-                  className="bg-muted"
-                />
-              )}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Tanggal Evaluasi {isEditing && '*'}</Label>
+                {isEditing ? (
+                  <Popover open={isEvaluasiCalendarOpen} onOpenChange={setIsEvaluasiCalendarOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-left font-normal"
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {formData.tanggalEvaluasi ? (
+                          format(formData.tanggalEvaluasi, 'dd MMM yyyy', { locale: id })
+                        ) : (
+                          <span>Pilih tanggal</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={formData.tanggalEvaluasi}
+                        onSelect={(date) => {
+                          setFormData(prev => ({ ...prev, tanggalEvaluasi: date }));
+                          setIsEvaluasiCalendarOpen(false);
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                ) : (
+                  <Input
+                    value={item ? format(new Date(item.tanggalEvaluasi), 'dd MMM yyyy', { locale: id }) : ''}
+                    disabled
+                    className="bg-muted"
+                  />
+                )}
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Tanggal Surat {isEditing && '*'}</Label>
+                {isEditing ? (
+                  <Popover open={isSuratCalendarOpen} onOpenChange={setIsSuratCalendarOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-left font-normal"
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {formData.tanggalSuratPemberitahuan ? (
+                          format(formData.tanggalSuratPemberitahuan, 'dd MMM yyyy', { locale: id })
+                        ) : (
+                          <span>Pilih tanggal</span>
+                        )}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={formData.tanggalSuratPemberitahuan}
+                        onSelect={(date) => {
+                          setFormData(prev => ({ ...prev, tanggalSuratPemberitahuan: date }));
+                          setIsSuratCalendarOpen(false);
+                        }}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                ) : (
+                  <Input
+                    value={item ? format(new Date(item.tanggalSuratPemberitahuan), 'dd MMM yyyy', { locale: id }) : ''}
+                    disabled
+                    className="bg-muted"
+                  />
+                )}
+              </div>
             </div>
 
             {!isEditing && (

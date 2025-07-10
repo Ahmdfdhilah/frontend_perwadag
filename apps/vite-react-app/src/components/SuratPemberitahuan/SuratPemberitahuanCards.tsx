@@ -24,6 +24,16 @@ const SuratPemberitahuanCards: React.FC<SuratPemberitahuanCardsProps> = ({
     });
   };
 
+  const getStatusLabel = (status: string) => {
+    return status === 'uploaded' ? 'Sudah Upload' : 'Belum Upload';
+  };
+
+  const getStatusColor = (status: string) => {
+    return status === 'uploaded' 
+      ? 'text-green-600 bg-green-50 px-2 py-1 rounded-full text-xs font-medium'
+      : 'text-orange-600 bg-orange-50 px-2 py-1 rounded-full text-xs font-medium';
+  };
+
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-32 text-muted-foreground">
@@ -51,14 +61,28 @@ const SuratPemberitahuanCards: React.FC<SuratPemberitahuanCardsProps> = ({
             </div>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium text-muted-foreground">No:</span>
-                <span className="ml-2">{index + 1}</span>
+            <div className="space-y-3 text-sm">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <span className="font-medium text-muted-foreground">No:</span>
+                  <span className="ml-2">{index + 1}</span>
+                </div>
+                <div>
+                  <span className="font-medium text-muted-foreground">Status:</span>
+                  <span className={`ml-2 ${getStatusColor(item.status)}`}>
+                    {getStatusLabel(item.status)}
+                  </span>
+                </div>
               </div>
+              
               <div>
-                <span className="font-medium text-muted-foreground">Tanggal:</span>
-                <span className="ml-2">{formatDate(item.tanggal)}</span>
+                <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
+                <span className="ml-2">{formatDate(item.tanggalEvaluasi)}</span>
+              </div>
+              
+              <div>
+                <span className="font-medium text-muted-foreground">Tanggal Surat:</span>
+                <span className="ml-2">{formatDate(item.tanggalSuratPemberitahuan)}</span>
               </div>
             </div>
           </CardContent>

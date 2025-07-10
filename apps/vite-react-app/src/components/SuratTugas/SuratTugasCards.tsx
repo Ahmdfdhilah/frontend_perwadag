@@ -26,6 +26,15 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
     });
   };
 
+  const formatDateRange = (startDate: string, endDate?: string) => {
+    const start = formatDate(startDate);
+    if (endDate) {
+      const end = formatDate(endDate);
+      return `${start} - ${end}`;
+    }
+    return start;
+  };
+
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-32 text-muted-foreground">
@@ -61,8 +70,8 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
                   <span className="ml-2">{index + 1}</span>
                 </div>
                 <div>
-                  <span className="font-medium text-muted-foreground">Tanggal:</span>
-                  <span className="ml-2">{formatDate(item.tanggal)}</span>
+                  <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
+                  <span className="ml-2">{formatDateRange(item.tanggalPelaksanaanEvaluasi, item.tanggalSelesaiEvaluasi)}</span>
                 </div>
               </div>
               

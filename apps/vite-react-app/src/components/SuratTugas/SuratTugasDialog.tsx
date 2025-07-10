@@ -46,7 +46,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   const [formData, setFormData] = useState({
     nomor: '',
     perwadagId: '',
-    tanggal: undefined as Date | undefined,
+    tanggalPelaksanaanEvaluasi: undefined as Date | undefined,
+    tanggalSelesaiEvaluasi: undefined as Date | undefined,
     pengendaliMutu: '',
     pengendaliTeknis: '',
     ketuaTim: '',
@@ -54,14 +55,16 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
     fileUrl: '',
   });
 
-  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [isStartCalendarOpen, setIsStartCalendarOpen] = useState(false);
+  const [isEndCalendarOpen, setIsEndCalendarOpen] = useState(false);
 
   useEffect(() => {
     if (editingItem) {
       setFormData({
         nomor: editingItem.nomor,
         perwadagId: editingItem.perwadagId,
-        tanggal: new Date(editingItem.tanggal),
+        tanggalPelaksanaanEvaluasi: new Date(editingItem.tanggalPelaksanaanEvaluasi),
+        tanggalSelesaiEvaluasi: editingItem.tanggalSelesaiEvaluasi ? new Date(editingItem.tanggalSelesaiEvaluasi) : undefined,
         pengendaliMutu: editingItem.pengendaliMutu,
         pengendaliTeknis: editingItem.pengendaliTeknis,
         ketuaTim: editingItem.ketuaTim,
@@ -72,7 +75,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       setFormData({
         nomor: '',
         perwadagId: '',
-        tanggal: undefined,
+        tanggalPelaksanaanEvaluasi: undefined,
+        tanggalSelesaiEvaluasi: undefined,
         pengendaliMutu: '',
         pengendaliTeknis: '',
         ketuaTim: '',
@@ -83,17 +87,18 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   }, [editingItem, open]);
 
   const handleSave = () => {
-    if (!formData.nomor || !formData.perwadagId || !formData.tanggal) {
+    if (!formData.nomor || !formData.perwadagId || !formData.tanggalPelaksanaanEvaluasi) {
       return;
     }
 
     const selectedPerwadag = availablePerwadag.find(p => p.id === formData.perwadagId);
-    
+
     const saveData: Partial<SuratTugas> = {
       ...formData,
-      tanggal: formData.tanggal.toISOString().split('T')[0],
+      tanggalPelaksanaanEvaluasi: formData.tanggalPelaksanaanEvaluasi.toISOString().split('T')[0],
+      tanggalSelesaiEvaluasi: formData.tanggalSelesaiEvaluasi?.toISOString().split('T')[0],
       perwadagName: selectedPerwadag?.name || '',
-      year: formData.tanggal.getFullYear(),
+      year: formData.tanggalPelaksanaanEvaluasi.getFullYear(),
       inspektorat: selectedPerwadag?.inspektorat || 1,
     };
 
@@ -127,8 +132,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
     }
   };
 
-  const isFormValid = formData.nomor && formData.perwadagId && formData.tanggal &&
-                      formData.pengendaliMutu && formData.pengendaliTeknis && formData.ketuaTim;
+  const isFormValid = formData.nomor && formData.perwadagId && formData.tanggalPelaksanaanEvaluasi &&
+    formData.pengendaliMutu && formData.pengendaliTeknis && formData.ketuaTim;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -170,34 +175,70 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label>Tanggal *</Label>
-              <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.tanggal ? (
-                      format(formData.tanggal, 'dd MMMM yyyy', { locale: id })
-                    ) : (
-                      <span>Pilih tanggal</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={formData.tanggal}
-                    onSelect={(date) => {
-                      setFormData(prev => ({ ...prev, tanggal: date }));
-                      setIsCalendarOpen(false);
-                    }}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+            <div className="grid grid-cols-1 gap-4">
+              <div className="space-y-2">
+                <Label>Tanggal Mulai Evaluasi *</Label>
+                <Popover open={isStartCalendarOpen} onOpenChange={setIsStartCalendarOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {formData.tanggalPelaksanaanEvaluasi ? (
+                        format(formData.tanggalPelaksanaanEvaluasi, 'dd MMM yyyy', { locale: id })
+                      ) : (
+                        <span>Pilih tanggal mulai</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={formData.tanggalPelaksanaanEvaluasi}
+                      onSelect={(date) => {
+                        setFormData(prev => ({ ...prev, tanggalPelaksanaanEvaluasi: date }));
+                        setIsStartCalendarOpen(false);
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Tanggal Selesai Evaluasi</Label>
+                <Popover open={isEndCalendarOpen} onOpenChange={setIsEndCalendarOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {formData.tanggalSelesaiEvaluasi ? (
+                        format(formData.tanggalSelesaiEvaluasi, 'dd MMM yyyy', { locale: id })
+                      ) : (
+                        <span>Pilih tanggal selesai</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={formData.tanggalSelesaiEvaluasi}
+                      onSelect={(date) => {
+                        setFormData(prev => ({ ...prev, tanggalSelesaiEvaluasi: date }));
+                        setIsEndCalendarOpen(false);
+                      }}
+                      disabled={(date) => {
+                        if (!formData.tanggalPelaksanaanEvaluasi) return false;
+                        return date < formData.tanggalPelaksanaanEvaluasi;
+                      }}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
 
             <div className="space-y-2">

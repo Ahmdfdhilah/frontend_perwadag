@@ -1,10 +1,12 @@
 export interface SuratPemberitahuan {
   id: string;
-  tanggal: string;
+  tanggalEvaluasi: string;
+  tanggalSuratPemberitahuan: string;
   perwadagId: string;
   perwadagName: string;
-  fileName: string;
-  fileUrl: string;
+  fileName?: string;
+  fileUrl?: string;
+  status: 'uploaded' | 'not_uploaded';
   year: number;
   inspektorat: number;
 }
@@ -13,71 +15,79 @@ export const SURAT_PEMBERITAHUAN_DATA: SuratPemberitahuan[] = [
   // 2024 Data
   {
     id: 'SP001',
-    tanggal: '2024-01-10',
+    tanggalEvaluasi: '2024-01-15',
+    tanggalSuratPemberitahuan: '2024-01-10',
     perwadagId: 'PWD001',
     perwadagName: 'Atdag Moscow – Rusia',
     fileName: 'surat-pemberitahuan-atdag-moscow-2024.pdf',
     fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-moscow-2024.pdf',
+    status: 'uploaded',
     year: 2024,
     inspektorat: 1
   },
   {
     id: 'SP002',
-    tanggal: '2024-01-15',
+    tanggalEvaluasi: '2024-01-20',
+    tanggalSuratPemberitahuan: '2024-01-15',
     perwadagId: 'PWD002',
     perwadagName: 'Atdag Washington DC – AS',
     fileName: 'surat-pemberitahuan-atdag-washington-2024.pdf',
     fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-washington-2024.pdf',
+    status: 'uploaded',
     year: 2024,
     inspektorat: 1
   },
   {
     id: 'SP003',
-    tanggal: '2024-01-20',
+    tanggalEvaluasi: '2024-01-25',
+    tanggalSuratPemberitahuan: '2024-01-20',
     perwadagId: 'PWD003',
     perwadagName: 'ITPC Vancouver – Canada',
-    fileName: 'surat-pemberitahuan-itpc-vancouver-2024.pdf',
-    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-itpc-vancouver-2024.pdf',
+    status: 'not_uploaded',
     year: 2024,
     inspektorat: 1
   },
   {
     id: 'SP004',
-    tanggal: '2024-02-05',
+    tanggalEvaluasi: '2024-02-10',
+    tanggalSuratPemberitahuan: '2024-02-05',
     perwadagId: 'PWD004',
     perwadagName: 'Atdag Madrid – Spanyol',
     fileName: 'surat-pemberitahuan-atdag-madrid-2024.pdf',
     fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-madrid-2024.pdf',
+    status: 'uploaded',
     year: 2024,
     inspektorat: 1
   },
   {
     id: 'SP005',
-    tanggal: '2024-02-10',
+    tanggalEvaluasi: '2024-02-15',
+    tanggalSuratPemberitahuan: '2024-02-10',
     perwadagId: 'PWD009',
     perwadagName: 'Atdag Paris – Perancis',
-    fileName: 'surat-pemberitahuan-atdag-paris-2024.pdf',
-    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-atdag-paris-2024.pdf',
+    status: 'not_uploaded',
     year: 2024,
     inspektorat: 2
   },
   {
     id: 'SP006',
-    tanggal: '2024-02-15',
+    tanggalEvaluasi: '2024-02-20',
+    tanggalSuratPemberitahuan: '2024-02-15',
     perwadagId: 'PWD010',
     perwadagName: 'ITPC Lagos – Nigeria',
     fileName: 'surat-pemberitahuan-itpc-lagos-2024.pdf',
     fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-itpc-lagos-2024.pdf',
+    status: 'uploaded',
     year: 2024,
     inspektorat: 2
   },
   {
     id: 'SP007',
-    tanggal: '2024-02-20',
+    tanggalEvaluasi: '2024-02-25',
+    tanggalSuratPemberitahuan: '2024-02-20',
     perwadagId: 'PWD011',
     perwadagName: 'ITPC Barcelona – Spanyol',
-    fileName: 'surat-pemberitahuan-itpc-barcelona-2024.pdf',
-    fileUrl: 'blob:http://localhost:3000/surat-pemberitahuan-itpc-barcelona-2024.pdf',
+    status: 'not_uploaded',
     year: 2024,
     inspektorat: 2
   },

@@ -8,14 +8,12 @@ B.	Penilaian Risiko: apps\vite-react-app\src\pages\RiskAssesment\* ✅
     4.	Setting pilihan kategori dalam penilaian risiko menjadi automatic dan di disable \\hitung otomatis apps\vite-react-app\src\pages\RiskAssesment\RiskAssessmentInputPage.tsx ✅
     5.	Menambahkan keterangan (Rp) pada Indikator 8 ini belum di apps\vite-react-app\src\pages\RiskAssesment\RiskAssessmentInputPage.tsx dan apps\vite-react-app\src\pages\RiskAssesment\RiskAssessmentDetailPage.tsx ✅
 
-C.	Surat Tugas apps\vite-react-app\src\pages\SuratTugasPage.tsx
-    1.	Tanggal disesuaikan menjadi tanggal pelaksanaan evaluasi.
-    2.	Inputan tanggal diubah menjadi range.
-    3.	Akses buka dan tutup penilaian untuk semua perwadag by admin.
-    4.	Mengubah upload link drive menjadi menu upload dokumen
+C.	Surat Tugas apps\vite-react-app\src\pages\SuratTugasPage.tsx✅
+    1.	Tanggal disesuaikan menjadi tanggal pelaksanaan evaluasi.✅
+    2.	Inputan tanggal diubah menjadi range.✅
 
-D.	Surat Pemberitahuan apps\vite-react-app\src\pages\SuratPemberitahuanPage.tsx
-    1.	Menyesuaikan kolom menjadi No, Tanggal Evaluasi, Tanggal Surat Pemberitahuan, Nama Perwadag, Status (apakah sudah upload dokumen belum)
+D.	Surat Pemberitahuan apps\vite-react-app\src\pages\SuratPemberitahuanPage.tsx✅
+    1.	Menyesuaikan kolom menjadi No, Tanggal Evaluasi, Tanggal Surat Pemberitahuan, Nama Perwadag, Status (apakah sudah upload dokumen belum)✅
 
 E.	Entry Meeting apps\vite-react-app\src\pages\EntryMeetingPage.tsx
     1.	Menyesuaikan kolom menjadi No, Nama Perwadag, Tanggal Evaluasi, Tanggal Entry Meeting, Link Zoom, Status (apakah sudah upload daftar hadir dan bukti)

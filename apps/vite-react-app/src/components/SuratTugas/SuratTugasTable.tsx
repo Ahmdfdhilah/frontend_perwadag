@@ -33,13 +33,22 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
     });
   };
 
+  const formatDateRange = (startDate: string, endDate?: string) => {
+    const start = formatDate(startDate);
+    if (endDate) {
+      const end = formatDate(endDate);
+      return `${start} - ${end}`;
+    }
+    return start;
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>No</TableHead>
-            <TableHead>Tanggal</TableHead>
+            <TableHead>Tanggal Pelaksanaan Evaluasi</TableHead>
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>No Surat</TableHead>
             <TableHead>Pengendali Mutu</TableHead>
@@ -59,7 +68,7 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{formatDate(item.tanggal)}</TableCell>
+                <TableCell>{formatDateRange(item.tanggalPelaksanaanEvaluasi, item.tanggalSelesaiEvaluasi)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
                 <TableCell>{item.nomor}</TableCell>
                 <TableCell>{item.pengendaliMutu}</TableCell>

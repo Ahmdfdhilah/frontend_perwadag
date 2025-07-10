@@ -65,13 +65,24 @@ const SuratTugasViewDialog: React.FC<SuratTugasViewDialogProps> = ({
               />
             </div>
 
-            <div className="space-y-2">
-              <Label>Tanggal</Label>
-              <Input
-                value={item ? format(new Date(item.tanggal), 'dd MMMM yyyy', { locale: id }) : ''}
-                disabled
-                className="bg-muted"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Tanggal Mulai Evaluasi</Label>
+                <Input
+                  value={item ? format(new Date(item.tanggalPelaksanaanEvaluasi), 'dd MMMM yyyy', { locale: id }) : ''}
+                  disabled
+                  className="bg-muted"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Tanggal Selesai Evaluasi</Label>
+                <Input
+                  value={item?.tanggalSelesaiEvaluasi ? format(new Date(item.tanggalSelesaiEvaluasi), 'dd MMMM yyyy', { locale: id }) : 'Belum ditentukan'}
+                  disabled
+                  className="bg-muted"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">

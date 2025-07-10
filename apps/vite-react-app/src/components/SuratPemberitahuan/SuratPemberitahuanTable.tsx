@@ -31,21 +31,33 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
     });
   };
 
+  const getStatusLabel = (status: string) => {
+    return status === 'uploaded' ? 'Sudah Upload' : 'Belum Upload';
+  };
+
+  const getStatusColor = (status: string) => {
+    return status === 'uploaded' 
+      ? 'text-green-600 bg-green-50 px-2 py-1 rounded-full text-xs font-medium'
+      : 'text-orange-600 bg-orange-50 px-2 py-1 rounded-full text-xs font-medium';
+  };
+
   return (
     <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>No</TableHead>
-            <TableHead>Tanggal</TableHead>
+            <TableHead>Tanggal Evaluasi</TableHead>
+            <TableHead>Tanggal Surat Pemberitahuan</TableHead>
             <TableHead>Nama Perwadag</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                 Tidak ada data surat pemberitahuan
               </TableCell>
             </TableRow>
@@ -53,8 +65,14 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{formatDate(item.tanggal)}</TableCell>
+                <TableCell>{formatDate(item.tanggalEvaluasi)}</TableCell>
+                <TableCell>{formatDate(item.tanggalSuratPemberitahuan)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
+                <TableCell>
+                  <span className={getStatusColor(item.status)}>
+                    {getStatusLabel(item.status)}
+                  </span>
+                </TableCell>
                 <TableCell>
                   <ActionDropdown
                     onView={() => onView?.(item)}

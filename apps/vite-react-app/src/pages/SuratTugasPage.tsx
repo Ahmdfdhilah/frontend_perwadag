@@ -112,8 +112,8 @@ const SuratTugasPage: React.FC = () => {
       filtered = filtered.filter(item => item.perwadagId === 'PWD001');
     }
 
-    // Sort by tanggal (newest first)
-    filtered.sort((a, b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime());
+    // Sort by tanggalPelaksanaanEvaluasi (newest first)
+    filtered.sort((a, b) => new Date(b.tanggalPelaksanaanEvaluasi).getTime() - new Date(a.tanggalPelaksanaanEvaluasi).getTime());
 
     return filtered;
   }, [searchQuery, selectedYear, selectedInspektorat, selectedPerwadag, isAdmin, isInspektorat, isPerwadag]);

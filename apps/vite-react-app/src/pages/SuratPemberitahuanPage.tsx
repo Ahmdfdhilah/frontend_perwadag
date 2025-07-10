@@ -104,8 +104,8 @@ const SuratPemberitahuanPage: React.FC = () => {
       filtered = filtered.filter(item => item.perwadagId === 'PWD001');
     }
 
-    // Sort by tanggal (newest first)
-    filtered.sort((a, b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime());
+    // Sort by tanggalSuratPemberitahuan (newest first)
+    filtered.sort((a, b) => new Date(b.tanggalSuratPemberitahuan).getTime() - new Date(a.tanggalSuratPemberitahuan).getTime());
 
     return filtered;
   }, [searchQuery, selectedYear, selectedInspektorat, selectedPerwadag, isAdmin, isInspektorat, isPerwadag]);
