@@ -9,27 +9,11 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
-import { Textarea } from '@workspace/ui/components/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@workspace/ui/components/select';
-import { Calendar } from '@workspace/ui/components/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@workspace/ui/components/popover';
-import { CalendarIcon, Upload, Download, File, ExternalLink } from 'lucide-react';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
-import { cn } from '@workspace/ui/lib/utils';
-import { ExitMeeting } from '@/mocks/exitMeeting';
-import { Perwadag } from '@/mocks/perwadag';
+import { Badge } from '@workspace/ui/components/badge';
+import { Upload, Download, File, ExternalLink, X } from 'lucide-react';
+import { ExitMeeting, getExitMeetingStatus } from '@/mocks/exitMeeting';
 import { useRole } from '@/hooks/useRole';
+import { formatIndonesianDate, formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface ExitMeetingDialogProps {
   open: boolean;
@@ -37,7 +21,6 @@ interface ExitMeetingDialogProps {
   item: ExitMeeting | null;
   mode: 'view' | 'edit';
   onSave: (data: Partial<ExitMeeting>) => void;
-  availablePerwadag: Perwadag[];
 }
 
 const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
@@ -46,46 +29,66 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   item,
   mode,
   onSave,
-  availablePerwadag,
 }) => {
   const { isAdmin, isInspektorat } = useRole();
   const [formData, setFormData] = useState<Partial<ExitMeeting>>({});
-  const [selectedDate, setSelectedDate] = useState<Date>();
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
   useEffect(() => {
     if (item && open) {
-      setFormData({
-        ...item,
-      });
-      setSelectedDate(new Date(item.tanggal));
+      setFormData({...item});
     } else {
       setFormData({});
-      setSelectedDate(undefined);
     }
   }, [item, open]);
 
   const handleSave = () => {
-    if (selectedDate) {
-      const dataToSave = {
-        ...formData,
-        tanggal: selectedDate.toISOString().split('T')[0],
-      };
-      onSave(dataToSave);
-    }
+    onSave(formData);
   };
 
   const handleCancel = () => {
     onOpenChange(false);
   };
 
-  const handleFileUpload = (field: string, file: File) => {
+  const handleFileUpload = (field: 'daftarHadir', file: File) => {
     const fileUrl = URL.createObjectURL(file);
     const fileName = file.name;
     setFormData({ 
       ...formData, 
       [field]: fileName,
       [`${field}Url`]: fileUrl
+    });
+  };
+
+  const handleImageUpload = (files: FileList | null) => {
+    if (!files) return;
+    
+    const newImages: string[] = [];
+    const newImageUrls: string[] = [];
+    
+    Array.from(files).slice(0, 2).forEach(file => {
+      const fileUrl = URL.createObjectURL(file);
+      newImages.push(file.name);
+      newImageUrls.push(fileUrl);
+    });
+    
+    setFormData({
+      ...formData,
+      buktiImages: [...(formData.buktiImages || []), ...newImages].slice(0, 2),
+      buktiImageUrls: [...(formData.buktiImageUrls || []), ...newImageUrls].slice(0, 2)
+    });
+  };
+
+  const handleRemoveImage = (index: number) => {
+    const newImages = [...(formData.buktiImages || [])];
+    const newImageUrls = [...(formData.buktiImageUrls || [])];
+    
+    newImages.splice(index, 1);
+    newImageUrls.splice(index, 1);
+    
+    setFormData({
+      ...formData,
+      buktiImages: newImages,
+      buktiImageUrls: newImageUrls
     });
   };
 
@@ -105,8 +108,17 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   };
 
   const isEditable = mode === 'edit';
-  const canEditAdminFields = isAdmin() && isEditable;
-  const canEditInspektoratFields = isInspektorat() && isEditable;
+  const canEdit = (isAdmin() || isInspektorat()) && isEditable;
+
+  const status = item ? getExitMeetingStatus(item) : 'Belum Upload';
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'Lengkap': return 'default';
+      case 'Sebagian': return 'secondary';
+      case 'Belum Upload': return 'outline';
+      default: return 'outline';
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -119,216 +131,208 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
 
         <div className="flex-1 overflow-y-auto py-4">
           <div className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="tanggal">Tanggal Evaluasi</Label>
-              <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !selectedDate && "text-muted-foreground",
-                      !isEditable && "bg-muted cursor-not-allowed"
-                    )}
-                    disabled={!isEditable}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? (
-                      format(selectedDate, "dd MMMM yyyy", { locale: id })
-                    ) : (
-                      <span>Pilih tanggal</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                {isEditable && (
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={(date) => {
-                        setSelectedDate(date);
-                        setIsDatePickerOpen(false);
-                      }}
-                      initialFocus
-                      locale={id}
-                    />
-                  </PopoverContent>
-                )}
-              </Popover>
+            {/* Info Basic - Read Only */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Nama Perwadag</Label>
+                <div className="p-3 bg-muted rounded-md">
+                  {item?.perwadagName}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Status Upload</Label>
+                <div>
+                  <Badge variant={getStatusBadgeVariant(status)}>
+                    {status}
+                  </Badge>
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="perwadag">Nama Perwadag</Label>
-              {isEditable ? (
-                <Select
-                  value={formData.perwadagId || ''}
-                  onValueChange={(value) => {
-                    const selected = availablePerwadag.find(p => p.id === value);
-                    setFormData({
-                      ...formData,
-                      perwadagId: value,
-                      perwadagName: selected?.name || '',
-                    });
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih perwadag" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availablePerwadag.map((perwadag) => (
-                      <SelectItem key={perwadag.id} value={perwadag.id}>
-                        {perwadag.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Input
-                  value={formData.perwadagName || ''}
-                  disabled
-                  className="bg-muted"
-                />
-              )}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Tanggal Evaluasi</Label>
+                <div className="p-3 bg-muted rounded-md">
+                  {item ? formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi) : '-'}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Tanggal Exit Meeting</Label>
+                <div className="p-3 bg-muted rounded-md">
+                  {item ? formatIndonesianDate(item.tanggal) : '-'}
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="rincian">Rincian</Label>
-              <Textarea
-                id="rincian"
-                value={formData.rincian || ''}
-                onChange={(e) => setFormData({ ...formData, rincian: e.target.value })}
-                disabled={!isEditable}
-                className={!isEditable ? "bg-muted" : ""}
-                rows={3}
-              />
-            </div>
-
-            {/* Admin fields */}
+            {/* Link Zoom - Editable */}
             <div className="space-y-2">
               <Label htmlFor="linkZoom">Link Zoom</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="linkZoom"
-                  value={formData.linkZoom || ''}
-                  onChange={(e) => setFormData({ ...formData, linkZoom: e.target.value })}
-                  disabled={!canEditAdminFields}
-                  className={!canEditAdminFields ? "bg-muted" : ""}
-                  placeholder="https://zoom.us/j/..."
-                />
-                {formData.linkZoom && mode === 'view' && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleOpenLink(formData.linkZoom!)}
-                    title="Buka Link Zoom"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            {/* Inspektorat fields */}
-            <div className="space-y-2">
-              <Label htmlFor="daftarHadir">Daftar Hadir</Label>
-              <div className="flex gap-2">
-                {canEditInspektoratFields ? (
-                  <>
-                    <input
-                      type="file"
-                      id="daftarHadir"
-                      accept=".pdf,.doc,.docx,.xls,.xlsx"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          handleFileUpload('daftarHadir', file);
-                        }
-                      }}
-                      className="hidden"
-                    />
-                    <Button
-                      variant="outline"
-                      onClick={() => document.getElementById('daftarHadir')?.click()}
-                      className="flex-1"
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      {formData.daftarHadir ? 'Ubah File' : 'Upload File'}
-                    </Button>
-                  </>
-                ) : (
+              {canEdit ? (
+                <div className="flex gap-2">
                   <Input
-                    value={formData.daftarHadir || 'Tidak ada file'}
-                    disabled
-                    className="bg-muted flex-1"
+                    id="linkZoom"
+                    value={formData.linkZoom || ''}
+                    onChange={(e) => setFormData({ ...formData, linkZoom: e.target.value })}
+                    placeholder="https://zoom.us/j/..."
                   />
-                )}
-                {formData.daftarHadir && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleDownloadFile(formData.daftarHadir!, formData.daftarHadirUrl!)}
-                    title="Download Daftar Hadir"
-                  >
-                    <Download className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-              {formData.daftarHadir && (
-                <div className="text-sm text-muted-foreground flex items-center gap-1">
-                  <File className="w-3 h-3" />
-                  File: {formData.daftarHadir}
+                  {formData.linkZoom && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOpenLink(formData.linkZoom!)}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <div className="p-3 bg-muted rounded-md flex-1">
+                    {item?.linkZoom || '-'}
+                  </div>
+                  {item?.linkZoom && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOpenLink(item.linkZoom!)}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               )}
             </div>
 
+            {/* Daftar Hadir - Editable */}
             <div className="space-y-2">
-              <Label htmlFor="buktiHadir">Bukti Hadir</Label>
-              <div className="flex gap-2">
-                {canEditInspektoratFields ? (
-                  <>
-                    <input
+              <Label>Daftar Hadir</Label>
+              {canEdit ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Input
                       type="file"
-                      id="buktiHadir"
-                      accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png"
+                      accept=".pdf,.doc,.docx"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
-                        if (file) {
-                          handleFileUpload('buktiHadir', file);
-                        }
+                        if (file) handleFileUpload('daftarHadir', file);
                       }}
                       className="hidden"
+                      id="daftar-hadir-upload"
                     />
                     <Button
+                      type="button"
                       variant="outline"
-                      onClick={() => document.getElementById('buktiHadir')?.click()}
-                      className="flex-1"
+                      onClick={() => document.getElementById('daftar-hadir-upload')?.click()}
                     >
-                      <Upload className="w-4 h-4 mr-2" />
-                      {formData.buktiHadir ? 'Ubah File' : 'Upload File'}
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload File
                     </Button>
-                  </>
-                ) : (
-                  <Input
-                    value={formData.buktiHadir || 'Tidak ada file'}
-                    disabled
-                    className="bg-muted flex-1"
-                  />
-                )}
-                {formData.buktiHadir && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleDownloadFile(formData.buktiHadir!, formData.buktiHadirUrl!)}
-                    title="Download Bukti Hadir"
-                  >
-                    <Download className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-              {formData.buktiHadir && (
-                <div className="text-sm text-muted-foreground flex items-center gap-1">
-                  <File className="w-3 h-3" />
-                  File: {formData.buktiHadir}
+                  </div>
+                  {formData.daftarHadir && (
+                    <div className="flex items-center gap-2 p-2 bg-muted rounded-md">
+                      <File className="h-4 w-4" />
+                      <span className="flex-1 text-sm">{formData.daftarHadir}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDownloadFile(formData.daftarHadir!, formData.daftarHadirUrl!)}
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  {item?.daftarHadir ? (
+                    <div className="flex items-center gap-2 p-2 bg-muted rounded-md">
+                      <File className="h-4 w-4" />
+                      <span className="flex-1 text-sm">{item.daftarHadir}</span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDownloadFile(item.daftarHadir!, item.daftarHadirUrl!)}
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-muted rounded-md text-muted-foreground">
+                      Belum ada file
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Bukti Images - Editable */}
+            <div className="space-y-2">
+              <Label>Bukti Hadir (Maksimal 2 gambar)</Label>
+              {canEdit ? (
+                <div className="space-y-2">
+                  {(formData.buktiImages?.length || 0) < 2 && (
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={(e) => handleImageUpload(e.target.files)}
+                        className="hidden"
+                        id="bukti-image-upload"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById('bukti-image-upload')?.click()}
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload Gambar ({formData.buktiImages?.length || 0}/2)
+                      </Button>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-2 gap-2">
+                    {formData.buktiImageUrls?.map((url, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={url}
+                          alt={`Bukti ${index + 1}`}
+                          className="w-full h-32 object-cover rounded-md border"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="absolute top-1 right-1"
+                          onClick={() => handleRemoveImage(index)}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  {item?.buktiImageUrls && item.buktiImageUrls.length > 0 ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      {item.buktiImageUrls.map((url, index) => (
+                        <img
+                          key={index}
+                          src={url}
+                          alt={`Bukti ${index + 1}`}
+                          className="w-full h-32 object-cover rounded-md border"
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-muted rounded-md text-muted-foreground">
+                      Belum ada gambar
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -336,47 +340,14 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
         </div>
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
-          <div className="flex flex-wrap gap-2 justify-between w-full">
-            <div className="flex gap-2">
-              {mode === 'view' && formData.linkZoom && (
-                <Button
-                  variant="outline"
-                  onClick={() => handleOpenLink(formData.linkZoom!)}
-                >
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  Buka Zoom
-                </Button>
-              )}
-              {mode === 'view' && formData.daftarHadir && (
-                <Button
-                  variant="outline"
-                  onClick={() => handleDownloadFile(formData.daftarHadir!, formData.daftarHadirUrl!)}
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Daftar Hadir
-                </Button>
-              )}
-              {mode === 'view' && formData.buktiHadir && (
-                <Button
-                  variant="outline"
-                  onClick={() => handleDownloadFile(formData.buktiHadir!, formData.buktiHadirUrl!)}
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Bukti Hadir
-                </Button>
-              )}
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={handleCancel}>
-                {mode === 'view' ? 'Tutup' : 'Batal'}
-              </Button>
-              {mode === 'edit' && (
-                <Button onClick={handleSave}>
-                  Simpan
-                </Button>
-              )}
-            </div>
-          </div>
+          <Button variant="outline" onClick={handleCancel}>
+            {mode === 'view' ? 'Tutup' : 'Batal'}
+          </Button>
+          {canEdit && (
+            <Button onClick={handleSave}>
+              Simpan
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

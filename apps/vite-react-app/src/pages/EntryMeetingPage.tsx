@@ -74,8 +74,7 @@ const EntryMeetingPage: React.FC = () => {
     // Filter by search query
     if (searchQuery) {
       filtered = filtered.filter(item =>
-        item.perwadagName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.rincian.toLowerCase().includes(searchQuery.toLowerCase())
+        item.perwadagName.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -250,7 +249,7 @@ const EntryMeetingPage: React.FC = () => {
             <SearchContainer
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
-              placeholder="Cari nama perwadag atau rincian..."
+              placeholder="Cari nama perwadag..."
             />
 
             {/* Desktop Table */}
@@ -295,7 +294,6 @@ const EntryMeetingPage: React.FC = () => {
         item={editingItem}
         mode={dialogMode}
         onSave={handleSave}
-        availablePerwadag={availablePerwadag}
       />
     </div>
   );

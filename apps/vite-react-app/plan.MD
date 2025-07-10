@@ -24,7 +24,7 @@ E.	Entry Meeting apps\vite-react-app\src\pages\EntryMeetingPage.tsx
 
 F.	Exit Meeting apps\vite-react-app\src\pages\ExitMeetingPage.tsx
     1.	Memindahkan icon exit meeting menjadi urutan ke 6
-    2.	Menyesuaikan kolom menjadi No, Nama Perwadag, Tanggal Evaluasi, Tanggal Entry Meeting, Link Zoom, Status (apakah sudah upload daftar hadir dan bukti)
+    2.	Menyesuaikan kolom menjadi No, Nama Perwadag, Tanggal Evaluasi, Tanggal Exit Meeting, Link Zoom, Status (apakah sudah upload daftar hadir dan bukti)
     3.	Akses edit link zoom, daftar hadir, dan bukti yaitu admin dan inspektorat.
     4.	Bukti diubah menjadi upload image maksimal 2 gambar
     5.	Mengahpus menu rincian

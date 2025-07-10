@@ -7,8 +7,9 @@ import {
   TableHeader,
   TableRow,
 } from '@workspace/ui/components/table';
+import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { ExitMeeting } from '@/mocks/exitMeeting';
+import { ExitMeeting, getExitMeetingStatus } from '@/mocks/exitMeeting';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface ExitMeetingTableProps {
@@ -31,29 +32,57 @@ const ExitMeetingTable: React.FC<ExitMeetingTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>No</TableHead>
-            <TableHead>Tanggal Exit Meeting</TableHead>
-            <TableHead>Tanggal Evaluasi</TableHead>
             <TableHead>Nama Perwadag</TableHead>
-            <TableHead>Rincian</TableHead>
+            <TableHead>Tanggal Evaluasi</TableHead>
+            <TableHead>Tanggal Exit Meeting</TableHead>
+            <TableHead>Link Zoom</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                 Tidak ada data exit meeting
               </TableCell>
             </TableRow>
           ) : (
-            data.map((item, index) => (
+            data.map((item, index) => {
+              const status = getExitMeetingStatus(item);
+              const getStatusBadgeVariant = (status: string) => {
+                switch (status) {
+                  case 'Lengkap': return 'default';
+                  case 'Sebagian': return 'secondary';
+                  case 'Belum Upload': return 'outline';
+                  default: return 'outline';
+                }
+              };
+              
+              return (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{formatIndonesianDate(item.tanggal)}</TableCell>
-                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
-                <TableCell className="max-w-xs truncate" title={item.rincian}>
-                  {item.rincian}
+                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
+                <TableCell>{formatIndonesianDate(item.tanggal)}</TableCell>
+                <TableCell>
+                  {item.linkZoom ? (
+                    <a 
+                      href={item.linkZoom} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 underline"
+                    >
+                      Join Meeting
+                    </a>
+                  ) : (
+                    <span className="text-muted-foreground">-</span>
+                  )}
+                </TableCell>
+                <TableCell>
+                  <Badge variant={getStatusBadgeVariant(status)}>
+                    {status}
+                  </Badge>
                 </TableCell>
                 <TableCell>
                   <ActionDropdown
@@ -65,7 +94,8 @@ const ExitMeetingTable: React.FC<ExitMeetingTableProps> = ({
                   />
                 </TableCell>
               </TableRow>
-            ))
+              );
+            })
           )}
         </TableBody>
       </Table>

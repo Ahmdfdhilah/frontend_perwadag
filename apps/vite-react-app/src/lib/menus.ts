@@ -47,18 +47,20 @@ export const appMenuItems: SidebarItem[] = [
     icon: PhoneIncoming,
     allowedRoles: ['admin', 'inspektorat', 'perwadag'],
   },
-  // Exit Meeting - Only admin and inspektorat, perwadag
-  {
-    title: 'Exit Meeting',
-    href: '/exit-meeting',
-    icon: PhoneOutgoing,
-    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
-  },
+
   // Matriks - Only admin and inspektorat, perwadag
   {
     title: 'Matriks',
     href: '/matriks',
     icon: Grid2X2,
+    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
+  },
+
+  // Exit Meeting - Only admin and inspektorat, perwadag
+  {
+    title: 'Exit Meeting',
+    href: '/exit-meeting',
+    icon: PhoneOutgoing,
     allowedRoles: ['admin', 'inspektorat', 'perwadag'],
   },
   // Laporan Hasil - Only admin and inspektorat, perwadag
