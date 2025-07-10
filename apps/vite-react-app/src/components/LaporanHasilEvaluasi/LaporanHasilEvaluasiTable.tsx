@@ -10,7 +10,7 @@ import {
 import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { LaporanHasilEvaluasi } from '@/mocks/laporanHasilEvaluasi';
-import { formatIndonesianDateRange } from '@/utils/timeFormat';
+import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface LaporanHasilEvaluasiTableProps {
   data: LaporanHasilEvaluasi[];
@@ -48,6 +48,7 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
           <TableRow>
             <TableHead>No</TableHead>
             <TableHead>Tanggal Laporan</TableHead>
+            <TableHead>Tanggal Evaluasi</TableHead>
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Matriks</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
@@ -56,7 +57,7 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                 Tidak ada data laporan hasil evaluasi
               </TableCell>
             </TableRow>
@@ -64,6 +65,7 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
+                <TableCell>{formatIndonesianDate(item.tanggal)}</TableCell>
                 <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
                 <TableCell>

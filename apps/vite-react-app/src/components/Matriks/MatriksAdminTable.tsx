@@ -10,7 +10,7 @@ import {
 import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { Matriks } from '@/mocks/matriks';
-import { formatIndonesianDateRange } from '@/utils/timeFormat';
+import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface MatriksAdminTableProps {
   data: Matriks[];
@@ -44,6 +44,7 @@ const MatriksAdminTable: React.FC<MatriksAdminTableProps> = ({
           <TableRow>
             <TableHead>No</TableHead>
             <TableHead>Tanggal Matriks</TableHead>
+            <TableHead>Tanggal Evaluasi</TableHead>
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
@@ -52,7 +53,7 @@ const MatriksAdminTable: React.FC<MatriksAdminTableProps> = ({
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                 Tidak ada data matriks
               </TableCell>
             </TableRow>
@@ -60,6 +61,7 @@ const MatriksAdminTable: React.FC<MatriksAdminTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
+                <TableCell>{formatIndonesianDate(item.tanggal)}</TableCell>
                 <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
                 <TableCell>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Matriks } from '@/mocks/matriks';
-import { formatIndonesianDateRange } from '@/utils/timeFormat';
+import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface MatriksPerwadagCardsProps {
   data: Matriks[];
@@ -36,6 +36,10 @@ const MatriksPerwadagCards: React.FC<MatriksPerwadagCardsProps> = ({
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Tanggal Matriks:</span>
+                <span className="ml-2">{formatIndonesianDate(item.tanggal)}</span>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
                 <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
               </div>
               <div>
