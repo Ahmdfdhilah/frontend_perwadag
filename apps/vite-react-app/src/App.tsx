@@ -19,6 +19,7 @@ import ExitMeetingPage from './pages/ExitMeetingPage';
 import LaporanHasilEvaluasiPage from './pages/LaporanHasilEvaluasiPage';
 import KuesionerPage from './pages/KuesionerPage';
 import MatriksPage from './pages/MatriksPage';
+import QuestionnaireTemplatePage from './pages/QuestionnaireTemplatePage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { DefaultLayout } from './components/layouts';
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
@@ -54,6 +55,7 @@ function App() {
                     <Route path="exit-meeting" element={<ExitMeetingPage />} />
                     <Route path="laporan-hasil" element={<LaporanHasilEvaluasiPage />} />
                     <Route path="kuesioner" element={<KuesionerPage />} />
+                    <Route path="template-kuesioner" element={<QuestionnaireTemplatePage />} />
                     <Route path="users" element={<UsersPage />} />
                     <Route path="profile" element={<ProfilePage />} />
                   </Route>

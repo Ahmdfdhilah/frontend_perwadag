@@ -1,4 +1,4 @@
-import { AlertTriangle, FileInput, Grid2X2, Mail, MailWarningIcon, PhoneIncoming, PhoneOutgoing, Users, ClipboardList } from "lucide-react";
+import { AlertTriangle, FileInput, Grid2X2, Mail, MailWarningIcon, PhoneIncoming, PhoneOutgoing, Users, ClipboardList, ClipboardCopyIcon } from "lucide-react";
 
 // Role definitions
 export type UserRole =
@@ -75,6 +75,13 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Kuesioner',
     href: '/kuesioner',
     icon: ClipboardList,
+    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
+  },
+  // Template Kuesioner - All users can view, only admin can manage
+  {
+    title: 'Template Kuesioner',
+    href: '/template-kuesioner',
+    icon: ClipboardCopyIcon,
     allowedRoles: ['admin', 'inspektorat', 'perwadag'],
   },
 
