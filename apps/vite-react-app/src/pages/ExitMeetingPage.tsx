@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@workspace/ui/components/select';
+import { Combobox } from '@workspace/ui/components/combobox';
 import { Label } from '@workspace/ui/components/label';
 import {
   EXIT_MEETING_DATA,
@@ -221,19 +222,19 @@ const ExitMeetingPage: React.FC = () => {
         {(isAdmin() || isInspektorat()) && (
           <div className="space-y-2">
             <Label htmlFor="perwadag-filter">Perwadag</Label>
-            <Select value={selectedPerwadag} onValueChange={setSelectedPerwadag}>
-              <SelectTrigger id="perwadag-filter">
-                <SelectValue placeholder="Pilih perwadag" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua Perwadag</SelectItem>
-                {availablePerwadag.map(perwadag => (
-                  <SelectItem key={perwadag.id} value={perwadag.id}>
-                    {perwadag.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Combobox
+              options={[
+                { value: 'all', label: 'Semua Perwadag' },
+                ...availablePerwadag.map(perwadag => ({
+                  value: perwadag.id,
+                  label: perwadag.name
+                }))
+              ]}
+              value={selectedPerwadag}
+              onChange={(value) => setSelectedPerwadag(value.toString())}
+              placeholder="Pilih perwadag"
+              searchPlaceholder="Cari perwadag..."
+            />
           </div>
         )}
       </Filtering>

@@ -53,7 +53,6 @@ export const UserForm: React.FC<UserFormProps> = ({
   onCancel,
   loading = false,
   disabled = false,
-  mode = 'create'
 }) => {
   const [showPerwadagSelect, setShowPerwadagSelect] = useState(
     initialData?.roles?.some(role => role.name === 'perwadag') || false
