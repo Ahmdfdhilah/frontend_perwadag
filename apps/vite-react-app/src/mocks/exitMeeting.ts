@@ -1,6 +1,8 @@
 export interface ExitMeeting {
   id: string;
   tanggal: string;
+  tanggalMulaiEvaluasi: string;
+  tanggalAkhirEvaluasi: string;
   perwadagId: string;
   perwadagName: string;
   rincian: string;
@@ -17,6 +19,8 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
   {
     id: "EXM001",
     tanggal: "2024-03-15",
+    tanggalMulaiEvaluasi: "2024-03-15",
+    tanggalAkhirEvaluasi: "2024-03-15",
     perwadagId: "PWD001",
     perwadagName: "Atdag Moscow – Rusia",
     rincian: "Exit Meeting Audit Kinerja 2024",
@@ -31,6 +35,8 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
   {
     id: "EXM002",
     tanggal: "2024-03-20",
+    tanggalMulaiEvaluasi: "2024-03-20",
+    tanggalAkhirEvaluasi: "2024-03-20",
     perwadagId: "PWD002",
     perwadagName: "ITPC Vancouver – Canada",
     rincian: "Exit Meeting Audit Kinerja 2024",
@@ -45,6 +51,8 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
   {
     id: "EXM003",
     tanggal: "2024-04-10",
+    tanggalMulaiEvaluasi: "2024-04-10",
+    tanggalAkhirEvaluasi: "2024-04-12",
     perwadagId: "PWD010",
     perwadagName: "Atdag Beijing – Tiongkok",
     rincian: "Exit Meeting Audit Kinerja 2024",
@@ -59,6 +67,8 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
   {
     id: "EXM004",
     tanggal: "2024-04-15",
+    tanggalMulaiEvaluasi: "2024-04-15",
+    tanggalAkhirEvaluasi: "2024-04-15",
     perwadagId: "PWD011",
     perwadagName: "ITPC Osaka – Jepang",
     rincian: "Exit Meeting Audit Kinerja 2024",
@@ -73,6 +83,8 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
   {
     id: "EXM005",
     tanggal: "2024-05-05",
+    tanggalMulaiEvaluasi: "2024-05-05",
+    tanggalAkhirEvaluasi: "2024-05-05",
     perwadagId: "PWD019",
     perwadagName: "Atdag New Delhi – India",
     rincian: "Exit Meeting Audit Kinerja 2024",
@@ -87,6 +99,8 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
   {
     id: "EXM006",
     tanggal: "2024-05-12",
+    tanggalMulaiEvaluasi: "2024-05-12",
+    tanggalAkhirEvaluasi: "2024-05-12",
     perwadagId: "PWD020",
     perwadagName: "ITPC Mumbai – India",
     rincian: "Exit Meeting Audit Kinerja 2024",
@@ -101,6 +115,8 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
   {
     id: "EXM007",
     tanggal: "2024-06-08",
+    tanggalMulaiEvaluasi: "2024-06-08",
+    tanggalAkhirEvaluasi: "2024-06-08",
     perwadagId: "PWD028",
     perwadagName: "Atdag Hamburg – Jerman",
     rincian: "Exit Meeting Audit Kinerja 2024",
@@ -115,6 +131,8 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
   {
     id: "EXM008",
     tanggal: "2024-06-15",
+    tanggalMulaiEvaluasi: "2024-06-15",
+    tanggalAkhirEvaluasi: "2024-06-15",
     perwadagId: "PWD029",
     perwadagName: "ITPC Duesseldorf – Jerman",
     rincian: "Exit Meeting Audit Kinerja 2024",
@@ -129,6 +147,8 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
   {
     id: "EXM009",
     tanggal: "2023-12-10",
+    tanggalMulaiEvaluasi: "2023-12-10",
+    tanggalAkhirEvaluasi: "2023-12-10",
     perwadagId: "PWD003",
     perwadagName: "Konsuldag Los Angeles – Amerika Serikat",
     rincian: "Exit Meeting Audit Kinerja 2023",
@@ -143,6 +163,8 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
   {
     id: "EXM010",
     tanggal: "2023-12-18",
+    tanggalMulaiEvaluasi: "2023-12-18",
+    tanggalAkhirEvaluasi: "2023-12-18",
     perwadagId: "PWD004",
     perwadagName: "KDEI New York – Amerika Serikat",
     rincian: "Exit Meeting Audit Kinerja 2023",
@@ -157,6 +179,8 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
   {
     id: "EXM011",
     tanggal: "2023-01-05",
+    tanggalMulaiEvaluasi: "2023-01-05",
+    tanggalAkhirEvaluasi: "2023-01-05",
     perwadagId: "PWD012",
     perwadagName: "Konsuldag Busan – Korea Selatan",
     rincian: "Exit Meeting Audit Kinerja 2023",
@@ -171,6 +195,8 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
   {
     id: "EXM012",
     tanggal: "2023-01-12",
+    tanggalMulaiEvaluasi: "2023-01-12",
+    tanggalAkhirEvaluasi: "2023-01-12",
     perwadagId: "PWD013",
     perwadagName: "KDEI Seoul – Korea Selatan",
     rincian: "Exit Meeting Audit Kinerja 2023",
@@ -185,6 +211,8 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
   {
     id: "EXM013",
     tanggal: "2022-12-20",
+    tanggalMulaiEvaluasi: "2022-12-20",
+    tanggalAkhirEvaluasi: "2022-12-20",
     perwadagId: "PWD021",
     perwadagName: "Konsuldag Karachi – Pakistan",
     rincian: "Exit Meeting Audit Kinerja 2022",
@@ -199,6 +227,8 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
   {
     id: "EXM014",
     tanggal: "2022-12-28",
+    tanggalMulaiEvaluasi: "2022-12-28",
+    tanggalAkhirEvaluasi: "2022-12-28",
     perwadagId: "PWD022",
     perwadagName: "KDEI Islamabad – Pakistan",
     rincian: "Exit Meeting Audit Kinerja 2022",
@@ -213,6 +243,8 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
   {
     id: "EXM015",
     tanggal: "2022-01-15",
+    tanggalMulaiEvaluasi: "2022-01-15",
+    tanggalAkhirEvaluasi: "2022-01-15",
     perwadagId: "PWD030",
     perwadagName: "Konsuldag Milan – Italia",
     rincian: "Exit Meeting Audit Kinerja 2022",

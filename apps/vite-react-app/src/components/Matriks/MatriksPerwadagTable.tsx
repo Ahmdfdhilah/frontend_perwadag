@@ -8,6 +8,7 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import { Matriks } from '@/mocks/matriks';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface MatriksPerwadagTableProps {
   data: Matriks[];
@@ -16,13 +17,6 @@ interface MatriksPerwadagTableProps {
 const MatriksPerwadagTable: React.FC<MatriksPerwadagTableProps> = ({
   data,
 }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
 
   return (
     <div className="rounded-md border">
@@ -30,7 +24,7 @@ const MatriksPerwadagTable: React.FC<MatriksPerwadagTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>No</TableHead>
-            <TableHead>Tanggal</TableHead>
+            <TableHead>Tanggal Matriks</TableHead>
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Temuan</TableHead>
             <TableHead>Rekomendasi</TableHead>
@@ -47,7 +41,7 @@ const MatriksPerwadagTable: React.FC<MatriksPerwadagTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{formatDate(item.tanggal)}</TableCell>
+                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
                 <TableCell className="max-w-xs">
                   <div className="truncate" title={item.temuan}>

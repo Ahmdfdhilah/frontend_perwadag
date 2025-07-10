@@ -70,7 +70,7 @@ const SuratPemberitahuanCards: React.FC<SuratPemberitahuanCardsProps> = ({
               </div>
               
               <div>
-                <span className="font-medium text-muted-foreground">Tanggal Pelaksanaan Evaluasi:</span>
+                <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
                 <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
               </div>
               

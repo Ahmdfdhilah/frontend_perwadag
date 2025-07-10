@@ -10,6 +10,7 @@ import {
 import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { Matriks } from '@/mocks/matriks';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface MatriksAdminTableProps {
   data: Matriks[];
@@ -24,13 +25,6 @@ const MatriksAdminTable: React.FC<MatriksAdminTableProps> = ({
   onEdit,
   canEdit,
 }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -49,7 +43,7 @@ const MatriksAdminTable: React.FC<MatriksAdminTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>No</TableHead>
-            <TableHead>Tanggal</TableHead>
+            <TableHead>Tanggal Matriks</TableHead>
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
@@ -66,7 +60,7 @@ const MatriksAdminTable: React.FC<MatriksAdminTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{formatDate(item.tanggal)}</TableCell>
+                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
                 <TableCell>
                   <Badge variant={getStatusBadgeVariant(item.status)}>

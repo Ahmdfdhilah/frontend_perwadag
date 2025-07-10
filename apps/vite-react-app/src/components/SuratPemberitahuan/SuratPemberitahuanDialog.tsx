@@ -42,7 +42,6 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
     fileUrl: '',
   });
 
-  const [isEvaluasiCalendarOpen, setIsEvaluasiCalendarOpen] = useState(false);
   const [isSuratCalendarOpen, setIsSuratCalendarOpen] = useState(false);
 
   useEffect(() => {
@@ -127,45 +126,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Tanggal Evaluasi {isEditing && '*'}</Label>
-                {isEditing ? (
-                  <Popover open={isEvaluasiCalendarOpen} onOpenChange={setIsEvaluasiCalendarOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-left font-normal"
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {formData.tanggalEvaluasi ? (
-                          format(formData.tanggalEvaluasi, 'dd MMM yyyy', { locale: id })
-                        ) : (
-                          <span>Pilih tanggal</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={formData.tanggalEvaluasi}
-                        onSelect={(date) => {
-                          setFormData(prev => ({ ...prev, tanggalEvaluasi: date }));
-                          setIsEvaluasiCalendarOpen(false);
-                        }}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                ) : (
-                  <Input
-                    value={item?.tanggalEvaluasi ? format(new Date(item.tanggalEvaluasi), 'dd MMM yyyy', { locale: id }) : 'Tidak ada data'}
-                    disabled
-                    className="bg-muted"
-                  />
-                )}
-              </div>
-              
+            <div>
               <div className="space-y-2">
                 <Label>Tanggal Surat {isEditing && '*'}</Label>
                 {isEditing ? (

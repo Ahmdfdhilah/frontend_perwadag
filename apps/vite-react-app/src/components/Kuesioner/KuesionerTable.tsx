@@ -9,6 +9,7 @@ import {
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { Kuesioner } from '@/mocks/kuesioner';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface KuesionerTableProps {
   data: Kuesioner[];
@@ -23,13 +24,6 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
   onEdit,
   canEdit,
 }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
 
 
   return (
@@ -38,7 +32,7 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>No</TableHead>
-            <TableHead>Tanggal</TableHead>
+            <TableHead>Tanggal Kuesioner</TableHead>
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Aspek</TableHead>
             <TableHead>Link Dokumen</TableHead>
@@ -56,7 +50,7 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{formatDate(item.tanggal)}</TableCell>
+                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
                 <TableCell>{item.aspek}</TableCell>
                 <TableCell>

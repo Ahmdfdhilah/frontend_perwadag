@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/componen
 import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { Matriks } from '@/mocks/matriks';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface MatriksAdminCardsProps {
   data: Matriks[];
@@ -17,13 +18,6 @@ const MatriksAdminCards: React.FC<MatriksAdminCardsProps> = ({
   onEdit,
   canEdit,
 }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
@@ -69,8 +63,8 @@ const MatriksAdminCards: React.FC<MatriksAdminCardsProps> = ({
                 <span className="ml-2">{index + 1}</span>
               </div>
               <div>
-                <span className="font-medium text-muted-foreground">Tanggal:</span>
-                <span className="ml-2">{formatDate(item.tanggal)}</span>
+                <span className="font-medium text-muted-foreground">Tanggal Matriks:</span>
+                <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Status:</span>

@@ -1,6 +1,7 @@
 export interface LaporanHasilEvaluasi {
   id: string;
-  tanggal: string;
+  tanggalMulaiEvaluasi: string;
+  tanggalAkhirEvaluasi: string;
   perwadagId: string;
   perwadagName: string;
   nomorEvaluasi: string;
@@ -14,7 +15,8 @@ export interface LaporanHasilEvaluasi {
 export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   {
     id: "LHE001",
-    tanggal: "2024-05-15",
+    tanggalMulaiEvaluasi: "2024-05-15",
+    tanggalAkhirEvaluasi: "2024-05-22",
     perwadagId: "PWD001",
     perwadagName: "Atdag Moscow – Rusia",
     nomorEvaluasi: "LHE/001/2024",
@@ -26,7 +28,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE002",
-    tanggal: "2024-05-20",
+    tanggalMulaiEvaluasi: "2024-05-20",
+    tanggalAkhirEvaluasi: "2024-05-27",
     perwadagId: "PWD002",
     perwadagName: "ITPC Vancouver – Canada",
     nomorEvaluasi: "LHE/002/2024",
@@ -38,7 +41,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE003",
-    tanggal: "2024-06-10",
+    tanggalMulaiEvaluasi: "2024-06-10",
+    tanggalAkhirEvaluasi: "2024-06-17",
     perwadagId: "PWD010",
     perwadagName: "Atdag Beijing – Tiongkok",
     nomorEvaluasi: "LHE/003/2024",
@@ -50,7 +54,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE004",
-    tanggal: "2024-06-15",
+    tanggalMulaiEvaluasi: "2024-06-15",
+    tanggalAkhirEvaluasi: "2024-06-22",
     perwadagId: "PWD011",
     perwadagName: "ITPC Osaka – Jepang",
     nomorEvaluasi: "LHE/004/2024",
@@ -62,7 +67,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE005",
-    tanggal: "2024-07-05",
+    tanggalMulaiEvaluasi: "2024-07-05",
+    tanggalAkhirEvaluasi: "2024-07-12",
     perwadagId: "PWD019",
     perwadagName: "Atdag New Delhi – India",
     nomorEvaluasi: "LHE/005/2024",
@@ -74,7 +80,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE006",
-    tanggal: "2024-07-12",
+    tanggalMulaiEvaluasi: "2024-07-12",
+    tanggalAkhirEvaluasi: "2024-07-19",
     perwadagId: "PWD020",
     perwadagName: "ITPC Mumbai – India",
     nomorEvaluasi: "LHE/006/2024",
@@ -86,7 +93,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE007",
-    tanggal: "2024-08-08",
+    tanggalMulaiEvaluasi: "2024-08-08",
+    tanggalAkhirEvaluasi: "2024-08-15",
     perwadagId: "PWD028",
     perwadagName: "Atdag Hamburg – Jerman",
     nomorEvaluasi: "LHE/007/2024",
@@ -98,7 +106,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE008",
-    tanggal: "2024-08-15",
+    tanggalMulaiEvaluasi: "2024-08-15",
+    tanggalAkhirEvaluasi: "2024-08-22",
     perwadagId: "PWD029",
     perwadagName: "ITPC Duesseldorf – Jerman",
     nomorEvaluasi: "LHE/008/2024",
@@ -110,7 +119,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE009",
-    tanggal: "2023-12-10",
+    tanggalMulaiEvaluasi: "2023-12-10",
+    tanggalAkhirEvaluasi: "2023-12-17",
     perwadagId: "PWD003",
     perwadagName: "Konsuldag Los Angeles – Amerika Serikat",
     nomorEvaluasi: "LHE/009/2023",
@@ -122,7 +132,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE010",
-    tanggal: "2023-12-18",
+    tanggalMulaiEvaluasi: "2023-12-18",
+    tanggalAkhirEvaluasi: "2023-12-25",
     perwadagId: "PWD004",
     perwadagName: "KDEI New York – Amerika Serikat",
     nomorEvaluasi: "LHE/010/2023",
@@ -134,7 +145,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE011",
-    tanggal: "2023-01-05",
+    tanggalMulaiEvaluasi: "2023-01-05",
+    tanggalAkhirEvaluasi: "2023-01-12",
     perwadagId: "PWD012",
     perwadagName: "Konsuldag Busan – Korea Selatan",
     nomorEvaluasi: "LHE/011/2023",
@@ -146,7 +158,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE012",
-    tanggal: "2023-01-12",
+    tanggalMulaiEvaluasi: "2023-01-12",
+    tanggalAkhirEvaluasi: "2023-01-19",
     perwadagId: "PWD013",
     perwadagName: "KDEI Seoul – Korea Selatan",
     nomorEvaluasi: "LHE/012/2023",
@@ -158,7 +171,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE013",
-    tanggal: "2022-12-20",
+    tanggalMulaiEvaluasi: "2022-12-20",
+    tanggalAkhirEvaluasi: "2022-12-27",
     perwadagId: "PWD021",
     perwadagName: "Konsuldag Karachi – Pakistan",
     nomorEvaluasi: "LHE/013/2022",
@@ -170,7 +184,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE014",
-    tanggal: "2022-12-28",
+    tanggalMulaiEvaluasi: "2022-12-28",
+    tanggalAkhirEvaluasi: "2023-01-04",
     perwadagId: "PWD022",
     perwadagName: "KDEI Islamabad – Pakistan",
     nomorEvaluasi: "LHE/014/2022",
@@ -182,7 +197,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE015",
-    tanggal: "2022-01-15",
+    tanggalMulaiEvaluasi: "2022-01-15",
+    tanggalAkhirEvaluasi: "2022-01-22",
     perwadagId: "PWD030",
     perwadagName: "Konsuldag Milan – Italia",
     nomorEvaluasi: "LHE/015/2022",
@@ -194,7 +210,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE016",
-    tanggal: "2024-09-10",
+    tanggalMulaiEvaluasi: "2024-09-10",
+    tanggalAkhirEvaluasi: "2024-09-17",
     perwadagId: "PWD005",
     perwadagName: "Atdag London – Inggris",
     nomorEvaluasi: "LHE/016/2024",
@@ -206,7 +223,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE017",
-    tanggal: "2024-09-15",
+    tanggalMulaiEvaluasi: "2024-09-15",
+    tanggalAkhirEvaluasi: "2024-09-22",
     perwadagId: "PWD006",
     perwadagName: "ITPC Birmingham – Inggris",
     nomorEvaluasi: "LHE/017/2024",
@@ -218,7 +236,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE018",
-    tanggal: "2024-10-08",
+    tanggalMulaiEvaluasi: "2024-10-08",
+    tanggalAkhirEvaluasi: "2024-10-15",
     perwadagId: "PWD014",
     perwadagName: "Konsuldag Singapore – Singapura",
     nomorEvaluasi: "LHE/018/2024",
@@ -230,7 +249,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE019",
-    tanggal: "2024-10-12",
+    tanggalMulaiEvaluasi: "2024-10-12",
+    tanggalAkhirEvaluasi: "2024-10-19",
     perwadagId: "PWD015",
     perwadagName: "KDEI Singapore – Singapura",
     nomorEvaluasi: "LHE/019/2024",
@@ -242,7 +262,8 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
   },
   {
     id: "LHE020",
-    tanggal: "2024-11-05",
+    tanggalMulaiEvaluasi: "2024-11-05",
+    tanggalAkhirEvaluasi: "2024-11-12",
     perwadagId: "PWD023",
     perwadagName: "Atdag Riyadh – Arab Saudi",
     nomorEvaluasi: "LHE/020/2024",

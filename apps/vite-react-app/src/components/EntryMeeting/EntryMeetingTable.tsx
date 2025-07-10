@@ -9,6 +9,7 @@ import {
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { EntryMeeting } from '@/mocks/entryMeeting';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface EntryMeetingTableProps {
   data: EntryMeeting[];
@@ -23,13 +24,6 @@ const EntryMeetingTable: React.FC<EntryMeetingTableProps> = ({
   onEdit,
   canEdit,
 }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
 
   return (
     <div className="rounded-md border">
@@ -37,7 +31,7 @@ const EntryMeetingTable: React.FC<EntryMeetingTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>No</TableHead>
-            <TableHead>Tanggal</TableHead>
+            <TableHead>Tanggal Entry Meeting</TableHead>
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Rincian</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
@@ -54,7 +48,7 @@ const EntryMeetingTable: React.FC<EntryMeetingTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{formatDate(item.tanggal)}</TableCell>
+                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
                 <TableCell className="max-w-xs truncate" title={item.rincian}>
                   {item.rincian}

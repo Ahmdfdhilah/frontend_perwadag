@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Kuesioner } from '@/mocks/kuesioner';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface KuesionerCardsProps {
   data: Kuesioner[];
@@ -16,13 +17,6 @@ const KuesionerCards: React.FC<KuesionerCardsProps> = ({
   onEdit,
   canEdit,
 }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
 
 
   if (data.length === 0) {
@@ -58,8 +52,8 @@ const KuesionerCards: React.FC<KuesionerCardsProps> = ({
                 <span className="ml-2">{index + 1}</span>
               </div>
               <div>
-                <span className="font-medium text-muted-foreground">Tanggal:</span>
-                <span className="ml-2">{formatDate(item.tanggal)}</span>
+                <span className="font-medium text-muted-foreground">Tanggal Kuesioner:</span>
+                <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Aspek:</span>

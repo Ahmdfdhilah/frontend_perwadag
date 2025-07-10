@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/componen
 import { Badge } from '@workspace/ui/components/badge';
 import { LaporanHasilEvaluasi } from '@/mocks/laporanHasilEvaluasi';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface LaporanHasilEvaluasiCardsProps {
   data: LaporanHasilEvaluasi[];
@@ -17,13 +18,6 @@ const LaporanHasilEvaluasiCards: React.FC<LaporanHasilEvaluasiCardsProps> = ({
   onEdit,
   canEdit,
 }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
 
   const getMatriksBadgeVariant = (matriks: string) => {
     switch (matriks) {
@@ -73,8 +67,8 @@ const LaporanHasilEvaluasiCards: React.FC<LaporanHasilEvaluasiCardsProps> = ({
                 <span className="ml-2">{index + 1}</span>
               </div>
               <div>
-                <span className="font-medium text-muted-foreground">Tanggal:</span>
-                <span className="ml-2">{formatDate(item.tanggal)}</span>
+                <span className="font-medium text-muted-foreground">Tanggal Laporan:</span>
+                <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Matriks:</span>
