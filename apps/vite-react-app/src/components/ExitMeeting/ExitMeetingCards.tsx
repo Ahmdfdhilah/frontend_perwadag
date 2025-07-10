@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { ExitMeeting } from '@/mocks/exitMeeting';
+import { ExitMeeting, getExitMeetingStatus } from '@/mocks/exitMeeting';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
@@ -90,6 +90,18 @@ const ExitMeetingCards: React.FC<ExitMeetingCardsProps> = ({
                   ) : (
                     <span className="ml-2 text-muted-foreground">-</span>
                   )}
+                </div>
+                <div>
+                  <span className="font-medium text-muted-foreground">Status:</span>
+                  <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                    getExitMeetingStatus(item) === 'Lengkap' 
+                      ? 'bg-green-100 text-green-800' 
+                      : getExitMeetingStatus(item) === 'Sebagian'
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {getExitMeetingStatus(item)}
+                  </span>
                 </div>
               </div>
             </CardContent>

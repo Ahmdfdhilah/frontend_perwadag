@@ -8,7 +8,7 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { EntryMeeting } from '@/mocks/entryMeeting';
+import { EntryMeeting, getEntryMeetingStatus } from '@/mocks/entryMeeting';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface EntryMeetingTableProps {
@@ -36,13 +36,14 @@ const EntryMeetingTable: React.FC<EntryMeetingTableProps> = ({
             <TableHead>Tanggal Entry Meeting</TableHead>
             <TableHead>Link Zoom</TableHead>
             <TableHead>Daftar Hadir</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                 Tidak ada data entry meeting
               </TableCell>
             </TableRow>
@@ -81,6 +82,17 @@ const EntryMeetingTable: React.FC<EntryMeetingTableProps> = ({
                     ) : (
                       <span className="text-muted-foreground">-</span>
                     )}
+                  </TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      getEntryMeetingStatus(item) === 'Lengkap' 
+                        ? 'bg-green-100 text-green-800' 
+                        : getEntryMeetingStatus(item) === 'Sebagian'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {getEntryMeetingStatus(item)}
+                    </span>
                   </TableCell>
                   <TableCell>
                     <ActionDropdown

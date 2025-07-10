@@ -8,7 +8,7 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { KonfirmasiMeeting } from '@/mocks/konfirmasiMeeting';
+import { KonfirmasiMeeting, getKonfirmasiMeetingStatus } from '@/mocks/konfirmasiMeeting';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 import { Badge } from '@workspace/ui/components/badge';
 
@@ -46,14 +46,15 @@ const KonfirmasiMeetingTable: React.FC<KonfirmasiMeetingTableProps> = ({
             <TableHead>Tanggal Konfirmasi</TableHead>
             <TableHead>Link Zoom</TableHead>
             <TableHead>Daftar Hadir</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>Status Meeting</TableHead>
+            <TableHead>Status Dokumen</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                 Tidak ada data konfirmasi meeting
               </TableCell>
             </TableRow>
@@ -97,6 +98,17 @@ const KonfirmasiMeetingTable: React.FC<KonfirmasiMeetingTableProps> = ({
                   </TableCell>
                   <TableCell>
                     {getStatusBadge(item.status, hasDocuments)}
+                  </TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      getKonfirmasiMeetingStatus(item) === 'Lengkap' 
+                        ? 'bg-green-100 text-green-800' 
+                        : getKonfirmasiMeetingStatus(item) === 'Sebagian'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {getKonfirmasiMeetingStatus(item)}
+                    </span>
                   </TableCell>
                   <TableCell>
                     <ActionDropdown

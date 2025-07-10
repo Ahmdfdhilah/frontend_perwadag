@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { KonfirmasiMeeting } from '@/mocks/konfirmasiMeeting';
+import { KonfirmasiMeeting, getKonfirmasiMeetingStatus } from '@/mocks/konfirmasiMeeting';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 import { Badge } from '@workspace/ui/components/badge';
@@ -102,8 +102,20 @@ const KonfirmasiMeetingCards: React.FC<KonfirmasiMeetingCardsProps> = ({
                   )}
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-muted-foreground">Status:</span>
+                  <span className="font-medium text-muted-foreground">Status Meeting:</span>
                   {getStatusBadge(item.status, hasDocuments)}
+                </div>
+                <div>
+                  <span className="font-medium text-muted-foreground">Status Dokumen:</span>
+                  <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                    getKonfirmasiMeetingStatus(item) === 'Lengkap' 
+                      ? 'bg-green-100 text-green-800' 
+                      : getKonfirmasiMeetingStatus(item) === 'Sebagian'
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {getKonfirmasiMeetingStatus(item)}
+                  </span>
                 </div>
               </div>
             </CardContent>

@@ -178,3 +178,16 @@ export const KONFIRMASI_MEETING_DATA: KonfirmasiMeeting[] = [
 export const YEARS_KONFIRMASI_MEETING = Array.from(
   new Set(KONFIRMASI_MEETING_DATA.map(item => item.year))
 ).sort((a, b) => b - a);
+
+export const getKonfirmasiMeetingStatus = (item: KonfirmasiMeeting): string => {
+  const hasLinkDaftarHadir = !!item.linkDaftarHadir;
+  const hasBuktiImages = !!item.buktiImages && item.buktiImages.length > 0;
+  
+  if (hasLinkDaftarHadir && hasBuktiImages) {
+    return 'Lengkap';
+  } else if (hasLinkDaftarHadir || hasBuktiImages) {
+    return 'Sebagian';
+  } else {
+    return 'Belum Upload';
+  }
+};

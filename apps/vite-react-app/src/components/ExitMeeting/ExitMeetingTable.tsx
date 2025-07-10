@@ -8,7 +8,7 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { ExitMeeting } from '@/mocks/exitMeeting';
+import { ExitMeeting, getExitMeetingStatus } from '@/mocks/exitMeeting';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface ExitMeetingTableProps {
@@ -36,13 +36,14 @@ const ExitMeetingTable: React.FC<ExitMeetingTableProps> = ({
             <TableHead>Tanggal Exit Meeting</TableHead>
             <TableHead>Link Zoom</TableHead>
             <TableHead>Daftar Hadir</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                 Tidak ada data exit meeting
               </TableCell>
             </TableRow>
@@ -83,6 +84,17 @@ const ExitMeetingTable: React.FC<ExitMeetingTableProps> = ({
                     ) : (
                       <span className="text-muted-foreground">-</span>
                     )}
+                  </TableCell>
+                  <TableCell>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      getExitMeetingStatus(item) === 'Lengkap' 
+                        ? 'bg-green-100 text-green-800' 
+                        : getExitMeetingStatus(item) === 'Sebagian'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {getExitMeetingStatus(item)}
+                    </span>
                   </TableCell>
                   <TableCell>
                     <ActionDropdown

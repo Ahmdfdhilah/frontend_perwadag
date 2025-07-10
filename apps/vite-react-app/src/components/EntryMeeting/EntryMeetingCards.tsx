@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { EntryMeeting } from '@/mocks/entryMeeting';
+import { EntryMeeting, getEntryMeetingStatus } from '@/mocks/entryMeeting';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
@@ -90,6 +90,18 @@ const EntryMeetingCards: React.FC<EntryMeetingCardsProps> = ({
                   ) : (
                     <span className="ml-2 text-muted-foreground">-</span>
                   )}
+                </div>
+                <div>
+                  <span className="font-medium text-muted-foreground">Status:</span>
+                  <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                    getEntryMeetingStatus(item) === 'Lengkap' 
+                      ? 'bg-green-100 text-green-800' 
+                      : getEntryMeetingStatus(item) === 'Sebagian'
+                      ? 'bg-yellow-100 text-yellow-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {getEntryMeetingStatus(item)}
+                  </span>
                 </div>
               </div>
             </CardContent>
