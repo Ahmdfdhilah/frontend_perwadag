@@ -10,7 +10,6 @@ import {
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { KonfirmasiMeeting, getKonfirmasiMeetingStatus } from '@/mocks/konfirmasiMeeting';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
-import { Badge } from '@workspace/ui/components/badge';
 
 interface KonfirmasiMeetingTableProps {
   data: KonfirmasiMeeting[];
@@ -25,15 +24,6 @@ const KonfirmasiMeetingTable: React.FC<KonfirmasiMeetingTableProps> = ({
   onEdit,
   canEdit,
 }) => {
-  const getStatusBadge = (status: string, hasDocuments: boolean) => {
-    if (status === 'completed' && hasDocuments) {
-      return <Badge variant="default" className="bg-green-500 hover:bg-green-600">Selesai</Badge>;
-    } else if (status === 'confirmed') {
-      return <Badge variant="secondary">Dikonfirmasi</Badge>;
-    } else {
-      return <Badge variant="outline">Pending</Badge>;
-    }
-  };
 
   return (
     <div className="rounded-md border">
@@ -46,7 +36,6 @@ const KonfirmasiMeetingTable: React.FC<KonfirmasiMeetingTableProps> = ({
             <TableHead>Tanggal Konfirmasi</TableHead>
             <TableHead>Link Zoom</TableHead>
             <TableHead>Daftar Hadir</TableHead>
-            <TableHead>Status Meeting</TableHead>
             <TableHead>Status Dokumen</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
@@ -54,7 +43,7 @@ const KonfirmasiMeetingTable: React.FC<KonfirmasiMeetingTableProps> = ({
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                 Tidak ada data konfirmasi meeting
               </TableCell>
             </TableRow>
@@ -95,9 +84,6 @@ const KonfirmasiMeetingTable: React.FC<KonfirmasiMeetingTableProps> = ({
                     ) : (
                       <span className="text-muted-foreground">-</span>
                     )}
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(item.status, hasDocuments)}
                   </TableCell>
                   <TableCell>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${

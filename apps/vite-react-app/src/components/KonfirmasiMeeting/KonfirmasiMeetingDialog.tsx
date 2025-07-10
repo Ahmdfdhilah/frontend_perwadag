@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useRole } from '@/hooks/useRole';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -10,26 +9,21 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@workspace/ui/components/select';
 import { Calendar } from '@workspace/ui/components/calendar';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@workspace/ui/components/popover';
-import { CalendarIcon, ExternalLink } from 'lucide-react';
+import { CalendarIcon, ExternalLink, Upload, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
 import { KonfirmasiMeeting } from '@/mocks/konfirmasiMeeting';
 import { Perwadag } from '@/mocks/perwadag';
-import { Badge } from '@workspace/ui/components/badge';
+import { useRole } from '@/hooks/useRole';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
 
 interface KonfirmasiMeetingDialogProps {
   open: boolean;
@@ -48,56 +42,33 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
   onSave,
   availablePerwadag,
 }) => {
-  const { isAdmin, isInspektorat, isPerwadag } = useRole();
+  const { isAdmin, isInspektorat } = useRole();
   const [formData, setFormData] = useState<Partial<KonfirmasiMeeting>>({});
   const [selectedKonfirmasiDate, setSelectedKonfirmasiDate] = useState<Date>();
-  const [selectedEvaluasiStartDate, setSelectedEvaluasiStartDate] = useState<Date>();
-  const [selectedEvaluasiEndDate, setSelectedEvaluasiEndDate] = useState<Date>();
   const [isKonfirmasiDatePickerOpen, setIsKonfirmasiDatePickerOpen] = useState(false);
-  const [isEvaluasiStartDatePickerOpen, setIsEvaluasiStartDatePickerOpen] = useState(false);
-  const [isEvaluasiEndDatePickerOpen, setIsEvaluasiEndDatePickerOpen] = useState(false);
+  const [daftarHadirFile, setDaftarHadirFile] = useState<File | null>(null);
+  const [buktiHadirFiles, setBuktiHadirFiles] = useState<File[]>([]);
+  const daftarHadirRef = useRef<HTMLInputElement>(null);
+  const buktiHadirRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (item && open) {
-      setFormData({
-        ...item,
-      });
+      setFormData({ ...item });
       setSelectedKonfirmasiDate(new Date(item.tanggalKonfirmasi));
-      setSelectedEvaluasiStartDate(new Date(item.tanggalMulaiEvaluasi));
-      setSelectedEvaluasiEndDate(new Date(item.tanggalAkhirEvaluasi));
     } else {
       setFormData({});
       setSelectedKonfirmasiDate(undefined);
-      setSelectedEvaluasiStartDate(undefined);
-      setSelectedEvaluasiEndDate(undefined);
+      setDaftarHadirFile(null);
+      setBuktiHadirFiles([]);
     }
   }, [item, open]);
 
   const handleSave = () => {
-    // Role-based validation
-    if (isPerwadag()) {
-      // Perwadag can only view/access documents
-      if (!formData.linkDaftarHadir && (!formData.buktiImages || formData.buktiImages.length === 0)) {
-        alert('Minimal harus ada link daftar hadir atau bukti');
-        return;
-      }
-    } else if (isAdmin() || isInspektorat()) {
-      // Admin/Inspektorat can edit all fields
-      if (!formData.perwadagId) {
-        alert('Nama perwadag harus dipilih');
-        return;
-      }
-      if (!selectedKonfirmasiDate) {
-        alert('Tanggal konfirmasi harus diisi');
-        return;
-      }
-    }
-
     const dataToSave = {
       ...formData,
       tanggalKonfirmasi: selectedKonfirmasiDate ? selectedKonfirmasiDate.toISOString().split('T')[0] : formData.tanggalKonfirmasi,
-      tanggalMulaiEvaluasi: selectedEvaluasiStartDate ? selectedEvaluasiStartDate.toISOString().split('T')[0] : formData.tanggalMulaiEvaluasi,
-      tanggalAkhirEvaluasi: selectedEvaluasiEndDate ? selectedEvaluasiEndDate.toISOString().split('T')[0] : formData.tanggalAkhirEvaluasi,
+      daftarHadirFile,
+      buktiHadirFiles,
     };
     onSave(dataToSave);
   };
@@ -106,32 +77,45 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
     onOpenChange(false);
   };
 
-  const handleOpenLink = () => {
-    if (formData.linkZoom) {
-      window.open(formData.linkZoom, '_blank');
+  const handleOpenLink = (url: string) => {
+    if (url) {
+      window.open(url, '_blank');
+    }
+  };
+
+  const handleDaftarHadirFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setDaftarHadirFile(file);
+    }
+  };
+
+  const handleBuktiHadirFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      setBuktiHadirFiles(prev => [...prev, ...files].slice(0, 2));
+    }
+  };
+
+  const removeBuktiHadirFile = (index: number) => {
+    setBuktiHadirFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removeDaftarHadirFile = () => {
+    setDaftarHadirFile(null);
+    if (daftarHadirRef.current) {
+      daftarHadirRef.current.value = '';
     }
   };
 
 
-  const getStatusBadge = (status: string, hasDocuments: boolean) => {
-    if (status === 'completed' && hasDocuments) {
-      return <Badge variant="default" className="bg-green-500 hover:bg-green-600">Selesai</Badge>;
-    } else if (status === 'confirmed') {
-      return <Badge variant="secondary">Dikonfirmasi</Badge>;
-    } else {
-      return <Badge variant="outline">Pending</Badge>;
-    }
-  };
 
   const isEditable = mode === 'edit';
-  const hasDocuments = !!(formData.linkDaftarHadir || (formData.buktiImages && formData.buktiImages.length > 0));
-
-  // Role-based field permissions
-  const canEditAdmin = isEditable && (isAdmin() || isInspektorat());
+  const canEdit = (isAdmin() || isInspektorat()) && isEditable;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0 border-b pb-4">
           <DialogTitle>
             {mode === 'view' ? 'Lihat Konfirmasi Meeting' : 'Edit Konfirmasi Meeting'}
@@ -139,12 +123,12 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto py-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left Column */}
-            <div className="space-y-4">
+          <div className="space-y-6">
+            {/* Info Basic - Read Only */}
+            <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="perwadag">Nama Perwadag</Label>
-                {canEditAdmin ? (
+                <Label>Nama Perwadag</Label>
+                {canEdit ? (
                   <Select
                     value={formData.perwadagId || ''}
                     onValueChange={(value) => {
@@ -168,26 +152,24 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
                     </SelectContent>
                   </Select>
                 ) : (
-                  <Input
-                    value={formData.perwadagName || ''}
-                    disabled
-                    className="bg-muted"
-                  />
+                  <div className="p-3 bg-muted rounded-md">
+                    {item?.perwadagName}
+                  </div>
                 )}
               </div>
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="tanggalKonfirmasi">Tanggal Konfirmasi</Label>
+            <div className="space-y-2">
+              <Label>Tanggal Konfirmasi</Label>
+              {canEdit ? (
                 <Popover open={isKonfirmasiDatePickerOpen} onOpenChange={setIsKonfirmasiDatePickerOpen}>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       className={cn(
                         "w-full justify-start text-left font-normal",
-                        !selectedKonfirmasiDate && "text-muted-foreground",
-                        !canEditAdmin && "bg-muted cursor-not-allowed"
+                        !selectedKonfirmasiDate && "text-muted-foreground"
                       )}
-                      disabled={!canEditAdmin}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
                       {selectedKonfirmasiDate ? (
@@ -197,223 +179,182 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
                       )}
                     </Button>
                   </PopoverTrigger>
-                  {canEditAdmin && (
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={selectedKonfirmasiDate}
-                        onSelect={(date) => {
-                          setSelectedKonfirmasiDate(date);
-                          setIsKonfirmasiDatePickerOpen(false);
-                        }}
-                        initialFocus
-                        locale={id}
-                      />
-                    </PopoverContent>
-                  )}
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedKonfirmasiDate}
+                      onSelect={(date) => {
+                        setSelectedKonfirmasiDate(date);
+                        setIsKonfirmasiDatePickerOpen(false);
+                      }}
+                      initialFocus
+                      locale={id}
+                    />
+                  </PopoverContent>
                 </Popover>
-              </div>
+              ) : (
+                <div className="p-3 bg-muted rounded-md">
+                  {item ? format(new Date(item.tanggalKonfirmasi), "dd MMMM yyyy", { locale: id }) : '-'}
+                </div>
+              )}
+            </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="linkZoom">Link Zoom</Label>
+            <div className="space-y-2">
+              <Label>Periode Evaluasi</Label>
+              <div className="p-3 bg-muted rounded-md">
+                {item ? formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi) : '-'}
+              </div>
+            </div>
+
+            {/* Link Zoom - Editable */}
+            <div className="space-y-2">
+              <Label htmlFor="linkZoom">Link Zoom</Label>
+              {canEdit ? (
                 <div className="flex gap-2">
                   <Input
                     id="linkZoom"
                     value={formData.linkZoom || ''}
                     onChange={(e) => setFormData({ ...formData, linkZoom: e.target.value })}
-                    disabled={!canEditAdmin}
-                    className={!canEditAdmin ? "bg-muted" : ""}
                     placeholder="https://zoom.us/j/..."
                   />
-                  {formData.linkZoom && mode === 'view' && (
+                  {formData.linkZoom && (
                     <Button
+                      type="button"
                       variant="outline"
-                      size="icon"
-                      onClick={handleOpenLink}
-                      title="Join Meeting"
+                      size="sm"
+                      onClick={() => handleOpenLink(formData.linkZoom!)}
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
                   )}
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <div className="flex items-center gap-2">
-                  {canEditAdmin ? (
-                    <Select
-                      value={formData.status || ''}
-                      onValueChange={(value) => setFormData({ ...formData, status: value as any })}
+              ) : (
+                <div className="flex gap-2">
+                  <div className="p-3 bg-muted rounded-md flex-1">
+                    {item?.linkZoom || '-'}
+                  </div>
+                  {item?.linkZoom && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOpenLink(item.linkZoom!)}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="confirmed">Dikonfirmasi</SelectItem>
-                        <SelectItem value="completed">Selesai</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  ) : (
-                    <div>
-                      {getStatusBadge(formData.status || 'pending', hasDocuments)}
-                    </div>
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
                   )}
                 </div>
-              </div>
+              )}
             </div>
 
-            {/* Right Column */}
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Periode Evaluasi</Label>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <Label className="text-xs text-muted-foreground">Tanggal Mulai</Label>
-                    <Popover open={isEvaluasiStartDatePickerOpen} onOpenChange={setIsEvaluasiStartDatePickerOpen}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !selectedEvaluasiStartDate && "text-muted-foreground",
-                            !canEditAdmin && "bg-muted cursor-not-allowed"
-                          )}
-                          disabled={!canEditAdmin}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {selectedEvaluasiStartDate ? (
-                            format(selectedEvaluasiStartDate, "dd/MM/yyyy", { locale: id })
-                          ) : (
-                            <span>Pilih</span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      {canEditAdmin && (
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={selectedEvaluasiStartDate}
-                            onSelect={(date) => {
-                              setSelectedEvaluasiStartDate(date);
-                              setIsEvaluasiStartDatePickerOpen(false);
-                            }}
-                            initialFocus
-                            locale={id}
-                          />
-                        </PopoverContent>
-                      )}
-                    </Popover>
-                  </div>
-                  <div>
-                    <Label className="text-xs text-muted-foreground">Tanggal Akhir</Label>
-                    <Popover open={isEvaluasiEndDatePickerOpen} onOpenChange={setIsEvaluasiEndDatePickerOpen}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className={cn(
-                            "w-full justify-start text-left font-normal",
-                            !selectedEvaluasiEndDate && "text-muted-foreground",
-                            !canEditAdmin && "bg-muted cursor-not-allowed"
-                          )}
-                          disabled={!canEditAdmin}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {selectedEvaluasiEndDate ? (
-                            format(selectedEvaluasiEndDate, "dd/MM/yyyy", { locale: id })
-                          ) : (
-                            <span>Pilih</span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      {canEditAdmin && (
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={selectedEvaluasiEndDate}
-                            onSelect={(date) => {
-                              setSelectedEvaluasiEndDate(date);
-                              setIsEvaluasiEndDatePickerOpen(false);
-                            }}
-                            initialFocus
-                            locale={id}
-                          />
-                        </PopoverContent>
-                      )}
-                    </Popover>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="linkDaftarHadir">Link Daftar Hadir</Label>
-                {canEditAdmin ? (
-                  <div className="flex gap-2">
-                    <Input
-                      id="linkDaftarHadir"
-                      value={formData.linkDaftarHadir || ''}
-                      onChange={(e) => setFormData({ ...formData, linkDaftarHadir: e.target.value })}
-                      placeholder="https://forms.google.com/..."
-                    />
-                    {formData.linkDaftarHadir && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.open(formData.linkDaftarHadir, '_blank')}
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                      </Button>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <Input
-                      value={formData.linkDaftarHadir || ''}
-                      disabled
-                      className="bg-muted"
-                    />
-                    {formData.linkDaftarHadir && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.open(formData.linkDaftarHadir, '_blank')}
-                      >
-                        <ExternalLink className="w-4 h-4" />
-                      </Button>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label>Bukti Foto</Label>
+            {/* Upload Daftar Hadir */}
+            <div className="space-y-2">
+              <Label>Upload Daftar Hadir</Label>
+              {canEdit ? (
                 <div className="space-y-2">
-                  {formData.buktiImages && formData.buktiImages.length > 0 && (
-                    <div className="space-y-1">
-                      {formData.buktiImages.map((image, index) => (
-                        <div key={index} className="flex items-center gap-2 p-2 bg-muted rounded">
-                          <span className="text-sm">{image}</span>
-                          {formData.buktiImageUrls && formData.buktiImageUrls[index] && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => window.open(formData.buktiImageUrls![index], '_blank')}
-                            >
-                              <ExternalLink className="w-4 h-4" />
-                            </Button>
-                          )}
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => daftarHadirRef.current?.click()}
+                      className="w-full justify-start"
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      {daftarHadirFile ? daftarHadirFile.name : 'Pilih file daftar hadir'}
+                    </Button>
+                    {daftarHadirFile && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={removeDaftarHadirFile}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                  <input
+                    ref={daftarHadirRef}
+                    type="file"
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                    onChange={handleDaftarHadirFileChange}
+                    className="hidden"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG (Max 5MB)
+                  </p>
+                </div>
+              ) : (
+                <div className="p-3 bg-muted rounded-md text-muted-foreground">
+                  {item?.linkDaftarHadir ? 'File daftar hadir telah diupload' : 'Belum ada file daftar hadir'}
+                </div>
+              )}
+            </div>
+
+            {/* Upload Bukti Foto */}
+            <div className="space-y-2">
+              <Label>Upload Bukti Foto (Maksimal 2 gambar)</Label>
+              {canEdit ? (
+                <div className="space-y-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => buktiHadirRef.current?.click()}
+                    className="w-full justify-start"
+                    disabled={buktiHadirFiles.length >= 2}
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    {buktiHadirFiles.length === 0 ? 'Pilih gambar bukti foto' : `Tambah gambar (${buktiHadirFiles.length}/2)`}
+                  </Button>
+                  <input
+                    ref={buktiHadirRef}
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleBuktiHadirFileChange}
+                    className="hidden"
+                  />
+                  {buktiHadirFiles.length > 0 && (
+                    <div className="space-y-2">
+                      {buktiHadirFiles.map((file, index) => (
+                        <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-md">
+                          <span className="text-sm truncate">{file.name}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => removeBuktiHadirFile(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
                         </div>
                       ))}
                     </div>
                   )}
-                  {(!formData.buktiImages || formData.buktiImages.length === 0) && (
-                    <div className="p-3 bg-muted rounded text-muted-foreground text-sm">
-                      Belum ada bukti foto
+                  <p className="text-xs text-muted-foreground">
+                    Format gambar: JPG, PNG, GIF (Max 5MB per file)
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  {item?.buktiImageUrls && item.buktiImageUrls.length > 0 ? (
+                    <div className="grid grid-cols-2 gap-2">
+                      {item.buktiImageUrls.map((url, index) => (
+                        <img
+                          key={index}
+                          src={url}
+                          alt={`Bukti ${index + 1}`}
+                          className="w-full h-32 object-cover rounded-md border"
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-muted rounded-md text-muted-foreground">
+                      Belum ada gambar
                     </div>
                   )}
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
@@ -422,13 +363,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
           <Button variant="outline" onClick={handleCancel}>
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
-          {mode === 'view' && formData.linkZoom && (
-            <Button onClick={handleOpenLink}>
-              <ExternalLink className="w-4 h-4 mr-2" />
-              Join Meeting
-            </Button>
-          )}
-          {mode === 'edit' && (
+          {canEdit && (
             <Button onClick={handleSave}>
               Simpan
             </Button>

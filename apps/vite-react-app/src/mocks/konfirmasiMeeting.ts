@@ -8,7 +8,6 @@ export interface KonfirmasiMeeting {
   tanggalAkhirEvaluasi: string;
   tanggalKonfirmasi: string;
   linkZoom?: string;
-  status: 'pending' | 'confirmed' | 'completed';
   linkDaftarHadir?: string;
   buktiImages?: string[];
   buktiImageUrls?: string[];
@@ -27,7 +26,6 @@ export const KONFIRMASI_MEETING_DATA: KonfirmasiMeeting[] = [
     tanggalAkhirEvaluasi: "2024-01-22",
     tanggalKonfirmasi: "2024-01-20",
     linkZoom: "https://zoom.us/j/123456789",
-    status: "completed",
     linkDaftarHadir: "https://forms.google.com/daftar-hadir-konfirmasi-atdag-moscow-2024",
     buktiImages: ["bukti-konfirmasi-1-atdag-moscow-2024.jpg", "bukti-konfirmasi-2-atdag-moscow-2024.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-konfirmasi-1-atdag-moscow-2024.jpg", "blob:http://localhost:3000/bukti-konfirmasi-2-atdag-moscow-2024.jpg"],
@@ -44,7 +42,6 @@ export const KONFIRMASI_MEETING_DATA: KonfirmasiMeeting[] = [
     tanggalAkhirEvaluasi: "2024-02-17",
     tanggalKonfirmasi: "2024-02-15",
     linkZoom: "https://zoom.us/j/234567890",
-    status: "confirmed",
     linkDaftarHadir: "https://forms.google.com/daftar-hadir-konfirmasi-itpc-vancouver-2024",
     buktiImages: ["bukti-konfirmasi-1-itpc-vancouver-2024.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-konfirmasi-1-itpc-vancouver-2024.jpg"],
@@ -61,7 +58,6 @@ export const KONFIRMASI_MEETING_DATA: KonfirmasiMeeting[] = [
     tanggalAkhirEvaluasi: "2024-03-12",
     tanggalKonfirmasi: "2024-03-10",
     linkZoom: "https://zoom.us/j/345678901",
-    status: "pending",
     year: 2024,
     inspektorat: 2
   },
@@ -75,7 +71,6 @@ export const KONFIRMASI_MEETING_DATA: KonfirmasiMeeting[] = [
     tanggalAkhirEvaluasi: "2024-03-22",
     tanggalKonfirmasi: "2024-03-20",
     linkZoom: "https://zoom.us/j/456789012",
-    status: "completed",
     linkDaftarHadir: "https://forms.google.com/daftar-hadir-konfirmasi-itpc-osaka-2024",
     buktiImages: ["bukti-konfirmasi-1-itpc-osaka-2024.jpg", "bukti-konfirmasi-2-itpc-osaka-2024.jpg", "bukti-konfirmasi-3-itpc-osaka-2024.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-konfirmasi-1-itpc-osaka-2024.jpg", "blob:http://localhost:3000/bukti-konfirmasi-2-itpc-osaka-2024.jpg", "blob:http://localhost:3000/bukti-konfirmasi-3-itpc-osaka-2024.jpg"],
@@ -92,7 +87,6 @@ export const KONFIRMASI_MEETING_DATA: KonfirmasiMeeting[] = [
     tanggalAkhirEvaluasi: "2024-04-15",
     tanggalKonfirmasi: "2024-04-12",
     linkZoom: "https://zoom.us/j/567890123",
-    status: "confirmed",
     linkDaftarHadir: "https://forms.google.com/daftar-hadir-konfirmasi-atdag-newdelhi-2024",
     year: 2024,
     inspektorat: 3
@@ -107,7 +101,6 @@ export const KONFIRMASI_MEETING_DATA: KonfirmasiMeeting[] = [
     tanggalAkhirEvaluasi: "2024-04-27",
     tanggalKonfirmasi: "2024-04-25",
     linkZoom: "https://zoom.us/j/678901234",
-    status: "pending",
     year: 2024,
     inspektorat: 3
   },
@@ -121,7 +114,6 @@ export const KONFIRMASI_MEETING_DATA: KonfirmasiMeeting[] = [
     tanggalAkhirEvaluasi: "2024-05-17",
     tanggalKonfirmasi: "2024-05-15",
     linkZoom: "https://zoom.us/j/789012345",
-    status: "completed",
     linkDaftarHadir: "https://forms.google.com/daftar-hadir-konfirmasi-atdag-hamburg-2024",
     buktiImages: ["bukti-konfirmasi-1-atdag-hamburg-2024.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-konfirmasi-1-atdag-hamburg-2024.jpg"],
@@ -138,7 +130,6 @@ export const KONFIRMASI_MEETING_DATA: KonfirmasiMeeting[] = [
     tanggalAkhirEvaluasi: "2024-06-01",
     tanggalKonfirmasi: "2024-05-30",
     linkZoom: "https://zoom.us/j/890123456",
-    status: "confirmed",
     year: 2024,
     inspektorat: 4
   },
@@ -152,7 +143,6 @@ export const KONFIRMASI_MEETING_DATA: KonfirmasiMeeting[] = [
     tanggalAkhirEvaluasi: "2023-11-22",
     tanggalKonfirmasi: "2023-11-20",
     linkZoom: "https://zoom.us/j/901234567",
-    status: "completed",
     linkDaftarHadir: "https://forms.google.com/daftar-hadir-konfirmasi-konsuldag-la-2023",
     buktiImages: ["bukti-konfirmasi-1-konsuldag-la-2023.jpg", "bukti-konfirmasi-2-konsuldag-la-2023.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-konfirmasi-1-konsuldag-la-2023.jpg", "blob:http://localhost:3000/bukti-konfirmasi-2-konsuldag-la-2023.jpg"],
@@ -169,7 +159,6 @@ export const KONFIRMASI_MEETING_DATA: KonfirmasiMeeting[] = [
     tanggalAkhirEvaluasi: "2023-12-17",
     tanggalKonfirmasi: "2023-12-15",
     linkZoom: "https://zoom.us/j/012345678",
-    status: "pending",
     year: 2023,
     inspektorat: 1
   }
