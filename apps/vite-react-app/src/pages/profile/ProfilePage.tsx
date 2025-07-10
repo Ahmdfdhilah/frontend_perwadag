@@ -13,7 +13,6 @@ import { id } from 'date-fns/locale';
 import {
   Mail,
   Phone,
-  CreditCard,
   Building,
   Shield,
   User as UserIcon,

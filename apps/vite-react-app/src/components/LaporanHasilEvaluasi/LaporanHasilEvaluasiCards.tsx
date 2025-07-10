@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { Badge } from '@workspace/ui/components/badge';
 import { LaporanHasilEvaluasi } from '@/mocks/laporanHasilEvaluasi';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
@@ -19,20 +18,6 @@ const LaporanHasilEvaluasiCards: React.FC<LaporanHasilEvaluasiCardsProps> = ({
   canEdit,
 }) => {
 
-  const getMatriksBadgeVariant = (matriks: string) => {
-    switch (matriks) {
-      case 'Sangat Baik':
-        return 'default';
-      case 'Baik':
-        return 'secondary';
-      case 'Cukup':
-        return 'outline';
-      case 'Kurang':
-        return 'destructive';
-      default:
-        return 'secondary';
-    }
-  };
 
   if (data.length === 0) {
     return (

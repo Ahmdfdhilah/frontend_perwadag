@@ -7,7 +7,6 @@ import {
   TableHeader,
   TableRow,
 } from '@workspace/ui/components/table';
-import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { LaporanHasilEvaluasi } from '@/mocks/laporanHasilEvaluasi';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
@@ -26,20 +25,6 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
   canEdit,
 }) => {
 
-  const getMatriksBadgeVariant = (matriks: string) => {
-    switch (matriks) {
-      case 'Sangat Baik':
-        return 'default';
-      case 'Baik':
-        return 'secondary';
-      case 'Cukup':
-        return 'outline';
-      case 'Kurang':
-        return 'destructive';
-      default:
-        return 'secondary';
-    }
-  };
 
   return (
     <div className="rounded-md border">

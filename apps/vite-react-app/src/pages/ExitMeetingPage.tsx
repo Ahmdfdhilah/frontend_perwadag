@@ -74,8 +74,7 @@ const ExitMeetingPage: React.FC = () => {
     // Filter by search query
     if (searchQuery) {
       filtered = filtered.filter(item =>
-        item.perwadagName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.rincian.toLowerCase().includes(searchQuery.toLowerCase())
+        item.perwadagName.toLowerCase().includes(searchQuery.toLowerCase()) 
       );
     }
 
@@ -144,26 +143,26 @@ const ExitMeetingPage: React.FC = () => {
   const getCompositeTitle = () => {
     let title = "Daftar Exit Meeting";
     const filters = [];
-    
+
     if (isInspektorat()) {
       filters.push("Inspektorat I");
     } else if (isAdmin() && selectedInspektorat !== 'all') {
       filters.push(`Inspektorat ${selectedInspektorat}`);
     }
-    
+
     if (selectedYear !== 'all') {
       filters.push(selectedYear);
     }
-    
+
     if (selectedPerwadag !== 'all') {
       const perwadag = PERWADAG_DATA.find(p => p.id === selectedPerwadag);
       if (perwadag) filters.push(perwadag.name);
     }
-    
+
     if (filters.length > 0) {
       title += " - " + filters.join(" - ");
     }
-    
+
     return title;
   };
 
@@ -295,7 +294,6 @@ const ExitMeetingPage: React.FC = () => {
         item={editingItem}
         mode={dialogMode}
         onSave={handleSave}
-        availablePerwadag={availablePerwadag}
       />
     </div>
   );
