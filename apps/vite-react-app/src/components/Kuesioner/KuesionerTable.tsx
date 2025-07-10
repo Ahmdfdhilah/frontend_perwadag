@@ -8,7 +8,7 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { Kuesioner } from '@/mocks/kuesioner';
+import { Kuesioner, getKuesionerStatus } from '@/mocks/kuesioner';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface KuesionerTableProps {
@@ -35,7 +35,8 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Tanggal Kuesioner</TableHead>
             <TableHead>Tanggal Evaluasi</TableHead>
-            <TableHead>Link Dokumen</TableHead>
+            <TableHead>Dokumen</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
         </TableHeader>
@@ -50,22 +51,32 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
+                <TableCell>{item.perwadagName}</TableCell>
                 <TableCell>{formatIndonesianDate(item.tanggal)}</TableCell>
                 <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
-                <TableCell>{item.perwadagName}</TableCell>
                 <TableCell>
-                  {item.linkDokumen ? (
-                    <a
-                      href={item.linkDokumen}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 underline"
+                  {item.dokumen ? (
+                    <button
+                      onClick={() => {
+                        console.log('Lihat dokumen:', item.dokumen);
+                        // Implement view/download logic here
+                      }}
+                      className="text-blue-600 hover:text-blue-800 underline text-left"
                     >
                       Lihat Dokumen
-                    </a>
+                    </button>
                   ) : (
                     <span className="text-muted-foreground">-</span>
                   )}
+                </TableCell>
+                <TableCell>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    getKuesionerStatus(item) === 'Tersedia'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {getKuesionerStatus(item)}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <ActionDropdown

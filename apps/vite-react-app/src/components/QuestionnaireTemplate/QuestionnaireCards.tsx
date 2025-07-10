@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { QuestionnaireTemplate } from '@/mocks/questionnaireTemplate';
+import { QuestionnaireTemplate, getQuestionnaireTemplateStatus } from '@/mocks/questionnaireTemplate';
 import ActionDropdown from '@/components/common/ActionDropdown';
 
 interface QuestionnaireCardsProps {
@@ -62,19 +62,30 @@ const QuestionnaireCards: React.FC<QuestionnaireCardsProps> = ({
                 <span className="ml-2">{item.tahun}</span>
               </div>
               <div>
-                <span className="font-medium text-muted-foreground">Link Template:</span>
-                {item.linkTemplate ? (
-                  <a
-                    href={item.linkTemplate}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                <span className="font-medium text-muted-foreground">Dokumen:</span>
+                {item.dokumen ? (
+                  <button
+                    onClick={() => {
+                      console.log('Lihat template:', item.dokumen);
+                      // Implement view/download logic here
+                    }}
                     className="ml-2 text-blue-600 hover:text-blue-800 underline"
                   >
                     Lihat Template
-                  </a>
+                  </button>
                 ) : (
                   <span className="ml-2 text-muted-foreground">-</span>
                 )}
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Status:</span>
+                <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                  getQuestionnaireTemplateStatus(item) === 'Tersedia'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {getQuestionnaireTemplateStatus(item)}
+                </span>
               </div>
             </div>
           </CardContent>

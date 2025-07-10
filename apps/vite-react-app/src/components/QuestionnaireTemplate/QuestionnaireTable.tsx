@@ -8,7 +8,7 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { QuestionnaireTemplate } from '@/mocks/questionnaireTemplate';
+import { QuestionnaireTemplate, getQuestionnaireTemplateStatus } from '@/mocks/questionnaireTemplate';
 
 interface QuestionnaireTableProps {
   data: QuestionnaireTemplate[];
@@ -36,14 +36,15 @@ const QuestionnaireTable: React.FC<QuestionnaireTableProps> = ({
             <TableHead>Nama Template</TableHead>
             <TableHead>Deskripsi</TableHead>
             <TableHead>Tahun</TableHead>
-            <TableHead>Link Template</TableHead>
+            <TableHead>Dokumen</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                 Tidak ada template kuesioner
               </TableCell>
             </TableRow>
@@ -59,18 +60,28 @@ const QuestionnaireTable: React.FC<QuestionnaireTableProps> = ({
                 </TableCell>
                 <TableCell>{item.tahun}</TableCell>
                 <TableCell>
-                  {item.linkTemplate ? (
-                    <a
-                      href={item.linkTemplate}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 underline"
+                  {item.dokumen ? (
+                    <button
+                      onClick={() => {
+                        console.log('Lihat template:', item.dokumen);
+                        // Implement view/download logic here
+                      }}
+                      className="text-blue-600 hover:text-blue-800 underline text-left"
                     >
                       Lihat Template
-                    </a>
+                    </button>
                   ) : (
                     <span className="text-muted-foreground">-</span>
                   )}
+                </TableCell>
+                <TableCell>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    getQuestionnaireTemplateStatus(item) === 'Tersedia'
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {getQuestionnaireTemplateStatus(item)}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <ActionDropdown

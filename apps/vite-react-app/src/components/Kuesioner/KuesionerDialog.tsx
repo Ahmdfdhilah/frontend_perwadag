@@ -23,7 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@workspace/ui/components/popover';
-import { CalendarIcon, ExternalLink } from 'lucide-react';
+import { CalendarIcon, Upload, X, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
@@ -51,6 +51,8 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   const [formData, setFormData] = useState<Partial<Kuesioner>>({});
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [dokumenFile, setDokumenFile] = useState<File | null>(null);
+  const dokumenRef = React.useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (item && open) {
@@ -58,49 +60,66 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
         ...item,
       });
       setSelectedDate(new Date(item.tanggal));
+      setDokumenFile(null);
     } else {
       setFormData({});
       setSelectedDate(undefined);
+      setDokumenFile(null);
     }
   }, [item, open]);
 
   const handleSave = () => {
+    // Basic validation for all roles
+    if (!selectedDate) {
+      alert('Tanggal harus diisi');
+      return;
+    }
+
     // Role-based validation
     if (isPerwadag()) {
-      // Perwadag can only edit tanggal and linkDokumen
-      if (!selectedDate) {
-        alert('Tanggal harus diisi');
-        return;
-      }
-      if (!formData.linkDokumen) {
-        alert('Link dokumen harus diisi');
+      // Perwadag can edit tanggal and dokumen for their own data
+      if (!dokumenFile && !formData.dokumen) {
+        alert('Dokumen harus diupload');
         return;
       }
     } else if (isAdmin() || isInspektorat()) {
-      // Admin/Inspektorat can only edit perwadagId and aspek
+      // Admin/Inspektorat can edit all fields including dokumen
       if (!formData.perwadagId) {
         alert('Nama perwadag harus dipilih');
         return;
       }
-
     }
 
-    if (selectedDate) {
-      const dataToSave = {
-        ...formData,
-        tanggal: selectedDate.toISOString().split('T')[0],
-      };
-      onSave(dataToSave);
-    }
+    const dataToSave = {
+      ...formData,
+      tanggal: selectedDate.toISOString().split('T')[0],
+      dokumenFile,
+    };
+    onSave(dataToSave);
   };
 
   const handleCancel = () => {
     onOpenChange(false);
   };
 
-  const handleOpenLink = () => {
-    if (formData.linkDokumen) {
-      window.open(formData.linkDokumen, '_blank');
+  const handleDokumenFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setDokumenFile(file);
+    }
+  };
+
+  const removeDokumenFile = () => {
+    setDokumenFile(null);
+    if (dokumenRef.current) {
+      dokumenRef.current.value = '';
+    }
+  };
+
+  const handleDownloadDokumen = () => {
+    if (formData.dokumen) {
+      console.log('Download dokumen:', formData.dokumen);
+      // Implement download logic here
     }
   };
 
@@ -108,9 +127,9 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   const isEditable = mode === 'edit';
 
   // Role-based field permissions
-  const canEditDate = isEditable && isPerwadag();
+  const canEditDate = isEditable && (isAdmin() || isInspektorat() || isPerwadag());
   const canEditPerwadag = isEditable && (isAdmin() || isInspektorat());
-  const canEditLinkDokumen = isEditable && isPerwadag();
+  const canEditDokumen = isEditable && (isAdmin() || isInspektorat() || isPerwadag());
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -195,28 +214,60 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
               )}
             </div>
 
+
             <div className="space-y-2">
-              <Label htmlFor="linkDokumen">Link Dokumen</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="linkDokumen"
-                  value={formData.linkDokumen || ''}
-                  onChange={(e) => setFormData({ ...formData, linkDokumen: e.target.value })}
-                  disabled={!canEditLinkDokumen}
-                  className={!canEditLinkDokumen ? "bg-muted" : ""}
-                  placeholder="https://drive.google.com/file/..."
-                />
-                {formData.linkDokumen && mode === 'view' && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={handleOpenLink}
-                    title="Buka Link"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
+              <Label>Upload Dokumen Kuesioner</Label>
+              {canEditDokumen ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => dokumenRef.current?.click()}
+                      className="w-full justify-start"
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      {dokumenFile ? dokumenFile.name : 'Pilih file dokumen kuesioner'}
+                    </Button>
+                    {dokumenFile && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={removeDokumenFile}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                  <input
+                    ref={dokumenRef}
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={handleDokumenFileChange}
+                    className="hidden"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Format yang didukung: PDF, DOC, DOCX (Max 10MB)
+                  </p>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <div className="p-3 bg-muted rounded-md flex-1">
+                    {item?.dokumen ? `File: ${item.dokumen}` : 'Belum ada file dokumen'}
+                  </div>
+                  {item?.dokumen && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDownloadDokumen}
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
 
           </div>
@@ -226,10 +277,10 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
           <Button variant="outline" onClick={handleCancel}>
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
-          {mode === 'view' && formData.linkDokumen && (
-            <Button onClick={handleOpenLink}>
-              <ExternalLink className="w-4 h-4 mr-2" />
-              Buka Link
+          {mode === 'view' && formData.dokumen && (
+            <Button onClick={handleDownloadDokumen}>
+              <Download className="w-4 h-4 mr-2" />
+              Download Dokumen
             </Button>
           )}
           {mode === 'edit' && (

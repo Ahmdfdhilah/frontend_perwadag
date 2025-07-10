@@ -74,8 +74,7 @@ const KuesionerPage: React.FC = () => {
     // Filter by search query
     if (searchQuery) {
       filtered = filtered.filter(item =>
-        item.perwadagName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.aspek.toLowerCase().includes(searchQuery.toLowerCase())
+        item.perwadagName.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
@@ -169,8 +168,16 @@ const KuesionerPage: React.FC = () => {
 
   const canEdit = (item: Kuesioner) => {
     if (isAdmin()) return true;
-    if (isInspektorat()) return item.inspektorat === 1;
-    if (isPerwadag()) return item.perwadagId === 'PWD001';
+    if (isInspektorat()) {
+      // Inspektorat can edit items from their affiliated inspektorat
+      // For demo, assume current user is inspektorat 1
+      return item.inspektorat === 1;
+    }
+    if (isPerwadag()) {
+      // Perwadag can edit their own data
+      // For demo, assume current user is PWD001
+      return item.perwadagId === 'PWD001';
+    }
     return false;
   };
 
@@ -251,7 +258,7 @@ const KuesionerPage: React.FC = () => {
             <SearchContainer
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
-              placeholder="Cari nama perwadag atau aspek..."
+              placeholder="Cari nama perwadag..."
             />
 
             {/* Desktop Table */}

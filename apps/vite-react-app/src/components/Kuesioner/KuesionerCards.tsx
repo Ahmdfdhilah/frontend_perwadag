@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { Kuesioner } from '@/mocks/kuesioner';
+import { Kuesioner, getKuesionerStatus } from '@/mocks/kuesioner';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
@@ -60,19 +60,30 @@ const KuesionerCards: React.FC<KuesionerCardsProps> = ({
                 <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
               </div>
               <div>
-                <span className="font-medium text-muted-foreground">Link Dokumen:</span>
-                {item.linkDokumen ? (
-                  <a
-                    href={item.linkDokumen}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                <span className="font-medium text-muted-foreground">Dokumen:</span>
+                {item.dokumen ? (
+                  <button
+                    onClick={() => {
+                      console.log('Lihat dokumen:', item.dokumen);
+                      // Implement view/download logic here
+                    }}
                     className="ml-2 text-blue-600 hover:text-blue-800 underline"
                   >
-                   Lihat Dokumen
-                  </a>
+                    Lihat Dokumen
+                  </button>
                 ) : (
                   <span className="ml-2 text-muted-foreground">-</span>
                 )}
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Status:</span>
+                <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                  getKuesionerStatus(item) === 'Tersedia'
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {getKuesionerStatus(item)}
+                </span>
               </div>
             </div>
           </CardContent>

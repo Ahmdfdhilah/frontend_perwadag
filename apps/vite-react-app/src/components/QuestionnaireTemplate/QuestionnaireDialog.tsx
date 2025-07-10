@@ -12,7 +12,7 @@ import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Textarea } from '@workspace/ui/components/textarea';
 import { QuestionnaireTemplate } from '@/mocks/questionnaireTemplate';
-import { ExternalLink } from 'lucide-react';
+import { Upload, X, Download } from 'lucide-react';
 
 interface QuestionnaireDialogProps {
   open: boolean;
@@ -31,6 +31,8 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
 }) => {
   const { isAdmin } = useRole();
   const [formData, setFormData] = useState<Partial<QuestionnaireTemplate>>({});
+  const [dokumenFile, setDokumenFile] = useState<File | null>(null);
+  const dokumenRef = React.useRef<HTMLInputElement>(null);
   
   const isCreating = !item;
   const isEditable = mode === 'edit' && isAdmin();
@@ -40,6 +42,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       setFormData({
         ...item,
       });
+      setDokumenFile(null);
     } else {
       // Initialize empty form for new template
       setFormData({
@@ -47,8 +50,9 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
         nama: '',
         deskripsi: '',
         tahun: new Date().getFullYear(),
-        linkTemplate: '',
+        dokumen: '',
       });
+      setDokumenFile(null);
     }
   }, [item, open]);
 
@@ -77,16 +81,35 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       return;
     }
 
-    onSave(formData);
+    const dataToSave = {
+      ...formData,
+      dokumenFile,
+    };
+    onSave(dataToSave);
   };
 
   const handleCancel = () => {
     onOpenChange(false);
   };
 
-  const handleOpenTemplate = () => {
-    if (formData.linkTemplate) {
-      window.open(formData.linkTemplate, '_blank');
+  const handleDokumenFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setDokumenFile(file);
+    }
+  };
+
+  const removeDokumenFile = () => {
+    setDokumenFile(null);
+    if (dokumenRef.current) {
+      dokumenRef.current.value = '';
+    }
+  };
+
+  const handleDownloadTemplate = () => {
+    if (formData.dokumen) {
+      console.log('Download template:', formData.dokumen);
+      // Implement download logic here
     }
   };
 
@@ -156,27 +179,58 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="linkTemplate">Link Template</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="linkTemplate"
-                  value={formData.linkTemplate || ''}
-                  onChange={(e) => setFormData({ ...formData, linkTemplate: e.target.value })}
-                  disabled={!isEditable}
-                  className={!isEditable ? "bg-muted" : ""}
-                  placeholder="https://drive.google.com/file/..."
-                />
-                {formData.linkTemplate && mode === 'view' && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={handleOpenTemplate}
-                    title="Buka Template"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
+              <Label>Upload Dokumen Template</Label>
+              {isEditable ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => dokumenRef.current?.click()}
+                      className="w-full justify-start"
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      {dokumenFile ? dokumenFile.name : 'Pilih file dokumen template'}
+                    </Button>
+                    {dokumenFile && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={removeDokumenFile}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                  <input
+                    ref={dokumenRef}
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    onChange={handleDokumenFileChange}
+                    className="hidden"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Format yang didukung: PDF, DOC, DOCX (Max 10MB)
+                  </p>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <div className="p-3 bg-muted rounded-md flex-1">
+                    {item?.dokumen ? `File: ${item.dokumen}` : 'Belum ada file template'}
+                  </div>
+                  {item?.dokumen && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleDownloadTemplate}
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -185,10 +239,10 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
           <Button variant="outline" onClick={handleCancel}>
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
-          {mode === 'view' && formData.linkTemplate && (
-            <Button onClick={handleOpenTemplate}>
-              <ExternalLink className="w-4 h-4 mr-2" />
-              Buka Template
+          {mode === 'view' && formData.dokumen && (
+            <Button onClick={handleDownloadTemplate}>
+              <Download className="w-4 h-4 mr-2" />
+              Download Template
             </Button>
           )}
           {mode === 'edit' && isAdmin() && (
