@@ -43,7 +43,6 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
     email: 'john.doe@example.com',
     mfa_enabled: true,
     is_verified: true,
-    roles: [{ id: 'perwadag', name: 'perwadag', label: 'Atdag Tokyo', description: 'Trade supervision and regulation role' }]
   };
 
   // Get user initials for avatar fallback
@@ -60,7 +59,7 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
 
   // Get user role display
   const getUserRole = () => {
-    return dummyUser.roles.length > 0 ? dummyUser.roles[0].label : currentRole.label;
+    return currentRole.label;
   };
 
   const handleLogout = async () => {
