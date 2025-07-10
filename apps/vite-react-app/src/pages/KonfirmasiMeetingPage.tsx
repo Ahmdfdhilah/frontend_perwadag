@@ -98,7 +98,7 @@ const KonfirmasiMeetingPage: React.FC = () => {
     if (selectedStatus !== 'all') {
       if (selectedStatus === 'uploaded') {
         filtered = filtered.filter(item => {
-          const hasDocuments = !!(item.daftarHadir || (item.buktiImages && item.buktiImages.length > 0));
+          const hasDocuments = !!(item.linkDaftarHadir || (item.buktiImages && item.buktiImages.length > 0));
           return hasDocuments;
         });
       } else {

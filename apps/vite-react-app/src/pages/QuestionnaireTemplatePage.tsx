@@ -131,11 +131,11 @@ const QuestionnaireTemplatePage: React.FC = () => {
     return title;
   };
 
-  const canEdit = (item: QuestionnaireTemplate) => {
+  const canEdit = () => {
     return isAdmin();
   };
 
-  const canDelete = (item: QuestionnaireTemplate) => {
+  const canDelete = () => {
     return isAdmin();
   };
 
