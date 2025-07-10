@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { SuratPemberitahuan } from '@/mocks/suratPemberitahuan';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import { formatIndonesianDate, formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface SuratPemberitahuanCardsProps {
   data: SuratPemberitahuan[];
@@ -16,13 +17,6 @@ const SuratPemberitahuanCards: React.FC<SuratPemberitahuanCardsProps> = ({
   onEdit,
   canEdit,
 }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
 
   const getStatusLabel = (status: string) => {
     return status === 'uploaded' ? 'Sudah Upload' : 'Belum Upload';
@@ -76,13 +70,13 @@ const SuratPemberitahuanCards: React.FC<SuratPemberitahuanCardsProps> = ({
               </div>
               
               <div>
-                <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
-                <span className="ml-2">{formatDate(item.tanggalEvaluasi)}</span>
+                <span className="font-medium text-muted-foreground">Tanggal Pelaksanaan Evaluasi:</span>
+                <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
               </div>
               
               <div>
                 <span className="font-medium text-muted-foreground">Tanggal Surat:</span>
-                <span className="ml-2">{formatDate(item.tanggalSuratPemberitahuan)}</span>
+                <span className="ml-2">{formatIndonesianDate(item.tanggalSuratPemberitahuan)}</span>
               </div>
             </div>
           </CardContent>

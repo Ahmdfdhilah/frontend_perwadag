@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { SuratTugas } from '@/mocks/suratTugas';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface SuratTugasCardsProps {
   data: SuratTugas[];
@@ -18,22 +19,6 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
   onDelete,
   isPerwadag = false,
 }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
-
-  const formatDateRange = (startDate: string, endDate?: string) => {
-    const start = formatDate(startDate);
-    if (endDate) {
-      const end = formatDate(endDate);
-      return `${start} - ${end}`;
-    }
-    return start;
-  };
 
   if (data.length === 0) {
     return (
@@ -71,7 +56,7 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
                 </div>
                 <div>
                   <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
-                  <span className="ml-2">{formatDateRange(item.tanggalPelaksanaanEvaluasi, item.tanggalSelesaiEvaluasi)}</span>
+                  <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
                 </div>
               </div>
               

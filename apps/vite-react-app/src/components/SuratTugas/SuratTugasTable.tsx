@@ -9,6 +9,7 @@ import {
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { SuratTugas } from '@/mocks/suratTugas';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface SuratTugasTableProps {
   data: SuratTugas[];
@@ -25,22 +26,6 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
   onDelete,
   isPerwadag = false,
 }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
-
-  const formatDateRange = (startDate: string, endDate?: string) => {
-    const start = formatDate(startDate);
-    if (endDate) {
-      const end = formatDate(endDate);
-      return `${start} - ${end}`;
-    }
-    return start;
-  };
 
   return (
     <div className="rounded-md border">
@@ -68,7 +53,7 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{formatDateRange(item.tanggalPelaksanaanEvaluasi, item.tanggalSelesaiEvaluasi)}</TableCell>
+                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
                 <TableCell>{item.nomor}</TableCell>
                 <TableCell>{item.pengendaliMutu}</TableCell>

@@ -15,6 +15,7 @@ C.	Surat Tugas apps\vite-react-app\src\pages\SuratTugasPage.tsx✅
 D.	Surat Pemberitahuan apps\vite-react-app\src\pages\SuratPemberitahuanPage.tsx✅
     1.	Menyesuaikan kolom menjadi No, Tanggal Evaluasi, Tanggal Surat Pemberitahuan, Nama Perwadag, Status (apakah sudah upload dokumen belum)✅
 
+
 E.	Entry Meeting apps\vite-react-app\src\pages\EntryMeetingPage.tsx
     1.	Menyesuaikan kolom menjadi No, Nama Perwadag, Tanggal Evaluasi, Tanggal Entry Meeting, Link Zoom, Status (apakah sudah upload daftar hadir dan bukti)
     2.	Akses edit link zoom, daftar hadir, dan bukti yaitu admin dan inspektorat.

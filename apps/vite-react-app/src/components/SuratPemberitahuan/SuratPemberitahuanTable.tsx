@@ -9,6 +9,7 @@ import {
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { SuratPemberitahuan } from '@/mocks/suratPemberitahuan';
+import { formatIndonesianDate, formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface SuratPemberitahuanTableProps {
   data: SuratPemberitahuan[];
@@ -23,13 +24,6 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
   onEdit,
   canEdit,
 }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
 
   const getStatusLabel = (status: string) => {
     return status === 'uploaded' ? 'Sudah Upload' : 'Belum Upload';
@@ -47,7 +41,7 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>No</TableHead>
-            <TableHead>Tanggal Evaluasi</TableHead>
+            <TableHead>Tanggal Pelaksanaan Evaluasi</TableHead>
             <TableHead>Tanggal Surat Pemberitahuan</TableHead>
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Status</TableHead>
@@ -65,8 +59,8 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{formatDate(item.tanggalEvaluasi)}</TableCell>
-                <TableCell>{formatDate(item.tanggalSuratPemberitahuan)}</TableCell>
+                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
+                <TableCell>{formatIndonesianDate(item.tanggalSuratPemberitahuan)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
                 <TableCell>
                   <span className={getStatusColor(item.status)}>
