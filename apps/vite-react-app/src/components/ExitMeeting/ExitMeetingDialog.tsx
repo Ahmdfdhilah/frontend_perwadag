@@ -9,9 +9,8 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
-import { Badge } from '@workspace/ui/components/badge';
 import { Upload, Download, File, ExternalLink, X } from 'lucide-react';
-import { ExitMeeting, getExitMeetingStatus } from '@/mocks/exitMeeting';
+import { ExitMeeting } from '@/mocks/exitMeeting';
 import { useRole } from '@/hooks/useRole';
 import { formatIndonesianDate, formatIndonesianDateRange } from '@/utils/timeFormat';
 
@@ -35,7 +34,7 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
 
   useEffect(() => {
     if (item && open) {
-      setFormData({...item});
+      setFormData({ ...item });
     } else {
       setFormData({});
     }
@@ -52,8 +51,8 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   const handleFileUpload = (field: 'daftarHadir', file: File) => {
     const fileUrl = URL.createObjectURL(file);
     const fileName = file.name;
-    setFormData({ 
-      ...formData, 
+    setFormData({
+      ...formData,
       [field]: fileName,
       [`${field}Url`]: fileUrl
     });
@@ -61,16 +60,16 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
 
   const handleImageUpload = (files: FileList | null) => {
     if (!files) return;
-    
+
     const newImages: string[] = [];
     const newImageUrls: string[] = [];
-    
+
     Array.from(files).slice(0, 2).forEach(file => {
       const fileUrl = URL.createObjectURL(file);
       newImages.push(file.name);
       newImageUrls.push(fileUrl);
     });
-    
+
     setFormData({
       ...formData,
       buktiImages: [...(formData.buktiImages || []), ...newImages].slice(0, 2),
@@ -81,10 +80,10 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   const handleRemoveImage = (index: number) => {
     const newImages = [...(formData.buktiImages || [])];
     const newImageUrls = [...(formData.buktiImageUrls || [])];
-    
+
     newImages.splice(index, 1);
     newImageUrls.splice(index, 1);
-    
+
     setFormData({
       ...formData,
       buktiImages: newImages,
@@ -110,16 +109,6 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   const isEditable = mode === 'edit';
   const canEdit = (isAdmin() || isInspektorat()) && isEditable;
 
-  const status = item ? getExitMeetingStatus(item) : 'Belum Upload';
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case 'Lengkap': return 'default';
-      case 'Sebagian': return 'secondary';
-      case 'Belum Upload': return 'outline';
-      default: return 'outline';
-    }
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
@@ -132,19 +121,11 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
         <div className="flex-1 overflow-y-auto py-4">
           <div className="space-y-6">
             {/* Info Basic - Read Only */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
                 <Label>Nama Perwadag</Label>
                 <div className="p-3 bg-muted rounded-md">
                   {item?.perwadagName}
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Status Upload</Label>
-                <div>
-                  <Badge variant={getStatusBadgeVariant(status)}>
-                    {status}
-                  </Badge>
                 </div>
               </div>
             </div>

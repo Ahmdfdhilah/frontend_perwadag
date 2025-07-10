@@ -7,9 +7,8 @@ import {
   TableHeader,
   TableRow,
 } from '@workspace/ui/components/table';
-import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { EntryMeeting, getEntryMeetingStatus } from '@/mocks/entryMeeting';
+import { EntryMeeting } from '@/mocks/entryMeeting';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface EntryMeetingTableProps {
@@ -36,7 +35,6 @@ const EntryMeetingTable: React.FC<EntryMeetingTableProps> = ({
             <TableHead>Tanggal Evaluasi</TableHead>
             <TableHead>Tanggal Entry Meeting</TableHead>
             <TableHead>Link Zoom</TableHead>
-            <TableHead>Status</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
         </TableHeader>
@@ -49,51 +47,36 @@ const EntryMeetingTable: React.FC<EntryMeetingTableProps> = ({
             </TableRow>
           ) : (
             data.map((item, index) => {
-              const status = getEntryMeetingStatus(item);
-              const getStatusBadgeVariant = (status: string) => {
-                switch (status) {
-                  case 'Lengkap': return 'default';
-                  case 'Sebagian': return 'secondary';
-                  case 'Belum Upload': return 'outline';
-                  default: return 'outline';
-                }
-              };
-              
               return (
-              <TableRow key={item.id}>
-                <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{item.perwadagName}</TableCell>
-                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
-                <TableCell>{formatIndonesianDate(item.tanggal)}</TableCell>
-                <TableCell>
-                  {item.linkZoom ? (
-                    <a 
-                      href={item.linkZoom} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 underline"
-                    >
-                      Join Meeting
-                    </a>
-                  ) : (
-                    <span className="text-muted-foreground">-</span>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Badge variant={getStatusBadgeVariant(status)}>
-                    {status}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <ActionDropdown
-                    onView={() => onView?.(item)}
-                    onEdit={canEdit?.(item) ? () => onEdit?.(item) : undefined}
-                    showView={true}
-                    showEdit={canEdit?.(item) && !!onEdit}
-                    showDelete={false}
-                  />
-                </TableCell>
-              </TableRow>
+                <TableRow key={item.id}>
+                  <TableCell className="font-medium">{index + 1}</TableCell>
+                  <TableCell>{item.perwadagName}</TableCell>
+                  <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
+                  <TableCell>{formatIndonesianDate(item.tanggal)}</TableCell>
+                  <TableCell>
+                    {item.linkZoom ? (
+                      <a
+                        href={item.linkZoom}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline"
+                      >
+                        Join Meeting
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <ActionDropdown
+                      onView={() => onView?.(item)}
+                      onEdit={canEdit?.(item) ? () => onEdit?.(item) : undefined}
+                      showView={true}
+                      showEdit={canEdit?.(item) && !!onEdit}
+                      showDelete={false}
+                    />
+                  </TableCell>
+                </TableRow>
               );
             })
           )}
