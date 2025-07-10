@@ -47,7 +47,7 @@ const MatriksPerwadagCards: React.FC<MatriksPerwadagCardsProps> = ({
                     rel="noopener noreferrer"
                     className="ml-2 text-blue-600 hover:text-blue-800 underline"
                   >
-                    {item.uploadFile}
+                    Lihat Dokumen
                   </a>
                 ) : (
                   <span className="ml-2 text-muted-foreground">Tidak ada dokumen</span>

@@ -23,7 +23,6 @@ import { KonfirmasiMeeting } from '@/mocks/konfirmasiMeeting';
 import { Perwadag } from '@/mocks/perwadag';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
 import FileUpload from '@/components/common/FileUpload';
 
 interface KonfirmasiMeetingDialogProps {
@@ -41,7 +40,6 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
   item,
   mode,
   onSave,
-  availablePerwadag,
 }) => {
   const { canEditForm } = useFormPermissions();
   const [formData, setFormData] = useState<Partial<KonfirmasiMeeting>>({});
@@ -110,34 +108,9 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
             <div className="grid grid-cols-1 gap-4">
               <div className="space-y-2">
                 <Label>Nama Perwadag</Label>
-                {canEdit ? (
-                  <Select
-                    value={formData.perwadagId || ''}
-                    onValueChange={(value) => {
-                      const selected = availablePerwadag.find(p => p.id === value);
-                      setFormData({
-                        ...formData,
-                        perwadagId: value,
-                        perwadagName: selected?.name || '',
-                      });
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih perwadag" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {availablePerwadag.map((perwadag) => (
-                        <SelectItem key={perwadag.id} value={perwadag.id}>
-                          {perwadag.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <div className="p-3 bg-muted rounded-md">
-                    {item?.perwadagName}
-                  </div>
-                )}
+                <div className="p-3 bg-muted rounded-md">
+                  {item?.perwadagName}
+                </div>
               </div>
             </div>
 

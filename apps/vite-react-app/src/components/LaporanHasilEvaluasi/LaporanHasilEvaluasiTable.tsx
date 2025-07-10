@@ -58,24 +58,23 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
                 <TableCell>{formatIndonesianDate(item.tanggal)}</TableCell>
                 <TableCell>
                   {item.uploadFile ? (
-                    <a 
-                      href={item.uploadFileUrl || '#'} 
-                      target="_blank" 
+                    <a
+                      href={item.uploadFileUrl || '#'}
+                      target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 underline"
                     >
-                      {item.uploadFile}
+                      Lihat Dokumen
                     </a>
                   ) : (
                     <span className="text-muted-foreground">Tidak ada file</span>
                   )}
                 </TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    getLaporanHasilEvaluasiStatus(item) === 'Sudah Upload' 
-                      ? 'bg-green-100 text-green-800' 
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getLaporanHasilEvaluasiStatus(item) === 'Sudah Upload'
+                      ? 'bg-green-100 text-green-800'
                       : 'bg-red-100 text-red-800'
-                  }`}>
+                    }`}>
                     {getLaporanHasilEvaluasiStatus(item)}
                   </span>
                 </TableCell>
