@@ -20,6 +20,7 @@ import LaporanHasilEvaluasiPage from './pages/LaporanHasilEvaluasiPage';
 import KuesionerPage from './pages/KuesionerPage';
 import MatriksPage from './pages/MatriksPage';
 import QuestionnaireTemplatePage from './pages/QuestionnaireTemplatePage';
+import KonfirmasiMeetingPage from './pages/KonfirmasiMeetingPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { DefaultLayout } from './components/layouts';
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
@@ -53,6 +54,7 @@ function App() {
                     <Route path="matriks" element={<MatriksPage />} />
                     <Route path="entry-meeting" element={<EntryMeetingPage />} />
                     <Route path="exit-meeting" element={<ExitMeetingPage />} />
+                    <Route path="konfirmasi-meeting" element={<KonfirmasiMeetingPage />} />
                     <Route path="laporan-hasil" element={<LaporanHasilEvaluasiPage />} />
                     <Route path="kuesioner" element={<KuesionerPage />} />
                     <Route path="template-kuesioner" element={<QuestionnaireTemplatePage />} />

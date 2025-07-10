@@ -1,4 +1,4 @@
-import { AlertTriangle, FileInput, Grid2X2, Mail, MailWarningIcon, PhoneIncoming, PhoneOutgoing, Users, ClipboardList, ClipboardCopyIcon } from "lucide-react";
+import { AlertTriangle, FileInput, Grid2X2, Mail, MailWarningIcon, PhoneIncoming, PhoneOutgoing, Users, ClipboardList, ClipboardCopyIcon, CheckSquare } from "lucide-react";
 
 // Role definitions
 export type UserRole =
@@ -61,6 +61,13 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Exit Meeting',
     href: '/exit-meeting',
     icon: PhoneOutgoing,
+    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
+  },
+  // Konfirmasi Meeting - Only admin and inspektorat, perwadag
+  {
+    title: 'Konfirmasi Meeting',
+    href: '/konfirmasi-meeting',
+    icon: CheckSquare,
     allowedRoles: ['admin', 'inspektorat', 'perwadag'],
   },
   // Laporan Hasil - Only admin and inspektorat, perwadag

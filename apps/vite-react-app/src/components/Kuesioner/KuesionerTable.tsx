@@ -32,9 +32,9 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>No</TableHead>
+            <TableHead>Nama Perwadag</TableHead>
             <TableHead>Tanggal Kuesioner</TableHead>
             <TableHead>Tanggal Evaluasi</TableHead>
-            <TableHead>Nama Perwadag</TableHead>
             <TableHead>Link Dokumen</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
