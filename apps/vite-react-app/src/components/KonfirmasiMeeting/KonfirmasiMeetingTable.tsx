@@ -49,8 +49,7 @@ const KonfirmasiMeetingTable: React.FC<KonfirmasiMeetingTableProps> = ({
             </TableRow>
           ) : (
             data.map((item) => {
-              const hasDocuments = !!(item.linkDaftarHadir || (item.buktiImages && item.buktiImages.length > 0));
-              
+
               return (
                 <TableRow key={item.id}>
                   <TableCell className="font-medium">{item.no}</TableCell>
@@ -86,13 +85,12 @@ const KonfirmasiMeetingTable: React.FC<KonfirmasiMeetingTableProps> = ({
                     )}
                   </TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      getKonfirmasiMeetingStatus(item) === 'Lengkap' 
-                        ? 'bg-green-100 text-green-800' 
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getKonfirmasiMeetingStatus(item) === 'Lengkap'
+                        ? 'bg-green-100 text-green-800'
                         : getKonfirmasiMeetingStatus(item) === 'Sebagian'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
+                          ? 'bg-yellow-100 text-yellow-800'
+                          : 'bg-red-100 text-red-800'
+                      }`}>
                       {getKonfirmasiMeetingStatus(item)}
                     </span>
                   </TableCell>

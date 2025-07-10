@@ -15,7 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@workspace/ui/components/popover';
-import { CalendarIcon, Download, File } from 'lucide-react';
+import { CalendarIcon, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { SuratPemberitahuan } from '@/mocks/suratPemberitahuan';

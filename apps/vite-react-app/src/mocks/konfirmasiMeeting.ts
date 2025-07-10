@@ -1,4 +1,5 @@
 export interface KonfirmasiMeeting {
+  status?: string;
   id: string;
   no: number;
   perwadagId: string;

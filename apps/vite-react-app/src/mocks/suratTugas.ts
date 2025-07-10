@@ -14,6 +14,7 @@ export interface SuratTugas {
   fileUrl: string;
   year: number;
   inspektorat: number;
+  uploadFiles?: File[];
 }
 
 export const SURAT_TUGAS_DATA: SuratTugas[] = [

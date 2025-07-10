@@ -23,12 +23,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@workspace/ui/components/popover';
-import { CalendarIcon, Upload, X, Download } from 'lucide-react';
+import { CalendarIcon, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
 import { Kuesioner } from '@/mocks/kuesioner';
 import { Perwadag } from '@/mocks/perwadag';
+import FileUpload from '@/components/common/FileUpload';
 
 interface KuesionerDialogProps {
   open: boolean;
@@ -51,8 +52,8 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   const [formData, setFormData] = useState<Partial<Kuesioner>>({});
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-  const [dokumenFile, setDokumenFile] = useState<File | null>(null);
-  const dokumenRef = React.useRef<HTMLInputElement>(null);
+  const [dokumenFiles, setDokumenFiles] = useState<File[]>([]);
+  const [existingDokumen, setExistingDokumen] = useState<Array<{ name: string; url?: string }>>([]);
 
   useEffect(() => {
     if (item && open) {
@@ -60,11 +61,13 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
         ...item,
       });
       setSelectedDate(new Date(item.tanggal));
-      setDokumenFile(null);
+      setDokumenFiles([]);
+      setExistingDokumen(item.dokumen ? [{ name: item.dokumen, url: item.dokumen }] : []);
     } else {
       setFormData({});
       setSelectedDate(undefined);
-      setDokumenFile(null);
+      setDokumenFiles([]);
+      setExistingDokumen([]);
     }
   }, [item, open]);
 
@@ -78,7 +81,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
     // Role-based validation
     if (isPerwadag()) {
       // Perwadag can edit tanggal and dokumen for their own data
-      if (!dokumenFile && !formData.dokumen) {
+      if (dokumenFiles.length === 0 && existingDokumen.length === 0) {
         alert('Dokumen harus diupload');
         return;
       }
@@ -93,7 +96,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
     const dataToSave = {
       ...formData,
       tanggal: selectedDate.toISOString().split('T')[0],
-      dokumenFile,
+      dokumenFiles,
     };
     onSave(dataToSave);
   };
@@ -102,18 +105,12 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
     onOpenChange(false);
   };
 
-  const handleDokumenFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setDokumenFile(file);
-    }
+  const handleDokumenFilesChange = (files: File[]) => {
+    setDokumenFiles(files);
   };
 
-  const removeDokumenFile = () => {
-    setDokumenFile(null);
-    if (dokumenRef.current) {
-      dokumenRef.current.value = '';
-    }
+  const handleExistingDokumenRemove = (index: number) => {
+    setExistingDokumen(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleDownloadDokumen = () => {
@@ -215,60 +212,20 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
             </div>
 
 
-            <div className="space-y-2">
-              <Label>Upload Dokumen Kuesioner</Label>
-              {canEditDokumen ? (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => dokumenRef.current?.click()}
-                      className="w-full justify-start"
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      {dokumenFile ? dokumenFile.name : 'Pilih file dokumen kuesioner'}
-                    </Button>
-                    {dokumenFile && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={removeDokumenFile}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                  <input
-                    ref={dokumenRef}
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    onChange={handleDokumenFileChange}
-                    className="hidden"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Format yang didukung: PDF, DOC, DOCX (Max 10MB)
-                  </p>
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <div className="p-3 bg-muted rounded-md flex-1">
-                    {item?.dokumen ? `File: ${item.dokumen}` : 'Belum ada file dokumen'}
-                  </div>
-                  {item?.dokumen && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={handleDownloadDokumen}
-                    >
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              )}
-            </div>
+            <FileUpload
+              label="Upload Dokumen Kuesioner"
+              accept=".pdf,.doc,.docx"
+              multiple={false}
+              maxSize={10 * 1024 * 1024} // 10MB
+              maxFiles={1}
+              files={dokumenFiles}
+              existingFiles={existingDokumen}
+              mode={canEditDokumen ? 'edit' : 'view'}
+              disabled={!canEditDokumen}
+              onFilesChange={handleDokumenFilesChange}
+              onExistingFileRemove={handleExistingDokumenRemove}
+              description="Format yang didukung: PDF, DOC, DOCX (Max 10MB)"
+            />
 
           </div>
         </div>
