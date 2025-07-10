@@ -23,7 +23,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@workspace/ui/components/popover';
-import { CalendarIcon, ExternalLink, Upload, Eye, Download } from 'lucide-react';
+import { CalendarIcon, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
@@ -76,9 +76,9 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
   const handleSave = () => {
     // Role-based validation
     if (isPerwadag()) {
-      // Perwadag can only upload documents
-      if (!formData.daftarHadir && (!formData.buktiImages || formData.buktiImages.length === 0)) {
-        alert('Minimal harus upload daftar hadir atau bukti');
+      // Perwadag can only view/access documents
+      if (!formData.linkDaftarHadir && (!formData.buktiImages || formData.buktiImages.length === 0)) {
+        alert('Minimal harus ada link daftar hadir atau bukti');
         return;
       }
     } else if (isAdmin() || isInspektorat()) {
@@ -112,28 +112,6 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
     }
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>, type: 'daftarHadir' | 'buktiImages') => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      if (type === 'daftarHadir') {
-        const file = files[0];
-        setFormData({
-          ...formData,
-          daftarHadir: file.name,
-          daftarHadirUrl: URL.createObjectURL(file),
-        });
-      } else {
-        const fileArray = Array.from(files);
-        const fileNames = fileArray.map(file => file.name);
-        const fileUrls = fileArray.map(file => URL.createObjectURL(file));
-        setFormData({
-          ...formData,
-          buktiImages: fileNames,
-          buktiImageUrls: fileUrls,
-        });
-      }
-    }
-  };
 
   const getStatusBadge = (status: string, hasDocuments: boolean) => {
     if (status === 'completed' && hasDocuments) {
@@ -146,11 +124,10 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
   };
 
   const isEditable = mode === 'edit';
-  const hasDocuments = !!(formData.daftarHadir || (formData.buktiImages && formData.buktiImages.length > 0));
+  const hasDocuments = !!(formData.linkDaftarHadir || (formData.buktiImages && formData.buktiImages.length > 0));
 
   // Role-based field permissions
   const canEditAdmin = isEditable && (isAdmin() || isInspektorat());
-  const canUploadDocs = isEditable && isPerwadag();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -370,67 +347,48 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
               </div>
 
               <div className="space-y-2">
-                <Label>Daftar Hadir</Label>
-                <div className="space-y-2">
-                  {canUploadDocs && (
-                    <div>
-                      <Input
-                        type="file"
-                        accept=".pdf,.doc,.docx"
-                        onChange={(e) => handleFileUpload(e, 'daftarHadir')}
-                        className="hidden"
-                        id="daftarHadirUpload"
-                      />
+                <Label htmlFor="linkDaftarHadir">Link Daftar Hadir</Label>
+                {canEditAdmin ? (
+                  <div className="flex gap-2">
+                    <Input
+                      id="linkDaftarHadir"
+                      value={formData.linkDaftarHadir || ''}
+                      onChange={(e) => setFormData({ ...formData, linkDaftarHadir: e.target.value })}
+                      placeholder="https://forms.google.com/..."
+                    />
+                    {formData.linkDaftarHadir && (
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => document.getElementById('daftarHadirUpload')?.click()}
+                        onClick={() => window.open(formData.linkDaftarHadir, '_blank')}
                       >
-                        <Upload className="w-4 h-4 mr-2" />
-                        Upload Daftar Hadir
+                        <ExternalLink className="w-4 h-4" />
                       </Button>
-                    </div>
-                  )}
-                  {formData.daftarHadir && (
-                    <div className="flex items-center gap-2 p-2 bg-muted rounded">
-                      <span className="text-sm">{formData.daftarHadir}</span>
-                      {formData.daftarHadirUrl && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => window.open(formData.daftarHadirUrl, '_blank')}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Button>
-                      )}
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Input
+                      value={formData.linkDaftarHadir || ''}
+                      disabled
+                      className="bg-muted"
+                    />
+                    {formData.linkDaftarHadir && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(formData.linkDaftarHadir, '_blank')}
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
                 <Label>Bukti Foto</Label>
                 <div className="space-y-2">
-                  {canUploadDocs && (
-                    <div>
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        onChange={(e) => handleFileUpload(e, 'buktiImages')}
-                        className="hidden"
-                        id="buktiImagesUpload"
-                      />
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => document.getElementById('buktiImagesUpload')?.click()}
-                      >
-                        <Upload className="w-4 h-4 mr-2" />
-                        Upload Bukti Foto
-                      </Button>
-                    </div>
-                  )}
                   {formData.buktiImages && formData.buktiImages.length > 0 && (
                     <div className="space-y-1">
                       {formData.buktiImages.map((image, index) => (
@@ -442,11 +400,16 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
                               size="sm"
                               onClick={() => window.open(formData.buktiImageUrls![index], '_blank')}
                             >
-                              <Eye className="w-4 h-4" />
+                              <ExternalLink className="w-4 h-4" />
                             </Button>
                           )}
                         </div>
                       ))}
+                    </div>
+                  )}
+                  {(!formData.buktiImages || formData.buktiImages.length === 0) && (
+                    <div className="p-3 bg-muted rounded text-muted-foreground text-sm">
+                      Belum ada bukti foto
                     </div>
                   )}
                 </div>

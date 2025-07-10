@@ -9,8 +9,7 @@ export interface KonfirmasiMeeting {
   tanggalKonfirmasi: string;
   linkZoom?: string;
   status: 'pending' | 'confirmed' | 'completed';
-  daftarHadir?: string;
-  daftarHadirUrl?: string;
+  linkDaftarHadir?: string;
   buktiImages?: string[];
   buktiImageUrls?: string[];
   year: number;
@@ -29,8 +28,7 @@ export const KONFIRMASI_MEETING_DATA: KonfirmasiMeeting[] = [
     tanggalKonfirmasi: "2024-01-20",
     linkZoom: "https://zoom.us/j/123456789",
     status: "completed",
-    daftarHadir: "daftar-hadir-konfirmasi-atdag-moscow-2024.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-konfirmasi-atdag-moscow-2024.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-konfirmasi-atdag-moscow-2024",
     buktiImages: ["bukti-konfirmasi-1-atdag-moscow-2024.jpg", "bukti-konfirmasi-2-atdag-moscow-2024.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-konfirmasi-1-atdag-moscow-2024.jpg", "blob:http://localhost:3000/bukti-konfirmasi-2-atdag-moscow-2024.jpg"],
     year: 2024,
@@ -47,8 +45,7 @@ export const KONFIRMASI_MEETING_DATA: KonfirmasiMeeting[] = [
     tanggalKonfirmasi: "2024-02-15",
     linkZoom: "https://zoom.us/j/234567890",
     status: "confirmed",
-    daftarHadir: "daftar-hadir-konfirmasi-itpc-vancouver-2024.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-konfirmasi-itpc-vancouver-2024.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-konfirmasi-itpc-vancouver-2024",
     buktiImages: ["bukti-konfirmasi-1-itpc-vancouver-2024.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-konfirmasi-1-itpc-vancouver-2024.jpg"],
     year: 2024,
@@ -79,8 +76,7 @@ export const KONFIRMASI_MEETING_DATA: KonfirmasiMeeting[] = [
     tanggalKonfirmasi: "2024-03-20",
     linkZoom: "https://zoom.us/j/456789012",
     status: "completed",
-    daftarHadir: "daftar-hadir-konfirmasi-itpc-osaka-2024.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-konfirmasi-itpc-osaka-2024.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-konfirmasi-itpc-osaka-2024",
     buktiImages: ["bukti-konfirmasi-1-itpc-osaka-2024.jpg", "bukti-konfirmasi-2-itpc-osaka-2024.jpg", "bukti-konfirmasi-3-itpc-osaka-2024.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-konfirmasi-1-itpc-osaka-2024.jpg", "blob:http://localhost:3000/bukti-konfirmasi-2-itpc-osaka-2024.jpg", "blob:http://localhost:3000/bukti-konfirmasi-3-itpc-osaka-2024.jpg"],
     year: 2024,
@@ -97,8 +93,7 @@ export const KONFIRMASI_MEETING_DATA: KonfirmasiMeeting[] = [
     tanggalKonfirmasi: "2024-04-12",
     linkZoom: "https://zoom.us/j/567890123",
     status: "confirmed",
-    daftarHadir: "daftar-hadir-konfirmasi-atdag-newdelhi-2024.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-konfirmasi-atdag-newdelhi-2024.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-konfirmasi-atdag-newdelhi-2024",
     year: 2024,
     inspektorat: 3
   },
@@ -127,8 +122,7 @@ export const KONFIRMASI_MEETING_DATA: KonfirmasiMeeting[] = [
     tanggalKonfirmasi: "2024-05-15",
     linkZoom: "https://zoom.us/j/789012345",
     status: "completed",
-    daftarHadir: "daftar-hadir-konfirmasi-atdag-hamburg-2024.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-konfirmasi-atdag-hamburg-2024.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-konfirmasi-atdag-hamburg-2024",
     buktiImages: ["bukti-konfirmasi-1-atdag-hamburg-2024.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-konfirmasi-1-atdag-hamburg-2024.jpg"],
     year: 2024,
@@ -159,8 +153,7 @@ export const KONFIRMASI_MEETING_DATA: KonfirmasiMeeting[] = [
     tanggalKonfirmasi: "2023-11-20",
     linkZoom: "https://zoom.us/j/901234567",
     status: "completed",
-    daftarHadir: "daftar-hadir-konfirmasi-konsuldag-la-2023.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-konfirmasi-konsuldag-la-2023.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-konfirmasi-konsuldag-la-2023",
     buktiImages: ["bukti-konfirmasi-1-konsuldag-la-2023.jpg", "bukti-konfirmasi-2-konsuldag-la-2023.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-konfirmasi-1-konsuldag-la-2023.jpg", "blob:http://localhost:3000/bukti-konfirmasi-2-konsuldag-la-2023.jpg"],
     year: 2023,

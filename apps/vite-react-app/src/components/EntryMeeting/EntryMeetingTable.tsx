@@ -35,13 +35,14 @@ const EntryMeetingTable: React.FC<EntryMeetingTableProps> = ({
             <TableHead>Tanggal Evaluasi</TableHead>
             <TableHead>Tanggal Entry Meeting</TableHead>
             <TableHead>Link Zoom</TableHead>
+            <TableHead>Daftar Hadir</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                 Tidak ada data entry meeting
               </TableCell>
             </TableRow>
@@ -62,6 +63,20 @@ const EntryMeetingTable: React.FC<EntryMeetingTableProps> = ({
                         className="text-blue-600 hover:text-blue-800 underline"
                       >
                         Join Meeting
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {item.linkDaftarHadir ? (
+                      <a
+                        href={item.linkDaftarHadir}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline"
+                      >
+                        Lihat Daftar Hadir
                       </a>
                     ) : (
                       <span className="text-muted-foreground">-</span>

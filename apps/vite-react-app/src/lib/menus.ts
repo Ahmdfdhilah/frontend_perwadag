@@ -48,11 +48,19 @@ export const appMenuItems: SidebarItem[] = [
     allowedRoles: ['admin', 'inspektorat', 'perwadag'],
   },
 
-  // Matriks - Only admin and inspektorat, perwadag
+  // Konfirmasi Meeting - Only admin and inspektorat, perwadag
   {
-    title: 'Matriks',
-    href: '/matriks',
-    icon: Grid2X2,
+    title: 'Konfirmasi Meeting',
+    href: '/konfirmasi-meeting',
+    icon: CheckSquare,
+    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
+  },
+
+  // Kuesioner - Only admin and inspektorat, perwadag
+  {
+    title: 'Kuesioner',
+    href: '/kuesioner',
+    icon: ClipboardList,
     allowedRoles: ['admin', 'inspektorat', 'perwadag'],
   },
 
@@ -63,13 +71,15 @@ export const appMenuItems: SidebarItem[] = [
     icon: PhoneOutgoing,
     allowedRoles: ['admin', 'inspektorat', 'perwadag'],
   },
-  // Konfirmasi Meeting - Only admin and inspektorat, perwadag
+
+  // Matriks - Only admin and inspektorat, perwadag
   {
-    title: 'Konfirmasi Meeting',
-    href: '/konfirmasi-meeting',
-    icon: CheckSquare,
+    title: 'Matriks',
+    href: '/matriks',
+    icon: Grid2X2,
     allowedRoles: ['admin', 'inspektorat', 'perwadag'],
   },
+
   // Laporan Hasil - Only admin and inspektorat, perwadag
   {
     title: 'Laporan Hasil',
@@ -77,13 +87,7 @@ export const appMenuItems: SidebarItem[] = [
     icon: FileInput,
     allowedRoles: ['admin', 'inspektorat', 'perwadag'],
   },
-  // Kuesioner - Only admin and inspektorat, perwadag
-  {
-    title: 'Kuesioner',
-    href: '/kuesioner',
-    icon: ClipboardList,
-    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
-  },
+
   // Template Kuesioner - All users can view, only admin can manage
   {
     title: 'Template Kuesioner',
@@ -94,18 +98,10 @@ export const appMenuItems: SidebarItem[] = [
 
   // User Management - Admin and Master Admin
   {
-    title: 'User Management',
+    title: 'Manajemen User',
+    href: '/users',
     icon: Users,
-    isPlaceholder: true,
     allowedRoles: ['admin'],
-    children: [
-      {
-        title: 'All Users',
-        href: '/users',
-        icon: Users,
-        allowedRoles: ['admin'],
-      }
-    ],
   },
 ];
 

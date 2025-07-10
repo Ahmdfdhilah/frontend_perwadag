@@ -6,8 +6,7 @@ export interface ExitMeeting {
   perwadagId: string;
   perwadagName: string;
   linkZoom?: string;
-  daftarHadir?: string;
-  daftarHadirUrl?: string;
+  linkDaftarHadir?: string;
   buktiImages?: string[];
   buktiImageUrls?: string[];
   year: number;
@@ -24,8 +23,7 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
     perwadagName: "Atdag Moscow – Rusia",
     
     linkZoom: "https://zoom.us/j/123456789",
-    daftarHadir: "daftar-hadir-exit-atdag-moscow-2024.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-exit-atdag-moscow-2024.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-exit-atdag-moscow-2024",
     buktiImages: ["bukti-hadir-exit-atdag-moscow-2024.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-hadir-exit-atdag-moscow-2024.jpg"],
     year: 2024,
@@ -40,8 +38,7 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
     perwadagName: "ITPC Vancouver – Canada",
     
     linkZoom: "https://zoom.us/j/987654321",
-    daftarHadir: "daftar-hadir-exit-itpc-vancouver-2024.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-exit-itpc-vancouver-2024.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-exit-itpc-vancouver-2024",
     buktiImages: ["bukti-hadir-exit-itpc-vancouver-2024.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-hadir-exit-itpc-vancouver-2024.jpg"],
     year: 2024,
@@ -56,8 +53,7 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
     perwadagName: "Atdag Beijing – Tiongkok",
     
     linkZoom: "https://zoom.us/j/456789123",
-    daftarHadir: "daftar-hadir-exit-atdag-beijing-2024.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-exit-atdag-beijing-2024.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-exit-atdag-beijing-2024",
     buktiImages: ["bukti-hadir-exit-atdag-beijing-2024.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-hadir-exit-atdag-beijing-2024.jpg"],
     year: 2024,
@@ -72,8 +68,7 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
     perwadagName: "ITPC Osaka – Jepang",
     
     linkZoom: "https://zoom.us/j/789123456",
-    daftarHadir: "daftar-hadir-exit-itpc-osaka-2024.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-exit-itpc-osaka-2024.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-exit-itpc-osaka-2024",
     buktiImages: ["bukti-hadir-exit-itpc-osaka-2024.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-hadir-exit-itpc-osaka-2024.jpg"],
     year: 2024,
@@ -88,8 +83,7 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
     perwadagName: "Atdag New Delhi – India",
     
     linkZoom: "https://zoom.us/j/321654987",
-    daftarHadir: "daftar-hadir-exit-atdag-newdelhi-2024.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-exit-atdag-newdelhi-2024.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-exit-atdag-newdelhi-2024",
     buktiImages: ["bukti-hadir-exit-atdag-newdelhi-2024.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-hadir-exit-atdag-newdelhi-2024.jpg"],
     year: 2024,
@@ -104,8 +98,7 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
     perwadagName: "ITPC Mumbai – India",
     
     linkZoom: "https://zoom.us/j/654987321",
-    daftarHadir: "daftar-hadir-exit-itpc-mumbai-2024.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-exit-itpc-mumbai-2024.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-exit-itpc-mumbai-2024",
     buktiImages: ["bukti-hadir-exit-itpc-mumbai-2024.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-hadir-exit-itpc-mumbai-2024.jpg"],
     year: 2024,
@@ -120,8 +113,7 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
     perwadagName: "Atdag Hamburg – Jerman",
     
     linkZoom: "https://zoom.us/j/147258369",
-    daftarHadir: "daftar-hadir-exit-atdag-hamburg-2024.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-exit-atdag-hamburg-2024.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-exit-atdag-hamburg-2024",
     buktiImages: ["bukti-hadir-exit-atdag-hamburg-2024.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-hadir-exit-atdag-hamburg-2024.jpg"],
     year: 2024,
@@ -136,8 +128,7 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
     perwadagName: "ITPC Duesseldorf – Jerman",
     
     linkZoom: "https://zoom.us/j/369258147",
-    daftarHadir: "daftar-hadir-exit-itpc-duesseldorf-2024.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-exit-itpc-duesseldorf-2024.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-exit-itpc-duesseldorf-2024",
     buktiImages: ["bukti-hadir-exit-itpc-duesseldorf-2024.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-hadir-exit-itpc-duesseldorf-2024.jpg"],
     year: 2024,
@@ -152,8 +143,7 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
     perwadagName: "Konsuldag Los Angeles – Amerika Serikat",
     
     linkZoom: "https://zoom.us/j/159357486",
-    daftarHadir: "daftar-hadir-exit-konsuldag-losangeles-2023.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-exit-konsuldag-losangeles-2023.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-exit-konsuldag-losangeles-2023",
     buktiImages: ["bukti-hadir-exit-konsuldag-losangeles-2023.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-hadir-exit-konsuldag-losangeles-2023.jpg"],
     year: 2023,
@@ -168,8 +158,7 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
     perwadagName: "KDEI New York – Amerika Serikat",
     
     linkZoom: "https://zoom.us/j/486357159",
-    daftarHadir: "daftar-hadir-exit-kdei-newyork-2023.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-exit-kdei-newyork-2023.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-exit-kdei-newyork-2023",
     buktiImages: ["bukti-hadir-exit-kdei-newyork-2023.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-hadir-exit-kdei-newyork-2023.jpg"],
     year: 2023,
@@ -184,8 +173,7 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
     perwadagName: "Konsuldag Busan – Korea Selatan",
     
     linkZoom: "https://zoom.us/j/753951864",
-    daftarHadir: "daftar-hadir-exit-konsuldag-busan-2023.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-exit-konsuldag-busan-2023.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-exit-konsuldag-busan-2023",
     buktiImages: ["bukti-hadir-exit-konsuldag-busan-2023.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-hadir-exit-konsuldag-busan-2023.jpg"],
     year: 2023,
@@ -200,8 +188,7 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
     perwadagName: "KDEI Seoul – Korea Selatan",
     
     linkZoom: "https://zoom.us/j/864951753",
-    daftarHadir: "daftar-hadir-exit-kdei-seoul-2023.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-exit-kdei-seoul-2023.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-exit-kdei-seoul-2023",
     buktiImages: ["bukti-hadir-exit-kdei-seoul-2023.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-hadir-exit-kdei-seoul-2023.jpg"],
     year: 2023,
@@ -216,8 +203,7 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
     perwadagName: "Konsuldag Karachi – Pakistan",
     
     linkZoom: "https://zoom.us/j/258147369",
-    daftarHadir: "daftar-hadir-exit-konsuldag-karachi-2022.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-exit-konsuldag-karachi-2022.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-exit-konsuldag-karachi-2022",
     buktiImages: ["bukti-hadir-exit-konsuldag-karachi-2022.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-hadir-exit-konsuldag-karachi-2022.jpg"],
     year: 2022,
@@ -232,8 +218,7 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
     perwadagName: "KDEI Islamabad – Pakistan",
     
     linkZoom: "https://zoom.us/j/369147258",
-    daftarHadir: "daftar-hadir-exit-kdei-islamabad-2022.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-exit-kdei-islamabad-2022.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-exit-kdei-islamabad-2022",
     buktiImages: ["bukti-hadir-exit-kdei-islamabad-2022.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-hadir-exit-kdei-islamabad-2022.jpg"],
     year: 2022,
@@ -248,8 +233,7 @@ export const EXIT_MEETING_DATA: ExitMeeting[] = [
     perwadagName: "Konsuldag Milan – Italia",
     
     linkZoom: "https://zoom.us/j/741852963",
-    daftarHadir: "daftar-hadir-exit-konsuldag-milan-2022.pdf",
-    daftarHadirUrl: "blob:http://localhost:3000/daftar-hadir-exit-konsuldag-milan-2022.pdf",
+    linkDaftarHadir: "https://forms.google.com/daftar-hadir-exit-konsuldag-milan-2022",
     buktiImages: ["bukti-hadir-exit-konsuldag-milan-2022.jpg"],
     buktiImageUrls: ["blob:http://localhost:3000/bukti-hadir-exit-konsuldag-milan-2022.jpg"],
     year: 2022,
@@ -262,12 +246,12 @@ export const YEARS_EXIT_MEETING = Array.from(
 ).sort((a, b) => b - a);
 
 export const getExitMeetingStatus = (item: ExitMeeting): string => {
-  const hasDaftarHadir = !!item.daftarHadir;
+  const hasLinkDaftarHadir = !!item.linkDaftarHadir;
   const hasBuktiImages = !!item.buktiImages && item.buktiImages.length > 0;
   
-  if (hasDaftarHadir && hasBuktiImages) {
+  if (hasLinkDaftarHadir && hasBuktiImages) {
     return 'Lengkap';
-  } else if (hasDaftarHadir || hasBuktiImages) {
+  } else if (hasLinkDaftarHadir || hasBuktiImages) {
     return 'Sebagian';
   } else {
     return 'Belum Upload';

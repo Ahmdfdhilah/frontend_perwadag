@@ -45,6 +45,7 @@ const KonfirmasiMeetingTable: React.FC<KonfirmasiMeetingTableProps> = ({
             <TableHead>Tanggal Evaluasi</TableHead>
             <TableHead>Tanggal Konfirmasi</TableHead>
             <TableHead>Link Zoom</TableHead>
+            <TableHead>Daftar Hadir</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
@@ -52,13 +53,13 @@ const KonfirmasiMeetingTable: React.FC<KonfirmasiMeetingTableProps> = ({
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                 Tidak ada data konfirmasi meeting
               </TableCell>
             </TableRow>
           ) : (
             data.map((item) => {
-              const hasDocuments = !!(item.daftarHadir || (item.buktiImages && item.buktiImages.length > 0));
+              const hasDocuments = !!(item.linkDaftarHadir || (item.buktiImages && item.buktiImages.length > 0));
               
               return (
                 <TableRow key={item.id}>
@@ -75,6 +76,20 @@ const KonfirmasiMeetingTable: React.FC<KonfirmasiMeetingTableProps> = ({
                         className="text-blue-600 hover:text-blue-800 underline"
                       >
                         Join Meeting
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground">-</span>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {item.linkDaftarHadir ? (
+                      <a
+                        href={item.linkDaftarHadir}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline"
+                      >
+                        Lihat Daftar Hadir
                       </a>
                     ) : (
                       <span className="text-muted-foreground">-</span>

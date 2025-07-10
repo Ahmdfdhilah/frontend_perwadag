@@ -39,7 +39,7 @@ const KonfirmasiMeetingCards: React.FC<KonfirmasiMeetingCardsProps> = ({
   return (
     <div className="grid grid-cols-1 gap-4">
       {data.map((item) => {
-        const hasDocuments = !!(item.daftarHadir || (item.buktiImages && item.buktiImages.length > 0));
+        const hasDocuments = !!(item.linkDaftarHadir || (item.buktiImages && item.buktiImages.length > 0));
         
         return (
           <Card key={item.id} className="w-full">
@@ -81,6 +81,21 @@ const KonfirmasiMeetingCards: React.FC<KonfirmasiMeetingCardsProps> = ({
                       className="ml-2 text-blue-600 hover:text-blue-800 underline"
                     >
                       Join Meeting
+                    </a>
+                  ) : (
+                    <span className="ml-2 text-muted-foreground">-</span>
+                  )}
+                </div>
+                <div>
+                  <span className="font-medium text-muted-foreground">Daftar Hadir:</span>
+                  {item.linkDaftarHadir ? (
+                    <a
+                      href={item.linkDaftarHadir}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-2 text-blue-600 hover:text-blue-800 underline"
+                    >
+                      Lihat Daftar Hadir
                     </a>
                   ) : (
                     <span className="ml-2 text-muted-foreground">-</span>

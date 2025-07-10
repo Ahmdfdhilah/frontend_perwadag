@@ -76,6 +76,21 @@ const ExitMeetingCards: React.FC<ExitMeetingCardsProps> = ({
                     <span className="ml-2 text-muted-foreground">-</span>
                   )}
                 </div>
+                <div>
+                  <span className="font-medium text-muted-foreground">Daftar Hadir:</span>
+                  {item.linkDaftarHadir ? (
+                    <a
+                      href={item.linkDaftarHadir}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-2 text-blue-600 hover:text-blue-800 underline"
+                    >
+                      Lihat Daftar Hadir
+                    </a>
+                  ) : (
+                    <span className="ml-2 text-muted-foreground">-</span>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
