@@ -51,12 +51,12 @@ const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
                 <span className="ml-2">{item.year}</span>
               </div>
               <div>
-                <span className="font-medium text-muted-foreground">Skor:</span>
-                <span className="ml-2">{item.score}</span>
+                <span className="font-medium text-muted-foreground">Inspektorat:</span>
+                <span className="ml-2">Inspektorat {item.inspektorat}</span>
               </div>
               <div>
-                <span className="font-medium text-muted-foreground">Total:</span>
-                <span className="ml-2">{item.total}</span>
+                <span className="font-medium text-muted-foreground">Skor:</span>
+                <span className="ml-2">{item.score}</span>
               </div>
               <div className="col-span-2">
                 <span className="font-medium text-muted-foreground">Profil Risiko:</span>

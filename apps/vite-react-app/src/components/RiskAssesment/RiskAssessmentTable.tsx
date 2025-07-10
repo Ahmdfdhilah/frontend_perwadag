@@ -30,10 +30,10 @@ const RiskAssessmentTable: React.FC<RiskAssessmentTableProps> = ({
           <TableRow>
             <TableHead className="w-[60px]">No</TableHead>
             <TableHead>Tahun</TableHead>
+            <TableHead>Inspektorat</TableHead>
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Skor</TableHead>
             <TableHead>Profil Risiko Auditan</TableHead>
-            <TableHead>Total</TableHead>
             <TableHead className="text-right">Aksi</TableHead>
           </TableRow>
         </TableHeader>
@@ -49,10 +49,10 @@ const RiskAssessmentTable: React.FC<RiskAssessmentTableProps> = ({
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
                 <TableCell>{item.year}</TableCell>
+                <TableCell>Inspektorat {item.inspektorat}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
                 <TableCell>{item.score}</TableCell>
                 <TableCell>{item.riskProfile}</TableCell>
-                <TableCell>{item.total}</TableCell>
                 <TableCell className="text-right">
                   <ActionDropdown
                     onView={() => onView?.(item)}

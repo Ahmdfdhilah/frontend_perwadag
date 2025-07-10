@@ -74,10 +74,6 @@ const RiskAssessmentPage: React.FC = () => {
           return b.score - a.score;
         case 'score-asc':
           return a.score - b.score;
-        case 'year-desc':
-          return b.year - a.year;
-        case 'year-asc':
-          return a.year - b.year;
         default:
           return 0;
       }
@@ -199,8 +195,6 @@ const RiskAssessmentPage: React.FC = () => {
             <SelectContent>
               <SelectItem value="score-desc">Skor Tertinggi</SelectItem>
               <SelectItem value="score-asc">Skor Terendah</SelectItem>
-              <SelectItem value="year-desc">Tahun Terbaru</SelectItem>
-              <SelectItem value="year-asc">Tahun Terlama</SelectItem>
             </SelectContent>
           </Select>
         </div>

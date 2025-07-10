@@ -48,6 +48,7 @@ export interface RiskAssessmentDetail {
   // Section 8: Nilai Transaksi TEI
   teiRealizationValue: number;
   teiPotentialValue: number;
+  teiPercentage: number;
   teiDescription: string;
   teiChoice: string;
   teiValue: number;
@@ -108,6 +109,7 @@ export const DUMMY_RISK_ASSESSMENT_DETAIL: RiskAssessmentDetail = {
   // Section 8: Nilai Transaksi TEI
   teiRealizationValue: 0,
   teiPotentialValue: 0,
+  teiPercentage: 0,
   teiDescription: 'tidak ada data realisasi dan nilai potensi',
   teiChoice: 'Belum Ada Realisasi',
   teiValue: 0,

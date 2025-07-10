@@ -88,6 +88,145 @@ const RiskAssessmentInputPage: React.FC = () => {
     });
   };
 
+  // Auto-calculate category selections based on values
+  useEffect(() => {
+    // Auto-calculate trend percentage based on achievement values
+    if (formData.achievement2023 > 0) {
+      const percentage = ((formData.achievement2024 - formData.achievement2023) / formData.achievement2023) * 100;
+      setFormData(prev => ({
+        ...prev,
+        trendAchievement: percentage
+      }));
+    }
+  }, [formData.achievement2023, formData.achievement2024]);
+
+  useEffect(() => {
+    // Auto-calculate trend category based on trendAchievement
+    const trendPercentage = formData.trendAchievement;
+    let trendChoice = '';
+    if (trendPercentage < -20) trendChoice = 'Turun > 20%';
+    else if (trendPercentage >= -20 && trendPercentage < -10) trendChoice = 'Turun 10% - 20%';
+    else if (trendPercentage >= 0 && trendPercentage <= 20) trendChoice = 'Naik 0% - 20%';
+    else if (trendPercentage > 20 && trendPercentage <= 50) trendChoice = 'Naik 20% - 50%';
+    else if (trendPercentage > 50) trendChoice = 'Naik > 50%';
+    
+    if (trendChoice) {
+      const choice = TREND_CHOICES.find(c => c.label === trendChoice);
+      if (choice) {
+        setFormData(prev => ({
+          ...prev,
+          trendChoice: trendChoice,
+          trendValue: choice.score
+        }));
+      }
+    }
+  }, [formData.trendAchievement]);
+
+  useEffect(() => {
+    // Auto-calculate budget percentage based on realization and pagu values
+    if (formData.budgetPagu2024 > 0) {
+      const percentage = (formData.budgetRealization2024 / formData.budgetPagu2024) * 100;
+      setFormData(prev => ({
+        ...prev,
+        budgetPercentage: percentage
+      }));
+    }
+  }, [formData.budgetRealization2024, formData.budgetPagu2024]);
+
+  useEffect(() => {
+    // Auto-calculate budget category based on budgetPercentage
+    const percentage = formData.budgetPercentage;
+    let budgetChoice = '';
+    if (percentage < 80) budgetChoice = '< 80%';
+    else if (percentage >= 80 && percentage < 90) budgetChoice = '80% - 90%';
+    else if (percentage >= 90 && percentage < 95) budgetChoice = '90% - 95%';
+    else if (percentage >= 95 && percentage < 97) budgetChoice = '95% - 97%';
+    else if (percentage >= 97) budgetChoice = '> 97%';
+    
+    if (budgetChoice) {
+      const choice = BUDGET_CHOICES.find(c => c.label === budgetChoice);
+      if (choice) {
+        setFormData(prev => ({
+          ...prev,
+          budgetChoice: budgetChoice,
+          budgetValue: choice.score
+        }));
+      }
+    }
+  }, [formData.budgetPercentage]);
+
+  useEffect(() => {
+    // Auto-calculate IK percentage based on not achieved and total values
+    if (formData.ikTotal > 0) {
+      const percentage = (formData.ikNotAchieved / formData.ikTotal) * 100;
+      setFormData(prev => ({
+        ...prev,
+        ikPercentage: percentage
+      }));
+    }
+  }, [formData.ikNotAchieved, formData.ikTotal]);
+
+  useEffect(() => {
+    // Auto-calculate IK category based on ikPercentage
+    const percentage = formData.ikPercentage;
+    let ikChoice = '';
+    if (percentage === 0) ikChoice = '0%';
+    else if (percentage > 0 && percentage <= 5) ikChoice = '0% - 5%';
+    else if (percentage > 5 && percentage <= 10) ikChoice = '5% - 10%';
+    else if (percentage > 10 && percentage <= 20) ikChoice = '10% - 20%';
+    else if (percentage > 20) ikChoice = '> 20%';
+    
+    if (ikChoice) {
+      const choice = IK_CHOICES.find(c => c.label === ikChoice);
+      if (choice) {
+        setFormData(prev => ({
+          ...prev,
+          ikChoice: ikChoice,
+          ikValue: choice.score
+        }));
+      }
+    }
+  }, [formData.ikPercentage]);
+
+  useEffect(() => {
+    // Auto-calculate TEI percentage based on realization and potential values
+    if (formData.teiPotentialValue > 0) {
+      const percentage = (formData.teiRealizationValue / formData.teiPotentialValue) * 100;
+      setFormData(prev => ({
+        ...prev,
+        teiPercentage: percentage
+      }));
+    } else if (formData.teiRealizationValue === 0 && formData.teiPotentialValue === 0) {
+      setFormData(prev => ({
+        ...prev,
+        teiPercentage: 0
+      }));
+    }
+  }, [formData.teiRealizationValue, formData.teiPotentialValue]);
+
+  useEffect(() => {
+    // Auto-calculate TEI category based on teiPercentage
+    const percentage = formData.teiPercentage;
+    let teiChoice = '';
+    if (percentage === 0) teiChoice = 'Belum Ada Realisasi';
+    else if (percentage < 50) teiChoice = '< 50%';
+    else if (percentage >= 50 && percentage < 70) teiChoice = '50% - 70%';
+    else if (percentage >= 70 && percentage < 85) teiChoice = '70% - 85%';
+    else if (percentage >= 85 && percentage < 95) teiChoice = '85% - 95%';
+    else if (percentage >= 95) teiChoice = '> 95%';
+    
+    if (teiChoice) {
+      const choice = TEI_CHOICES.find(c => c.label === teiChoice);
+      if (choice) {
+        setFormData(prev => ({
+          ...prev,
+          teiChoice: teiChoice,
+          teiValue: choice.score
+        }));
+      }
+    }
+  }, [formData.teiPercentage]);
+
   const calculateTotalRisk = () => {
     const totalValue =
       formData.trendValue +
@@ -193,34 +332,24 @@ const RiskAssessmentInputPage: React.FC = () => {
               </div>
             </div>
             <div>
-              <Label>Tren Capaian (%)</Label>
+              <Label>Tren Capaian (%) - Otomatis</Label>
               <Input
                 type="number"
                 step="0.01"
                 value={formData.trendAchievement}
-                onChange={(e) => handleInputChange('trendAchievement', parseFloat(e.target.value))}
+                disabled
+                className="bg-muted"
               />
             </div>
             <div>
-              <Label>Pilihan Kategori</Label>
+              <Label>Pilihan Kategori (Otomatis)</Label>
               <Select
                 value={formData.trendChoice}
-                onValueChange={(value) => {
-                  const choice = TREND_CHOICES.find(c => c.label === value);
-                  handleInputChange('trendChoice', value);
-                  handleInputChange('trendValue', choice?.score || 0);
-                }}
+                disabled
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih kategori tren" />
+                <SelectTrigger className="bg-muted">
+                  <SelectValue placeholder="Kategori akan dipilih otomatis" />
                 </SelectTrigger>
-                <SelectContent>
-                  {TREND_CHOICES.map((choice) => (
-                    <SelectItem key={choice.value} value={choice.label}>
-                      {choice.label} (Nilai: {choice.score})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
               </Select>
             </div>
             <div>
@@ -260,34 +389,24 @@ const RiskAssessmentInputPage: React.FC = () => {
               />
             </div>
             <div>
-              <Label>Persentase Realisasi (%)</Label>
+              <Label>Persentase Realisasi (%) - Otomatis</Label>
               <Input
                 type="number"
                 step="0.1"
                 value={formData.budgetPercentage}
-                onChange={(e) => handleInputChange('budgetPercentage', parseFloat(e.target.value))}
+                disabled
+                className="bg-muted"
               />
             </div>
             <div>
-              <Label>Pilihan Kategori</Label>
+              <Label>Pilihan Kategori (Otomatis)</Label>
               <Select
                 value={formData.budgetChoice}
-                onValueChange={(value) => {
-                  const choice = BUDGET_CHOICES.find(c => c.label === value);
-                  handleInputChange('budgetChoice', value);
-                  handleInputChange('budgetValue', choice?.score || 0);
-                }}
+                disabled
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih kategori anggaran" />
+                <SelectTrigger className="bg-muted">
+                  <SelectValue placeholder="Kategori akan dipilih otomatis" />
                 </SelectTrigger>
-                <SelectContent>
-                  {BUDGET_CHOICES.map((choice) => (
-                    <SelectItem key={choice.value} value={choice.label}>
-                      {choice.label} (Nilai: {choice.score})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
               </Select>
             </div>
             <div>
@@ -526,34 +645,24 @@ const RiskAssessmentInputPage: React.FC = () => {
               </div>
             </div>
             <div>
-              <Label>Persentase IK Tidak Tercapai (%)</Label>
+              <Label>Persentase IK Tidak Tercapai (%) - Otomatis</Label>
               <Input
                 type="number"
                 step="0.1"
                 value={formData.ikPercentage}
-                onChange={(e) => handleInputChange('ikPercentage', parseFloat(e.target.value))}
+                disabled
+                className="bg-muted"
               />
             </div>
             <div>
-              <Label>Pilihan Kategori</Label>
+              <Label>Pilihan Kategori (Otomatis)</Label>
               <Select
                 value={formData.ikChoice}
-                onValueChange={(value) => {
-                  const choice = IK_CHOICES.find(c => c.label === value);
-                  handleInputChange('ikChoice', value);
-                  handleInputChange('ikValue', choice?.score || 0);
-                }}
+                disabled
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih kategori persentase IK" />
+                <SelectTrigger className="bg-muted">
+                  <SelectValue placeholder="Kategori akan dipilih otomatis" />
                 </SelectTrigger>
-                <SelectContent>
-                  {IK_CHOICES.map((choice) => (
-                    <SelectItem key={choice.value} value={choice.label}>
-                      {choice.label} (Nilai: {choice.score})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
               </Select>
             </div>
             <div>
@@ -603,25 +712,24 @@ const RiskAssessmentInputPage: React.FC = () => {
               />
             </div>
             <div>
-              <Label>Pilihan Kategori</Label>
+              <Label>Persentase Realisasi TEI (%) - Otomatis</Label>
+              <Input
+                type="number"
+                step="0.1"
+                value={formData.teiPercentage}
+                disabled
+                className="bg-muted"
+              />
+            </div>
+            <div>
+              <Label>Pilihan Kategori (Otomatis)</Label>
               <Select
                 value={formData.teiChoice}
-                onValueChange={(value) => {
-                  const choice = TEI_CHOICES.find(c => c.label === value);
-                  handleInputChange('teiChoice', value);
-                  handleInputChange('teiValue', choice?.score || 0);
-                }}
+                disabled
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih kategori TEI" />
+                <SelectTrigger className="bg-muted">
+                  <SelectValue placeholder="Kategori akan dipilih otomatis" />
                 </SelectTrigger>
-                <SelectContent>
-                  {TEI_CHOICES.map((choice) => (
-                    <SelectItem key={choice.value} value={choice.label}>
-                      {choice.label} (Nilai: {choice.score})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
               </Select>
             </div>
             <div>
