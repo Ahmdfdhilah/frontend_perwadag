@@ -61,7 +61,7 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 underline"
                     >
-                      View Document
+                      Lihat Dokumen
                     </a>
                   ) : (
                     <span className="text-muted-foreground">-</span>

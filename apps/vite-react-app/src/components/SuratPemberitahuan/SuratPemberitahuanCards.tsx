@@ -18,15 +18,6 @@ const SuratPemberitahuanCards: React.FC<SuratPemberitahuanCardsProps> = ({
   canEdit,
 }) => {
 
-  const getStatusLabel = (status: string) => {
-    return status === 'uploaded' ? 'Sudah Upload' : 'Belum Upload';
-  };
-
-  const getStatusColor = (status: string) => {
-    return status === 'uploaded'
-      ? 'text-green-600 bg-green-50 px-2 py-1 rounded-full text-xs font-medium'
-      : 'text-orange-600 bg-orange-50 px-2 py-1 rounded-full text-xs font-medium';
-  };
 
   if (data.length === 0) {
     return (
@@ -60,12 +51,6 @@ const SuratPemberitahuanCards: React.FC<SuratPemberitahuanCardsProps> = ({
                 <div>
                   <span className="font-medium text-muted-foreground">No:</span>
                   <span className="ml-2">{index + 1}</span>
-                </div>
-                <div>
-                  <span className="font-medium text-muted-foreground">Status:</span>
-                  <span className={`ml-2 ${getStatusColor(item.status)}`}>
-                    {getStatusLabel(item.status)}
-                  </span>
                 </div>
               </div>
 

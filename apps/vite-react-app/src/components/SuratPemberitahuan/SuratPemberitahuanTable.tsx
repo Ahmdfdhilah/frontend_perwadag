@@ -25,16 +25,6 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
   canEdit,
 }) => {
 
-  const getStatusLabel = (status: string) => {
-    return status === 'uploaded' ? 'Sudah Upload' : 'Belum Upload';
-  };
-
-  const getStatusColor = (status: string) => {
-    return status === 'uploaded'
-      ? 'text-green-600 bg-green-50 px-2 py-1 rounded-full text-xs font-medium'
-      : 'text-orange-600 bg-orange-50 px-2 py-1 rounded-full text-xs font-medium';
-  };
-
   return (
     <div className="rounded-md border">
       <Table>
@@ -44,7 +34,6 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Tanggal Surat Pemberitahuan</TableHead>
             <TableHead>Tanggal Evaluasi</TableHead>
-            <TableHead>Status</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
         </TableHeader>
@@ -62,11 +51,6 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
                 <TableCell>{item.perwadagName}</TableCell>
                 <TableCell>{formatIndonesianDate(item.tanggalSuratPemberitahuan)}</TableCell>
                 <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
-                <TableCell>
-                  <span className={getStatusColor(item.status)}>
-                    {getStatusLabel(item.status)}
-                  </span>
-                </TableCell>
                 <TableCell>
                   <ActionDropdown
                     onView={() => onView?.(item)}

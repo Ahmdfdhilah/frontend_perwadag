@@ -73,7 +73,6 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
       tanggalSuratPemberitahuan: formData.tanggalSuratPemberitahuan.toISOString().split('T')[0],
       fileName: formData.fileName,
       fileUrl: formData.fileUrl,
-      status: formData.fileName ? 'uploaded' : 'not_uploaded',
       year: formData.tanggalEvaluasi.getFullYear(),
     };
 
