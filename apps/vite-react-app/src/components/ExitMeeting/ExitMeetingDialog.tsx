@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -9,10 +9,11 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
-import { ExternalLink, Upload, X } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { ExitMeeting } from '@/mocks/exitMeeting';
 import { useRole } from '@/hooks/useRole';
 import { formatIndonesianDate, formatIndonesianDateRange } from '@/utils/timeFormat';
+import FileUpload from '@/components/common/FileUpload';
 
 interface ExitMeetingDialogProps {
   open: boolean;
@@ -31,25 +32,31 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
 }) => {
   const { isAdmin, isInspektorat } = useRole();
   const [formData, setFormData] = useState<Partial<ExitMeeting>>({});
-  const [daftarHadirFile, setDaftarHadirFile] = useState<File | null>(null);
+  const [daftarHadirFiles, setDaftarHadirFiles] = useState<File[]>([]);
   const [buktiHadirFiles, setBuktiHadirFiles] = useState<File[]>([]);
-  const daftarHadirRef = useRef<HTMLInputElement>(null);
-  const buktiHadirRef = useRef<HTMLInputElement>(null);
+  const [existingDaftarHadir, setExistingDaftarHadir] = useState<Array<{ name: string; url?: string }>>([]);
+  const [existingBuktiHadir, setExistingBuktiHadir] = useState<Array<{ name: string; url?: string }>>([]);
 
   useEffect(() => {
     if (item && open) {
       setFormData({ ...item });
+      
+      // Set existing files for display
+      setExistingDaftarHadir(item.linkDaftarHadir ? [{ name: 'Daftar Hadir', url: item.linkDaftarHadir }] : []);
+      setExistingBuktiHadir(item.buktiImageUrls ? item.buktiImageUrls.map((url, index) => ({ name: `Bukti ${index + 1}`, url })) : []);
     } else {
       setFormData({});
-      setDaftarHadirFile(null);
+      setDaftarHadirFiles([]);
       setBuktiHadirFiles([]);
+      setExistingDaftarHadir([]);
+      setExistingBuktiHadir([]);
     }
   }, [item, open]);
 
   const handleSave = () => {
     const dataToSave = {
       ...formData,
-      daftarHadirFile,
+      daftarHadirFiles,
       buktiHadirFiles,
     };
     onSave(dataToSave);
@@ -66,29 +73,20 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
     }
   };
 
-  const handleDaftarHadirFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setDaftarHadirFile(file);
-    }
+  const handleDaftarHadirFilesChange = (files: File[]) => {
+    setDaftarHadirFiles(files);
   };
 
-  const handleBuktiHadirFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length > 0) {
-      setBuktiHadirFiles(prev => [...prev, ...files].slice(0, 2));
-    }
+  const handleBuktiHadirFilesChange = (files: File[]) => {
+    setBuktiHadirFiles(files);
   };
 
-  const removeBuktiHadirFile = (index: number) => {
-    setBuktiHadirFiles(prev => prev.filter((_, i) => i !== index));
+  const handleExistingDaftarHadirRemove = (index: number) => {
+    setExistingDaftarHadir(prev => prev.filter((_, i) => i !== index));
   };
 
-  const removeDaftarHadirFile = () => {
-    setDaftarHadirFile(null);
-    if (daftarHadirRef.current) {
-      daftarHadirRef.current.value = '';
-    }
+  const handleExistingBuktiHadirRemove = (index: number) => {
+    setExistingBuktiHadir(prev => prev.filter((_, i) => i !== index));
   };
 
   const isEditable = mode === 'edit';
@@ -172,114 +170,36 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
             </div>
 
             {/* Upload Daftar Hadir */}
-            <div className="space-y-2">
-              <Label>Upload Daftar Hadir</Label>
-              {canEdit ? (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => daftarHadirRef.current?.click()}
-                      className="w-full justify-start"
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      {daftarHadirFile ? daftarHadirFile.name : 'Pilih file daftar hadir'}
-                    </Button>
-                    {daftarHadirFile && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={removeDaftarHadirFile}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                  <input
-                    ref={daftarHadirRef}
-                    type="file"
-                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                    onChange={handleDaftarHadirFileChange}
-                    className="hidden"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG (Max 5MB)
-                  </p>
-                </div>
-              ) : (
-                <div className="p-3 bg-muted rounded-md text-muted-foreground">
-                  {item?.linkDaftarHadir ? 'File daftar hadir telah diupload' : 'Belum ada file daftar hadir'}
-                </div>
-              )}
-            </div>
+            <FileUpload
+              label="Upload Daftar Hadir"
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              multiple={false}
+              maxSize={5 * 1024 * 1024} // 5MB
+              maxFiles={1}
+              files={daftarHadirFiles}
+              existingFiles={existingDaftarHadir}
+              mode={canEdit ? 'edit' : 'view'}
+              disabled={!canEdit}
+              onFilesChange={handleDaftarHadirFilesChange}
+              onExistingFileRemove={handleExistingDaftarHadirRemove}
+              description="Format yang didukung: PDF, DOC, DOCX, JPG, PNG (Max 5MB)"
+            />
 
             {/* Upload Bukti Hadir */}
-            <div className="space-y-2">
-              <Label>Upload Bukti Hadir (Maksimal 2 gambar)</Label>
-              {canEdit ? (
-                <div className="space-y-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => buktiHadirRef.current?.click()}
-                    className="w-full justify-start"
-                    disabled={buktiHadirFiles.length >= 2}
-                  >
-                    <Upload className="mr-2 h-4 w-4" />
-                    {buktiHadirFiles.length === 0 ? 'Pilih gambar bukti hadir' : `Tambah gambar (${buktiHadirFiles.length}/2)`}
-                  </Button>
-                  <input
-                    ref={buktiHadirRef}
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleBuktiHadirFileChange}
-                    className="hidden"
-                  />
-                  {buktiHadirFiles.length > 0 && (
-                    <div className="space-y-2">
-                      {buktiHadirFiles.map((file, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-md">
-                          <span className="text-sm truncate">{file.name}</span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeBuktiHadirFile(index)}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <p className="text-xs text-muted-foreground">
-                    Format gambar: JPG, PNG, GIF (Max 5MB per file)
-                  </p>
-                </div>
-              ) : (
-                <div>
-                  {item?.buktiImageUrls && item.buktiImageUrls.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-2">
-                      {item.buktiImageUrls.map((url, index) => (
-                        <img
-                          key={index}
-                          src={url}
-                          alt={`Bukti ${index + 1}`}
-                          className="w-full h-32 object-cover rounded-md border"
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-3 bg-muted rounded-md text-muted-foreground">
-                      Belum ada gambar
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+            <FileUpload
+              label="Upload Bukti Hadir (Maksimal 2 gambar)"
+              accept="image/*"
+              multiple={true}
+              maxSize={5 * 1024 * 1024} // 5MB
+              maxFiles={2}
+              files={buktiHadirFiles}
+              existingFiles={existingBuktiHadir}
+              mode={canEdit ? 'edit' : 'view'}
+              disabled={!canEdit}
+              onFilesChange={handleBuktiHadirFilesChange}
+              onExistingFileRemove={handleExistingBuktiHadirRemove}
+              description="Format gambar: JPG, PNG, GIF (Max 5MB per file)"
+            />
           </div>
         </div>
 

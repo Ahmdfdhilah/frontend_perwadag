@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -15,7 +15,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@workspace/ui/components/popover';
-import { CalendarIcon, ExternalLink, Upload, X } from 'lucide-react';
+import { CalendarIcon, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
@@ -24,6 +24,7 @@ import { Perwadag } from '@/mocks/perwadag';
 import { useRole } from '@/hooks/useRole';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@workspace/ui/components/select';
+import FileUpload from '@/components/common/FileUpload';
 
 interface KonfirmasiMeetingDialogProps {
   open: boolean;
@@ -46,10 +47,8 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
   const [formData, setFormData] = useState<Partial<KonfirmasiMeeting>>({});
   const [selectedKonfirmasiDate, setSelectedKonfirmasiDate] = useState<Date>();
   const [isKonfirmasiDatePickerOpen, setIsKonfirmasiDatePickerOpen] = useState(false);
-  const [daftarHadirFile, setDaftarHadirFile] = useState<File | null>(null);
+  const [daftarHadirFiles, setDaftarHadirFiles] = useState<File[]>([]);
   const [buktiHadirFiles, setBuktiHadirFiles] = useState<File[]>([]);
-  const daftarHadirRef = useRef<HTMLInputElement>(null);
-  const buktiHadirRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (item && open) {
@@ -58,7 +57,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
     } else {
       setFormData({});
       setSelectedKonfirmasiDate(undefined);
-      setDaftarHadirFile(null);
+      setDaftarHadirFiles([]);
       setBuktiHadirFiles([]);
     }
   }, [item, open]);
@@ -67,7 +66,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
     const dataToSave = {
       ...formData,
       tanggalKonfirmasi: selectedKonfirmasiDate ? selectedKonfirmasiDate.toISOString().split('T')[0] : formData.tanggalKonfirmasi,
-      daftarHadirFile,
+      daftarHadirFiles,
       buktiHadirFiles,
     };
     onSave(dataToSave);
@@ -83,29 +82,12 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
     }
   };
 
-  const handleDaftarHadirFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setDaftarHadirFile(file);
-    }
+  const handleDaftarHadirFilesChange = (files: File[]) => {
+    setDaftarHadirFiles(files);
   };
 
-  const handleBuktiHadirFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length > 0) {
-      setBuktiHadirFiles(prev => [...prev, ...files].slice(0, 2));
-    }
-  };
-
-  const removeBuktiHadirFile = (index: number) => {
-    setBuktiHadirFiles(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const removeDaftarHadirFile = () => {
-    setDaftarHadirFile(null);
-    if (daftarHadirRef.current) {
-      daftarHadirRef.current.value = '';
-    }
+  const handleBuktiHadirFilesChange = (files: File[]) => {
+    setBuktiHadirFiles(files);
   };
 
 
@@ -248,114 +230,31 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
             </div>
 
             {/* Upload Daftar Hadir */}
-            <div className="space-y-2">
-              <Label>Upload Daftar Hadir</Label>
-              {canEdit ? (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => daftarHadirRef.current?.click()}
-                      className="w-full justify-start"
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      {daftarHadirFile ? daftarHadirFile.name : 'Pilih file daftar hadir'}
-                    </Button>
-                    {daftarHadirFile && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={removeDaftarHadirFile}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                  <input
-                    ref={daftarHadirRef}
-                    type="file"
-                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                    onChange={handleDaftarHadirFileChange}
-                    className="hidden"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Format yang didukung: PDF, DOC, DOCX, JPG, PNG (Max 5MB)
-                  </p>
-                </div>
-              ) : (
-                <div className="p-3 bg-muted rounded-md text-muted-foreground">
-                  {item?.linkDaftarHadir ? 'File daftar hadir telah diupload' : 'Belum ada file daftar hadir'}
-                </div>
-              )}
-            </div>
+            <FileUpload
+              label="Upload Daftar Hadir"
+              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+              maxSize={5 * 1024 * 1024}
+              multiple={false}
+              mode={canEdit ? 'edit' : 'view'}
+              files={daftarHadirFiles}
+              existingFiles={item?.linkDaftarHadir ? [{ name: 'Daftar Hadir', url: item.linkDaftarHadir }] : []}
+              onFilesChange={handleDaftarHadirFilesChange}
+              description="Format yang didukung: PDF, DOC, DOCX, JPG, PNG (Max 5MB)"
+            />
 
             {/* Upload Bukti Foto */}
-            <div className="space-y-2">
-              <Label>Upload Bukti Foto (Maksimal 2 gambar)</Label>
-              {canEdit ? (
-                <div className="space-y-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => buktiHadirRef.current?.click()}
-                    className="w-full justify-start"
-                    disabled={buktiHadirFiles.length >= 2}
-                  >
-                    <Upload className="mr-2 h-4 w-4" />
-                    {buktiHadirFiles.length === 0 ? 'Pilih gambar bukti foto' : `Tambah gambar (${buktiHadirFiles.length}/2)`}
-                  </Button>
-                  <input
-                    ref={buktiHadirRef}
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleBuktiHadirFileChange}
-                    className="hidden"
-                  />
-                  {buktiHadirFiles.length > 0 && (
-                    <div className="space-y-2">
-                      {buktiHadirFiles.map((file, index) => (
-                        <div key={index} className="flex items-center justify-between p-2 bg-muted rounded-md">
-                          <span className="text-sm truncate">{file.name}</span>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeBuktiHadirFile(index)}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <p className="text-xs text-muted-foreground">
-                    Format gambar: JPG, PNG, GIF (Max 5MB per file)
-                  </p>
-                </div>
-              ) : (
-                <div>
-                  {item?.buktiImageUrls && item.buktiImageUrls.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-2">
-                      {item.buktiImageUrls.map((url, index) => (
-                        <img
-                          key={index}
-                          src={url}
-                          alt={`Bukti ${index + 1}`}
-                          className="w-full h-32 object-cover rounded-md border"
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="p-3 bg-muted rounded-md text-muted-foreground">
-                      Belum ada gambar
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+            <FileUpload
+              label="Upload Bukti Foto (Maksimal 2 gambar)"
+              accept="image/*"
+              maxSize={5 * 1024 * 1024}
+              multiple={true}
+              maxFiles={2}
+              mode={canEdit ? 'edit' : 'view'}
+              files={buktiHadirFiles}
+              existingFiles={item?.buktiImageUrls ? item.buktiImageUrls.map((url, index) => ({ name: `Bukti ${index + 1}`, url })) : []}
+              onFilesChange={handleBuktiHadirFilesChange}
+              description="Format gambar: JPG, PNG, GIF (Max 5MB per file)"
+            />
           </div>
         </div>
 

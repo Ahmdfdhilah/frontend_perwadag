@@ -22,12 +22,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@workspace/ui/components/popover';
-import { CalendarIcon, Upload, Download, File } from 'lucide-react';
+import { CalendarIcon, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
 import { LaporanHasilEvaluasi, MATRIKS_OPTIONS } from '@/mocks/laporanHasilEvaluasi';
 import { Perwadag } from '@/mocks/perwadag';
+import FileUpload from '@/components/common/FileUpload';
 
 interface LaporanHasilEvaluasiDialogProps {
   open: boolean;
@@ -49,6 +50,8 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
   const [formData, setFormData] = useState<Partial<LaporanHasilEvaluasi>>({});
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string }>>([]);
 
   useEffect(() => {
     if (item && open) {
@@ -56,9 +59,14 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
         ...item,
       });
       setSelectedDate(new Date(item.tanggal));
+      
+      // Set existing files for display
+      setExistingFiles(item.uploadFile ? [{ name: item.uploadFile, url: item.uploadFileUrl }] : []);
     } else {
       setFormData({});
       setSelectedDate(undefined);
+      setUploadFiles([]);
+      setExistingFiles([]);
     }
   }, [item, open]);
 
@@ -67,6 +75,7 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
       const dataToSave = {
         ...formData,
         tanggal: selectedDate.toISOString().split('T')[0],
+        uploadFiles,
       };
       onSave(dataToSave);
     }
@@ -76,14 +85,12 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
     onOpenChange(false);
   };
 
-  const handleFileUpload = (field: string, file: File) => {
-    const fileUrl = URL.createObjectURL(file);
-    const fileName = file.name;
-    setFormData({ 
-      ...formData, 
-      [field]: fileName,
-      [`${field}Url`]: fileUrl
-    });
+  const handleUploadFilesChange = (files: File[]) => {
+    setUploadFiles(files);
+  };
+
+  const handleExistingFileRemove = (index: number) => {
+    setExistingFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleDownloadFile = (fileName: string, fileUrl: string) => {
@@ -219,57 +226,20 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="uploadFile">Upload File</Label>
-              <div className="flex gap-2">
-                {isEditable ? (
-                  <>
-                    <input
-                      type="file"
-                      id="uploadFile"
-                      accept=".pdf,.doc,.docx,.xls,.xlsx"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          handleFileUpload('uploadFile', file);
-                        }
-                      }}
-                      className="hidden"
-                    />
-                    <Button
-                      variant="outline"
-                      onClick={() => document.getElementById('uploadFile')?.click()}
-                      className="flex-1"
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      {formData.uploadFile ? 'Ubah File' : 'Upload File'}
-                    </Button>
-                  </>
-                ) : (
-                  <Input
-                    value={formData.uploadFile || 'Tidak ada file'}
-                    disabled
-                    className="bg-muted flex-1"
-                  />
-                )}
-                {formData.uploadFile && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleDownloadFile(formData.uploadFile!, formData.uploadFileUrl!)}
-                    title="Download File"
-                  >
-                    <Download className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-              {formData.uploadFile && (
-                <div className="text-sm text-muted-foreground flex items-center gap-1">
-                  <File className="w-3 h-3" />
-                  File: {formData.uploadFile}
-                </div>
-              )}
-            </div>
+            <FileUpload
+              label="Upload File"
+              accept=".pdf,.doc,.docx,.xls,.xlsx"
+              multiple={false}
+              maxSize={10 * 1024 * 1024} // 10MB
+              maxFiles={1}
+              files={uploadFiles}
+              existingFiles={existingFiles}
+              mode={isEditable ? 'edit' : 'view'}
+              disabled={!isEditable}
+              onFilesChange={handleUploadFilesChange}
+              onExistingFileRemove={handleExistingFileRemove}
+              description="Format yang didukung: PDF, DOC, DOCX, XLS, XLSX (Max 10MB)"
+            />
 
             {mode === 'view' && (
               <div className="space-y-2">

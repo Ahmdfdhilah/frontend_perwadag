@@ -12,7 +12,8 @@ import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Textarea } from '@workspace/ui/components/textarea';
 import { QuestionnaireTemplate } from '@/mocks/questionnaireTemplate';
-import { Upload, X, Download } from 'lucide-react';
+import { Download } from 'lucide-react';
+import FileUpload from '@/components/common/FileUpload';
 
 interface QuestionnaireDialogProps {
   open: boolean;
@@ -31,8 +32,8 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
 }) => {
   const { isAdmin } = useRole();
   const [formData, setFormData] = useState<Partial<QuestionnaireTemplate>>({});
-  const [dokumenFile, setDokumenFile] = useState<File | null>(null);
-  const dokumenRef = React.useRef<HTMLInputElement>(null);
+  const [dokumenFiles, setDokumenFiles] = useState<File[]>([]);
+  const [existingDokumen, setExistingDokumen] = useState<Array<{ name: string; url?: string }>>([]);
   
   const isCreating = !item;
   const isEditable = mode === 'edit' && isAdmin();
@@ -42,7 +43,9 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       setFormData({
         ...item,
       });
-      setDokumenFile(null);
+      
+      // Set existing files for display
+      setExistingDokumen(item.dokumen ? [{ name: item.dokumen, url: item.dokumen }] : []);
     } else {
       // Initialize empty form for new template
       setFormData({
@@ -52,7 +55,8 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
         tahun: new Date().getFullYear(),
         dokumen: '',
       });
-      setDokumenFile(null);
+      setDokumenFiles([]);
+      setExistingDokumen([]);
     }
   }, [item, open]);
 
@@ -83,7 +87,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
 
     const dataToSave = {
       ...formData,
-      dokumenFile,
+      dokumenFiles,
     };
     onSave(dataToSave);
   };
@@ -92,18 +96,12 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
     onOpenChange(false);
   };
 
-  const handleDokumenFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setDokumenFile(file);
-    }
+  const handleDokumenFilesChange = (files: File[]) => {
+    setDokumenFiles(files);
   };
 
-  const removeDokumenFile = () => {
-    setDokumenFile(null);
-    if (dokumenRef.current) {
-      dokumenRef.current.value = '';
-    }
+  const handleExistingDokumenRemove = (index: number) => {
+    setExistingDokumen(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleDownloadTemplate = () => {
@@ -178,60 +176,20 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
               />
             </div>
 
-            <div className="space-y-2">
-              <Label>Upload Dokumen Template</Label>
-              {isEditable ? (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => dokumenRef.current?.click()}
-                      className="w-full justify-start"
-                    >
-                      <Upload className="mr-2 h-4 w-4" />
-                      {dokumenFile ? dokumenFile.name : 'Pilih file dokumen template'}
-                    </Button>
-                    {dokumenFile && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={removeDokumenFile}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                  <input
-                    ref={dokumenRef}
-                    type="file"
-                    accept=".pdf,.doc,.docx"
-                    onChange={handleDokumenFileChange}
-                    className="hidden"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Format yang didukung: PDF, DOC, DOCX (Max 10MB)
-                  </p>
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <div className="p-3 bg-muted rounded-md flex-1">
-                    {item?.dokumen ? `File: ${item.dokumen}` : 'Belum ada file template'}
-                  </div>
-                  {item?.dokumen && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={handleDownloadTemplate}
-                    >
-                      <Download className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              )}
-            </div>
+            <FileUpload
+              label="Upload Dokumen Template"
+              accept=".pdf,.doc,.docx"
+              multiple={false}
+              maxSize={10 * 1024 * 1024} // 10MB
+              maxFiles={1}
+              files={dokumenFiles}
+              existingFiles={existingDokumen}
+              mode={isEditable ? 'edit' : 'view'}
+              disabled={!isEditable}
+              onFilesChange={handleDokumenFilesChange}
+              onExistingFileRemove={handleExistingDokumenRemove}
+              description="Format yang didukung: PDF, DOC, DOCX (Max 10MB)"
+            />
           </div>
         </div>
 

@@ -15,10 +15,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@workspace/ui/components/popover';
-import { CalendarIcon, Upload, Download, File } from 'lucide-react';
+import { CalendarIcon, Download, File } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { SuratPemberitahuan } from '@/mocks/suratPemberitahuan';
+import FileUpload from '@/components/common/FileUpload';
 
 interface SuratPemberitahuanDialogProps {
   open: boolean;
@@ -41,6 +42,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
     fileName: '',
     fileUrl: '',
   });
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 
   const [isSuratCalendarOpen, setIsSuratCalendarOpen] = useState(false);
 
@@ -83,14 +85,24 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
     onOpenChange(false);
   };
 
-  const handleFileUpload = (file: File) => {
-    const fileUrl = URL.createObjectURL(file);
-    const fileName = file.name;
-    setFormData({
-      ...formData,
-      fileName,
-      fileUrl,
-    });
+  const handleFilesChange = (files: File[]) => {
+    setUploadedFiles(files);
+    if (files.length > 0) {
+      const file = files[0];
+      const fileUrl = URL.createObjectURL(file);
+      const fileName = file.name;
+      setFormData({
+        ...formData,
+        fileName,
+        fileUrl,
+      });
+    } else {
+      setFormData({
+        ...formData,
+        fileName: '',
+        fileUrl: '',
+      });
+    }
   };
 
   const handleDownloadFile = () => {
@@ -183,57 +195,18 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
               </div>
             )}
 
-            <div className="space-y-2">
-              <Label htmlFor="fileUpload">File Surat Pemberitahuan {isEditing && '*'}</Label>
-              <div className="flex gap-2">
-                {isEditing ? (
-                  <>
-                    <input
-                      type="file"
-                      id="fileUpload"
-                      accept=".pdf,.doc,.docx"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          handleFileUpload(file);
-                        }
-                      }}
-                      className="hidden"
-                    />
-                    <Button
-                      variant="outline"
-                      onClick={() => document.getElementById('fileUpload')?.click()}
-                      className="flex-1"
-                    >
-                      <Upload className="w-4 h-4 mr-2" />
-                      {formData.fileName ? 'Ubah File' : 'Upload File'}
-                    </Button>
-                  </>
-                ) : (
-                  <Input
-                    value={formData.fileName || 'Tidak ada file'}
-                    disabled
-                    className="bg-muted flex-1"
-                  />
-                )}
-                {formData.fileName && (
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={handleDownloadFile}
-                    title="Download File"
-                  >
-                    <Download className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-              {formData.fileName && (
-                <div className="text-sm text-muted-foreground flex items-center gap-1">
-                  <File className="w-3 h-3" />
-                  File: {formData.fileName}
-                </div>
-              )}
-            </div>
+            <FileUpload
+              label={`File Surat Pemberitahuan ${isEditing ? '*' : ''}`}
+              accept=".pdf,.doc,.docx"
+              maxSize={10 * 1024 * 1024}
+              multiple={false}
+              mode={isEditing ? 'edit' : 'view'}
+              files={uploadedFiles}
+              existingFiles={formData.fileName ? [{ name: formData.fileName, url: formData.fileUrl }] : []}
+              onFilesChange={handleFilesChange}
+              onFileDownload={handleDownloadFile}
+              description="Format yang didukung: PDF, DOC, DOCX (Max 10MB)"
+            />
           </div>
         </div>
 
