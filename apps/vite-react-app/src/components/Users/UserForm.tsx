@@ -4,7 +4,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { User } from '@/mocks/users';
 import { ROLES } from '@/mocks/roles';
-import { PERWADAG_DATA } from '@/mocks/perwadag';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Textarea } from '@workspace/ui/components/textarea';
@@ -33,6 +32,7 @@ const userSchema = z.object({
   address: z.string().min(1, 'Address is required'),
   roles: z.string().min(1, 'Please select a role'),
   perwadagId: z.string().optional(),
+  inspektoratLevel: z.string().optional(),
   isActive: z.boolean(),
 });
 
@@ -54,6 +54,9 @@ export const UserForm: React.FC<UserFormProps> = ({
   const [showPerwadagSelect, setShowPerwadagSelect] = useState(
     initialData?.roles?.some(role => role.name === 'perwadag') || false
   );
+  const [showInspektoratSelect, setShowInspektoratSelect] = useState(
+    initialData?.roles?.some(role => role.name === 'perwadag') || false
+  );
 
   const form = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
@@ -65,17 +68,22 @@ export const UserForm: React.FC<UserFormProps> = ({
       address: initialData?.address || '',
       roles: initialData?.roles?.[0]?.id || '',
       perwadagId: initialData?.perwadagId || '',
+      inspektoratLevel: initialData?.inspektoratLevel || '',
       isActive: initialData?.isActive !== undefined ? initialData.isActive : true,
     }
   });
 
   useEffect(() => {
     const roleId = form.watch('roles');
-    const hasPerwadagRole = ROLES.find(role => role.id === roleId)?.name === 'perwadag';
+    const selectedRole = ROLES.find(role => role.id === roleId);
+    const hasPerwadagRole = selectedRole?.name === 'perwadag';
+    
     setShowPerwadagSelect(hasPerwadagRole);
+    setShowInspektoratSelect(hasPerwadagRole);
     
     if (!hasPerwadagRole) {
       form.setValue('perwadagId', '');
+      form.setValue('inspektoratLevel', '');
     }
   }, [form.watch('roles')]);
 
@@ -187,26 +195,46 @@ export const UserForm: React.FC<UserFormProps> = ({
           )}
         />
 
-        {/* Perwadag Selection */}
+        {/* Perwadag Assignment */}
         {showPerwadagSelect && (
           <FormField
             control={form.control}
             name="perwadagId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Perwadag Assignment</FormLabel>
+                <FormLabel>Nama Perwadag</FormLabel>
+                <FormControl>
+                  <Input 
+                    placeholder="Enter perwadag name" 
+                    disabled={loading} 
+                    {...field} 
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        )}
+
+        {/* Inspektorat Level Selection */}
+        {showInspektoratSelect && (
+          <FormField
+            control={form.control}
+            name="inspektoratLevel"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Inspektorat</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select perwadag office" />
+                      <SelectValue placeholder="Select inspektorat" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {PERWADAG_DATA.map((perwadag) => (
-                      <SelectItem key={perwadag.id} value={perwadag.id}>
-                        {perwadag.name}
-                      </SelectItem>
-                    ))}
+                    <SelectItem value="1">Inspektorat 1</SelectItem>
+                    <SelectItem value="2">Inspektorat 2</SelectItem>
+                    <SelectItem value="3">Inspektorat 3</SelectItem>
+                    <SelectItem value="4">Inspektorat 4</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

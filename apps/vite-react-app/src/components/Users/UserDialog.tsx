@@ -37,7 +37,9 @@ export const UserDialog: React.FC<UserDialogProps> = ({
         id: editingUser?.id || `USR${Date.now()}`,
         createdAt: editingUser?.createdAt || new Date(),
         updatedAt: new Date(),
-        lastLogin: editingUser?.lastLogin || undefined
+        lastLogin: editingUser?.lastLogin || undefined,
+        perwadagId: data.perwadagId || undefined,
+        inspektoratLevel: data.inspektoratLevel || undefined
       };
 
       // Simulate API call
