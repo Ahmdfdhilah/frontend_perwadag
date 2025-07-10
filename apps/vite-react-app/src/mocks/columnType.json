@@ -1,0 +1,242 @@
+{
+    "file_name": "Peta Risiko Perwadag 2025.csv",
+    "column_mapping": [{
+            "column_name": "NO",
+            "data_type": "number",
+            "sub_columns": null
+        },
+        {
+            "column_name": "NAMA PERWADAG",
+            "data_type": "string",
+            "sub_columns": null
+        },
+        {
+            "column_name": "Tren Capaian Tahun 2024 dibandingkan Tahun 2023",
+            "sub_columns": [{
+                    "sub_column_name": "Capaian 2023",
+                    "data_type": "float64"
+                },
+                {
+                    "sub_column_name": "Capaian 2024",
+                    "data_type": "float64"
+                },
+                {
+                    "sub_column_name": "Tren Capaian",
+                    "data_type": "percentage"
+                },
+                {
+                    "sub_column_name": "Pilihan",
+                    "data_type": "object",
+                    "options": [
+                        "Turun >= 25%",
+                        "Turun < 25%",
+                        "Naik 0% - 20%",
+                        "Naik 21% - 40%",
+                        "Naik >=41%"
+
+                    ]
+                },
+                {
+                    "sub_column_name": "Nilai",
+                    "data_type": "float64"
+                }
+            ]
+        },
+        {
+            "column_name": "Persentase Realisasi Anggaran 2024",
+            "sub_columns": [{
+                    "sub_column_name": "Realisasi 2024",
+                    "data_type": "float64"
+                },
+                {
+                    "sub_column_name": "Pagu 2024",
+                    "data_type": "float64"
+                },
+                {
+                    "sub_column_name": "Realisasi 2024 (%)",
+                    "data_type": "percentage"
+                },
+                {
+                    "sub_column_name": "Pilihan",
+                    "data_type": "object",
+                    "options": [
+                        "> 98%",
+                        "95% - 97%",
+                        "90% - 94%",
+                        "85% - 89%",
+                        "<85%"
+                    ]
+                },
+                {
+                    "sub_column_name": "Nilai",
+                    "data_type": "float64"
+                }
+            ]
+        },
+        {
+            "column_name": "Tren Nilai Ekspor ke Negara Akreditasi 5 Tahun Terakhir",
+            "sub_columns": [{
+                    "sub_column_name": "Deskripsi",
+                    "data_type": "percentage"
+                },
+                {
+                    "sub_column_name": "Pilihan",
+                    "data_type": "object",
+                    "options": [
+                        "Naik >= 35 %",
+                        "Naik 20% - 34%",
+                        "Naik 0% - 19%",
+                        "Turun < 25%",
+                        "Turun >= 25%"
+                    ]
+                },
+                {
+                    "sub_column_name": "Nilai",
+                    "data_type": "float64"
+                }
+            ]
+        },
+        {
+            "column_name": "Pelaksanaan Audit Itjen Tahun Sebelumnya",
+            "sub_columns": [{
+                    "sub_column_name": "Deskripsi",
+                    "data_type": "string"
+                },
+                {
+                    "sub_column_name": "Pilihan",
+                    "data_type": "object",
+                    "options": [
+                        "1 Tahun",
+                        "2 Tahun",
+                        "3 Tahun",
+                        "4 Tahun",
+                        "Belum pernah diaudit"
+
+                    ]
+                },
+                {
+                    "sub_column_name": "Nilai",
+                    "data_type": "float64"
+                }
+            ]
+        },
+        {
+            "column_name": "Perjanjian Perdagangan Indonesia dengan Negara Mitra (per Desember 2024)",
+            "sub_columns": [{
+                    "sub_column_name": "Deskripsi",
+                    "data_type": "string"
+                },
+                {
+                    "sub_column_name": "Pilihan",
+                    "data_type": "object",
+                    "options": [
+                        "Tidak ada perjanjian internasional",
+                        "Sedang diusulkan/ Being Proposed",
+                        "Masih berproses/ on going",
+                        "Sudah disepakati namun belum diratifikasi",
+                        "Sudah diimplementasikan"
+                    ]
+                },
+                {
+                    "sub_column_name": "Nilai",
+                    "data_type": "float64"
+                }
+            ]
+        },
+        {
+            "column_name": "Peringkat Nilai Ekspor Non Migas Tahun 2024 (Jan - Okt)",
+            "sub_columns": [{
+                    "sub_column_name": "Deskripsi",
+                    "data_type": "number"
+                },
+                {
+                    "sub_column_name": "Pilihan",
+                    "data_type": "object",
+                    "options": [
+                        "Peringkat 1 - 6",
+                        "Peringkat 7 - 12",
+                        "Peringkat 13 - 18",
+                        "Peringkat 19 - 23",
+                        "Peringkat diatas 23"
+                    ]
+                },
+                {
+                    "sub_column_name": "Nilai",
+                    "data_type": "float64"
+                }
+            ]
+        },
+        {
+            "column_name": "Persentase Jumlah IK yang Tidak Mencapai Target Tahun 2024",
+            "sub_columns": [{
+                    "sub_column_name": "IK Tidak Tercapai",
+                    "data_type": "float64"
+                },
+                {
+                    "sub_column_name": "Total IK",
+                    "data_type": "float64"
+                },
+                {
+                    "sub_column_name": "% IK Tidak Tercapai",
+                    "data_type": "percentage"
+                },
+                {
+                    "sub_column_name": "Pilihan",
+                    "data_type": "object",
+                    "options": [
+                        "< 5% ",
+                        "6% - 10%",
+                        "11% - 15% ",
+                        "16% - 20%",
+                        "> 20%"
+                    ]
+                },
+                {
+                    "sub_column_name": "Nilai",
+                    "data_type": "float64"
+                }
+            ]
+        },
+        {
+            "column_name": "Persentase Realisasi Nilai Transaksi TEI 2024",
+            "sub_columns": [{
+                    "sub_column_name": "Nilai Realisasi",
+                    "data_type": "float64"
+                },
+                {
+                    "sub_column_name": "Nilai Potensi",
+                    "data_type": "float64"
+                },
+                {
+                    "sub_column_name": "Persentasi Nilai Transaksi",
+                    "data_type": "percentage"
+                },
+                {
+                    "sub_column_name": "Pilihan",
+                    "data_type": "object",
+                    "options": [
+                        "> 70%",
+                        "50% - 70%",
+                        "25% - 49%",
+                        "< 25%",
+                        "Belum Ada Realisasi"
+                    ]
+                },
+                {
+                    "sub_column_name": "Nilai",
+                    "data_type": "float64"
+                }
+            ]
+        },
+        {
+            "column_name": "Nilai Risiko",
+            "data_type": "float64",
+            "sub_columns": null
+        },
+        {
+            "column_name": "Keterangan",
+            "data_type": "string",
+            "sub_columns": null
+        }
+    ]
+}

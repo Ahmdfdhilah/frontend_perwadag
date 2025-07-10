@@ -77,7 +77,7 @@ export const DUMMY_RISK_ASSESSMENT_DETAIL: RiskAssessmentDetail = {
   budgetPagu2024: 2192642000,
   budgetPercentage: 97.5,
   budgetChoice: '95% - 97%',
-  budgetValue: 2,
+  budgetValue: 4,
   
   // Section 3: Tren Nilai Ekspor
   exportTrendDescription: '4.71%',
@@ -87,7 +87,7 @@ export const DUMMY_RISK_ASSESSMENT_DETAIL: RiskAssessmentDetail = {
   // Section 4: Audit Itjen
   auditDescription: 'Belum pernah diaudit',
   auditChoice: 'Belum pernah diaudit',
-  auditValue: 5,
+  auditValue: 1,
   
   // Section 5: Perjanjian Perdagangan
   tradeAgreementDescription: 'Tidak ada perjanjian internasional',
@@ -97,14 +97,14 @@ export const DUMMY_RISK_ASSESSMENT_DETAIL: RiskAssessmentDetail = {
   // Section 6: Peringkat Nilai Ekspor
   exportRankingDescription: '27',
   exportRankingChoice: 'Peringkat diatas 23',
-  exportRankingValue: 5,
+  exportRankingValue: 1,
   
   // Section 7: IK Target
   ikNotAchieved: 4,
   ikTotal: 16,
   ikPercentage: 25.0,
   ikChoice: '> 20%',
-  ikValue: 5,
+  ikValue: 1,
   
   // Section 8: Nilai Transaksi TEI
   teiRealizationValue: 0,
@@ -112,75 +112,74 @@ export const DUMMY_RISK_ASSESSMENT_DETAIL: RiskAssessmentDetail = {
   teiPercentage: 0,
   teiDescription: 'tidak ada data realisasi dan nilai potensi',
   teiChoice: 'Belum Ada Realisasi',
-  teiValue: 0,
+  teiValue: 1,
   
   // Final
-  totalRiskValue: 24,
+  totalRiskValue: 14,
   notes: 'Assessment lengkap untuk tahun 2024'
 };
 
 // Options untuk dropdown
 export const TREND_CHOICES = [
-  { value: 'turun-lebih-20', label: 'Turun > 20%', score: 5 },
-  { value: 'turun-10-20', label: 'Turun 10% - 20%', score: 4 },
+  { value: 'naik-41-plus', label: 'Naik >=41%', score: 5 },
+  { value: 'naik-21-40', label: 'Naik 21% - 40%', score: 4 },
   { value: 'naik-0-20', label: 'Naik 0% - 20%', score: 3 },
-  { value: 'naik-20-50', label: 'Naik 20% - 50%', score: 2 },
-  { value: 'naik-lebih-50', label: 'Naik > 50%', score: 1 }
+  { value: 'turun-kurang-25', label: 'Turun < 25%', score: 2 },
+  { value: 'turun-25-plus', label: 'Turun >= 25%', score: 1 }
 ];
 
 export const BUDGET_CHOICES = [
-  { value: 'kurang-80', label: '< 80%', score: 5 },
-  { value: '80-90', label: '80% - 90%', score: 4 },
-  { value: '90-95', label: '90% - 95%', score: 3 },
-  { value: '95-97', label: '95% - 97%', score: 2 },
-  { value: 'lebih-97', label: '> 97%', score: 1 }
+  { value: 'lebih-98', label: '> 98%', score: 5 },
+  { value: '95-97', label: '95% - 97%', score: 4 },
+  { value: '90-94', label: '90% - 94%', score: 3 },
+  { value: '85-89', label: '85% - 89%', score: 2 },
+  { value: 'kurang-85', label: '<85%', score: 1 }
 ];
 
 export const EXPORT_TREND_CHOICES = [
-  { value: 'turun-lebih-20', label: 'Turun > 20%', score: 5 },
-  { value: 'turun-0-20', label: 'Turun 0% - 20%', score: 4 },
+  { value: 'naik-35-plus', label: 'Naik >= 35 %', score: 5 },
+  { value: 'naik-20-34', label: 'Naik 20% - 34%', score: 4 },
   { value: 'naik-0-19', label: 'Naik 0% - 19%', score: 3 },
-  { value: 'naik-20-50', label: 'Naik 20% - 50%', score: 2 },
-  { value: 'naik-lebih-50', label: 'Naik > 50%', score: 1 }
+  { value: 'turun-kurang-25', label: 'Turun < 25%', score: 2 },
+  { value: 'turun-25-plus', label: 'Turun >= 25%', score: 1 }
 ];
 
 export const AUDIT_CHOICES = [
-  { value: 'belum-pernah', label: 'Belum pernah diaudit', score: 5 },
-  { value: 'lebih-5-tahun', label: '> 5 tahun yang lalu', score: 4 },
-  { value: '3-5-tahun', label: '3 - 5 tahun yang lalu', score: 3 },
-  { value: '1-2-tahun', label: '1 - 2 tahun yang lalu', score: 2 },
-  { value: 'tahun-lalu', label: 'Tahun lalu', score: 1 }
+  { value: '1-tahun', label: '1 Tahun', score: 5 },
+  { value: '2-tahun', label: '2 Tahun', score: 4 },
+  { value: '3-tahun', label: '3 Tahun', score: 3 },
+  { value: '4-tahun', label: '4 Tahun', score: 2 },
+  { value: 'belum-pernah', label: 'Belum pernah diaudit', score: 1 }
 ];
 
 export const TRADE_AGREEMENT_CHOICES = [
-  { value: 'tidak-ada', label: 'Tidak ada perjanjian internasional', score: 1 },
-  { value: 'ada-1', label: '1 perjanjian', score: 2 },
-  { value: 'ada-2-3', label: '2 - 3 perjanjian', score: 3 },
-  { value: 'ada-4-5', label: '4 - 5 perjanjian', score: 4 },
-  { value: 'ada-lebih-5', label: '> 5 perjanjian', score: 5 }
+  { value: 'sudah-implementasi', label: 'Sudah diimplementasikan', score: 5 },
+  { value: 'sudah-sepakat-belum-ratifikasi', label: 'Sudah disepakati namun belum diratifikasi', score: 4 },
+  { value: 'masih-proses', label: 'Masih berproses/ on going', score: 3 },
+  { value: 'sedang-diusulkan', label: 'Sedang diusulkan/ Being Proposed', score: 2 },
+  { value: 'tidak-ada', label: 'Tidak ada perjanjian internasional', score: 1 }
 ];
 
 export const EXPORT_RANKING_CHOICES = [
-  { value: 'peringkat-1-5', label: 'Peringkat 1 - 5', score: 1 },
-  { value: 'peringkat-6-10', label: 'Peringkat 6 - 10', score: 2 },
-  { value: 'peringkat-11-15', label: 'Peringkat 11 - 15', score: 3 },
-  { value: 'peringkat-16-23', label: 'Peringkat 16 - 23', score: 4 },
-  { value: 'peringkat-diatas-23', label: 'Peringkat diatas 23', score: 5 }
+  { value: 'peringkat-1-6', label: 'Peringkat 1 - 6', score: 5 },
+  { value: 'peringkat-7-12', label: 'Peringkat 7 - 12', score: 4 },
+  { value: 'peringkat-13-18', label: 'Peringkat 13 - 18', score: 3 },
+  { value: 'peringkat-19-23', label: 'Peringkat 19 - 23', score: 2 },
+  { value: 'peringkat-diatas-23', label: 'Peringkat diatas 23', score: 1 }
 ];
 
 export const IK_CHOICES = [
-  { value: '0', label: '0%', score: 1 },
-  { value: '0-5', label: '0% - 5%', score: 2 },
-  { value: '5-10', label: '5% - 10%', score: 3 },
-  { value: '10-20', label: '10% - 20%', score: 4 },
-  { value: 'lebih-20', label: '> 20%', score: 5 }
+  { value: 'kurang-5', label: '< 5%', score: 5 },
+  { value: '6-10', label: '6% - 10%', score: 4 },
+  { value: '11-15', label: '11% - 15%', score: 3 },
+  { value: '16-20', label: '16% - 20%', score: 2 },
+  { value: 'lebih-20', label: '> 20%', score: 1 }
 ];
 
 export const TEI_CHOICES = [
-  { value: 'belum-ada', label: 'Belum Ada Realisasi', score: 0 },
-  { value: 'kurang-50', label: '< 50%', score: 5 },
+  { value: 'lebih-70', label: '> 70%', score: 5 },
   { value: '50-70', label: '50% - 70%', score: 4 },
-  { value: '70-85', label: '70% - 85%', score: 3 },
-  { value: '85-95', label: '85% - 95%', score: 2 },
-  { value: 'lebih-95', label: '> 95%', score: 1 }
+  { value: '25-49', label: '25% - 49%', score: 3 },
+  { value: 'kurang-25', label: '< 25%', score: 2 },
+  { value: 'belum-ada', label: 'Belum Ada Realisasi', score: 1 }
 ];

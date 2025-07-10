@@ -101,14 +101,14 @@ const RiskAssessmentInputPage: React.FC = () => {
   }, [formData.achievement2023, formData.achievement2024]);
 
   useEffect(() => {
-    // Auto-calculate trend category based on trendAchievement
+    // Auto-calculate trend category based on trendAchievement - Updated rules
     const trendPercentage = formData.trendAchievement;
     let trendChoice = '';
-    if (trendPercentage < -20) trendChoice = 'Turun > 20%';
-    else if (trendPercentage >= -20 && trendPercentage < -10) trendChoice = 'Turun 10% - 20%';
+    if (trendPercentage >= 41) trendChoice = 'Naik >=41%';
+    else if (trendPercentage >= 21 && trendPercentage <= 40) trendChoice = 'Naik 21% - 40%';
     else if (trendPercentage >= 0 && trendPercentage <= 20) trendChoice = 'Naik 0% - 20%';
-    else if (trendPercentage > 20 && trendPercentage <= 50) trendChoice = 'Naik 20% - 50%';
-    else if (trendPercentage > 50) trendChoice = 'Naik > 50%';
+    else if (trendPercentage < 0 && trendPercentage > -25) trendChoice = 'Turun < 25%';
+    else if (trendPercentage <= -25) trendChoice = 'Turun >= 25%';
     
     if (trendChoice) {
       const choice = TREND_CHOICES.find(c => c.label === trendChoice);
@@ -134,14 +134,14 @@ const RiskAssessmentInputPage: React.FC = () => {
   }, [formData.budgetRealization2024, formData.budgetPagu2024]);
 
   useEffect(() => {
-    // Auto-calculate budget category based on budgetPercentage
+    // Auto-calculate budget category based on budgetPercentage - Updated rules
     const percentage = formData.budgetPercentage;
     let budgetChoice = '';
-    if (percentage < 80) budgetChoice = '< 80%';
-    else if (percentage >= 80 && percentage < 90) budgetChoice = '80% - 90%';
-    else if (percentage >= 90 && percentage < 95) budgetChoice = '90% - 95%';
-    else if (percentage >= 95 && percentage < 97) budgetChoice = '95% - 97%';
-    else if (percentage >= 97) budgetChoice = '> 97%';
+    if (percentage > 98) budgetChoice = '> 98%';
+    else if (percentage >= 95 && percentage <= 97) budgetChoice = '95% - 97%';
+    else if (percentage >= 90 && percentage <= 94) budgetChoice = '90% - 94%';
+    else if (percentage >= 85 && percentage <= 89) budgetChoice = '85% - 89%';
+    else if (percentage < 85) budgetChoice = '<85%';
     
     if (budgetChoice) {
       const choice = BUDGET_CHOICES.find(c => c.label === budgetChoice);
@@ -167,13 +167,13 @@ const RiskAssessmentInputPage: React.FC = () => {
   }, [formData.ikNotAchieved, formData.ikTotal]);
 
   useEffect(() => {
-    // Auto-calculate IK category based on ikPercentage
+    // Auto-calculate IK category based on ikPercentage - Updated rules
     const percentage = formData.ikPercentage;
     let ikChoice = '';
-    if (percentage === 0) ikChoice = '0%';
-    else if (percentage > 0 && percentage <= 5) ikChoice = '0% - 5%';
-    else if (percentage > 5 && percentage <= 10) ikChoice = '5% - 10%';
-    else if (percentage > 10 && percentage <= 20) ikChoice = '10% - 20%';
+    if (percentage < 5) ikChoice = '< 5%';
+    else if (percentage >= 6 && percentage <= 10) ikChoice = '6% - 10%';
+    else if (percentage >= 11 && percentage <= 15) ikChoice = '11% - 15%';
+    else if (percentage >= 16 && percentage <= 20) ikChoice = '16% - 20%';
     else if (percentage > 20) ikChoice = '> 20%';
     
     if (ikChoice) {
@@ -205,15 +205,14 @@ const RiskAssessmentInputPage: React.FC = () => {
   }, [formData.teiRealizationValue, formData.teiPotentialValue]);
 
   useEffect(() => {
-    // Auto-calculate TEI category based on teiPercentage
+    // Auto-calculate TEI category based on teiPercentage - Updated rules
     const percentage = formData.teiPercentage;
     let teiChoice = '';
     if (percentage === 0) teiChoice = 'Belum Ada Realisasi';
-    else if (percentage < 50) teiChoice = '< 50%';
-    else if (percentage >= 50 && percentage < 70) teiChoice = '50% - 70%';
-    else if (percentage >= 70 && percentage < 85) teiChoice = '70% - 85%';
-    else if (percentage >= 85 && percentage < 95) teiChoice = '85% - 95%';
-    else if (percentage >= 95) teiChoice = '> 95%';
+    else if (percentage > 70) teiChoice = '> 70%';
+    else if (percentage >= 50 && percentage <= 70) teiChoice = '50% - 70%';
+    else if (percentage >= 25 && percentage <= 49) teiChoice = '25% - 49%';
+    else if (percentage < 25) teiChoice = '< 25%';
     
     if (teiChoice) {
       const choice = TEI_CHOICES.find(c => c.label === teiChoice);
@@ -343,14 +342,11 @@ const RiskAssessmentInputPage: React.FC = () => {
             </div>
             <div>
               <Label>Pilihan Kategori (Otomatis)</Label>
-              <Select
-                value={formData.trendChoice}
+              <Input
+                value={formData.trendChoice || 'Kategori akan dipilih otomatis'}
                 disabled
-              >
-                <SelectTrigger className="bg-muted">
-                  <SelectValue placeholder="Kategori akan dipilih otomatis" />
-                </SelectTrigger>
-              </Select>
+                className="bg-muted"
+              />
             </div>
             <div>
               <Label>Nilai</Label>
@@ -400,14 +396,11 @@ const RiskAssessmentInputPage: React.FC = () => {
             </div>
             <div>
               <Label>Pilihan Kategori (Otomatis)</Label>
-              <Select
-                value={formData.budgetChoice}
+              <Input
+                value={formData.budgetChoice || 'Kategori akan dipilih otomatis'}
                 disabled
-              >
-                <SelectTrigger className="bg-muted">
-                  <SelectValue placeholder="Kategori akan dipilih otomatis" />
-                </SelectTrigger>
-              </Select>
+                className="bg-muted"
+              />
             </div>
             <div>
               <Label>Nilai</Label>
@@ -656,14 +649,11 @@ const RiskAssessmentInputPage: React.FC = () => {
             </div>
             <div>
               <Label>Pilihan Kategori (Otomatis)</Label>
-              <Select
-                value={formData.ikChoice}
+              <Input
+                value={formData.ikChoice || 'Kategori akan dipilih otomatis'}
                 disabled
-              >
-                <SelectTrigger className="bg-muted">
-                  <SelectValue placeholder="Kategori akan dipilih otomatis" />
-                </SelectTrigger>
-              </Select>
+                className="bg-muted"
+              />
             </div>
             <div>
               <Label>Nilai</Label>
@@ -723,14 +713,11 @@ const RiskAssessmentInputPage: React.FC = () => {
             </div>
             <div>
               <Label>Pilihan Kategori (Otomatis)</Label>
-              <Select
-                value={formData.teiChoice}
+              <Input
+                value={formData.teiChoice || 'Kategori akan dipilih otomatis'}
                 disabled
-              >
-                <SelectTrigger className="bg-muted">
-                  <SelectValue placeholder="Kategori akan dipilih otomatis" />
-                </SelectTrigger>
-              </Select>
+                className="bg-muted"
+              />
             </div>
             <div>
               <Label>Nilai</Label>
