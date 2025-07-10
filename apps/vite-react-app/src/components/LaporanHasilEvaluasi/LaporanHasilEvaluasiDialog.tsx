@@ -109,7 +109,7 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
         <div className="flex-1 overflow-y-auto py-4">
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="tanggal">Tanggal Evaluasi</Label>
+              <Label htmlFor="tanggal">Tanggal Laporan</Label>
               <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
                 <PopoverTrigger asChild>
                   <Button
@@ -181,7 +181,7 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="nomorEvaluasi">Nomor Evaluasi</Label>
+              <Label htmlFor="nomorEvaluasi">Nomor Laporan Evaluasi</Label>
               <Input
                 id="nomorEvaluasi"
                 value={formData.nomorEvaluasi || ''}

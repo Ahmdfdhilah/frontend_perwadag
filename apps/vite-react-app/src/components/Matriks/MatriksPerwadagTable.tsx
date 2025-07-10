@@ -8,7 +8,7 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import { Matriks } from '@/mocks/matriks';
-import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface MatriksPerwadagTableProps {
   data: Matriks[];
@@ -24,17 +24,15 @@ const MatriksPerwadagTable: React.FC<MatriksPerwadagTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>No</TableHead>
-            <TableHead>Tanggal Matriks</TableHead>
-            <TableHead>Tanggal Evaluasi</TableHead>
             <TableHead>Nama Perwadag</TableHead>
-            <TableHead>Temuan</TableHead>
-            <TableHead>Rekomendasi</TableHead>
+            <TableHead>Tanggal Evaluasi</TableHead>
+            <TableHead>Dokumen</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
                 Tidak ada data matriks
               </TableCell>
             </TableRow>
@@ -42,18 +40,21 @@ const MatriksPerwadagTable: React.FC<MatriksPerwadagTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{formatIndonesianDate(item.tanggal)}</TableCell>
-                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
-                <TableCell className="max-w-xs">
-                  <div className="truncate" title={item.temuan}>
-                    {item.temuan}
-                  </div>
-                </TableCell>
-                <TableCell className="max-w-xs">
-                  <div className="truncate" title={item.rekomendasi}>
-                    {item.rekomendasi}
-                  </div>
+                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
+                <TableCell>
+                  {item.uploadFile ? (
+                    <a 
+                      href={item.uploadFileUrl || '#'} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 underline"
+                    >
+                      {item.uploadFile}
+                    </a>
+                  ) : (
+                    <span className="text-muted-foreground">Tidak ada dokumen</span>
+                  )}
                 </TableCell>
               </TableRow>
             ))

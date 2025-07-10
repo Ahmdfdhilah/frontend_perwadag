@@ -8,6 +8,8 @@ export interface Matriks {
   status: 'Diisi' | 'Belum Diisi';
   temuan: string;
   rekomendasi: string;
+  uploadFile?: string;
+  uploadFileUrl?: string;
   year: number;
   inspektorat: number;
 }
@@ -23,6 +25,8 @@ export const MATRIKS_DATA: Matriks[] = [
     status: "Diisi",
     temuan: "Kegiatan promosi perdagangan berjalan dengan baik, namun perlu peningkatan dalam dokumentasi kegiatan dan pelaporan berkala.",
     rekomendasi: "Meningkatkan sistem dokumentasi kegiatan dan membuat jadwal pelaporan yang lebih terstruktur untuk memudahkan monitoring.",
+    uploadFile: "matriks-atdag-moscow-2024.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/matriks-atdag-moscow-2024.pdf",
     year: 2024,
     inspektorat: 1
   },
@@ -36,6 +40,8 @@ export const MATRIKS_DATA: Matriks[] = [
     status: "Diisi",
     temuan: "Pelaksanaan program ITPC sudah sesuai target, tetapi masih ada kendala dalam koordinasi dengan stakeholder lokal.",
     rekomendasi: "Membuat mekanisme koordinasi yang lebih efektif dengan stakeholder lokal dan mengadakan pertemuan rutin bulanan.",
+    uploadFile: "matriks-itpc-vancouver-2024.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/matriks-itpc-vancouver-2024.pdf",
     year: 2024,
     inspektorat: 1
   },
@@ -49,6 +55,8 @@ export const MATRIKS_DATA: Matriks[] = [
     status: "Diisi",
     temuan: "Program fasilitasi perdagangan menunjukkan hasil positif dengan peningkatan volume ekspor sebesar 15%.",
     rekomendasi: "Mempertahankan strategi yang sudah berjalan baik dan melakukan ekspansi program ke sektor komoditas lainnya.",
+    uploadFile: "matriks-atdag-beijing-2024.pdf",
+    uploadFileUrl: "blob:http://localhost:3000/matriks-atdag-beijing-2024.pdf",
     year: 2024,
     inspektorat: 2
   },

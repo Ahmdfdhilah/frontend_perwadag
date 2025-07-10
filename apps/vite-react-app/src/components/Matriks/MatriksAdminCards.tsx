@@ -1,9 +1,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { Matriks } from '@/mocks/matriks';
-import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface MatriksAdminCardsProps {
   data: Matriks[];
@@ -18,17 +17,6 @@ const MatriksAdminCards: React.FC<MatriksAdminCardsProps> = ({
   onEdit,
   canEdit,
 }) => {
-
-  const getStatusBadgeVariant = (status: string) => {
-    switch (status) {
-      case 'Diisi':
-        return 'default';
-      case 'Belum Diisi':
-        return 'outline';
-      default:
-        return 'secondary';
-    }
-  };
 
   if (data.length === 0) {
     return (
@@ -63,21 +51,23 @@ const MatriksAdminCards: React.FC<MatriksAdminCardsProps> = ({
                 <span className="ml-2">{index + 1}</span>
               </div>
               <div>
-                <span className="font-medium text-muted-foreground">Tanggal Matriks:</span>
-                <span className="ml-2">{formatIndonesianDate(item.tanggal)}</span>
-              </div>
-              <div>
                 <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
                 <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
               </div>
               <div>
-                <span className="font-medium text-muted-foreground">Status:</span>
-                <Badge 
-                  variant={getStatusBadgeVariant(item.status)}
-                  className="ml-2"
-                >
-                  {item.status}
-                </Badge>
+                <span className="font-medium text-muted-foreground">Dokumen:</span>
+                {item.uploadFile ? (
+                  <a
+                    href={item.uploadFileUrl || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ml-2 text-blue-600 hover:text-blue-800 underline"
+                  >
+                    {item.uploadFile}
+                  </a>
+                ) : (
+                  <span className="ml-2 text-muted-foreground">Tidak ada dokumen</span>
+                )}
               </div>
             </div>
           </CardContent>

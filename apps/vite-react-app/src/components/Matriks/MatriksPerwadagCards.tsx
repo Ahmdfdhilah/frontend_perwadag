@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Matriks } from '@/mocks/matriks';
-import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface MatriksPerwadagCardsProps {
   data: Matriks[];
@@ -29,26 +29,29 @@ const MatriksPerwadagCards: React.FC<MatriksPerwadagCardsProps> = ({
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="space-y-3 text-sm">
+            <div className="space-y-2 text-sm">
               <div>
                 <span className="font-medium text-muted-foreground">No:</span>
                 <span className="ml-2">{index + 1}</span>
-              </div>
-              <div>
-                <span className="font-medium text-muted-foreground">Tanggal Matriks:</span>
-                <span className="ml-2">{formatIndonesianDate(item.tanggal)}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
                 <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
               </div>
               <div>
-                <span className="font-medium text-muted-foreground">Temuan:</span>
-                <p className="mt-1 text-foreground leading-relaxed">{item.temuan}</p>
-              </div>
-              <div>
-                <span className="font-medium text-muted-foreground">Rekomendasi:</span>
-                <p className="mt-1 text-foreground leading-relaxed">{item.rekomendasi}</p>
+                <span className="font-medium text-muted-foreground">Dokumen:</span>
+                {item.uploadFile ? (
+                  <a 
+                    href={item.uploadFileUrl || '#'} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="ml-2 text-blue-600 hover:text-blue-800 underline"
+                  >
+                    {item.uploadFile}
+                  </a>
+                ) : (
+                  <span className="ml-2 text-muted-foreground">Tidak ada dokumen</span>
+                )}
               </div>
             </div>
           </CardContent>
