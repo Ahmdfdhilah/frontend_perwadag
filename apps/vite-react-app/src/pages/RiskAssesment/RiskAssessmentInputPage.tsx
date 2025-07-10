@@ -226,6 +226,82 @@ const RiskAssessmentInputPage: React.FC = () => {
     }
   }, [formData.teiPercentage]);
 
+  // Auto-calculate export trend category based on description percentage
+  useEffect(() => {
+    if (formData.exportTrendDescription) {
+      const percentage = parseFloat(formData.exportTrendDescription.replace('%', ''));
+      let exportChoice = '';
+      if (percentage >= 35) exportChoice = 'Naik >= 35 %';
+      else if (percentage >= 20 && percentage <= 34) exportChoice = 'Naik 20% - 34%';
+      else if (percentage >= 0 && percentage <= 19) exportChoice = 'Naik 0% - 19%';
+      else if (percentage < 0 && percentage > -25) exportChoice = 'Turun < 25%';
+      else if (percentage <= -25) exportChoice = 'Turun >= 25%';
+      
+      if (exportChoice) {
+        const choice = EXPORT_TREND_CHOICES.find(c => c.label === exportChoice);
+        if (choice) {
+          setFormData(prev => ({
+            ...prev,
+            exportChoice: exportChoice,
+            exportValue: choice.score
+          }));
+        }
+      }
+    }
+  }, [formData.exportTrendDescription]);
+
+  // Auto-calculate export ranking category based on ranking number
+  useEffect(() => {
+    if (formData.exportRankingDescription) {
+      const ranking = parseInt(formData.exportRankingDescription);
+      let exportRankingChoice = '';
+      if (ranking >= 1 && ranking <= 6) exportRankingChoice = 'Peringkat 1 - 6';
+      else if (ranking >= 7 && ranking <= 12) exportRankingChoice = 'Peringkat 7 - 12';
+      else if (ranking >= 13 && ranking <= 18) exportRankingChoice = 'Peringkat 13 - 18';
+      else if (ranking >= 19 && ranking <= 23) exportRankingChoice = 'Peringkat 19 - 23';
+      else if (ranking > 23) exportRankingChoice = 'Peringkat diatas 23';
+      
+      if (exportRankingChoice) {
+        const choice = EXPORT_RANKING_CHOICES.find(c => c.label === exportRankingChoice);
+        if (choice) {
+          setFormData(prev => ({
+            ...prev,
+            exportRankingChoice: exportRankingChoice,
+            exportRankingValue: choice.score
+          }));
+        }
+      }
+    }
+  }, [formData.exportRankingDescription]);
+
+  // Auto-calculate audit category based on audit description
+  useEffect(() => {
+    if (formData.auditDescription) {
+      const choice = AUDIT_CHOICES.find(c => c.label === formData.auditDescription);
+      if (choice) {
+        setFormData(prev => ({
+          ...prev,
+          auditChoice: formData.auditDescription,
+          auditValue: choice.score
+        }));
+      }
+    }
+  }, [formData.auditDescription]);
+
+  // Auto-calculate trade agreement category based on trade agreement description
+  useEffect(() => {
+    if (formData.tradeAgreementDescription) {
+      const choice = TRADE_AGREEMENT_CHOICES.find(c => c.label === formData.tradeAgreementDescription);
+      if (choice) {
+        setFormData(prev => ({
+          ...prev,
+          tradeAgreementChoice: formData.tradeAgreementDescription,
+          tradeAgreementValue: choice.score
+        }));
+      }
+    }
+  }, [formData.tradeAgreementDescription]);
+
   const calculateTotalRisk = () => {
     const totalValue =
       formData.trendValue +
@@ -421,34 +497,20 @@ const RiskAssessmentInputPage: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Deskripsi Tren</Label>
+              <Label>Deskripsi Tren (%)</Label>
               <Input
                 value={formData.exportTrendDescription}
                 onChange={(e) => handleInputChange('exportTrendDescription', e.target.value)}
-                placeholder="Contoh: 4.71%"
+                placeholder="Contoh: 4.71"
               />
             </div>
             <div>
-              <Label>Pilihan Kategori</Label>
-              <Select
-                value={formData.exportChoice}
-                onValueChange={(value) => {
-                  const choice = EXPORT_TREND_CHOICES.find(c => c.label === value);
-                  handleInputChange('exportChoice', value);
-                  handleInputChange('exportValue', choice?.score || 0);
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih kategori tren ekspor" />
-                </SelectTrigger>
-                <SelectContent>
-                  {EXPORT_TREND_CHOICES.map((choice) => (
-                    <SelectItem key={choice.value} value={choice.label}>
-                      {choice.label} (Nilai: {choice.score})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label>Pilihan Kategori (Otomatis)</Label>
+              <Input
+                value={formData.exportChoice || 'Kategori akan dipilih otomatis'}
+                disabled
+                className="bg-muted"
+              />
             </div>
             <div>
               <Label>Nilai</Label>
@@ -469,22 +531,10 @@ const RiskAssessmentInputPage: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Deskripsi Audit</Label>
-              <Input
-                value={formData.auditDescription}
-                onChange={(e) => handleInputChange('auditDescription', e.target.value)}
-                placeholder="Contoh: Belum pernah diaudit"
-              />
-            </div>
-            <div>
-              <Label>Pilihan Kategori</Label>
+              <Label>Status Audit</Label>
               <Select
-                value={formData.auditChoice}
-                onValueChange={(value) => {
-                  const choice = AUDIT_CHOICES.find(c => c.label === value);
-                  handleInputChange('auditChoice', value);
-                  handleInputChange('auditValue', choice?.score || 0);
-                }}
+                value={formData.auditDescription}
+                onValueChange={(value) => handleInputChange('auditDescription', value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Pilih status audit" />
@@ -497,6 +547,14 @@ const RiskAssessmentInputPage: React.FC = () => {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div>
+              <Label>Pilihan Kategori (Otomatis)</Label>
+              <Input
+                value={formData.auditChoice || 'Kategori akan dipilih otomatis'}
+                disabled
+                className="bg-muted"
+              />
             </div>
             <div>
               <Label>Nilai</Label>
@@ -522,25 +580,13 @@ const RiskAssessmentInputPage: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Deskripsi Perjanjian</Label>
-              <Input
-                value={formData.tradeAgreementDescription}
-                onChange={(e) => handleInputChange('tradeAgreementDescription', e.target.value)}
-                placeholder="Contoh: Tidak ada perjanjian internasional"
-              />
-            </div>
-            <div>
-              <Label>Pilihan Kategori</Label>
+              <Label>Status Perjanjian</Label>
               <Select
-                value={formData.tradeAgreementChoice}
-                onValueChange={(value) => {
-                  const choice = TRADE_AGREEMENT_CHOICES.find(c => c.label === value);
-                  handleInputChange('tradeAgreementChoice', value);
-                  handleInputChange('tradeAgreementValue', choice?.score || 0);
-                }}
+                value={formData.tradeAgreementDescription}
+                onValueChange={(value) => handleInputChange('tradeAgreementDescription', value)}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Pilih jumlah perjanjian" />
+                  <SelectValue placeholder="Pilih status perjanjian" />
                 </SelectTrigger>
                 <SelectContent>
                   {TRADE_AGREEMENT_CHOICES.map((choice) => (
@@ -550,6 +596,14 @@ const RiskAssessmentInputPage: React.FC = () => {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div>
+              <Label>Pilihan Kategori (Otomatis)</Label>
+              <Input
+                value={formData.tradeAgreementChoice || 'Kategori akan dipilih otomatis'}
+                disabled
+                className="bg-muted"
+              />
             </div>
             <div>
               <Label>Nilai</Label>
@@ -570,34 +624,21 @@ const RiskAssessmentInputPage: React.FC = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label>Deskripsi Peringkat</Label>
+              <Label>Peringkat</Label>
               <Input
+                type="number"
                 value={formData.exportRankingDescription}
                 onChange={(e) => handleInputChange('exportRankingDescription', e.target.value)}
                 placeholder="Contoh: 27"
               />
             </div>
             <div>
-              <Label>Pilihan Kategori</Label>
-              <Select
-                value={formData.exportRankingChoice}
-                onValueChange={(value) => {
-                  const choice = EXPORT_RANKING_CHOICES.find(c => c.label === value);
-                  handleInputChange('exportRankingChoice', value);
-                  handleInputChange('exportRankingValue', choice?.score || 0);
-                }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih kategori peringkat" />
-                </SelectTrigger>
-                <SelectContent>
-                  {EXPORT_RANKING_CHOICES.map((choice) => (
-                    <SelectItem key={choice.value} value={choice.label}>
-                      {choice.label} (Nilai: {choice.score})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Label>Pilihan Kategori (Otomatis)</Label>
+              <Input
+                value={formData.exportRankingChoice || 'Kategori akan dipilih otomatis'}
+                disabled
+                className="bg-muted"
+              />
             </div>
             <div>
               <Label>Nilai</Label>
