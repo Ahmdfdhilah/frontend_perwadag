@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { SuratPemberitahuan } from '@/mocks/suratPemberitahuan';
+import { SuratPemberitahuan, getSuratPemberitahuanStatus } from '@/mocks/suratPemberitahuan';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { formatIndonesianDate, formatIndonesianDateRange } from '@/utils/timeFormat';
 
@@ -62,6 +62,17 @@ const SuratPemberitahuanCards: React.FC<SuratPemberitahuanCardsProps> = ({
               <div>
                 <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
                 <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
+              </div>
+
+              <div>
+                <span className="font-medium text-muted-foreground">Status:</span>
+                <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                  getSuratPemberitahuanStatus(item) === 'Sudah Upload' 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {getSuratPemberitahuanStatus(item)}
+                </span>
               </div>
             </div>
 

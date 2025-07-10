@@ -8,7 +8,7 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { LaporanHasilEvaluasi } from '@/mocks/laporanHasilEvaluasi';
+import { LaporanHasilEvaluasi, getLaporanHasilEvaluasiStatus } from '@/mocks/laporanHasilEvaluasi';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface LaporanHasilEvaluasiTableProps {
@@ -37,13 +37,14 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
             <TableHead>Nomor Laporan</TableHead>
             <TableHead>Tanggal Laporan</TableHead>
             <TableHead>Laporan Hasil Evaluasi</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                 Tidak ada data laporan hasil evaluasi
               </TableCell>
             </TableRow>
@@ -68,6 +69,15 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
                   ) : (
                     <span className="text-muted-foreground">Tidak ada file</span>
                   )}
+                </TableCell>
+                <TableCell>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    getLaporanHasilEvaluasiStatus(item) === 'Sudah Upload' 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {getLaporanHasilEvaluasiStatus(item)}
+                  </span>
                 </TableCell>
                 <TableCell>
                   <ActionDropdown

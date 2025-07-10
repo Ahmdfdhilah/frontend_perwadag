@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { LaporanHasilEvaluasi } from '@/mocks/laporanHasilEvaluasi';
+import { LaporanHasilEvaluasi, getLaporanHasilEvaluasiStatus } from '@/mocks/laporanHasilEvaluasi';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
@@ -77,6 +77,16 @@ const LaporanHasilEvaluasiCards: React.FC<LaporanHasilEvaluasiCardsProps> = ({
                 ) : (
                   <span className="ml-2 text-muted-foreground">Tidak ada file</span>
                 )}
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Status:</span>
+                <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
+                  getLaporanHasilEvaluasiStatus(item) === 'Sudah Upload' 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-red-100 text-red-800'
+                }`}>
+                  {getLaporanHasilEvaluasiStatus(item)}
+                </span>
               </div>
             </div>
           </CardContent>

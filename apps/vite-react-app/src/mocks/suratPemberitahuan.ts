@@ -418,3 +418,7 @@ export const getSuratPemberitahuanByInspektorat = (inspektorat: number): SuratPe
 export const getSuratPemberitahuanByPerwadag = (perwadagId: string): SuratPemberitahuan[] => {
   return SURAT_PEMBERITAHUAN_DATA.filter(sp => sp.perwadagId === perwadagId);
 };
+
+export const getSuratPemberitahuanStatus = (item: SuratPemberitahuan): string => {
+  return item.status === 'uploaded' ? 'Sudah Upload' : 'Belum Upload';
+};

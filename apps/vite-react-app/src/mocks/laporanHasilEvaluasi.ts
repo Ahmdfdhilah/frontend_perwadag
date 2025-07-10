@@ -9,6 +9,7 @@ export interface LaporanHasilEvaluasi {
   matriks: string;
   uploadFile?: string;
   uploadFileUrl?: string;
+  status: 'uploaded' | 'not_uploaded';
   year: number;
   inspektorat: number;
 }
@@ -25,6 +26,7 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     matriks: "Sangat Baik",
     uploadFile: "laporan-hasil-evaluasi-atdag-moscow-2024.pdf",
     uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-atdag-moscow-2024.pdf",
+    status: 'uploaded',
     year: 2024,
     inspektorat: 1
   },
@@ -39,6 +41,7 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     matriks: "Baik",
     uploadFile: "laporan-hasil-evaluasi-itpc-vancouver-2024.pdf",
     uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-itpc-vancouver-2024.pdf",
+    status: 'uploaded',
     year: 2024,
     inspektorat: 1
   },
@@ -53,6 +56,7 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     matriks: "Sangat Baik",
     uploadFile: "laporan-hasil-evaluasi-atdag-beijing-2024.pdf",
     uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-atdag-beijing-2024.pdf",
+    status: 'uploaded',
     year: 2024,
     inspektorat: 2
   },
@@ -65,8 +69,7 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "ITPC Osaka – Jepang",
     nomorEvaluasi: "LHE/004/2024",
     matriks: "Baik",
-    uploadFile: "laporan-hasil-evaluasi-itpc-osaka-2024.pdf",
-    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-itpc-osaka-2024.pdf",
+    status: 'not_uploaded',
     year: 2024,
     inspektorat: 2
   },
@@ -79,8 +82,7 @@ export const LAPORAN_HASIL_EVALUASI_DATA: LaporanHasilEvaluasi[] = [
     perwadagName: "Atdag New Delhi – India",
     nomorEvaluasi: "LHE/005/2024",
     matriks: "Cukup",
-    uploadFile: "laporan-hasil-evaluasi-atdag-newdelhi-2024.pdf",
-    uploadFileUrl: "blob:http://localhost:3000/laporan-hasil-evaluasi-atdag-newdelhi-2024.pdf",
+    status: 'not_uploaded',
     year: 2024,
     inspektorat: 3
   },
@@ -96,3 +98,7 @@ export const MATRIKS_OPTIONS = [
   "Cukup",
   "Kurang"
 ] as const;
+
+export const getLaporanHasilEvaluasiStatus = (item: LaporanHasilEvaluasi): string => {
+  return item.status === 'uploaded' ? 'Sudah Upload' : 'Belum Upload';
+};
