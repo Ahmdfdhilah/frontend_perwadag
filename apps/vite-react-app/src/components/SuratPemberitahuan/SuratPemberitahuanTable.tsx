@@ -30,7 +30,7 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
   };
 
   const getStatusColor = (status: string) => {
-    return status === 'uploaded' 
+    return status === 'uploaded'
       ? 'text-green-600 bg-green-50 px-2 py-1 rounded-full text-xs font-medium'
       : 'text-orange-600 bg-orange-50 px-2 py-1 rounded-full text-xs font-medium';
   };
@@ -41,8 +41,8 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>No</TableHead>
-            <TableHead>Tanggal Evaluasi</TableHead>
             <TableHead>Tanggal Surat Pemberitahuan</TableHead>
+            <TableHead>Tanggal Evaluasi</TableHead>
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
@@ -59,8 +59,8 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
                 <TableCell>{formatIndonesianDate(item.tanggalSuratPemberitahuan)}</TableCell>
+                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
                 <TableCell>
                   <span className={getStatusColor(item.status)}>

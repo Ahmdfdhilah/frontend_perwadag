@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { ExitMeeting } from '@/mocks/exitMeeting';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface ExitMeetingCardsProps {
   data: ExitMeeting[];
@@ -16,13 +17,6 @@ const ExitMeetingCards: React.FC<ExitMeetingCardsProps> = ({
   onEdit,
   canEdit,
 }) => {
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    });
-  };
 
   if (data.length === 0) {
     return (
@@ -57,8 +51,12 @@ const ExitMeetingCards: React.FC<ExitMeetingCardsProps> = ({
                 <span className="ml-2">{index + 1}</span>
               </div>
               <div>
-                <span className="font-medium text-muted-foreground">Tanggal:</span>
-                <span className="ml-2">{formatDate(item.tanggal)}</span>
+                <span className="font-medium text-muted-foreground">Tanggal Exit Meeting:</span>
+                <span className="ml-2">{formatIndonesianDate(item.tanggal)}</span>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
+                <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Rincian:</span>

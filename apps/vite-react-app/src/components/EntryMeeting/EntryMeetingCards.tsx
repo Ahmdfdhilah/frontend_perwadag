@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { EntryMeeting } from '@/mocks/entryMeeting';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { formatIndonesianDateRange } from '@/utils/timeFormat';
+import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface EntryMeetingCardsProps {
   data: EntryMeeting[];
@@ -52,6 +52,10 @@ const EntryMeetingCards: React.FC<EntryMeetingCardsProps> = ({
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Tanggal Entry Meeting:</span>
+                <span className="ml-2">{formatIndonesianDate(item.tanggal)}</span>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
                 <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
               </div>
               <div>

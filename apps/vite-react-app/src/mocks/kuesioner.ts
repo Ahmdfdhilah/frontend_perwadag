@@ -1,5 +1,6 @@
 export interface Kuesioner {
   id: string;
+  tanggal: string;
   tanggalMulaiEvaluasi: string;
   tanggalAkhirEvaluasi: string;
   perwadagId: string;
@@ -13,6 +14,7 @@ export interface Kuesioner {
 export const KUESIONER_DATA: Kuesioner[] = [
   {
     id: "KS001",
+    tanggal: "2024-05-16",
     tanggalMulaiEvaluasi: "2024-05-15",
     tanggalAkhirEvaluasi: "2024-05-22",
     perwadagId: "PWD001",
@@ -24,6 +26,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS002",
+    tanggal: "2024-05-21",
     tanggalMulaiEvaluasi: "2024-05-20",
     tanggalAkhirEvaluasi: "2024-05-27",
     perwadagId: "PWD002",
@@ -35,6 +38,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS003",
+    tanggal: "2024-06-11",
     tanggalMulaiEvaluasi: "2024-06-10",
     tanggalAkhirEvaluasi: "2024-06-17",
     perwadagId: "PWD010",
@@ -46,6 +50,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS004",
+    tanggal: "2024-06-16",
     tanggalMulaiEvaluasi: "2024-06-15",
     tanggalAkhirEvaluasi: "2024-06-22",
     perwadagId: "PWD011",
@@ -57,6 +62,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS005",
+    tanggal: "2024-07-06",
     tanggalMulaiEvaluasi: "2024-07-05",
     tanggalAkhirEvaluasi: "2024-07-12",
     perwadagId: "PWD019",
@@ -68,6 +74,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS006",
+    tanggal: "2024-07-13",
     tanggalMulaiEvaluasi: "2024-07-12",
     tanggalAkhirEvaluasi: "2024-07-19",
     perwadagId: "PWD020",
@@ -79,6 +86,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS007",
+    tanggal: "2024-08-09",
     tanggalMulaiEvaluasi: "2024-08-08",
     tanggalAkhirEvaluasi: "2024-08-15",
     perwadagId: "PWD028",
@@ -90,6 +98,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS008",
+    tanggal: "2024-08-16",
     tanggalMulaiEvaluasi: "2024-08-15",
     tanggalAkhirEvaluasi: "2024-08-22",
     perwadagId: "PWD029",
@@ -101,6 +110,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS009",
+    tanggal: "2023-12-11",
     tanggalMulaiEvaluasi: "2023-12-10",
     tanggalAkhirEvaluasi: "2023-12-17",
     perwadagId: "PWD003",
@@ -112,6 +122,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS010",
+    tanggal: "2023-12-19",
     tanggalMulaiEvaluasi: "2023-12-18",
     tanggalAkhirEvaluasi: "2023-12-25",
     perwadagId: "PWD004",
@@ -123,6 +134,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS011",
+    tanggal: "2023-01-06",
     tanggalMulaiEvaluasi: "2023-01-05",
     tanggalAkhirEvaluasi: "2023-01-12",
     perwadagId: "PWD012",
@@ -134,6 +146,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS012",
+    tanggal: "2023-01-13",
     tanggalMulaiEvaluasi: "2023-01-12",
     tanggalAkhirEvaluasi: "2023-01-19",
     perwadagId: "PWD013",
@@ -145,6 +158,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS013",
+    tanggal: "2022-12-21",
     tanggalMulaiEvaluasi: "2022-12-20",
     tanggalAkhirEvaluasi: "2022-12-27",
     perwadagId: "PWD021",
@@ -156,6 +170,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS014",
+    tanggal: "2022-12-29",
     tanggalMulaiEvaluasi: "2022-12-28",
     tanggalAkhirEvaluasi: "2023-01-04",
     perwadagId: "PWD022",
@@ -167,6 +182,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS015",
+    tanggal: "2022-01-16",
     tanggalMulaiEvaluasi: "2022-01-15",
     tanggalAkhirEvaluasi: "2022-01-22",
     perwadagId: "PWD030",
@@ -178,6 +194,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS016",
+    tanggal: "2024-09-11",
     tanggalMulaiEvaluasi: "2024-09-10",
     tanggalAkhirEvaluasi: "2024-09-17",
     perwadagId: "PWD005",
@@ -189,6 +206,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS017",
+    tanggal: "2024-09-16",
     tanggalMulaiEvaluasi: "2024-09-15",
     tanggalAkhirEvaluasi: "2024-09-22",
     perwadagId: "PWD006",
@@ -200,6 +218,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS018",
+    tanggal: "2024-10-09",
     tanggalMulaiEvaluasi: "2024-10-08",
     tanggalAkhirEvaluasi: "2024-10-15",
     perwadagId: "PWD014",
@@ -211,6 +230,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS019",
+    tanggal: "2024-10-13",
     tanggalMulaiEvaluasi: "2024-10-12",
     tanggalAkhirEvaluasi: "2024-10-19",
     perwadagId: "PWD015",
@@ -222,6 +242,7 @@ export const KUESIONER_DATA: Kuesioner[] = [
   },
   {
     id: "KS020",
+    tanggal: "2024-11-06",
     tanggalMulaiEvaluasi: "2024-11-05",
     tanggalAkhirEvaluasi: "2024-11-12",
     perwadagId: "PWD023",

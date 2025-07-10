@@ -9,7 +9,7 @@ import {
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { Kuesioner } from '@/mocks/kuesioner';
-import { formatIndonesianDateRange } from '@/utils/timeFormat';
+import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface KuesionerTableProps {
   data: Kuesioner[];
@@ -33,6 +33,7 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
           <TableRow>
             <TableHead>No</TableHead>
             <TableHead>Tanggal Kuesioner</TableHead>
+            <TableHead>Tanggal Evaluasi</TableHead>
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Aspek</TableHead>
             <TableHead>Link Dokumen</TableHead>
@@ -42,7 +43,7 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                 Tidak ada data kuesioner
               </TableCell>
             </TableRow>
@@ -50,6 +51,7 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
+                <TableCell>{formatIndonesianDate(item.tanggal)}</TableCell>
                 <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
                 <TableCell>{item.aspek}</TableCell>

@@ -9,7 +9,7 @@ import {
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { ExitMeeting } from '@/mocks/exitMeeting';
-import { formatIndonesianDateRange } from '@/utils/timeFormat';
+import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface ExitMeetingTableProps {
   data: ExitMeeting[];
@@ -32,6 +32,7 @@ const ExitMeetingTable: React.FC<ExitMeetingTableProps> = ({
           <TableRow>
             <TableHead>No</TableHead>
             <TableHead>Tanggal Exit Meeting</TableHead>
+            <TableHead>Tanggal Evaluasi</TableHead>
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Rincian</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
@@ -40,7 +41,7 @@ const ExitMeetingTable: React.FC<ExitMeetingTableProps> = ({
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                 Tidak ada data exit meeting
               </TableCell>
             </TableRow>
@@ -48,6 +49,7 @@ const ExitMeetingTable: React.FC<ExitMeetingTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
+                <TableCell>{formatIndonesianDate(item.tanggal)}</TableCell>
                 <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
                 <TableCell className="max-w-xs truncate" title={item.rincian}>
