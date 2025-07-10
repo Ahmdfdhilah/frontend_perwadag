@@ -41,9 +41,9 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>No</TableHead>
+            <TableHead>Nama Perwadag</TableHead>
             <TableHead>Tanggal Surat Pemberitahuan</TableHead>
             <TableHead>Tanggal Evaluasi</TableHead>
-            <TableHead>Nama Perwadag</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
@@ -59,9 +59,9 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
+                <TableCell>{item.perwadagName}</TableCell>
                 <TableCell>{formatIndonesianDate(item.tanggalSuratPemberitahuan)}</TableCell>
                 <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
-                <TableCell>{item.perwadagName}</TableCell>
                 <TableCell>
                   <span className={getStatusColor(item.status)}>
                     {getStatusLabel(item.status)}

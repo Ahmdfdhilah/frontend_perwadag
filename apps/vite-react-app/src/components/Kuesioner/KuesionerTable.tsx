@@ -35,7 +35,6 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
             <TableHead>Tanggal Kuesioner</TableHead>
             <TableHead>Tanggal Evaluasi</TableHead>
             <TableHead>Nama Perwadag</TableHead>
-            <TableHead>Aspek</TableHead>
             <TableHead>Link Dokumen</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
@@ -54,7 +53,6 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
                 <TableCell>{formatIndonesianDate(item.tanggal)}</TableCell>
                 <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
-                <TableCell>{item.aspek}</TableCell>
                 <TableCell>
                   {item.linkDokumen ? (
                     <a

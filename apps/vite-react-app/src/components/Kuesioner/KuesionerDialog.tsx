@@ -82,10 +82,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
         alert('Nama perwadag harus dipilih');
         return;
       }
-      if (!formData.aspek) {
-        alert('Aspek harus diisi');
-        return;
-      }
+
     }
 
     if (selectedDate) {
@@ -113,7 +110,6 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   // Role-based field permissions
   const canEditDate = isEditable && isPerwadag();
   const canEditPerwadag = isEditable && (isAdmin() || isInspektorat());
-  const canEditAspek = isEditable && (isAdmin() || isInspektorat());
   const canEditLinkDokumen = isEditable && isPerwadag();
 
   return (
@@ -197,18 +193,6 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
                   className="bg-muted"
                 />
               )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="aspek">Aspek</Label>
-              <Input
-                id="aspek"
-                value={formData.aspek || ''}
-                onChange={(e) => setFormData({ ...formData, aspek: e.target.value })}
-                disabled={!canEditAspek}
-                className={!canEditAspek ? "bg-muted" : ""}
-                placeholder="Masukkan aspek"
-              />
             </div>
 
             <div className="space-y-2">

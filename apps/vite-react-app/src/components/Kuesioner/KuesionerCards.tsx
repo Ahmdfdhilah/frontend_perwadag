@@ -60,10 +60,6 @@ const KuesionerCards: React.FC<KuesionerCardsProps> = ({
                 <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
               </div>
               <div>
-                <span className="font-medium text-muted-foreground">Aspek:</span>
-                <span className="ml-2">{item.aspek}</span>
-              </div>
-              <div>
                 <span className="font-medium text-muted-foreground">Link Dokumen:</span>
                 {item.linkDokumen ? (
                   <a

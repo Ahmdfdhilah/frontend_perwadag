@@ -47,17 +47,18 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>No</TableHead>
-            <TableHead>Tanggal Laporan</TableHead>
-            <TableHead>Tanggal Evaluasi</TableHead>
             <TableHead>Nama Perwadag</TableHead>
-            <TableHead>Matriks</TableHead>
+            <TableHead>Tanggal Evaluasi</TableHead>
+            <TableHead>Nomor Laporan</TableHead>
+            <TableHead>Tanggal Laporan</TableHead>
+            <TableHead>Laporan Hasil Evaluasi</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                 Tidak ada data laporan hasil evaluasi
               </TableCell>
             </TableRow>
@@ -65,13 +66,23 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{formatIndonesianDate(item.tanggal)}</TableCell>
-                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
+                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
+                <TableCell>{item.nomorEvaluasi}</TableCell>
+                <TableCell>{formatIndonesianDate(item.tanggal)}</TableCell>
                 <TableCell>
-                  <Badge variant={getMatriksBadgeVariant(item.matriks)}>
-                    {item.matriks}
-                  </Badge>
+                  {item.uploadFile ? (
+                    <a 
+                      href={item.uploadFileUrl || '#'} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 underline"
+                    >
+                      {item.uploadFile}
+                    </a>
+                  ) : (
+                    <span className="text-muted-foreground">Tidak ada file</span>
+                  )}
                 </TableCell>
                 <TableCell>
                   <ActionDropdown

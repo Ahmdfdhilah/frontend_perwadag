@@ -67,21 +67,31 @@ const LaporanHasilEvaluasiCards: React.FC<LaporanHasilEvaluasiCardsProps> = ({
                 <span className="ml-2">{index + 1}</span>
               </div>
               <div>
-                <span className="font-medium text-muted-foreground">Tanggal Laporan:</span>
-                <span className="ml-2">{formatIndonesianDate(item.tanggal)}</span>
-              </div>
-              <div>
                 <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
                 <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
               </div>
               <div>
-                <span className="font-medium text-muted-foreground">Matriks:</span>
-                <Badge 
-                  variant={getMatriksBadgeVariant(item.matriks)}
-                  className="ml-2"
-                >
-                  {item.matriks}
-                </Badge>
+                <span className="font-medium text-muted-foreground">Nomor Laporan:</span>
+                <span className="ml-2">{item.nomorEvaluasi}</span>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Tanggal Laporan:</span>
+                <span className="ml-2">{formatIndonesianDate(item.tanggal)}</span>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Laporan Hasil Evaluasi:</span>
+                {item.uploadFile ? (
+                  <a 
+                    href={item.uploadFileUrl || '#'} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="ml-2 text-blue-600 hover:text-blue-800 underline"
+                  >
+                    {item.uploadFile}
+                  </a>
+                ) : (
+                  <span className="ml-2 text-muted-foreground">Tidak ada file</span>
+                )}
               </div>
             </div>
           </CardContent>

@@ -33,8 +33,8 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>No</TableHead>
-            <TableHead>Tanggal Pelaksanaan Evaluasi</TableHead>
             <TableHead>Nama Perwadag</TableHead>
+            <TableHead>Tanggal Pelaksanaan Evaluasi</TableHead>
             <TableHead>No Surat</TableHead>
             <TableHead>Pengendali Mutu</TableHead>
             <TableHead>Pengendali Teknis</TableHead>
@@ -53,8 +53,8 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
                 <TableCell>{item.perwadagName}</TableCell>
+                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
                 <TableCell>{item.nomor}</TableCell>
                 <TableCell>{item.pengendaliMutu}</TableCell>
                 <TableCell>{item.pengendaliTeknis}</TableCell>
