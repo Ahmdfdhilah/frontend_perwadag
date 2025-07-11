@@ -34,7 +34,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
   const [formData, setFormData] = useState<Partial<QuestionnaireTemplate>>({});
   const [dokumenFiles, setDokumenFiles] = useState<File[]>([]);
   const [existingDokumen, setExistingDokumen] = useState<Array<{ name: string; url?: string }>>([]);
-  
+
   const isCreating = !item;
   const isEditable = mode === 'edit' && isAdmin();
 
@@ -43,7 +43,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       setFormData({
         ...item,
       });
-      
+
       // Set existing files for display
       setExistingDokumen(item.dokumen ? [{ name: item.dokumen, url: item.dokumen }] : []);
     } else {
@@ -122,20 +122,6 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
 
         <div className="flex-1 overflow-y-auto py-4">
           <div className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="no">No</Label>
-              <Input
-                id="no"
-                type="number"
-                value={formData.no || ''}
-                onChange={(e) => setFormData({ ...formData, no: parseInt(e.target.value) || 0 })}
-                disabled={!isEditable}
-                className={!isEditable ? "bg-muted" : ""}
-                placeholder="Nomor urut template"
-                min="1"
-              />
-            </div>
-
             <div className="space-y-2">
               <Label htmlFor="nama">Nama Template</Label>
               <Input

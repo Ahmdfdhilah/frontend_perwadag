@@ -26,7 +26,7 @@ import { CalendarIcon, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
-import { LaporanHasilEvaluasi, MATRIKS_OPTIONS } from '@/mocks/laporanHasilEvaluasi';
+import { LaporanHasilEvaluasi } from '@/mocks/laporanHasilEvaluasi';
 import { Perwadag } from '@/mocks/perwadag';
 import FileUpload from '@/components/common/FileUpload';
 
@@ -59,7 +59,7 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
         ...item,
       });
       setSelectedDate(new Date(item.tanggal));
-      
+
       // Set existing files for display
       setExistingFiles(item.uploadFile ? [{ name: item.uploadFile, url: item.uploadFileUrl }] : []);
     } else {
@@ -197,33 +197,6 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
                 className={!isEditable ? "bg-muted" : ""}
                 placeholder="LHE/001/2024"
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="matriks">Matriks</Label>
-              {isEditable ? (
-                <Select
-                  value={formData.matriks || ''}
-                  onValueChange={(value) => setFormData({ ...formData, matriks: value })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih matriks" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {MATRIKS_OPTIONS.map((matriks) => (
-                      <SelectItem key={matriks} value={matriks}>
-                        {matriks}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <Input
-                  value={formData.matriks || ''}
-                  disabled
-                  className="bg-muted"
-                />
-              )}
             </div>
 
             <FileUpload
