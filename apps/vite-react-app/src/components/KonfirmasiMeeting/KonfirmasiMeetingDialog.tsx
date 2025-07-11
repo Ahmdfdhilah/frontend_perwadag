@@ -45,7 +45,6 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
   const [formData, setFormData] = useState<Partial<KonfirmasiMeeting>>({});
   const [selectedKonfirmasiDate, setSelectedKonfirmasiDate] = useState<Date>();
   const [isKonfirmasiDatePickerOpen, setIsKonfirmasiDatePickerOpen] = useState(false);
-  const [daftarHadirFiles, setDaftarHadirFiles] = useState<File[]>([]);
   const [buktiHadirFiles, setBuktiHadirFiles] = useState<File[]>([]);
 
   useEffect(() => {
@@ -55,7 +54,6 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
     } else {
       setFormData({});
       setSelectedKonfirmasiDate(undefined);
-      setDaftarHadirFiles([]);
       setBuktiHadirFiles([]);
     }
   }, [item, open]);
@@ -64,7 +62,6 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
     const dataToSave = {
       ...formData,
       tanggalKonfirmasi: selectedKonfirmasiDate ? selectedKonfirmasiDate.toISOString().split('T')[0] : formData.tanggalKonfirmasi,
-      daftarHadirFiles,
       buktiHadirFiles,
     };
     onSave(dataToSave);
@@ -78,10 +75,6 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
     if (url) {
       window.open(url, '_blank');
     }
-  };
-
-  const handleDaftarHadirFilesChange = (files: File[]) => {
-    setDaftarHadirFiles(files);
   };
 
   const handleBuktiHadirFilesChange = (files: File[]) => {
@@ -203,18 +196,46 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
               )}
             </div>
 
-            {/* Upload Daftar Hadir */}
-            <FileUpload
-              label="Upload Daftar Hadir"
-              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-              maxSize={5 * 1024 * 1024}
-              multiple={false}
-              mode={canEdit ? 'edit' : 'view'}
-              files={daftarHadirFiles}
-              existingFiles={item?.linkDaftarHadir ? [{ name: 'Daftar Hadir', url: item.linkDaftarHadir }] : []}
-              onFilesChange={handleDaftarHadirFilesChange}
-              description="Format yang didukung: PDF, DOC, DOCX, JPG, PNG (Max 5MB)"
-            />
+            {/* Link Daftar Hadir */}
+            <div className="space-y-2">
+              <Label htmlFor="linkDaftarHadir">Link Daftar Hadir (Google Form)</Label>
+              {canEdit ? (
+                <div className="flex gap-2">
+                  <Input
+                    id="linkDaftarHadir"
+                    value={formData.linkDaftarHadir || ''}
+                    onChange={(e) => setFormData({ ...formData, linkDaftarHadir: e.target.value })}
+                    placeholder="https://forms.google.com/..."
+                  />
+                  {formData.linkDaftarHadir && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOpenLink(formData.linkDaftarHadir!)}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <div className="p-3 bg-muted rounded-md flex-1">
+                    {item?.linkDaftarHadir || '-'}
+                  </div>
+                  {item?.linkDaftarHadir && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOpenLink(item.linkDaftarHadir!)}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Upload Bukti Foto */}
             <FileUpload

@@ -43,9 +43,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
   const [formData, setFormData] = useState<Partial<EntryMeeting>>({});
   const [selectedEntryDate, setSelectedEntryDate] = useState<Date>();
   const [isEntryDatePickerOpen, setIsEntryDatePickerOpen] = useState(false);
-  const [daftarHadirFiles, setDaftarHadirFiles] = useState<File[]>([]);
   const [buktiHadirFiles, setBuktiHadirFiles] = useState<File[]>([]);
-  const [existingDaftarHadir, setExistingDaftarHadir] = useState<Array<{ name: string; url?: string }>>([]);
   const [existingBuktiHadir, setExistingBuktiHadir] = useState<Array<{ name: string; url?: string }>>([]);
 
   useEffect(() => {
@@ -54,14 +52,11 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
       setSelectedEntryDate(item.tanggal ? new Date(item.tanggal) : undefined);
       
       // Set existing files for display
-      setExistingDaftarHadir(item.linkDaftarHadir ? [{ name: 'Daftar Hadir', url: item.linkDaftarHadir }] : []);
       setExistingBuktiHadir(item.buktiImageUrls ? item.buktiImageUrls.map((url, index) => ({ name: `Bukti ${index + 1}`, url })) : []);
     } else {
       setFormData({});
       setSelectedEntryDate(undefined);
-      setDaftarHadirFiles([]);
       setBuktiHadirFiles([]);
-      setExistingDaftarHadir([]);
       setExistingBuktiHadir([]);
     }
   }, [item, open]);
@@ -70,7 +65,6 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
     const dataToSave = {
       ...formData,
       tanggal: selectedEntryDate ? selectedEntryDate.toISOString().split('T')[0] : formData.tanggal,
-      daftarHadirFiles,
       buktiHadirFiles,
     };
     onSave(dataToSave);
@@ -87,16 +81,8 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
     }
   };
 
-  const handleDaftarHadirFilesChange = (files: File[]) => {
-    setDaftarHadirFiles(files);
-  };
-
   const handleBuktiHadirFilesChange = (files: File[]) => {
     setBuktiHadirFiles(files);
-  };
-
-  const handleExistingDaftarHadirRemove = (index: number) => {
-    setExistingDaftarHadir(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleExistingBuktiHadirRemove = (index: number) => {
@@ -217,21 +203,46 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
               )}
             </div>
 
-            {/* Upload Daftar Hadir */}
-            <FileUpload
-              label="Upload Daftar Hadir"
-              accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-              multiple={false}
-              maxSize={5 * 1024 * 1024} // 5MB
-              maxFiles={1}
-              files={daftarHadirFiles}
-              existingFiles={existingDaftarHadir}
-              mode={canEdit ? 'edit' : 'view'}
-              disabled={!canEdit}
-              onFilesChange={handleDaftarHadirFilesChange}
-              onExistingFileRemove={handleExistingDaftarHadirRemove}
-              description="Format yang didukung: PDF, DOC, DOCX, JPG, PNG (Max 5MB)"
-            />
+            {/* Link Daftar Hadir */}
+            <div className="space-y-2">
+              <Label htmlFor="linkDaftarHadir">Link Daftar Hadir (Google Form)</Label>
+              {canEdit ? (
+                <div className="flex gap-2">
+                  <Input
+                    id="linkDaftarHadir"
+                    value={formData.linkDaftarHadir || ''}
+                    onChange={(e) => setFormData({ ...formData, linkDaftarHadir: e.target.value })}
+                    placeholder="https://forms.google.com/..."
+                  />
+                  {formData.linkDaftarHadir && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOpenLink(formData.linkDaftarHadir!)}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <div className="p-3 bg-muted rounded-md flex-1">
+                    {item?.linkDaftarHadir || '-'}
+                  </div>
+                  {item?.linkDaftarHadir && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleOpenLink(item.linkDaftarHadir!)}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              )}
+            </div>
 
             {/* Upload Bukti Hadir */}
             <FileUpload
