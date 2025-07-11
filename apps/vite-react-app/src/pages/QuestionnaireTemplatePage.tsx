@@ -22,6 +22,8 @@ import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import QuestionnaireTable from '@/components/QuestionnaireTemplate/QuestionnaireTable';
 import QuestionnaireCards from '@/components/QuestionnaireTemplate/QuestionnaireCards';
 import QuestionnaireDialog from '@/components/QuestionnaireTemplate/QuestionnaireDialog';
+import { Button } from '@workspace/ui/components/button';
+import { Plus } from 'lucide-react';
 
 const QuestionnaireTemplatePage: React.FC = () => {
   const { isAdmin, isInspektorat, isPerwadag } = useRole();
@@ -144,6 +146,12 @@ const QuestionnaireTemplatePage: React.FC = () => {
       <PageHeader
         title="Template Kuesioner"
         description="Template kuesioner yang dapat digunakan untuk evaluasi audit"
+        actions={
+          <Button variant="default" onClick={isAdmin() ? handleAdd : undefined}>
+            <Plus className='w-4'/>
+            Tambah Template
+          </Button>
+        }
       />
 
       <Filtering>
@@ -171,8 +179,6 @@ const QuestionnaireTemplatePage: React.FC = () => {
             <ListHeaderComposite
               title={getCompositeTitle()}
               subtitle="Template kuesioner yang dapat digunakan untuk evaluasi audit"
-              onAdd={isAdmin() ? handleAdd : undefined}
-              addLabel="Tambah Template"
             />
 
             <SearchContainer
