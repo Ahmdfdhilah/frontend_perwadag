@@ -183,7 +183,7 @@ const MatriksPage: React.FC = () => {
   };
 
   const canEdit = (item: Matriks) => {
-    return isInspektorat() && item.inspektorat === 1;
+    return isInspektorat() && item.inspektorat === 1 || isAdmin();
   };
 
   const isAdminOrInspektorat = isAdmin() || isInspektorat();
@@ -328,8 +328,8 @@ const MatriksPage: React.FC = () => {
         />
       )}
 
-      {/* Edit Dialog - Only for Inspektorat */}
-      {isInspektorat() && (
+      {/* Edit Dialog - For Admin and Inspektorat */}
+      {(isAdmin() || isInspektorat()) && (
         <MatriksDialog
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}

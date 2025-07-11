@@ -24,7 +24,8 @@ const MatriksAdminTable: React.FC<MatriksAdminTableProps> = ({
   onEdit,
   canEdit,
 }) => {
-
+  console.log(canEdit);
+  
   return (
     <div className="rounded-md border">
       <Table>

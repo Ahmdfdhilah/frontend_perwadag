@@ -32,7 +32,6 @@ const KonfirmasiMeetingPage: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [selectedInspektorat, setSelectedInspektorat] = useState<string>('all');
   const [selectedPerwadag, setSelectedPerwadag] = useState<string>('all');
-  const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -95,17 +94,6 @@ const KonfirmasiMeetingPage: React.FC = () => {
       filtered = filtered.filter(item => item.perwadagId === selectedPerwadag);
     }
 
-    // Filter by status
-    if (selectedStatus !== 'all') {
-      if (selectedStatus === 'uploaded') {
-        filtered = filtered.filter(item => {
-          const hasDocuments = !!(item.linkDaftarHadir || (item.buktiImages && item.buktiImages.length > 0));
-          return hasDocuments;
-        });
-      } else {
-        filtered = filtered.filter(item => item.status === selectedStatus);
-      }
-    }
 
     // Role-based filtering
     if (isInspektorat()) {
@@ -122,7 +110,7 @@ const KonfirmasiMeetingPage: React.FC = () => {
     filtered.sort((a, b) => new Date(b.tanggalKonfirmasi).getTime() - new Date(a.tanggalKonfirmasi).getTime());
 
     return filtered;
-  }, [searchQuery, selectedYear, selectedInspektorat, selectedPerwadag, selectedStatus, isAdmin, isInspektorat, isPerwadag]);
+  }, [searchQuery, selectedYear, selectedInspektorat, selectedPerwadag, isAdmin, isInspektorat, isPerwadag]);
 
   // Pagination
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -157,38 +145,26 @@ const KonfirmasiMeetingPage: React.FC = () => {
   const getCompositeTitle = () => {
     let title = "Daftar Konfirmasi Meeting";
     const filters = [];
-    
+
     if (isInspektorat()) {
       filters.push("Inspektorat I");
     } else if (isAdmin() && selectedInspektorat !== 'all') {
       filters.push(`Inspektorat ${selectedInspektorat}`);
     }
-    
+
     if (selectedYear !== 'all') {
       filters.push(selectedYear);
     }
-    
+
     if (selectedPerwadag !== 'all') {
       const perwadag = PERWADAG_DATA.find(p => p.id === selectedPerwadag);
       if (perwadag) filters.push(perwadag.name);
     }
 
-    if (selectedStatus !== 'all') {
-      if (selectedStatus === 'uploaded') {
-        filters.push("Sudah Upload");
-      } else if (selectedStatus === 'completed') {
-        filters.push("Selesai");
-      } else if (selectedStatus === 'confirmed') {
-        filters.push("Dikonfirmasi");
-      } else if (selectedStatus === 'pending') {
-        filters.push("Pending");
-      }
-    }
-    
     if (filters.length > 0) {
       title += " - " + filters.join(" - ");
     }
-    
+
     return title;
   };
 
@@ -263,22 +239,6 @@ const KonfirmasiMeetingPage: React.FC = () => {
             />
           </div>
         )}
-
-        <div className="space-y-2">
-          <Label htmlFor="status-filter">Status</Label>
-          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-            <SelectTrigger id="status-filter">
-              <SelectValue placeholder="Pilih status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Status</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="confirmed">Dikonfirmasi</SelectItem>
-              <SelectItem value="completed">Selesai</SelectItem>
-              <SelectItem value="uploaded">Sudah Upload</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
       </Filtering>
 
       <Card>
