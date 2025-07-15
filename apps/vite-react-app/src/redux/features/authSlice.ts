@@ -36,13 +36,10 @@ export const loginAsync = createAsyncThunk(
       
       const tokenExpiry = Date.now() + (response.expires_in * 1000);
       
-      const verificationResponse = await authService.verifyToken();
-      
       return {
         access_token: response.access_token,
         expires_in: response.expires_in,
-        tokenExpiry,
-        user: verificationResponse
+        tokenExpiry
       };
     } catch (error: any) {
       return rejectWithValue(error.message || 'Login failed');
@@ -183,21 +180,6 @@ const authSlice = createSlice({
         state.isAuthenticated = true;
         state.accessToken = action.payload.access_token;
         state.tokenExpiry = action.payload.tokenExpiry;
-        
-        if (action.payload.user) {
-          state.user = {
-            id: action.payload.user.user_id || '',
-            nama: action.payload.user.nama || '',
-            email: '',
-            role: (action.payload.user.role as "admin" | "inspektorat" | "perwadag") || 'perwadag',
-            inspektorat: action.payload.user.inspektorat,
-            wilayah: '',
-            perwadag_id: '',
-            is_active: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          };
-        }
         state.error = null;
       })
       .addCase(loginAsync.rejected, (state, action) => {
