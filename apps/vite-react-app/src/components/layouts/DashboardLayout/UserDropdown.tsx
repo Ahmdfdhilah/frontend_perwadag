@@ -51,11 +51,11 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
   // Get user role display
   const getUserRole = () => {
     switch (currentRole) {
-      case 'admin':
+      case 'ADMIN':
         return 'Administrator';
-      case 'inspektorat':
+      case 'INSPEKTORAT':
         return 'Inspektorat';
-      case 'perwadag':
+      case 'PERWADAG':
         return 'Perwadag';
       default:
         return currentRole;

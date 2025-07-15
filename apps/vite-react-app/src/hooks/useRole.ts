@@ -4,22 +4,22 @@ import { selectUser } from '@/redux/features/authSlice';
 
 export const useRole = () => {
   const user = useAppSelector(selectUser);
-  const currentRole = user?.role || 'perwadag';
+  const currentRole = user?.role || 'PERWADAG';
 
   const isRole = useCallback((role: string) => {
     return currentRole === role;
   }, [currentRole]);
 
   const isAdmin = useCallback(() => {
-    return currentRole === 'admin';
+    return currentRole === 'ADMIN';
   }, [currentRole]);
 
   const isInspektorat = useCallback(() => {
-    return currentRole === 'inspektorat';
+    return currentRole === 'INSPEKTORAT';
   }, [currentRole]);
 
   const isPerwadag = useCallback(() => {
-    return currentRole === 'perwadag';
+    return currentRole === 'PERWADAG';
   }, [currentRole]);
 
   const hasPermission = useCallback((requiredRoles: string[]) => {

@@ -39,8 +39,8 @@ export function SidebarContent({
   
   // Get appropriate menu items based on current role
   const menuItems = useMemo(() => {
-    return getMenuItemsForUser([currentRole.id]) as SidebarItem[];
-  }, [currentRole.id]);
+    return getMenuItemsForUser([currentRole]) as SidebarItem[];
+  }, [currentRole]);
 
   return (
     <div className="flex h-full flex-col">

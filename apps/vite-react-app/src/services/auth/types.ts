@@ -72,14 +72,11 @@ export interface DefaultPasswordInfoResponse {
 
 // Token verification
 export interface TokenVerificationResponse {
-  perwadag_id: string;
-  wilayah: string;
-  email: string;
   valid: boolean;
-  user_id?: string;
-  nama?: string;
-  role?: string;
-  inspektorat?: string;
+  user_id: string;
+  nama: string;
+  roles: string[];
+  message: string;
 }
 
 export interface AuthServiceOptions {

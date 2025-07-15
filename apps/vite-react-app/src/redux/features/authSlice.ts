@@ -240,21 +240,11 @@ const authSlice = createSlice({
         state.tokenExpiry = null;
       })
       .addCase(verifyTokenAsync.fulfilled, (state, action) => {
-        if (action.payload.valid && action.payload.user_id) {
-          state.user = {
-            id: action.payload.user_id,
-            nama: action.payload.nama || '',
-            email: action.payload.email || '',
-            role: (action.payload.role) as "ADMIN" | "INSPEKTORAT" | "PERWADAG",
-            inspektorat: action.payload.inspektorat,
-            wilayah: action.payload.wilayah || '',
-            perwadag_id: action.payload.perwadag_id || '',
-            is_active: true,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          };
+        if (action.payload.valid) {
+          // Token is valid - don't overwrite existing user data
           state.isAuthenticated = true;
         } else {
+          // Token is invalid - clear auth
           state.isAuthenticated = false;
           state.user = null;
           state.accessToken = null;
