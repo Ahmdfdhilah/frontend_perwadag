@@ -1,10 +1,10 @@
 import { AlertTriangle, FileInput, Grid2X2, Mail, MailWarningIcon, PhoneIncoming, PhoneOutgoing, Users, ClipboardList, ClipboardCopyIcon, CheckSquare } from "lucide-react";
 
-// Role definitions
+// Role definitions - UPPERCASE to match backend
 export type UserRole =
-  | 'admin'
-  | 'inspektorat'
-  | 'perwadag';
+  | 'ADMIN'
+  | 'INSPEKTORAT'
+  | 'PERWADAG';
 
 export interface SidebarItem {
   title: string;
@@ -19,89 +19,89 @@ export interface SidebarItem {
 
 export const appMenuItems: SidebarItem[] = [
 
-  // Risk Assessment - Only admin and inspektorat
+  // Risk Assessment - Only ADMIN and INSPEKTORAT
   {
     title: 'Penilaian Risiko',
     href: '/penilaian-resiko',
     icon: AlertTriangle,
-    allowedRoles: ['admin', 'inspektorat'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT'],
   },
-  // Surat Tugas - Only admin and inspektorat, perwadag
+  // Surat Tugas - All roles
   {
     title: 'Surat Tugas',
     href: '/surat-tugas',
     icon: Mail,
-    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
   },
-  // Surat Pemberitahuan - Only admin and inspektorat, perwadag
+  // Surat Pemberitahuan - All roles
   {
     title: 'Surat Pemberitahuan',
     href: '/surat-pemberitahuan',
     icon: MailWarningIcon,
-    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
   },
-  // Entry Meeting - Only admin and inspektorat, perwadag
+  // Entry Meeting - All roles
   {
     title: 'Entry Meeting',
     href: '/entry-meeting',
     icon: PhoneIncoming,
-    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
   },
 
-  // Konfirmasi Meeting - Only admin and inspektorat, perwadag
+  // Konfirmasi Meeting - All roles
   {
     title: 'Konfirmasi Meeting',
     href: '/konfirmasi-meeting',
     icon: CheckSquare,
-    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
   },
 
-  // Kuesioner - Only admin and inspektorat, perwadag
+  // Kuesioner - All roles
   {
     title: 'Kuesioner',
     href: '/kuesioner',
     icon: ClipboardList,
-    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
   },
 
-  // Exit Meeting - Only admin and inspektorat, perwadag
+  // Exit Meeting - All roles
   {
     title: 'Exit Meeting',
     href: '/exit-meeting',
     icon: PhoneOutgoing,
-    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
   },
 
-  // Matriks - Only admin and inspektorat, perwadag
+  // Matriks - All roles
   {
     title: 'Matriks',
     href: '/matriks',
     icon: Grid2X2,
-    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
   },
 
-  // Laporan Hasil - Only admin and inspektorat, perwadag
+  // Laporan Hasil - All roles
   {
     title: 'Laporan Hasil',
     href: '/laporan-hasil',
     icon: FileInput,
-    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
   },
 
-  // Template Kuesioner - All users can view, only admin can manage
+  // Template Kuesioner - All roles
   {
     title: 'Template Kuesioner',
     href: '/template-kuesioner',
     icon: ClipboardCopyIcon,
-    allowedRoles: ['admin', 'inspektorat', 'perwadag'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
   },
 
-  // User Management - Admin and Master Admin
+  // User Management - ADMIN only
   {
     title: 'Manajemen User',
     href: '/users',
     icon: Users,
-    allowedRoles: ['admin'],
+    allowedRoles: ['ADMIN'],
   },
 ];
 

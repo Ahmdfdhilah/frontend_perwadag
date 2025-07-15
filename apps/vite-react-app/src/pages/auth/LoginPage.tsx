@@ -116,7 +116,7 @@ export function LoginPage() {
             {/* Logo and Header */}
             <div className="text-center space-y-4">
               <div className="flex justify-center">
-                <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="OKOCE HRIS" className="h-12 w-auto" />
+                <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="" className="h-12 w-auto" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">Selamat Datang</h1>
@@ -268,7 +268,7 @@ export function LoginPage() {
           {/* Logo and Header */}
           <div className="text-center space-y-4">
             <div className="flex justify-center">
-              <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="OKOCE HRIS" className="h-12 w-auto" />
+              <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="" className="h-12 w-auto" />
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-white">Selamat Datang</h1>

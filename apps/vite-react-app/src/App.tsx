@@ -70,73 +70,73 @@ function App() {
                     {/* Home route - redirects based on role */}
                     <Route index element={<RoleBasedHome />} />
                     
-                    {/* Risk Assessment - Admin and Inspektorat only */}
+                    {/* Risk Assessment - ADMIN and INSPEKTORAT only */}
                     <Route path="penilaian-resiko" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'inspektorat']}>
+                      <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT']}>
                         <RiskAssessmentPage />
                       </RoleProtectedRoute>
                     } />
                     <Route path="penilaian-resiko/:id" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'inspektorat']}>
+                      <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT']}>
                         <RiskAssessmentDetailPage />
                       </RoleProtectedRoute>
                     } />
                     <Route path="penilaian-resiko/:id/edit" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'inspektorat']}>
+                      <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT']}>
                         <RiskAssessmentInputPage />
                       </RoleProtectedRoute>
                     } />
                     
                     {/* All roles can access these */}
                     <Route path="surat-tugas" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'inspektorat', 'perwadag']}>
+                      <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT', 'PERWADAG']}>
                         <SuratTugasPage />
                       </RoleProtectedRoute>
                     } />
                     <Route path="surat-pemberitahuan" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'inspektorat', 'perwadag']}>
+                      <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT', 'PERWADAG']}>
                         <SuratPemberitahuanPage />
                       </RoleProtectedRoute>
                     } />
                     <Route path="matriks" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'inspektorat', 'perwadag']}>
+                      <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT', 'PERWADAG']}>
                         <MatriksPage />
                       </RoleProtectedRoute>
                     } />
                     <Route path="entry-meeting" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'inspektorat', 'perwadag']}>
+                      <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT', 'PERWADAG']}>
                         <EntryMeetingPage />
                       </RoleProtectedRoute>
                     } />
                     <Route path="exit-meeting" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'inspektorat', 'perwadag']}>
+                      <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT', 'PERWADAG']}>
                         <ExitMeetingPage />
                       </RoleProtectedRoute>
                     } />
                     <Route path="konfirmasi-meeting" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'inspektorat', 'perwadag']}>
+                      <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT', 'PERWADAG']}>
                         <KonfirmasiMeetingPage />
                       </RoleProtectedRoute>
                     } />
                     <Route path="laporan-hasil" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'inspektorat', 'perwadag']}>
+                      <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT', 'PERWADAG']}>
                         <LaporanHasilEvaluasiPage />
                       </RoleProtectedRoute>
                     } />
                     <Route path="kuesioner" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'inspektorat', 'perwadag']}>
+                      <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT', 'PERWADAG']}>
                         <KuesionerPage />
                       </RoleProtectedRoute>
                     } />
                     <Route path="template-kuesioner" element={
-                      <RoleProtectedRoute allowedRoles={['admin', 'inspektorat', 'perwadag']}>
+                      <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT', 'PERWADAG']}>
                         <QuestionnaireTemplatePage />
                       </RoleProtectedRoute>
                     } />
                     
-                    {/* Admin only routes */}
+                    {/* ADMIN only routes */}
                     <Route path="users" element={
-                      <RoleProtectedRoute allowedRoles={['admin']}>
+                      <RoleProtectedRoute allowedRoles={['ADMIN']}>
                         <UsersPage />
                       </RoleProtectedRoute>
                     } />

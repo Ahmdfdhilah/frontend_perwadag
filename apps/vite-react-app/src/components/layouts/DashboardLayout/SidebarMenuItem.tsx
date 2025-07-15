@@ -10,8 +10,8 @@ interface GenericSidebarItem {
   icon: any;
   children?: GenericSidebarItem[];
   isPlaceholder?: boolean;
-  allowedRoles?: string[]; // Optional property for HRIS menus
-  badge?: string; // Optional property for HRIS menus
+  allowedRoles?: string[]; // Optional
+  badge?: string; // Optional 
 }
 
 interface SidebarMenuItemProps {

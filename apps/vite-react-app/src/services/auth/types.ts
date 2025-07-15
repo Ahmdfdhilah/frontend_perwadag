@@ -30,8 +30,32 @@ export interface MessageResponse {
   message: string;
 }
 
-// Backward compatibility type aliases
-export interface LoginResponse extends TokenResponse {}
+// Login response includes user data and refresh token
+export interface LoginResponse extends TokenResponse {
+  refresh_token: string;
+  user: {
+    id: string;
+    username: string;
+    nama: string;
+    email: string;
+    role: string;
+    is_active: boolean;
+    inspektorat?: string;
+    wilayah?: string;
+    perwadag_id?: string;
+    created_at: string;
+    updated_at?: string;
+    tempat_lahir?: string;
+    tanggal_lahir?: string;
+    pangkat?: string;
+    jabatan?: string;
+    display_name?: string;
+    age?: number;
+    has_email?: boolean;
+    last_login?: string;
+    role_display?: string;
+  };
+}
 
 // User password eligibility and info
 export interface PasswordResetEligibilityResponse {
@@ -48,6 +72,9 @@ export interface DefaultPasswordInfoResponse {
 
 // Token verification
 export interface TokenVerificationResponse {
+  perwadag_id: string;
+  wilayah: string;
+  email: string;
   valid: boolean;
   user_id?: string;
   nama?: string;

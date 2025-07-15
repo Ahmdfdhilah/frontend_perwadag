@@ -38,8 +38,10 @@ export const loginAsync = createAsyncThunk(
       
       return {
         access_token: response.access_token,
+        refresh_token: response.refresh_token,
         expires_in: response.expires_in,
-        tokenExpiry
+        tokenExpiry,
+        user: response.user
       };
     } catch (error: any) {
       return rejectWithValue(error.message || 'Login failed');
@@ -179,7 +181,23 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isAuthenticated = true;
         state.accessToken = action.payload.access_token;
+        state.refreshToken = action.payload.refresh_token;
         state.tokenExpiry = action.payload.tokenExpiry;
+        
+        if (action.payload.user) {
+          state.user = {
+            id: action.payload.user.id,
+            nama: action.payload.user.nama,
+            email: action.payload.user.email,
+            role: action.payload.user.role as "ADMIN" | "INSPEKTORAT" | "PERWADAG",
+            inspektorat: action.payload.user.inspektorat,
+            wilayah: action.payload.user.wilayah || '',
+            perwadag_id: action.payload.user.perwadag_id || '',
+            is_active: action.payload.user.is_active,
+            created_at: action.payload.user.created_at,
+            updated_at: action.payload.user.updated_at || new Date().toISOString(),
+          };
+        }
         state.error = null;
       })
       .addCase(loginAsync.rejected, (state, action) => {
@@ -226,11 +244,11 @@ const authSlice = createSlice({
           state.user = {
             id: action.payload.user_id,
             nama: action.payload.nama || '',
-            email: '',
-            role: (action.payload.role as "admin" | "inspektorat" | "perwadag") || 'perwadag',
+            email: action.payload.email || '',
+            role: (action.payload.role) as "ADMIN" | "INSPEKTORAT" | "PERWADAG",
             inspektorat: action.payload.inspektorat,
-            wilayah: '',
-            perwadag_id: '',
+            wilayah: action.payload.wilayah || '',
+            perwadag_id: action.payload.perwadag_id || '',
             is_active: true,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
@@ -297,7 +315,7 @@ const authSlice = createSlice({
           id: action.payload.id,
           nama: action.payload.nama,
           email: action.payload.email || '',
-          role: action.payload.role as "admin" | "inspektorat" | "perwadag",
+          role: action.payload.role as "ADMIN" | "INSPEKTORAT" | "PERWADAG",
           inspektorat: action.payload.inspektorat,
           wilayah: action.payload.wilayah,
           perwadag_id: action.payload.perwadag_id,

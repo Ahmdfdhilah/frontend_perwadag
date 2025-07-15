@@ -7,7 +7,7 @@ export interface User {
   id: string;
   nama: string;
   email?: string;
-  role: "admin" | "inspektorat" | "perwadag";
+  role: "ADMIN" | "INSPEKTORAT" | "PERWADAG";
   inspektorat?: string;
   wilayah?: string;
   perwadag_id?: string;
@@ -29,7 +29,7 @@ export interface UserSummary {
 export interface UserCreate {
   nama: string;
   email?: string;
-  role: "admin" | "inspektorat" | "perwadag";
+  role: "ADMIN" | "INSPEKTORAT" | "PERWADAG";
   inspektorat?: string;
   wilayah?: string;
   perwadag_id?: string;

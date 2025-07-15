@@ -132,19 +132,19 @@ export const withAuthGuard = (
 
 // Role-specific guards
 export const AdminGuard: React.FC<Omit<AuthGuardProps, 'requireRoles'>> = (props) => (
-  <AuthGuard {...props} requireRoles={['admin']} />
+  <AuthGuard {...props} requireRoles={['ADMIN']} />
 );
 
 export const InspektoratGuard: React.FC<Omit<AuthGuardProps, 'requireRoles'>> = (props) => (
-  <AuthGuard {...props} requireRoles={['inspektorat']} />
+  <AuthGuard {...props} requireRoles={['INSPEKTORAT']} />
 );
 
 export const PerwadagGuard: React.FC<Omit<AuthGuardProps, 'requireRoles'>> = (props) => (
-  <AuthGuard {...props} requireRoles={['perwadag']} />
+  <AuthGuard {...props} requireRoles={['PERWADAG']} />
 );
 
 export const AdminOrInspektoratGuard: React.FC<Omit<AuthGuardProps, 'requireRoles'>> = (props) => (
-  <AuthGuard {...props} requireRoles={['admin', 'inspektorat']} />
+  <AuthGuard {...props} requireRoles={['ADMIN', 'INSPEKTORAT']} />
 );
 
 export const MfaGuard: React.FC<Omit<AuthGuardProps, 'requireMfa'>> = (props) => (

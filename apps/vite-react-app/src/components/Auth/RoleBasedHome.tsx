@@ -10,23 +10,23 @@ export function RoleBasedHome() {
     const userRoles = [role];
     
     switch (role) {
-      case 'admin':
-        // Admin can access everything, default to risk assessment
+      case 'ADMIN':
+        // ADMIN can access everything, default to risk assessment
         if (hasRouteAccess('/penilaian-resiko', userRoles)) {
           return '/penilaian-resiko';
         }
         return '/users'; // Fallback to user management
         
-      case 'inspektorat':
-        // Inspektorat can access most features, default to risk assessment
+      case 'INSPEKTORAT':
+        // INSPEKTORAT can access most features, default to risk assessment
         if (hasRouteAccess('/penilaian-resiko', userRoles)) {
           return '/penilaian-resiko';
         }
         // Fallback to surat tugas if risk assessment not available
         return '/surat-tugas';
         
-      case 'perwadag':
-        // Perwadag cannot access risk assessment, default to surat tugas
+      case 'PERWADAG':
+        // PERWADAG cannot access risk assessment, default to surat tugas
         return '/surat-tugas';
         
       default:

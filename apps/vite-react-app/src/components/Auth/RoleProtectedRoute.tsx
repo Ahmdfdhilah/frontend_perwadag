@@ -131,9 +131,9 @@ export function useRoleAccess() {
     return roles.includes(userRole as UserRole);
   };
 
-  const isAdmin = userRole === 'admin';
-  const isInspektorat = userRole === 'inspektorat';
-  const isPerwadag = userRole === 'perwadag';
+  const isAdmin = userRole === 'ADMIN';
+  const isInspektorat = userRole === 'INSPEKTORAT';
+  const isPerwadag = userRole === 'PERWADAG';
 
   return {
     userRole,
