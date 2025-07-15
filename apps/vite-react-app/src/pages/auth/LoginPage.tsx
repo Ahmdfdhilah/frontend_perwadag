@@ -1,5 +1,5 @@
 // apps/vite-react-app/src/pages/auth/LoginPage.tsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -36,7 +36,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from || '/dashboard';
+  const from = location.state?.from || '/';
 
   // Check if already logged in
   useEffect(() => {

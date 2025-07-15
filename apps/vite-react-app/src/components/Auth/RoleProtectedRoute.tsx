@@ -14,7 +14,7 @@ interface RoleProtectedRouteProps {
 export function RoleProtectedRoute({
   children,
   allowedRoles = [],
-  redirectTo = '/dashboard',
+  redirectTo = '/',
   fallback,
   requireRoles = false
 }: RoleProtectedRouteProps) {
@@ -55,7 +55,7 @@ export function RoleProtectedRoute({
 // Guard for routes that require user to have ANY role assigned
 export function RequireRoles({ 
   children, 
-  redirectTo = '/dashboard',
+  redirectTo = '/',
   fallback 
 }: { 
   children: ReactNode; 
@@ -76,7 +76,7 @@ export function RequireRoles({
 // Guard for routes that are ONLY for users without roles
 export function NoRolesOnly({ 
   children, 
-  redirectTo = '/dashboard',
+  redirectTo = '/',
   fallback 
 }: { 
   children: ReactNode; 
