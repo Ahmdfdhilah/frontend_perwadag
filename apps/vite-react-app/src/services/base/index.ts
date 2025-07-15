@@ -1,4 +1,4 @@
-export { BaseService } from "./BaseService";
+export { BaseService } from "./service";
 export type {
   ServiceOptions,
   ApiResponse,

@@ -30,7 +30,6 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
   children, 
   fallback = null, 
   requireRoles = [],
-  requireMfa = false,
   redirectTo = '/login',
   allowUnauthenticated = false
 }) => {
@@ -38,8 +37,6 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
     isAuthenticated, 
     user, 
     loading, 
-    mfaRequired, 
-    mfaVerified, 
     checkAuth,
     isTokenValid 
   } = useAuth();
@@ -90,34 +87,13 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
     );
   }
 
-  // Check if user needs to change password
-  if (user.force_password_change) {
-    return (
-      <Navigate 
-        to="/change-password" 
-        state={{ from: location.pathname, forced: true }} 
-        replace 
-      />
-    );
-  }
+  // Note: Password change requirement should be handled by backend
 
-  // Check MFA requirements
-  if (requireMfa || (mfaRequired && !mfaVerified)) {
-    if (user.mfa_enabled && !mfaVerified) {
-      return (
-        <Navigate 
-          to="/mfa-verify" 
-          state={{ from: location.pathname }} 
-          replace 
-        />
-      );
-    }
-  }
+  // Note: MFA requirements should be handled by backend
 
   // Check role requirements
   if (requireRoles.length > 0) {
-    const userRoles = user.roles?.map(role =>  role.name) || [];
-    const hasRequiredRole = requireRoles.some(role => userRoles.includes(role));
+    const hasRequiredRole = requireRoles.includes(user.role);
     
     if (!hasRequiredRole) {
       if (fallback) {
@@ -159,16 +135,16 @@ export const AdminGuard: React.FC<Omit<AuthGuardProps, 'requireRoles'>> = (props
   <AuthGuard {...props} requireRoles={['admin']} />
 );
 
-export const MasterAdminGuard: React.FC<Omit<AuthGuardProps, 'requireRoles'>> = (props) => (
-  <AuthGuard {...props} requireRoles={['master_admin']} />
+export const InspektoratGuard: React.FC<Omit<AuthGuardProps, 'requireRoles'>> = (props) => (
+  <AuthGuard {...props} requireRoles={['inspektorat']} />
 );
 
-export const AdminOrMasterAdminGuard: React.FC<Omit<AuthGuardProps, 'requireRoles'>> = (props) => (
-  <AuthGuard {...props} requireRoles={['admin', 'master_admin']} />
+export const PerwadagGuard: React.FC<Omit<AuthGuardProps, 'requireRoles'>> = (props) => (
+  <AuthGuard {...props} requireRoles={['perwadag']} />
 );
 
-export const UserGuard: React.FC<Omit<AuthGuardProps, 'requireRoles'>> = (props) => (
-  <AuthGuard {...props} requireRoles={['user', 'admin', 'master_admin']} />
+export const AdminOrInspektoratGuard: React.FC<Omit<AuthGuardProps, 'requireRoles'>> = (props) => (
+  <AuthGuard {...props} requireRoles={['admin', 'inspektorat']} />
 );
 
 export const MfaGuard: React.FC<Omit<AuthGuardProps, 'requireMfa'>> = (props) => (

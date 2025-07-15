@@ -9,7 +9,7 @@ export abstract class BaseService {
   protected baseEndpoint: string;
 
   constructor(baseEndpoint: string) {
-    this.baseEndpoint = baseEndpoint;
+    this.baseEndpoint = `/api/v1${baseEndpoint}`;
   }
 
   protected showToast(

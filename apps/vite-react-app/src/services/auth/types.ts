@@ -2,7 +2,7 @@
 
 // Auth Request Types
 export interface LoginRequest {
-  nama: string; // username field as per backend
+  username: string; // username field as per backend
   password: string;
 }
 

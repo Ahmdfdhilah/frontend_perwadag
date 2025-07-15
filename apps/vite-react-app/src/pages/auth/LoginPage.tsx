@@ -1,5 +1,5 @@
 // apps/vite-react-app/src/pages/auth/LoginPage.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,12 +14,13 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Checkbox } from '@workspace/ui/components/checkbox';
 
 import { useTheme } from '@/hooks/useTheme';
+import { useAuth } from '@/components/Auth/AuthProvider';
 import logoLightMode from '@/assets/logoLightMode.png';
 import logoDarkMode from '@/assets/logoDarkMode.png';
 import loginIcon from '@/assets/loginIcon.png';
 
 const loginSchema = z.object({
-  email: z.string().min(1, 'Email/NIP is required'),
+  username: z.string().min(1, 'Username is required'),
   password: z.string().min(1, 'Password is required'),
   rememberMe: z.boolean().default(false)
 });
@@ -28,61 +29,70 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export function LoginPage() {
   const { isDarkMode } = useTheme();
+  const { login, isAuthenticated, loading: authLoading, error, clearAuthError } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState<string>('');
 
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from || '/';
+  const from = location.state?.from || '/dashboard';
 
-  // Check if already logged in (dummy check)
-  // React.useEffect(() => {
-  //   const isLoggedIn = localStorage.getItem('isLoggedIn');
-  //   if (isLoggedIn === 'true') {
-  //     navigate(from, { replace: true });
-  //   }
-  // }, [navigate, from]);
+  // Check if already logged in
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, from]);
+
+  // Update local error state when auth error changes
+  useEffect(() => {
+    if (error) {
+      setLoginError(error);
+    }
+  }, [error]);
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
+      username: '',
       password: '',
       rememberMe: false
     }
   });
 
   // Clear errors when form values change
-  React.useEffect(() => {
+  useEffect(() => {
     if (loginError) {
       setLoginError('');
+      clearAuthError();
     }
-  }, [form.watch()]);
+  }, [form.watch(), clearAuthError]);
 
-  const onSubmit = (data: LoginFormData) => {
-    setLoading(true);
+  const onSubmit = async (data: LoginFormData) => {
     setLoginError('');
+    clearAuthError();
 
-    // Dummy authentication - just simulate a delay
-    setTimeout(() => {
-      // Store dummy login state
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userEmail', data.email);
+    try {
+      await login({
+        username: data.username,
+        password: data.password
+      });
+      
       if (data.rememberMe) {
         localStorage.setItem('rememberMe', 'true');
       }
       
-      setLoading(false);
-      // Redirect to dashboard
-      navigate(from, { replace: true });
-    }, 1000);
+      // Navigation will be handled by useEffect when isAuthenticated becomes true
+    } catch (error: any) {
+      // Error is already handled by auth provider
+      console.error('Login failed:', error);
+    }
   };
 
   const handleForgotPassword = () => {
     navigate('/forgot-password', {
-      state: { email: form.getValues('email') }
+      state: { username: form.getValues('username') }
     });
   };
 
@@ -111,7 +121,7 @@ export function LoginPage() {
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">Selamat Datang</h1>
                 <p className="text-muted-foreground">
-                  Login dengan Email atau NIP
+                  Login dengan Username
                 </p>
               </div>
             </div>
@@ -121,7 +131,7 @@ export function LoginPage() {
               <CardHeader className="space-y-1">
                 <CardTitle className="text-xl">Login</CardTitle>
                 <CardDescription>
-                  Masukan email/NIP dan pasword untuk akses akun
+                  Masukan username dan password untuk akses akun
                 </CardDescription>
               </CardHeader>
 
@@ -137,18 +147,18 @@ export function LoginPage() {
                       </Alert>
                     )}
 
-                    {/* Email/NIP Field */}
+                    {/* Username Field */}
                     <FormField
                       control={form.control}
-                      name="email"
+                      name="username"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Email/NIP</FormLabel>
+                          <FormLabel>Username</FormLabel>
                           <FormControl>
                             <Input
                               type="text"
-                              placeholder="Enter your email or NIP"
-                              disabled={loading}
+                              placeholder="Masukkan username"
+                              disabled={authLoading}
                               {...field}
                             />
                           </FormControl>
@@ -168,8 +178,8 @@ export function LoginPage() {
                             <div className="relative">
                               <Input
                                 type={showPassword ? 'text' : 'password'}
-                                placeholder="Enter your password"
-                                disabled={loading}
+                                placeholder="Masukkan password"
+                                disabled={authLoading}
                                 {...field}
                               />
                               <Button
@@ -178,7 +188,7 @@ export function LoginPage() {
                                 size="sm"
                                 className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                                 onClick={() => setShowPassword(!showPassword)}
-                                disabled={loading}
+                                disabled={authLoading}
                               >
                                 {showPassword ? (
                                   <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -205,7 +215,7 @@ export function LoginPage() {
                               <Checkbox
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
-                                disabled={loading}
+                                disabled={authLoading}
                               />
                             </FormControl>
                             <div className="space-y-1 leading-none">
@@ -222,7 +232,7 @@ export function LoginPage() {
                         size="sm"
                         className="px-0 h-auto font-normal"
                         onClick={handleForgotPassword}
-                        disabled={loading}
+                        disabled={authLoading}
                       >
                         Lupa password?
                       </Button>
@@ -233,15 +243,15 @@ export function LoginPage() {
                     <Button
                       type="submit"
                       className="w-full"
-                      disabled={loading}
+                      disabled={authLoading}
                     >
-                      {loading ? (
+                      {authLoading ? (
                         <>
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Log in...
+                          Masuk...
                         </>
                       ) : (
-                        'Sign in'
+                        'Masuk'
                       )}
                     </Button>
                   </CardFooter>
@@ -263,7 +273,7 @@ export function LoginPage() {
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-white">Selamat Datang</h1>
               <p className="text-white/80">
-              Login dengan Email atau NIP
+                Login dengan Username
               </p>
             </div>
           </div>
@@ -273,7 +283,7 @@ export function LoginPage() {
             <CardHeader className="space-y-1">
               <CardTitle className="text-xl">Login</CardTitle>
               <CardDescription>
-              Masukan email/NIP dan pasword untuk akses akun
+                Masukan username dan password untuk akses akun
               </CardDescription>
             </CardHeader>
 
@@ -289,18 +299,18 @@ export function LoginPage() {
                     </Alert>
                   )}
 
-                  {/* Email/NIP Field */}
+                  {/* Username Field */}
                   <FormField
                     control={form.control}
-                    name="email"
+                    name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email/NIP</FormLabel>
+                        <FormLabel>Username</FormLabel>
                         <FormControl>
                           <Input
                             type="text"
-                            placeholder="Enter your email or NIP"
-                            disabled={loading}
+                            placeholder="Masukkan username"
+                            disabled={authLoading}
                             {...field}
                           />
                         </FormControl>
@@ -320,8 +330,8 @@ export function LoginPage() {
                           <div className="relative">
                             <Input
                               type={showPassword ? 'text' : 'password'}
-                              placeholder="Enter your password"
-                              disabled={loading}
+                              placeholder="Masukkan password"
+                              disabled={authLoading}
                               {...field}
                             />
                             <Button
@@ -330,7 +340,7 @@ export function LoginPage() {
                               size="sm"
                               className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                               onClick={() => setShowPassword(!showPassword)}
-                              disabled={loading}
+                              disabled={authLoading}
                             >
                               {showPassword ? (
                                 <EyeOff className="h-4 w-4 text-muted-foreground" />
@@ -357,7 +367,7 @@ export function LoginPage() {
                             <Checkbox
                               checked={field.value}
                               onCheckedChange={field.onChange}
-                              disabled={loading}
+                              disabled={authLoading}
                             />
                           </FormControl>
                           <div className="space-y-1 leading-none">
@@ -374,7 +384,7 @@ export function LoginPage() {
                       size="sm"
                       className="px-0 h-auto font-normal"
                       onClick={handleForgotPassword}
-                      disabled={loading}
+                      disabled={authLoading}
                     >
                       Lupa password?
                     </Button>
@@ -385,15 +395,15 @@ export function LoginPage() {
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={loading}
+                    disabled={authLoading}
                   >
-                    {loading ? (
+                    {authLoading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Log in...
+                        Masuk...
                       </>
                     ) : (
-                      'Sign in'
+                      'Masuk'
                     )}
                   </Button>
                 </CardFooter>

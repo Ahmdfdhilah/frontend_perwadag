@@ -1,7 +1,6 @@
 import { ReactNode } from 'react';
-import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-import { RootState } from '@/redux/store';
+import { useAuth } from './AuthProvider';
 import { type UserRole } from '@/lib/menus';
 
 interface RoleProtectedRouteProps {
@@ -19,19 +18,19 @@ export function RoleProtectedRoute({
   fallback,
   requireRoles = false
 }: RoleProtectedRouteProps) {
-  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { user, isAuthenticated } = useAuth();
 
   // Check if user is authenticated
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  // Get user role names
-  const userRoles = user?.roles?.map(role => role.name) || [];
-  const hasRoles = userRoles.length > 0;
+  // Get user role
+  const userRole = user?.role;
+  const hasRole = !!userRole;
 
   // If route requires roles but user has none, redirect to home
-  if (requireRoles && !hasRoles) {
+  if (requireRoles && !hasRole) {
     return <Navigate to="/" replace />;
   }
 
@@ -41,7 +40,7 @@ export function RoleProtectedRoute({
   }
 
   // Check if user has any of the required roles
-  const hasAccess = allowedRoles.some(role => userRoles.includes(role));
+  const hasAccess = userRole && allowedRoles.includes(userRole as UserRole);
 
   if (!hasAccess) {
     if (fallback) {
@@ -84,17 +83,16 @@ export function NoRolesOnly({
   redirectTo?: string;
   fallback?: ReactNode;
 }) {
-  const { user, isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { user, isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  const userRoles = user?.roles?.map(role => role.name) || [];
-  const hasRoles = userRoles.length > 0;
+  const hasRole = !!user?.role;
 
   // If user has roles, redirect them away from this route
-  if (hasRoles) {
+  if (hasRole) {
     if (fallback) {
       return <>{fallback}</>;
     }
@@ -106,7 +104,7 @@ export function NoRolesOnly({
 
 // Guard for home page accessible to users with or without roles
 export function HomePageGuard({ children }: { children: ReactNode }) {
-  const { isAuthenticated } = useSelector((state: RootState) => state.auth);
+  const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -117,41 +115,33 @@ export function HomePageGuard({ children }: { children: ReactNode }) {
 
 // Hook to check role access in components
 export function useRoleAccess() {
-  const user = useSelector((state: RootState) => state.auth.user);
+  const { user } = useAuth();
   
-  const userRoles = user?.roles?.map(role => role.name) || [];
-  const hasRoles = userRoles.length > 0;
+  const userRole = user?.role;
+  const hasRole = !!userRole;
 
-  const hasRole = (role: UserRole | UserRole[]) => {
+  const checkRole = (role: UserRole | UserRole[]) => {
+    if (!userRole) return false;
     const rolesToCheck = Array.isArray(role) ? role : [role];
-    return rolesToCheck.some(r => userRoles.includes(r));
+    return rolesToCheck.includes(userRole as UserRole);
   };
 
   const hasAnyRole = (roles: UserRole[]) => {
-    return roles.some(role => userRoles.includes(role));
+    if (!userRole) return false;
+    return roles.includes(userRole as UserRole);
   };
 
-  const hasAllRoles = (roles: UserRole[]) => {
-    return roles.every(role => userRoles.includes(role));
-  };
-
-  // const canAccessRoute = (path: string) => {
-  //   return hasRouteAccess(path, userRoles);
-  // };
-
-  // const isMasterAdmin = hasRole('master_admin');
-  // const isAdmin = hasRole('admin');
-  // const isUser = hasRole('user');
+  const isAdmin = userRole === 'admin';
+  const isInspektorat = userRole === 'inspektorat';
+  const isPerwadag = userRole === 'perwadag';
 
   return {
-    userRoles,
-    hasRoles,
+    userRole,
     hasRole,
+    checkRole,
     hasAnyRole,
-    hasAllRoles,
-    // canAccessRoute,
-    // isMasterAdmin,
-    // isAdmin,
-    // isUser,
+    isAdmin,
+    isInspektorat,
+    isPerwadag,
   };
 }

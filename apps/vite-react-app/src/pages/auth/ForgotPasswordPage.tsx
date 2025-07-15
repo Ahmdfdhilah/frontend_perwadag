@@ -33,7 +33,7 @@ export function ForgotPasswordPage() {
   const form = useForm({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
-      email: location.state?.email || '',
+      email: location.state?.username || '',
     }
   });
 
