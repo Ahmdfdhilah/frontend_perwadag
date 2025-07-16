@@ -889,7 +889,274 @@ All users are created with default password: `@Kemendag123`
 
 ---
 
-## 8. Meeting Endpoints
+## 8. Periode Evaluasi Endpoints
+**Base Path**: `/periode-evaluasi`
+
+| Method | Route | Request Schema | Response Schema | Auth Required | Description |
+|--------|-------|---------------|----------------|---------------|-------------|
+| POST | `/` | `PeriodeEvaluasiCreate` | `PeriodeEvaluasiCreateResponse` | Admin | Create periode evaluasi with auto bulk generate |
+| GET | `/` | `PeriodeEvaluasiFilterParams` | `PeriodeEvaluasiListResponse` | Admin/Inspektorat | Get all periode evaluasi with filters |
+| GET | `/{periode_id}` | None | `PeriodeEvaluasiResponse` | Admin/Inspektorat | Get periode evaluasi by ID |
+| PUT | `/{periode_id}` | `PeriodeEvaluasiUpdate` | `PeriodeEvaluasiResponse` | Admin | Update periode evaluasi |
+| DELETE | `/{periode_id}` | None | `SuccessResponse` | Admin | Delete periode evaluasi with cascade |
+| GET | `/check/tahun-availability` | Query: `tahun` | Dict | Admin | Check tahun availability |
+| GET | `/statistics/overview` | None | Dict | Admin | Get comprehensive statistics |
+
+### Key Features:
+- **Auto bulk generate**: Automatically creates penilaian risiko for all active perwadag
+- **Tahun pembanding**: Auto-generates comparison years (tahun-2, tahun-1)
+- **Cascade delete**: Deletes all related penilaian risiko when periode is deleted
+- **Lock/unlock**: Controls editing permissions for the periode
+
+### Request/Response Schemas:
+
+#### **PeriodeEvaluasiCreate**
+```json
+{
+  "tahun": "int (2020-2050)",
+  "status": "enum (aktif/tutup, default: aktif)"
+}
+```
+
+#### **PeriodeEvaluasiUpdate**
+```json
+{
+  "is_locked": "bool?",
+  "status": "enum? (aktif/tutup)"
+}
+```
+
+#### **PeriodeEvaluasiResponse**
+```json
+{
+  "id": "string",
+  "tahun": "int",
+  "is_locked": "bool",
+  "status": "enum",
+  "is_editable": "bool",
+  "status_display": "string",
+  "lock_status_display": "string",
+  "tahun_pembanding_1": "int",
+  "tahun_pembanding_2": "int",
+  "total_penilaian": "int",
+  "penilaian_completed": "int",
+  "completion_rate": "float",
+  "created_at": "datetime",
+  "updated_at": "datetime?",
+  "created_by": "string?",
+  "updated_by": "string?"
+}
+```
+
+#### **PeriodeEvaluasiCreateResponse**
+```json
+{
+  "success": "bool",
+  "message": "string",
+  "data": "any",
+  "periode_evaluasi": "PeriodeEvaluasiResponse",
+  "bulk_generation_summary": {
+    "total_perwadag": "int",
+    "generated_penilaian": "int",
+    "failed_generation": "int",
+    "errors": ["string"]
+  }
+}
+```
+
+#### **PeriodeEvaluasiFilterParams** (Query Parameters)
+- **page**: Page number (default: 1)
+- **size**: Items per page (default: 10)
+- **search**: Search by tahun
+- **status**: Filter by status (aktif/tutup)
+- **is_locked**: Filter by lock status
+- **tahun_from**: Start year filter
+- **tahun_to**: End year filter
+- **include_statistics**: Include statistics in response
+
+### Business Rules:
+- **Tahun uniqueness**: Each tahun can only have one periode
+- **Auto-generated years**: tahun_pembanding_1 = tahun-2, tahun_pembanding_2 = tahun-1
+- **Cascade operations**: Creating periode auto-generates penilaian risiko for all active perwadag
+- **Lock mechanism**: Locked periode prevents editing of related penilaian risiko
+
+---
+
+## 9. Penilaian Risiko Endpoints
+**Base Path**: `/penilaian-risiko`
+
+| Method | Route | Request Schema | Response Schema | Auth Required | Description |
+|--------|-------|---------------|----------------|---------------|-------------|
+| GET | `/` | `PenilaianRisikoFilterParams` | `PenilaianRisikoListResponse` | Admin/Inspektorat | Get all penilaian risiko with filters |
+| GET | `/{penilaian_id}` | None | `PenilaianRisikoResponse` | Admin/Inspektorat | Get penilaian risiko by ID |
+| PUT | `/{penilaian_id}` | `PenilaianRisikoUpdate` | `PenilaianRisikoResponse` | Admin/Inspektorat | Update penilaian risiko with auto-calculate |
+| GET | `/periode/{periode_id}/summary` | None | Dict | Admin/Inspektorat | Get periode summary statistics |
+
+### Key Features:
+- **Auto-calculate**: Automatically calculates total_nilai_risiko and profil_risiko when data is complete
+- **Role-based filtering**: Admin sees all, Inspektorat sees only their jurisdiction
+- **8 criteria evaluation**: Comprehensive risk assessment with weighted scoring
+- **Risk profiling**: Automatic risk categorization (Rendah/Sedang/Tinggi)
+
+### Request/Response Schemas:
+
+#### **PenilaianRisikoUpdate**
+```json
+{
+  "kriteria_data": {
+    "tren_capaian": {
+      "tahun_pembanding_1": "int",
+      "capaian_tahun_1": "float?",
+      "tahun_pembanding_2": "int", 
+      "capaian_tahun_2": "float?",
+      "tren": "float?",
+      "pilihan": "string?",
+      "nilai": "int?"
+    },
+    "realisasi_anggaran": {
+      "tahun_pembanding": "int",
+      "realisasi": "float?",
+      "pagu": "float?",
+      "persentase": "float?",
+      "pilihan": "string?",
+      "nilai": "int?"
+    },
+    "tren_ekspor": {
+      "tahun_pembanding": "int",
+      "deskripsi": "float?",
+      "pilihan": "string?",
+      "nilai": "int?"
+    },
+    "audit_itjen": {
+      "tahun_pembanding": "int",
+      "deskripsi": "string?",
+      "pilihan": "string?",
+      "nilai": "int?"
+    },
+    "perjanjian_perdagangan": {
+      "tahun_pembanding": "int",
+      "deskripsi": "string?",
+      "pilihan": "string?",
+      "nilai": "int?"
+    },
+    "peringkat_ekspor": {
+      "tahun_pembanding": "int",
+      "deskripsi": "int?",
+      "pilihan": "string?",
+      "nilai": "int?"
+    },
+    "persentase_ik": {
+      "tahun_pembanding": "int",
+      "ik_tidak_tercapai": "int?",
+      "total_ik": "int?",
+      "persentase": "float?",
+      "pilihan": "string?",
+      "nilai": "int?"
+    },
+    "realisasi_tei": {
+      "tahun_pembanding": "int",
+      "nilai_realisasi": "float?",
+      "nilai_potensi": "float?",
+      "deskripsi": "float?",
+      "pilihan": "string?",
+      "nilai": "int?"
+    }
+  },
+  "catatan": "string? (max 1000 chars)",
+  "auto_calculate": "bool (default: true)"
+}
+```
+
+#### **PenilaianRisikoResponse**
+```json
+{
+  "id": "string",
+  "user_perwadag_id": "string",
+  "periode_id": "string",
+  "tahun": "int",
+  "inspektorat": "string",
+  "total_nilai_risiko": "decimal?",
+  "skor_rata_rata": "decimal?",
+  "profil_risiko_auditan": "string?",
+  "catatan": "string?",
+  "kriteria_data": {
+    "tren_capaian": "TrenCapaianData",
+    "realisasi_anggaran": "RealisasiAnggaranData",
+    "tren_ekspor": "TrenEksporData",
+    "audit_itjen": "AuditItjenData",
+    "perjanjian_perdagangan": "PerjanjianPerdaganganData",
+    "peringkat_ekspor": "PeringkatEksporData",
+    "persentase_ik": "PersentaseIkData",
+    "realisasi_tei": "RealisasiTeiData"
+  },
+  "is_calculation_complete": "bool",
+  "has_calculation_result": "bool",
+  "completion_percentage": "int (0-100)",
+  "profil_risiko_color": "string",
+  "perwadag_info": {
+    "id": "string",
+    "nama": "string",
+    "inspektorat": "string",
+    "email": "string?"
+  },
+  "periode_info": {
+    "id": "string",
+    "tahun": "int",
+    "status": "string",
+    "is_locked": "bool",
+    "is_editable": "bool"
+  },
+  "nama_perwadag": "string",
+  "periode_tahun": "int",
+  "periode_status": "string",
+  "calculation_performed": "bool",
+  "calculation_details": {
+    "formula_used": "string",
+    "individual_scores": "dict",
+    "weighted_total": "decimal",
+    "risk_category": "string"
+  },
+  "created_at": "datetime",
+  "updated_at": "datetime?",
+  "created_by": "string?",
+  "updated_by": "string?"
+}
+```
+
+#### **PenilaianRisikoFilterParams** (Query Parameters)
+- **page**: Page number (default: 1)
+- **size**: Items per page (default: 10)
+- **search**: Search in nama perwadag, inspektorat
+- **periode_id**: Filter by periode
+- **user_perwadag_id**: Filter by perwadag
+- **inspektorat**: Filter by inspektorat
+- **tahun**: Filter by tahun
+- **is_complete**: Filter complete data (true/false)
+- **sort_by**: Sort order (skor_tertinggi, skor_terendah, nama, created_at)
+
+### Calculation Formula:
+```
+total_nilai_risiko = (
+    (nilai1 * 15) + (nilai2 * 10) + (nilai3 * 15) + (nilai4 * 25) + 
+    (nilai5 * 5) + (nilai6 * 10) + (nilai7 * 10) + (nilai8 * 10)
+) / 5
+
+skor_rata_rata = (nilai1 + nilai2 + ... + nilai8) / 8
+
+profil_risiko_auditan:
+- skor_rata_rata <= 2.0 → "Rendah"
+- skor_rata_rata <= 3.5 → "Sedang"
+- skor_rata_rata > 3.5 → "Tinggi"
+```
+
+### Access Control:
+- **Admin**: Full access to all penilaian risiko
+- **Inspektorat**: Access only to penilaian risiko in their jurisdiction
+- **Perwadag**: No direct access (managed through other endpoints)
+
+---
+
+## 10. Meeting Endpoints
 **Base Path**: `/meeting`
 
 | Method | Route | Request Schema | Response Schema | Auth Required | Description |

@@ -13,6 +13,8 @@ export { laporanHasilService } from "./laporanHasil";
 export { matriksService } from "./matriks";
 export { suratPemberitahuanService } from "./suratPemberitahuan";
 export { meetingService } from "./meeting";
+export { penilaianRisikoService } from "./penilaianRisiko";
+export { periodeEvaluasiService } from "./periodeEvaluasi";
 
 // Export types with explicit imports to avoid conflicts
 export type {
@@ -128,3 +130,35 @@ export type {
   MeetingFileDeleteResponse,
   MeetingFilterParams,
 } from "./meeting";
+
+export type {
+  TrenCapaianData,
+  RealisasiAnggaranData,
+  TrenEksporData,
+  AuditItjenData,
+  PerjanjianPerdaganganData,
+  PeringkatEksporData,
+  PersentaseIkData,
+  RealisasiTeiData,
+  KriteriaData,
+  CalculationDetails,
+  PenilaianRisiko,
+  PenilaianRisikoUpdate,
+  PenilaianRisikoResponse,
+  PenilaianRisikoListResponse,
+  PeriodeSummaryStatistics,
+  PenilaianRisikoFilterParams,
+} from "./penilaianRisiko";
+
+export type {
+  PeriodeEvaluasi,
+  PeriodeEvaluasiCreate,
+  PeriodeEvaluasiUpdate,
+  PeriodeEvaluasiResponse,
+  BulkGenerationSummary,
+  PeriodeEvaluasiCreateResponse,
+  PeriodeEvaluasiListResponse,
+  TahunAvailabilityResponse,
+  PeriodeEvaluasiStatistics,
+  PeriodeEvaluasiFilterParams,
+} from "./periodeEvaluasi";
