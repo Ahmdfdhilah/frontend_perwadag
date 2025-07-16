@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
+import { ROLE_LABELS } from '@/lib/constants';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Button } from '@workspace/ui/components/button';
@@ -20,8 +21,8 @@ const RiskAssessmentDetailPage: React.FC = () => {
   const [formData] = useState<RiskAssessmentDetail>(DUMMY_RISK_ASSESSMENT_DETAIL);
 
   // Calculate role values once to avoid hooks being called conditionally
-  const userIsAdmin = currentRole.id === 'admin';
-  const userIsInspektorat = currentRole.id === 'inspektorat';
+  const userIsAdmin = currentRole === 'ADMIN';
+  const userIsInspektorat = currentRole === 'INSPEKTORAT';
   const hasAccess = userIsAdmin || userIsInspektorat;
 
   // Check if user can access this specific assessment
@@ -76,7 +77,7 @@ const RiskAssessmentDetailPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title={`Detail Penilaian Risiko - ${basicAssessment.perwadagName}`}
-        description={`Tahun ${basicAssessment.year} | Role: ${currentRole.label}`}
+        description={`Tahun ${basicAssessment.year} | Role: ${ROLE_LABELS[currentRole as keyof typeof ROLE_LABELS]}`}
         actions={
           <div className="flex gap-2">
             <Button

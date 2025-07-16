@@ -3,13 +3,13 @@ import { User } from '@/services/users/types';
 import { ROLE_LABELS } from '@/lib/constants';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
-import { Avatar, AvatarImage, AvatarFallback } from '@workspace/ui/components/avatar';
+import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import ActionDropdown  from '@/components/common/ActionDropdown';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { 
   Mail, 
-  Phone, 
+ 
   MapPin, 
   Calendar, 
   CreditCard,

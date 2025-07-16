@@ -265,7 +265,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
     );
   };
 
-  const renderExistingFileItem = (file: { name: string; url?: string; size?: number }, index: number) => {
+  const renderExistingFileItem = (file: { name: string; url?: string; viewUrl?: string; size?: number }, index: number) => {
     const fileSize = file.size ? formatFileSize(file.size) : 'Unknown size';
     const fileName = file.name;
     const isImage = fileName.match(/\.(jpg|jpeg|png|gif|webp)$/i);

@@ -10,10 +10,8 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import { Badge } from '@workspace/ui/components/badge';
-import { Avatar, AvatarImage, AvatarFallback } from '@workspace/ui/components/avatar';
+import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import ActionDropdown  from '@/components/common/ActionDropdown';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
 
 interface UserTableProps {
   users: User[];

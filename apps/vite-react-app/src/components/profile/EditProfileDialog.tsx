@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useToast } from '@workspace/ui/components/sonner';
 import { User, UserUpdate } from '@/services/users/types';
 import {
   Dialog,
@@ -14,7 +13,6 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
-import { Textarea } from '@workspace/ui/components/textarea';
 import {
   Form,
   FormControl,
@@ -23,8 +21,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@workspace/ui/components/form';
-import { Avatar, AvatarImage, AvatarFallback } from '@workspace/ui/components/avatar';
-import { Upload, X, CalendarDays, MapPin } from 'lucide-react';
+import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 
 const editProfileSchema = z.object({
   nama: z.string().min(1, 'Nama wajib diisi').min(2, 'Nama minimal 2 karakter'),

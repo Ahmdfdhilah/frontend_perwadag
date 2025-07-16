@@ -1,28 +1,24 @@
 import React, { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
-import { selectUser, selectAuthLoading, updateProfileAsync, changePasswordAsync } from '@/redux/features/authSlice';
+import { selectUser, selectAuthLoading, updateProfileAsync } from '@/redux/features/authSlice';
 import { useToast } from '@workspace/ui/components/sonner';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
-import { Avatar, AvatarImage, AvatarFallback } from '@workspace/ui/components/avatar';
+import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import { PageHeader } from '@/components/common/PageHeader';
 import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { UserUpdate, UserChangePassword } from '@/services/users/types';
+import { UserUpdate } from '@/services/users/types';
 import {
   Mail,
-  Phone,
   Building,
   Shield,
   User as UserIcon,
   Edit,
-  Lock,
   CheckCircle,
   XCircle,
-  Calendar,
-  MapPin,
   Award,
   IdCard,
 } from 'lucide-react';
@@ -129,23 +125,6 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  const handlePasswordChange = async (data: UserChangePassword) => {
-    try {
-      await dispatch(changePasswordAsync(data)).unwrap();
-      toast({
-        title: 'Password berhasil diubah',
-        description: 'Password Anda telah berhasil diubah.',
-        variant: 'default'
-      });
-      setIsPasswordDialogOpen(false);
-    } catch (error) {
-      toast({
-        title: 'Gagal mengubah password',
-        description: 'Terjadi kesalahan saat mengubah password.',
-        variant: 'destructive'
-      });
-    }
-  };
 
   return (
     <div className="space-y-6">

@@ -12,7 +12,6 @@ import {
   UsernameGenerationPreview,
   UsernameGenerationResponse,
   MessageResponse,
-  PerwadagSummary,
   PerwadagListResponse,
   PerwadagSearchParams,
 } from "./types";
