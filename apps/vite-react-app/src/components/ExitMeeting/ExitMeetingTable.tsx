@@ -8,22 +8,45 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { ExitMeeting, getExitMeetingStatus } from '@/mocks/exitMeeting';
+import { MeetingResponse } from '@/services/meeting/types';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface ExitMeetingTableProps {
-  data: ExitMeeting[];
-  onView?: (item: ExitMeeting) => void;
-  onEdit?: (item: ExitMeeting) => void;
-  canEdit?: (item: ExitMeeting) => boolean;
+  data: MeetingResponse[];
+  loading?: boolean;
+  onView?: (item: MeetingResponse) => void;
+  onEdit?: (item: MeetingResponse) => void;
+  canEdit?: (item: MeetingResponse) => boolean;
 }
 
 const ExitMeetingTable: React.FC<ExitMeetingTableProps> = ({
   data,
+  loading = false,
   onView,
   onEdit,
   canEdit,
 }) => {
+
+  const getStatusBadge = (meeting: MeetingResponse) => {
+    const isCompleted = meeting.is_completed;
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+        isCompleted
+          ? 'bg-green-100 text-green-800' 
+          : 'bg-red-100 text-red-800'
+      }`}>
+        {isCompleted ? 'Lengkap' : 'Belum Lengkap'}
+      </span>
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-32 text-muted-foreground">
+        Loading meetings...
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-md border">
@@ -43,24 +66,22 @@ const ExitMeetingTable: React.FC<ExitMeetingTableProps> = ({
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
-                Tidak ada data exit meeting
+              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                Tidak ada data exit meeting yang ditemukan.
               </TableCell>
             </TableRow>
           ) : (
             data.map((item, index) => {
-
-
               return (
                 <TableRow key={item.id}>
                   <TableCell className="font-medium">{index + 1}</TableCell>
-                  <TableCell>{item.perwadagName}</TableCell>
-                  <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
-                  <TableCell>{formatIndonesianDate(item.tanggal)}</TableCell>
+                  <TableCell>{item.nama_perwadag}</TableCell>
+                  <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
+                  <TableCell>{item.tanggal_meeting ? formatIndonesianDate(item.tanggal_meeting) : '-'}</TableCell>
                   <TableCell>
-                    {item.linkZoom ? (
+                    {item.link_zoom ? (
                       <a
-                        href={item.linkZoom}
+                        href={item.link_zoom}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 underline"
@@ -72,9 +93,9 @@ const ExitMeetingTable: React.FC<ExitMeetingTableProps> = ({
                     )}
                   </TableCell>
                   <TableCell>
-                    {item.linkDaftarHadir ? (
+                    {item.link_daftar_hadir ? (
                       <a
-                        href={item.linkDaftarHadir}
+                        href={item.link_daftar_hadir}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 underline"
@@ -86,15 +107,7 @@ const ExitMeetingTable: React.FC<ExitMeetingTableProps> = ({
                     )}
                   </TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      getExitMeetingStatus(item) === 'Lengkap' 
-                        ? 'bg-green-100 text-green-800' 
-                        : getExitMeetingStatus(item) === 'Sebagian'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {getExitMeetingStatus(item)}
-                    </span>
+                    {getStatusBadge(item)}
                   </TableCell>
                   <TableCell>
                     <ActionDropdown

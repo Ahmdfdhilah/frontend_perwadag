@@ -1,22 +1,45 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { KonfirmasiMeeting, getKonfirmasiMeetingStatus } from '@/mocks/konfirmasiMeeting';
+import { MeetingResponse } from '@/services/meeting/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface KonfirmasiMeetingCardsProps {
-  data: KonfirmasiMeeting[];
-  onView?: (item: KonfirmasiMeeting) => void;
-  onEdit?: (item: KonfirmasiMeeting) => void;
-  canEdit?: (item: KonfirmasiMeeting) => boolean;
+  data: MeetingResponse[];
+  loading?: boolean;
+  onView?: (item: MeetingResponse) => void;
+  onEdit?: (item: MeetingResponse) => void;
+  canEdit?: (item: MeetingResponse) => boolean;
 }
 
 const KonfirmasiMeetingCards: React.FC<KonfirmasiMeetingCardsProps> = ({
   data,
+  loading = false,
   onView,
   onEdit,
   canEdit,
 }) => {
+  
+  const getStatusBadge = (meeting: MeetingResponse) => {
+    const isCompleted = meeting.is_completed;
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+        isCompleted
+          ? 'bg-green-100 text-green-800' 
+          : 'bg-red-100 text-red-800'
+      }`}>
+        {isCompleted ? 'Lengkap' : 'Belum Lengkap'}
+      </span>
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-32 text-muted-foreground">
+        Loading meetings...
+      </div>
+    );
+  }
 
   if (data.length === 0) {
     return (
@@ -28,14 +51,13 @@ const KonfirmasiMeetingCards: React.FC<KonfirmasiMeetingCardsProps> = ({
 
   return (
     <div className="grid grid-cols-1 gap-4">
-      {data.map((item) => {
-
+      {data.map((item, index) => {
         return (
           <Card key={item.id} className="w-full">
             <CardHeader className="pb-3">
               <div className="flex justify-between items-start">
                 <CardTitle className="text-lg font-semibold">
-                  {item.perwadagName}
+                  {item.nama_perwadag}
                 </CardTitle>
                 <ActionDropdown
                   onView={() => onView?.(item)}
@@ -50,21 +72,21 @@ const KonfirmasiMeetingCards: React.FC<KonfirmasiMeetingCardsProps> = ({
               <div className="space-y-2 text-sm">
                 <div>
                   <span className="font-medium text-muted-foreground">No:</span>
-                  <span className="ml-2">{item.no}</span>
+                  <span className="ml-2">{index + 1}</span>
                 </div>
                 <div>
                   <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
-                  <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
+                  <span className="ml-2">{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</span>
                 </div>
                 <div>
-                  <span className="font-medium text-muted-foreground">Tanggal Konfirmasi:</span>
-                  <span className="ml-2">{formatIndonesianDate(item.tanggalKonfirmasi)}</span>
+                  <span className="font-medium text-muted-foreground">Tanggal Konfirmasi Meeting:</span>
+                  <span className="ml-2">{item.tanggal_meeting ? formatIndonesianDate(item.tanggal_meeting) : '-'}</span>
                 </div>
                 <div>
                   <span className="font-medium text-muted-foreground">Link Zoom:</span>
-                  {item.linkZoom ? (
+                  {item.link_zoom ? (
                     <a
-                      href={item.linkZoom}
+                      href={item.link_zoom}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ml-2 text-blue-600 hover:text-blue-800 underline"
@@ -77,9 +99,9 @@ const KonfirmasiMeetingCards: React.FC<KonfirmasiMeetingCardsProps> = ({
                 </div>
                 <div>
                   <span className="font-medium text-muted-foreground">Daftar Hadir:</span>
-                  {item.linkDaftarHadir ? (
+                  {item.link_daftar_hadir ? (
                     <a
-                      href={item.linkDaftarHadir}
+                      href={item.link_daftar_hadir}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="ml-2 text-blue-600 hover:text-blue-800 underline"
@@ -91,14 +113,9 @@ const KonfirmasiMeetingCards: React.FC<KonfirmasiMeetingCardsProps> = ({
                   )}
                 </div>
                 <div>
-                  <span className="font-medium text-muted-foreground">Status Dokumen:</span>
-                  <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${getKonfirmasiMeetingStatus(item) === 'Lengkap'
-                      ? 'bg-green-100 text-green-800'
-                      : getKonfirmasiMeetingStatus(item) === 'Sebagian'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                    {getKonfirmasiMeetingStatus(item)}
+                  <span className="font-medium text-muted-foreground">Status:</span>
+                  <span className="ml-2">
+                    {getStatusBadge(item)}
                   </span>
                 </div>
               </div>

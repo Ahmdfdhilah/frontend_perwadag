@@ -19,8 +19,8 @@ import { CalendarIcon, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
-import { KonfirmasiMeeting } from '@/mocks/konfirmasiMeeting';
-import { Perwadag } from '@/mocks/perwadag';
+import { MeetingResponse } from '@/services/meeting/types';
+import { PerwadagSummary } from '@/services/users/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
@@ -28,10 +28,10 @@ import FileUpload from '@/components/common/FileUpload';
 interface KonfirmasiMeetingDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  item: KonfirmasiMeeting | null;
+  item: MeetingResponse | null;
   mode: 'view' | 'edit';
-  onSave: (data: Partial<KonfirmasiMeeting>) => void;
-  availablePerwadag: Perwadag[];
+  onSave: (data: any) => void;
+  availablePerwadag?: PerwadagSummary[];
 }
 
 const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
@@ -42,27 +42,36 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
   onSave,
 }) => {
   const { canEditForm } = useFormPermissions();
-  const [formData, setFormData] = useState<Partial<KonfirmasiMeeting>>({});
+  const [formData, setFormData] = useState<any>({});
   const [selectedKonfirmasiDate, setSelectedKonfirmasiDate] = useState<Date>();
   const [isKonfirmasiDatePickerOpen, setIsKonfirmasiDatePickerOpen] = useState(false);
-  const [buktiHadirFiles, setBuktiHadirFiles] = useState<File[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
 
   useEffect(() => {
     if (item && open) {
-      setFormData({ ...item });
-      setSelectedKonfirmasiDate(new Date(item.tanggalKonfirmasi));
+      setFormData({
+        tanggal_meeting: item.tanggal_meeting,
+        link_zoom: item.link_zoom || '',
+        link_daftar_hadir: item.link_daftar_hadir || '',
+      });
+      setSelectedKonfirmasiDate(item.tanggal_meeting ? new Date(item.tanggal_meeting) : undefined);
     } else {
-      setFormData({});
+      setFormData({
+        tanggal_meeting: '',
+        link_zoom: '',
+        link_daftar_hadir: '',
+      });
       setSelectedKonfirmasiDate(undefined);
-      setBuktiHadirFiles([]);
+      setFiles([]);
     }
   }, [item, open]);
 
   const handleSave = () => {
     const dataToSave = {
-      ...formData,
-      tanggalKonfirmasi: selectedKonfirmasiDate ? selectedKonfirmasiDate.toISOString().split('T')[0] : formData.tanggalKonfirmasi,
-      buktiHadirFiles,
+      tanggal_meeting: selectedKonfirmasiDate ? selectedKonfirmasiDate.toISOString().split('T')[0] : formData.tanggal_meeting,
+      link_zoom: formData.link_zoom,
+      link_daftar_hadir: formData.link_daftar_hadir,
+      files,
     };
     onSave(dataToSave);
   };
@@ -77,8 +86,8 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
     }
   };
 
-  const handleBuktiHadirFilesChange = (files: File[]) => {
-    setBuktiHadirFiles(files);
+  const handleFilesChange = (newFiles: File[]) => {
+    setFiles(newFiles);
   };
 
 
@@ -102,7 +111,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
               <div className="space-y-2">
                 <Label>Nama Perwadag</Label>
                 <div className="p-3 bg-muted rounded-md">
-                  {item?.perwadagName}
+                  {item?.nama_perwadag}
                 </div>
               </div>
             </div>
@@ -111,12 +120,12 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
             <div className="space-y-2">
               <Label>Periode Evaluasi</Label>
               <div className="p-3 bg-muted rounded-md">
-                {item ? formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi) : '-'}
+                {item ? formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai) : '-'}
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label>Tanggal Konfirmasi</Label>
+              <Label>Tanggal Konfirmasi Meeting</Label>
               {canEdit ? (
                 <Popover open={isKonfirmasiDatePickerOpen} onOpenChange={setIsKonfirmasiDatePickerOpen}>
                   <PopoverTrigger asChild>
@@ -150,28 +159,28 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
                 </Popover>
               ) : (
                 <div className="p-3 bg-muted rounded-md">
-                  {item ? format(new Date(item.tanggalKonfirmasi), "dd MMMM yyyy", { locale: id }) : '-'}
+                  {item?.tanggal_meeting ? format(new Date(item.tanggal_meeting), "dd MMMM yyyy", { locale: id }) : '-'}
                 </div>
               )}
             </div>
 
             {/* Link Zoom - Editable */}
             <div className="space-y-2">
-              <Label htmlFor="linkZoom">Link Zoom</Label>
+              <Label htmlFor="link_zoom">Link Zoom</Label>
               {canEdit ? (
                 <div className="flex gap-2">
                   <Input
-                    id="linkZoom"
-                    value={formData.linkZoom || ''}
-                    onChange={(e) => setFormData({ ...formData, linkZoom: e.target.value })}
+                    id="link_zoom"
+                    value={formData.link_zoom || ''}
+                    onChange={(e) => setFormData({ ...formData, link_zoom: e.target.value })}
                     placeholder="https://zoom.us/j/..."
                   />
-                  {formData.linkZoom && (
+                  {formData.link_zoom && (
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => handleOpenLink(formData.linkZoom!)}
+                      onClick={() => handleOpenLink(formData.link_zoom!)}
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
@@ -180,14 +189,14 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
               ) : (
                 <div className="flex gap-2">
                   <div className="p-3 bg-muted rounded-md flex-1">
-                    {item?.linkZoom || '-'}
+                    {item?.link_zoom || '-'}
                   </div>
-                  {item?.linkZoom && (
+                  {item?.link_zoom && (
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => handleOpenLink(item.linkZoom!)}
+                      onClick={() => handleOpenLink(item.link_zoom!)}
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
@@ -198,21 +207,21 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
 
             {/* Link Daftar Hadir */}
             <div className="space-y-2">
-              <Label htmlFor="linkDaftarHadir">Link Daftar Hadir (Google Form)</Label>
+              <Label htmlFor="link_daftar_hadir">Link Daftar Hadir (Google Form)</Label>
               {canEdit ? (
                 <div className="flex gap-2">
                   <Input
-                    id="linkDaftarHadir"
-                    value={formData.linkDaftarHadir || ''}
-                    onChange={(e) => setFormData({ ...formData, linkDaftarHadir: e.target.value })}
+                    id="link_daftar_hadir"
+                    value={formData.link_daftar_hadir || ''}
+                    onChange={(e) => setFormData({ ...formData, link_daftar_hadir: e.target.value })}
                     placeholder="https://forms.google.com/..."
                   />
-                  {formData.linkDaftarHadir && (
+                  {formData.link_daftar_hadir && (
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => handleOpenLink(formData.linkDaftarHadir!)}
+                      onClick={() => handleOpenLink(formData.link_daftar_hadir!)}
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
@@ -221,14 +230,14 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
               ) : (
                 <div className="flex gap-2">
                   <div className="p-3 bg-muted rounded-md flex-1">
-                    {item?.linkDaftarHadir || '-'}
+                    {item?.link_daftar_hadir || '-'}
                   </div>
-                  {item?.linkDaftarHadir && (
+                  {item?.link_daftar_hadir && (
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => handleOpenLink(item.linkDaftarHadir!)}
+                      onClick={() => handleOpenLink(item.link_daftar_hadir!)}
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
@@ -237,19 +246,19 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
               )}
             </div>
 
-            {/* Upload Bukti Foto */}
-            <FileUpload
-              label="Upload Bukti Foto (Maksimal 2 gambar)"
-              accept="image/*"
-              maxSize={5 * 1024 * 1024}
-              multiple={true}
-              maxFiles={2}
-              mode={canEdit ? 'edit' : 'view'}
-              files={buktiHadirFiles}
-              existingFiles={item?.buktiImageUrls ? item.buktiImageUrls.map((url, index) => ({ name: `Bukti ${index + 1}`, url })) : []}
-              onFilesChange={handleBuktiHadirFilesChange}
-              description="Format gambar: JPG, PNG, GIF (Max 5MB per file)"
-            />
+            {/* Upload Files */}
+            {canEdit && (
+              <FileUpload
+                label="Upload Files (Optional)"
+                accept="*/*"
+                multiple={true}
+                maxSize={10 * 1024 * 1024} // 10MB
+                files={files}
+                mode="edit"
+                onFilesChange={handleFilesChange}
+                description="Upload any relevant files for this meeting"
+              />
+            )}
           </div>
         </div>
 

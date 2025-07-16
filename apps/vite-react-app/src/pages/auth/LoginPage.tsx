@@ -105,7 +105,7 @@ export function LoginPage() {
           <img 
             src={loginIcon} 
             alt="Login Banner" 
-            className="w-[80%] object-cover"
+            className="w-[75%] object-cover"
           />
         </div>
 
