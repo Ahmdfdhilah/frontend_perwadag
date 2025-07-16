@@ -95,7 +95,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+      <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0 border-b pb-4">
           <DialogTitle>
             {mode === 'view' ? 'Lihat Entry Meeting' : 'Edit Entry Meeting'}

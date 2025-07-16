@@ -40,7 +40,7 @@ const SuratTugasViewDialog: React.FC<SuratTugasViewDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col">
+      <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0 border-b pb-4">
           <DialogTitle>Lihat Surat Tugas</DialogTitle>
         </DialogHeader>
