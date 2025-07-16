@@ -78,7 +78,6 @@ const RiskAssessmentPage: React.FC = () => {
         inspektorat: filters.inspektorat !== 'all' ? filters.inspektorat : undefined,
         user_perwadag_id: filters.user_perwadag_id !== 'all' ? filters.user_perwadag_id : undefined,
         tahun: filters.tahun !== 'all' ? parseInt(filters.tahun) : undefined,
-        is_complete: filters.is_complete !== 'all' ? filters.is_complete === 'true' : undefined,
         sort_by: filters.sort_by as "skor_tertinggi" | "skor_terendah" | "nama" | "created_at",
       };
 
