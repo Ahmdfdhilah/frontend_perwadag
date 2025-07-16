@@ -1,9 +1,5 @@
 import api from "@/utils/api";
-import { useToast } from "@workspace/ui/components/sonner";
 import { AxiosResponse } from "axios";
-import { ServiceOptions, ToastConfig } from "./types";
-
-const { toast } = useToast();
 
 export abstract class BaseService {
   protected baseEndpoint: string;
@@ -12,121 +8,45 @@ export abstract class BaseService {
     this.baseEndpoint = `/api/v1${baseEndpoint}`;
   }
 
-  protected showToast(
-    config: ToastConfig,
-    options?: ServiceOptions
-  ): void {
-    if (options?.showToast !== false) {
-      toast({
-        title: config.title,
-        description: config.description,
-        variant: config.variant || "default",
-      });
-    }
-  }
-
   protected async handleRequest<T>(
-    requestFn: () => Promise<AxiosResponse<T>>,
-    successConfig?: ToastConfig,
-    errorConfig?: Partial<ToastConfig>,
-    options?: ServiceOptions
+    requestFn: () => Promise<AxiosResponse<T>>
   ): Promise<T> {
     try {
       const response = await requestFn();
-      
-      if (successConfig) {
-        this.showToast(successConfig, options);
-      }
-      
       return response.data;
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || error.message || "An error occurred";
-      
-      if (errorConfig) {
-        this.showToast(
-          {
-            title: errorConfig.title || "Error",
-            description: errorConfig.description || errorMessage,
-            variant: errorConfig.variant || "destructive",
-          },
-          options
-        );
-      }
-      
       throw new Error(errorMessage);
     }
   }
 
-  protected async get<T>(
-    endpoint: string,
-    successConfig?: ToastConfig,
-    errorConfig?: Partial<ToastConfig>,
-    options?: ServiceOptions
-  ): Promise<T> {
+  protected async get<T>(endpoint: string): Promise<T> {
     return this.handleRequest(
-      () => api.get(`${this.baseEndpoint}${endpoint}`),
-      successConfig,
-      errorConfig,
-      options
+      () => api.get(`${this.baseEndpoint}${endpoint}`)
     );
   }
 
-  protected async post<T>(
-    endpoint: string,
-    data?: any,
-    successConfig?: ToastConfig,
-    errorConfig?: Partial<ToastConfig>,
-    options?: ServiceOptions
-  ): Promise<T> {
+  protected async post<T>(endpoint: string, data?: any): Promise<T> {
     return this.handleRequest(
-      () => api.post(`${this.baseEndpoint}${endpoint}`, data),
-      successConfig,
-      errorConfig,
-      options
+      () => api.post(`${this.baseEndpoint}${endpoint}`, data)
     );
   }
 
-  protected async put<T>(
-    endpoint: string,
-    data?: any,
-    successConfig?: ToastConfig,
-    errorConfig?: Partial<ToastConfig>,
-    options?: ServiceOptions
-  ): Promise<T> {
+  protected async put<T>(endpoint: string, data?: any): Promise<T> {
     return this.handleRequest(
-      () => api.put(`${this.baseEndpoint}${endpoint}`, data),
-      successConfig,
-      errorConfig,
-      options
+      () => api.put(`${this.baseEndpoint}${endpoint}`, data)
     );
   }
 
-  protected async patch<T>(
-    endpoint: string,
-    data?: any,
-    successConfig?: ToastConfig,
-    errorConfig?: Partial<ToastConfig>,
-    options?: ServiceOptions
-  ): Promise<T> {
+  protected async patch<T>(endpoint: string, data?: any): Promise<T> {
     return this.handleRequest(
-      () => api.patch(`${this.baseEndpoint}${endpoint}`, data),
-      successConfig,
-      errorConfig,
-      options
+      () => api.patch(`${this.baseEndpoint}${endpoint}`, data)
     );
   }
 
-  protected async delete<T>(
-    endpoint: string,
-    successConfig?: ToastConfig,
-    errorConfig?: Partial<ToastConfig>,
-    options?: ServiceOptions
-  ): Promise<T> {
+  protected async delete<T>(endpoint: string): Promise<T> {
     return this.handleRequest(
-      () => api.delete(`${this.baseEndpoint}${endpoint}`),
-      successConfig,
-      errorConfig,
-      options
+      () => api.delete(`${this.baseEndpoint}${endpoint}`)
     );
   }
 }

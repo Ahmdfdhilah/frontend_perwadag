@@ -1,6 +1,3 @@
-export interface ServiceOptions {
-  showToast?: boolean;
-}
 
 export interface ApiResponse<T = any> {
   success: boolean;
@@ -28,11 +25,6 @@ export interface PaginatedResponse<T> {
   pages: number;
 }
 
-export interface ToastConfig {
-  title: string;
-  description: string;
-  variant?: "default" | "destructive";
-}
 
 export interface FilterOption {
   label: string;

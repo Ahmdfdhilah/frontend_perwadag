@@ -1,6 +1,6 @@
 // apps/vite-react-app/src/services/users/types.ts
 
-import { ServiceOptions, PaginatedResponse } from "../base/types";
+import { PaginatedResponse } from "../base/types";
 
 // User Types
 export interface User {
@@ -109,7 +109,6 @@ export interface UserFilterParams {
   max_age?: number; // 17-70
 }
 
-export interface UserServiceOptions extends ServiceOptions {}
 
 // Response wrapper for single operations
 export interface MessageResponse {

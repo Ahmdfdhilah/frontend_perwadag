@@ -1,4 +1,4 @@
-import { ServiceOptions, PaginatedResponse } from "../base/types";
+import { PaginatedResponse } from "../base/types";
 
 // Base Types
 export interface SuratTugas {
@@ -141,9 +141,6 @@ export interface SuratTugasFileUploadResponse {
   file_path: string;
   file_url: string;
 }
-
-// Service Options
-export interface SuratTugasServiceOptions extends ServiceOptions {}
 
 // Message Response
 export interface MessageResponse {

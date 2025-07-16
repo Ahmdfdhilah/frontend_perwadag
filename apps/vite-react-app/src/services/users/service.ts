@@ -12,7 +12,6 @@ import {
   UsernameGenerationPreview,
   UsernameGenerationResponse,
   MessageResponse,
-  UserServiceOptions,
 } from "./types";
 
 class UserService extends BaseService {
@@ -21,60 +20,25 @@ class UserService extends BaseService {
   }
 
   // Current user methods
-  async getCurrentUser(options?: UserServiceOptions): Promise<UserResponse> {
-    return this.get(
-      "/me",
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to get user profile",
-      },
-      options
-    );
+  async getCurrentUser(): Promise<UserResponse> {
+    return this.get("/me");
   }
 
   async updateCurrentUser(
-    userData: UserUpdate,
-    options?: UserServiceOptions
+    userData: UserUpdate
   ): Promise<UserResponse> {
-    return this.put(
-      "/me",
-      userData,
-      {
-        title: "Success",
-        description: "Profile updated successfully",
-      },
-      {
-        title: "Update Failed",
-        description: "Failed to update profile",
-      },
-      options
-    );
+    return this.put("/me", userData);
   }
 
   async changePassword(
-    passwordData: UserChangePassword,
-    options?: UserServiceOptions
+    passwordData: UserChangePassword
   ): Promise<MessageResponse> {
-    return this.post(
-      "/me/change-password",
-      passwordData,
-      {
-        title: "Success",
-        description: "Password changed successfully",
-      },
-      {
-        title: "Error",
-        description: "Failed to change password",
-      },
-      options
-    );
+    return this.post("/me/change-password", passwordData);
   }
 
   // Admin user management methods
   async getUsers(
-    params?: UserFilterParams,
-    options?: UserServiceOptions
+    params?: UserFilterParams
   ): Promise<UserListResponse> {
     const queryParams = new URLSearchParams();
     if (params) {
@@ -86,189 +50,66 @@ class UserService extends BaseService {
     }
     
     const endpoint = queryParams.toString() ? `/?${queryParams.toString()}` : "/";
-    return this.get(
-      endpoint,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to fetch users",
-      },
-      options
-    );
+    return this.get(endpoint);
   }
 
   async getUsersByRole(
-    roleName: string,
-    options?: UserServiceOptions
+    roleName: string
   ): Promise<UserSummary[]> {
-    return this.get(
-      `/by-role/${roleName}`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to fetch users by role",
-      },
-      options
-    );
+    return this.get(`/by-role/${roleName}`);
   }
 
-  async getUserStatistics(
-    options?: UserServiceOptions
-  ): Promise<UserStatistics> {
-    return this.get(
-      "/statistics",
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to get user statistics",
-      },
-      options
-    );
+  async getUserStatistics(): Promise<UserStatistics> {
+    return this.get("/statistics");
   }
 
   async previewUsername(
-    previewData: UsernameGenerationPreview,
-    options?: UserServiceOptions
+    previewData: UsernameGenerationPreview
   ): Promise<UsernameGenerationResponse> {
-    return this.post(
-      "/preview-username",
-      previewData,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to preview username",
-      },
-      options
-    );
+    return this.post("/preview-username", previewData);
   }
 
   async createUser(
-    userData: UserCreate,
-    options?: UserServiceOptions
+    userData: UserCreate
   ): Promise<UserResponse> {
-    return this.post(
-      "/",
-      userData,
-      {
-        title: "Success",
-        description: "User created successfully",
-      },
-      {
-        title: "Creation Failed",
-        description: "Failed to create user",
-      },
-      options
-    );
+    return this.post("/", userData);
   }
 
   async getUserById(
-    userId: string,
-    options?: UserServiceOptions
+    userId: string
   ): Promise<UserResponse> {
-    return this.get(
-      `/${userId}`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to get user",
-      },
-      options
-    );
+    return this.get(`/${userId}`);
   }
 
   async updateUser(
     userId: string,
-    userData: UserUpdate,
-    options?: UserServiceOptions
+    userData: UserUpdate
   ): Promise<UserResponse> {
-    return this.put(
-      `/${userId}`,
-      userData,
-      {
-        title: "Success",
-        description: "User updated successfully",
-      },
-      {
-        title: "Update Failed",
-        description: "Failed to update user",
-      },
-      options
-    );
+    return this.put(`/${userId}`, userData);
   }
 
   async resetUserPassword(
-    userId: string,
-    options?: UserServiceOptions
+    userId: string
   ): Promise<MessageResponse> {
-    return this.post(
-      `/${userId}/reset-password`,
-      undefined,
-      {
-        title: "Success",
-        description: "Password reset successfully",
-      },
-      {
-        title: "Error",
-        description: "Failed to reset password",
-      },
-      options
-    );
+    return this.post(`/${userId}/reset-password`);
   }
 
   async activateUser(
-    userId: string,
-    options?: UserServiceOptions
+    userId: string
   ): Promise<UserResponse> {
-    return this.post(
-      `/${userId}/activate`,
-      undefined,
-      {
-        title: "Success",
-        description: "User activated successfully",
-      },
-      {
-        title: "Error",
-        description: "Failed to activate user",
-      },
-      options
-    );
+    return this.post(`/${userId}/activate`);
   }
 
   async deactivateUser(
-    userId: string,
-    options?: UserServiceOptions
+    userId: string
   ): Promise<UserResponse> {
-    return this.post(
-      `/${userId}/deactivate`,
-      undefined,
-      {
-        title: "Success",
-        description: "User deactivated successfully",
-      },
-      {
-        title: "Error",
-        description: "Failed to deactivate user",
-      },
-      options
-    );
+    return this.post(`/${userId}/deactivate`);
   }
 
   async deleteUser(
-    userId: string,
-    options?: UserServiceOptions
+    userId: string
   ): Promise<MessageResponse> {
-    return this.delete(
-      `/${userId}`,
-      {
-        title: "Success",
-        description: "User deleted successfully",
-      },
-      {
-        title: "Error",
-        description: "Failed to delete user",
-      },
-      options
-    );
+    return this.delete(`/${userId}`);
   }
 }
 

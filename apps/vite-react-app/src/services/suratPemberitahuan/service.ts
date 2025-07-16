@@ -5,7 +5,6 @@ import {
   SuratPemberitahuanListResponse,
   SuratPemberitahuanFilterParams,
   SuratPemberitahuanFileUploadResponse,
-  SuratPemberitahuanServiceOptions,
 } from "./types";
 
 class SuratPemberitahuanService extends BaseService {
@@ -15,8 +14,7 @@ class SuratPemberitahuanService extends BaseService {
 
   // Get all surat pemberitahuan with filters
   async getSuratPemberitahuanList(
-    params?: SuratPemberitahuanFilterParams,
-    options?: SuratPemberitahuanServiceOptions
+    params?: SuratPemberitahuanFilterParams
   ): Promise<SuratPemberitahuanListResponse> {
     const queryParams = new URLSearchParams();
     if (params) {
@@ -28,124 +26,54 @@ class SuratPemberitahuanService extends BaseService {
     }
     
     const endpoint = queryParams.toString() ? `/?${queryParams.toString()}` : "/";
-    return this.get(
-      endpoint,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to fetch surat pemberitahuan list",
-      },
-      options
-    );
+    return this.get(endpoint);
   }
 
   // Get surat pemberitahuan by ID
   async getSuratPemberitahuanById(
-    suratPemberitahuanId: string,
-    options?: SuratPemberitahuanServiceOptions
+    suratPemberitahuanId: string
   ): Promise<SuratPemberitahuanResponse> {
-    return this.get(
-      `/${suratPemberitahuanId}`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to get surat pemberitahuan details",
-      },
-      options
-    );
+    return this.get(`/${suratPemberitahuanId}`);
   }
 
   // Get surat pemberitahuan by surat tugas ID
   async getSuratPemberitahuanBySuratTugasId(
-    suratTugasId: string,
-    options?: SuratPemberitahuanServiceOptions
+    suratTugasId: string
   ): Promise<SuratPemberitahuanResponse> {
-    return this.get(
-      `/surat-tugas/${suratTugasId}`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to get surat pemberitahuan by surat tugas",
-      },
-      options
-    );
+    return this.get(`/surat-tugas/${suratTugasId}`);
   }
 
   // Update surat pemberitahuan
   async updateSuratPemberitahuan(
     suratPemberitahuanId: string,
-    data: SuratPemberitahuanUpdate,
-    options?: SuratPemberitahuanServiceOptions
+    data: SuratPemberitahuanUpdate
   ): Promise<SuratPemberitahuanResponse> {
-    return this.put(
-      `/${suratPemberitahuanId}`,
-      data,
-      {
-        title: "Success",
-        description: "Surat pemberitahuan updated successfully",
-      },
-      {
-        title: "Update Failed",
-        description: "Failed to update surat pemberitahuan",
-      },
-      options
-    );
+    return this.put(`/${suratPemberitahuanId}`, data);
   }
 
   // Upload file for surat pemberitahuan
   async uploadFile(
     suratPemberitahuanId: string,
-    file: File,
-    options?: SuratPemberitahuanServiceOptions
+    file: File
   ): Promise<SuratPemberitahuanFileUploadResponse> {
     const formData = new FormData();
     formData.append("file", file);
 
-    return this.post(
-      `/${suratPemberitahuanId}/upload-file`,
-      formData,
-      {
-        title: "Success",
-        description: "Surat pemberitahuan file uploaded successfully",
-      },
-      {
-        title: "Upload Failed",
-        description: "Failed to upload surat pemberitahuan file",
-      },
-      options
-    );
+    return this.post(`/${suratPemberitahuanId}/upload-file`, formData);
   }
 
   // Download surat pemberitahuan file
   async downloadFile(
-    suratPemberitahuanId: string,
-    options?: SuratPemberitahuanServiceOptions
+    suratPemberitahuanId: string
   ): Promise<Blob> {
-    return this.get(
-      `/${suratPemberitahuanId}/download`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to download surat pemberitahuan file",
-      },
-      options
-    );
+    return this.get(`/${suratPemberitahuanId}/download`);
   }
 
   // View surat pemberitahuan file in browser
   async viewFile(
-    suratPemberitahuanId: string,
-    options?: SuratPemberitahuanServiceOptions
+    suratPemberitahuanId: string
   ): Promise<Blob> {
-    return this.get(
-      `/${suratPemberitahuanId}/view`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to view surat pemberitahuan file",
-      },
-      options
-    );
+    return this.get(`/${suratPemberitahuanId}/view`);
   }
 }
 

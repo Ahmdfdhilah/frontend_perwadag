@@ -5,7 +5,6 @@ import {
   MatriksListResponse,
   MatriksFilterParams,
   MatriksFileUploadResponse,
-  MatriksServiceOptions,
 } from "./types";
 
 class MatriksService extends BaseService {
@@ -15,8 +14,7 @@ class MatriksService extends BaseService {
 
   // Get all matriks with filters
   async getMatriksList(
-    params?: MatriksFilterParams,
-    options?: MatriksServiceOptions
+    params?: MatriksFilterParams
   ): Promise<MatriksListResponse> {
     const queryParams = new URLSearchParams();
     if (params) {
@@ -28,124 +26,54 @@ class MatriksService extends BaseService {
     }
     
     const endpoint = queryParams.toString() ? `/?${queryParams.toString()}` : "/";
-    return this.get(
-      endpoint,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to fetch matriks list",
-      },
-      options
-    );
+    return this.get(endpoint);
   }
 
   // Get matriks by ID
   async getMatriksById(
-    matriksId: string,
-    options?: MatriksServiceOptions
+    matriksId: string
   ): Promise<MatriksResponse> {
-    return this.get(
-      `/${matriksId}`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to get matriks details",
-      },
-      options
-    );
+    return this.get(`/${matriksId}`);
   }
 
   // Get matriks by surat tugas ID
   async getMatriksBySuratTugasId(
-    suratTugasId: string,
-    options?: MatriksServiceOptions
+    suratTugasId: string
   ): Promise<MatriksResponse> {
-    return this.get(
-      `/surat-tugas/${suratTugasId}`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to get matriks by surat tugas",
-      },
-      options
-    );
+    return this.get(`/surat-tugas/${suratTugasId}`);
   }
 
   // Update matriks
   async updateMatriks(
     matriksId: string,
-    data: MatriksUpdate,
-    options?: MatriksServiceOptions
+    data: MatriksUpdate
   ): Promise<MatriksResponse> {
-    return this.put(
-      `/${matriksId}`,
-      data,
-      {
-        title: "Success",
-        description: "Matriks updated successfully",
-      },
-      {
-        title: "Update Failed",
-        description: "Failed to update matriks",
-      },
-      options
-    );
+    return this.put(`/${matriksId}`, data);
   }
 
   // Upload file for matriks
   async uploadFile(
     matriksId: string,
-    file: File,
-    options?: MatriksServiceOptions
+    file: File
   ): Promise<MatriksFileUploadResponse> {
     const formData = new FormData();
     formData.append("file", file);
 
-    return this.post(
-      `/${matriksId}/upload-file`,
-      formData,
-      {
-        title: "Success",
-        description: "Matriks file uploaded successfully",
-      },
-      {
-        title: "Upload Failed",
-        description: "Failed to upload matriks file",
-      },
-      options
-    );
+    return this.post(`/${matriksId}/upload-file`, formData);
   }
 
   // Download matriks file
   async downloadFile(
-    matriksId: string,
-    options?: MatriksServiceOptions
+    matriksId: string
   ): Promise<Blob> {
-    return this.get(
-      `/${matriksId}/download`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to download matriks file",
-      },
-      options
-    );
+    return this.get(`/${matriksId}/download`);
   }
 
   // View matriks file in browser
   async viewFile(
-    matriksId: string,
-    options?: MatriksServiceOptions
+    matriksId: string
   ): Promise<Blob> {
-    return this.get(
-      `/${matriksId}/view`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to view matriks file",
-      },
-      options
-    );
+    return this.get(`/${matriksId}/view`);
   }
 }
 

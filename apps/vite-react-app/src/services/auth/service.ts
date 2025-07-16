@@ -10,7 +10,6 @@ import {
   DefaultPasswordInfoResponse,
   TokenVerificationResponse,
   MessageResponse,
-  AuthServiceOptions,
 } from "./types";
 
 class AuthService extends BaseService {
@@ -18,34 +17,13 @@ class AuthService extends BaseService {
     super("/auth");
   }
 
-  async login(
-    loginData: LoginRequest,
-    options?: AuthServiceOptions
-  ): Promise<LoginResponse> {
-    return this.post(
-      "/login",
-      loginData,
-      undefined,
-      {
-        title: "Login Failed",
-        description: "Login failed",
-      },
-      options
-    );
+  async login(loginData: LoginRequest): Promise<LoginResponse> {
+    return this.post("/login", loginData);
   }
 
-  async logout(options?: AuthServiceOptions): Promise<MessageResponse> {
+  async logout(): Promise<MessageResponse> {
     try {
-      return await this.post(
-        "/logout",
-        {},
-        {
-          title: "Success",
-          description: "Logged out successfully",
-        },
-        undefined,
-        options
-      );
+      return await this.post("/logout", {});
     } catch (error: any) {
       console.error("Logout error:", error);
       return { message: "Logout failed" };
@@ -61,69 +39,23 @@ class AuthService extends BaseService {
   }
 
   async requestPasswordReset(
-    resetData: PasswordResetRequest,
-    options?: AuthServiceOptions
+    resetData: PasswordResetRequest
   ): Promise<MessageResponse> {
-    return this.post(
-      "/request-password-reset",
-      resetData,
-      {
-        title: "Success",
-        description: "Password reset instructions sent to your email",
-      },
-      {
-        title: "Error",
-        description: "Failed to send reset email",
-      },
-      options
-    );
+    return this.post("/request-password-reset", resetData);
   }
 
   async confirmPasswordReset(
-    resetData: PasswordResetConfirmRequest,
-    options?: AuthServiceOptions
+    resetData: PasswordResetConfirmRequest
   ): Promise<MessageResponse> {
-    return this.post(
-      "/confirm-password-reset",
-      resetData,
-      {
-        title: "Success",
-        description: "Password reset successfully",
-      },
-      {
-        title: "Error",
-        description: "Failed to reset password",
-      },
-      options
-    );
+    return this.post("/confirm-password-reset", resetData);
   }
 
-  async getPasswordResetEligibility(
-    options?: AuthServiceOptions
-  ): Promise<PasswordResetEligibilityResponse> {
-    return this.get(
-      "/password-reset-eligibility",
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to check password reset eligibility",
-      },
-      options
-    );
+  async getPasswordResetEligibility(): Promise<PasswordResetEligibilityResponse> {
+    return this.get("/password-reset-eligibility");
   }
 
-  async getDefaultPasswordInfo(
-    options?: AuthServiceOptions
-  ): Promise<DefaultPasswordInfoResponse> {
-    return this.get(
-      "/default-password-info",
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to get default password info",
-      },
-      options
-    );
+  async getDefaultPasswordInfo(): Promise<DefaultPasswordInfoResponse> {
+    return this.get("/default-password-info");
   }
 }
 

@@ -7,7 +7,6 @@ import {
   MeetingFileUploadRequest,
   MeetingFileUploadResponse,
   MeetingFileDeleteResponse,
-  MeetingServiceOptions,
 } from "./types";
 
 class MeetingService extends BaseService {
@@ -17,8 +16,7 @@ class MeetingService extends BaseService {
 
   // Get all meetings with filters
   async getMeetingList(
-    params?: MeetingFilterParams,
-    options?: MeetingServiceOptions
+    params?: MeetingFilterParams
   ): Promise<MeetingListResponse> {
     const queryParams = new URLSearchParams();
     if (params) {
@@ -30,93 +28,44 @@ class MeetingService extends BaseService {
     }
     
     const endpoint = queryParams.toString() ? `/?${queryParams.toString()}` : "/";
-    return this.get(
-      endpoint,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to fetch meeting list",
-      },
-      options
-    );
+    return this.get(endpoint);
   }
 
   // Get meeting by ID
   async getMeetingById(
-    meetingId: string,
-    options?: MeetingServiceOptions
+    meetingId: string
   ): Promise<MeetingResponse> {
-    return this.get(
-      `/${meetingId}`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to get meeting details",
-      },
-      options
-    );
+    return this.get(`/${meetingId}`);
   }
 
   // Get meeting by surat tugas ID and type
   async getMeetingBySuratTugasAndType(
     suratTugasId: string,
-    meetingType: "ENTRY" | "KONFIRMASI" | "EXIT",
-    options?: MeetingServiceOptions
+    meetingType: "ENTRY" | "KONFIRMASI" | "EXIT"
   ): Promise<MeetingResponse> {
-    return this.get(
-      `/surat-tugas/${suratTugasId}/type/${meetingType}`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to get meeting by surat tugas and type",
-      },
-      options
-    );
+    return this.get(`/surat-tugas/${suratTugasId}/type/${meetingType}`);
   }
 
   // Get all meetings for a surat tugas
   async getMeetingsBySuratTugasId(
-    suratTugasId: string,
-    options?: MeetingServiceOptions
+    suratTugasId: string
   ): Promise<MeetingResponse[]> {
-    return this.get(
-      `/surat-tugas/${suratTugasId}`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to get meetings by surat tugas",
-      },
-      options
-    );
+    return this.get(`/surat-tugas/${suratTugasId}`);
   }
 
   // Update meeting
   async updateMeeting(
     meetingId: string,
-    data: MeetingUpdate,
-    options?: MeetingServiceOptions
+    data: MeetingUpdate
   ): Promise<MeetingResponse> {
-    return this.put(
-      `/${meetingId}`,
-      data,
-      {
-        title: "Success",
-        description: "Meeting updated successfully",
-      },
-      {
-        title: "Update Failed",
-        description: "Failed to update meeting",
-      },
-      options
-    );
+    return this.put(`/${meetingId}`, data);
   }
 
   // Upload multiple files for meeting
   async uploadFiles(
     meetingId: string,
     files: File[],
-    uploadOptions?: MeetingFileUploadRequest,
-    options?: MeetingServiceOptions
+    uploadOptions?: MeetingFileUploadRequest
   ): Promise<MeetingFileUploadResponse> {
     const formData = new FormData();
     
@@ -128,89 +77,38 @@ class MeetingService extends BaseService {
       formData.append("replace_existing", uploadOptions.replace_existing.toString());
     }
 
-    return this.post(
-      `/${meetingId}/upload-files`,
-      formData,
-      {
-        title: "Success",
-        description: "Meeting files uploaded successfully",
-      },
-      {
-        title: "Upload Failed",
-        description: "Failed to upload meeting files",
-      },
-      options
-    );
+    return this.post(`/${meetingId}/upload-files`, formData);
   }
 
   // Delete specific file from meeting
   async deleteFile(
     meetingId: string,
-    filename: string,
-    options?: MeetingServiceOptions
+    filename: string
   ): Promise<MeetingFileDeleteResponse> {
-    return this.delete(
-      `/${meetingId}/files/${filename}`,
-      {
-        title: "Success",
-        description: "Meeting file deleted successfully",
-      },
-      {
-        title: "Error",
-        description: "Failed to delete meeting file",
-      },
-      options
-    );
+    return this.delete(`/${meetingId}/files/${filename}`);
   }
 
   // Download specific file from meeting
   async downloadFile(
     meetingId: string,
-    filename: string,
-    options?: MeetingServiceOptions
+    filename: string
   ): Promise<Blob> {
-    return this.get(
-      `/${meetingId}/files/${filename}/download`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to download meeting file",
-      },
-      options
-    );
+    return this.get(`/${meetingId}/files/${filename}/download`);
   }
 
   // View specific file from meeting in browser
   async viewFile(
     meetingId: string,
-    filename: string,
-    options?: MeetingServiceOptions
+    filename: string
   ): Promise<Blob> {
-    return this.get(
-      `/${meetingId}/files/${filename}/view`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to view meeting file",
-      },
-      options
-    );
+    return this.get(`/${meetingId}/files/${filename}/view`);
   }
 
   // Download all files as ZIP
   async downloadAllFiles(
-    meetingId: string,
-    options?: MeetingServiceOptions
+    meetingId: string
   ): Promise<Blob> {
-    return this.get(
-      `/${meetingId}/files/download-all`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to download all meeting files",
-      },
-      options
-    );
+    return this.get(`/${meetingId}/files/download-all`);
   }
 }
 

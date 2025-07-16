@@ -9,7 +9,6 @@ import {
   SuratTugasDashboardSummary,
   PerwadagListResponse,
   SuratTugasFileUploadResponse,
-  SuratTugasServiceOptions,
   MessageResponse,
 } from "./types";
 
@@ -20,28 +19,14 @@ class SuratTugasService extends BaseService {
 
   // Create surat tugas
   async createSuratTugas(
-    data: SuratTugasCreate,
-    options?: SuratTugasServiceOptions
+    data: SuratTugasCreate
   ): Promise<SuratTugasCreateResponse> {
-    return this.post(
-      "/",
-      data,
-      {
-        title: "Success",
-        description: "Surat tugas created successfully with auto-generated evaluation records",
-      },
-      {
-        title: "Creation Failed",
-        description: "Failed to create surat tugas",
-      },
-      options
-    );
+    return this.post("/", data);
   }
 
   // Get all surat tugas with filters
   async getSuratTugasList(
-    params?: SuratTugasFilterParams,
-    options?: SuratTugasServiceOptions
+    params?: SuratTugasFilterParams
   ): Promise<SuratTugasListResponse> {
     const queryParams = new URLSearchParams();
     if (params) {
@@ -53,125 +38,50 @@ class SuratTugasService extends BaseService {
     }
     
     const endpoint = queryParams.toString() ? `/?${queryParams.toString()}` : "/";
-    return this.get(
-      endpoint,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to fetch surat tugas list",
-      },
-      options
-    );
+    return this.get(endpoint);
   }
 
   // Get surat tugas by ID
   async getSuratTugasById(
-    suratTugasId: string,
-    options?: SuratTugasServiceOptions
+    suratTugasId: string
   ): Promise<SuratTugasResponse> {
-    return this.get(
-      `/${suratTugasId}`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to get surat tugas details",
-      },
-      options
-    );
+    return this.get(`/${suratTugasId}`);
   }
 
   // Update surat tugas
   async updateSuratTugas(
     suratTugasId: string,
-    data: SuratTugasUpdate,
-    options?: SuratTugasServiceOptions
+    data: SuratTugasUpdate
   ): Promise<SuratTugasResponse> {
-    return this.put(
-      `/${suratTugasId}`,
-      data,
-      {
-        title: "Success",
-        description: "Surat tugas updated successfully",
-      },
-      {
-        title: "Update Failed",
-        description: "Failed to update surat tugas",
-      },
-      options
-    );
+    return this.put(`/${suratTugasId}`, data);
   }
 
   // Upload file for surat tugas
   async uploadFile(
     suratTugasId: string,
-    file: File,
-    options?: SuratTugasServiceOptions
+    file: File
   ): Promise<SuratTugasFileUploadResponse> {
     const formData = new FormData();
     formData.append("file", file);
 
-    return this.post(
-      `/${suratTugasId}/upload-file`,
-      formData,
-      {
-        title: "Success",
-        description: "File uploaded successfully",
-      },
-      {
-        title: "Upload Failed",
-        description: "Failed to upload file",
-      },
-      options
-    );
+    return this.post(`/${suratTugasId}/upload-file`, formData);
   }
 
   // Delete surat tugas
   async deleteSuratTugas(
-    suratTugasId: string,
-    options?: SuratTugasServiceOptions
+    suratTugasId: string
   ): Promise<MessageResponse> {
-    return this.delete(
-      `/${suratTugasId}`,
-      {
-        title: "Success",
-        description: "Surat tugas deleted successfully",
-      },
-      {
-        title: "Error",
-        description: "Failed to delete surat tugas",
-      },
-      options
-    );
+    return this.delete(`/${suratTugasId}`);
   }
 
   // Get available perwadag users list
-  async getPerwadagList(
-    options?: SuratTugasServiceOptions
-  ): Promise<PerwadagListResponse> {
-    return this.get(
-      "/perwadag/list",
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to fetch perwadag users list",
-      },
-      options
-    );
+  async getPerwadagList(): Promise<PerwadagListResponse> {
+    return this.get("/perwadag/list");
   }
 
   // Get dashboard summary
-  async getDashboardSummary(
-    options?: SuratTugasServiceOptions
-  ): Promise<SuratTugasDashboardSummary> {
-    return this.get(
-      "/dashboard/summary",
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to fetch dashboard summary",
-      },
-      options
-    );
+  async getDashboardSummary(): Promise<SuratTugasDashboardSummary> {
+    return this.get("/dashboard/summary");
   }
 }
 

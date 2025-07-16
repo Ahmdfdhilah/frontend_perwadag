@@ -5,7 +5,6 @@ import {
   KuisionerListResponse,
   KuisionerFilterParams,
   KuisionerFileUploadResponse,
-  KuisionerServiceOptions,
 } from "./types";
 
 class KuisionerService extends BaseService {
@@ -15,8 +14,7 @@ class KuisionerService extends BaseService {
 
   // Get all kuisioner with filters
   async getKuisionerList(
-    params?: KuisionerFilterParams,
-    options?: KuisionerServiceOptions
+    params?: KuisionerFilterParams
   ): Promise<KuisionerListResponse> {
     const queryParams = new URLSearchParams();
     if (params) {
@@ -28,124 +26,54 @@ class KuisionerService extends BaseService {
     }
     
     const endpoint = queryParams.toString() ? `/?${queryParams.toString()}` : "/";
-    return this.get(
-      endpoint,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to fetch kuisioner list",
-      },
-      options
-    );
+    return this.get(endpoint);
   }
 
   // Get kuisioner by ID
   async getKuisionerById(
-    kuisionerId: string,
-    options?: KuisionerServiceOptions
+    kuisionerId: string
   ): Promise<KuisionerResponse> {
-    return this.get(
-      `/${kuisionerId}`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to get kuisioner details",
-      },
-      options
-    );
+    return this.get(`/${kuisionerId}`);
   }
 
   // Get kuisioner by surat tugas ID
   async getKuisionerBySuratTugasId(
-    suratTugasId: string,
-    options?: KuisionerServiceOptions
+    suratTugasId: string
   ): Promise<KuisionerResponse> {
-    return this.get(
-      `/surat-tugas/${suratTugasId}`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to get kuisioner by surat tugas",
-      },
-      options
-    );
+    return this.get(`/surat-tugas/${suratTugasId}`);
   }
 
   // Update kuisioner
   async updateKuisioner(
     kuisionerId: string,
-    data: KuisionerUpdate,
-    options?: KuisionerServiceOptions
+    data: KuisionerUpdate
   ): Promise<KuisionerResponse> {
-    return this.put(
-      `/${kuisionerId}`,
-      data,
-      {
-        title: "Success",
-        description: "Kuisioner updated successfully",
-      },
-      {
-        title: "Update Failed",
-        description: "Failed to update kuisioner",
-      },
-      options
-    );
+    return this.put(`/${kuisionerId}`, data);
   }
 
   // Upload file for kuisioner
   async uploadFile(
     kuisionerId: string,
-    file: File,
-    options?: KuisionerServiceOptions
+    file: File
   ): Promise<KuisionerFileUploadResponse> {
     const formData = new FormData();
     formData.append("file", file);
 
-    return this.post(
-      `/${kuisionerId}/upload-file`,
-      formData,
-      {
-        title: "Success",
-        description: "Kuisioner file uploaded successfully",
-      },
-      {
-        title: "Upload Failed",
-        description: "Failed to upload kuisioner file",
-      },
-      options
-    );
+    return this.post(`/${kuisionerId}/upload-file`, formData);
   }
 
   // Download kuisioner file
   async downloadFile(
-    kuisionerId: string,
-    options?: KuisionerServiceOptions
+    kuisionerId: string
   ): Promise<Blob> {
-    return this.get(
-      `/${kuisionerId}/download`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to download kuisioner file",
-      },
-      options
-    );
+    return this.get(`/${kuisionerId}/download`);
   }
 
   // View kuisioner file in browser
   async viewFile(
-    kuisionerId: string,
-    options?: KuisionerServiceOptions
+    kuisionerId: string
   ): Promise<Blob> {
-    return this.get(
-      `/${kuisionerId}/view`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to view kuisioner file",
-      },
-      options
-    );
+    return this.get(`/${kuisionerId}/view`);
   }
 }
 

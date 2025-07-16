@@ -25,7 +25,6 @@ export type {
   PasswordResetEligibilityResponse,
   DefaultPasswordInfoResponse,
   TokenVerificationResponse,
-  AuthServiceOptions
 } from "./auth";
 
 export type {
@@ -40,7 +39,6 @@ export type {
   UserListResponse,
   UserStatistics,
   UserFilterParams,
-  UserServiceOptions
 } from "./users";
 
 export type {

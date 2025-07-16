@@ -8,7 +8,6 @@ import {
   FormatKuisionerFileUploadResponse,
   FormatKuisionerByYearResponse,
   FormatKuisionerStatisticsResponse,
-  FormatKuisionerServiceOptions,
   MessageResponse,
 } from "./types";
 
@@ -20,8 +19,7 @@ class FormatKuisionerService extends BaseService {
   // Create format kuisioner template
   async createFormatKuisioner(
     data: FormatKuisionerCreate,
-    file?: File,
-    options?: FormatKuisionerServiceOptions
+    file?: File
   ): Promise<FormatKuisionerResponse> {
     const formData = new FormData();
     formData.append("nama_template", data.nama_template);
@@ -33,25 +31,12 @@ class FormatKuisionerService extends BaseService {
       formData.append("file", file);
     }
 
-    return this.post(
-      "/",
-      formData,
-      {
-        title: "Success",
-        description: "Format kuisioner template created successfully",
-      },
-      {
-        title: "Creation Failed",
-        description: "Failed to create format kuisioner template",
-      },
-      options
-    );
+    return this.post("/", formData);
   }
 
   // Get all format kuisioner with filters
   async getFormatKuisionerList(
-    params?: FormatKuisionerFilterParams,
-    options?: FormatKuisionerServiceOptions
+    params?: FormatKuisionerFilterParams
   ): Promise<FormatKuisionerListResponse> {
     const queryParams = new URLSearchParams();
     if (params) {
@@ -63,142 +48,59 @@ class FormatKuisionerService extends BaseService {
     }
     
     const endpoint = queryParams.toString() ? `/?${queryParams.toString()}` : "/";
-    return this.get(
-      endpoint,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to fetch format kuisioner list",
-      },
-      options
-    );
+    return this.get(endpoint);
   }
 
   // Get format kuisioner by year
   async getFormatKuisionerByYear(
-    tahun: number,
-    options?: FormatKuisionerServiceOptions
+    tahun: number
   ): Promise<FormatKuisionerByYearResponse> {
-    return this.get(
-      `/tahun/${tahun}`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to get format kuisioner by year",
-      },
-      options
-    );
+    return this.get(`/tahun/${tahun}`);
   }
 
   // Get format kuisioner by ID
   async getFormatKuisionerById(
-    formatKuisionerId: string,
-    options?: FormatKuisionerServiceOptions
+    formatKuisionerId: string
   ): Promise<FormatKuisionerResponse> {
-    return this.get(
-      `/${formatKuisionerId}`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to get format kuisioner details",
-      },
-      options
-    );
+    return this.get(`/${formatKuisionerId}`);
   }
 
   // Update format kuisioner
   async updateFormatKuisioner(
     formatKuisionerId: string,
-    data: FormatKuisionerUpdate,
-    options?: FormatKuisionerServiceOptions
+    data: FormatKuisionerUpdate
   ): Promise<FormatKuisionerResponse> {
-    return this.put(
-      `/${formatKuisionerId}`,
-      data,
-      {
-        title: "Success",
-        description: "Format kuisioner updated successfully",
-      },
-      {
-        title: "Update Failed",
-        description: "Failed to update format kuisioner",
-      },
-      options
-    );
+    return this.put(`/${formatKuisionerId}`, data);
   }
 
   // Upload template file
   async uploadFile(
     formatKuisionerId: string,
-    file: File,
-    options?: FormatKuisionerServiceOptions
+    file: File
   ): Promise<FormatKuisionerFileUploadResponse> {
     const formData = new FormData();
     formData.append("file", file);
 
-    return this.post(
-      `/${formatKuisionerId}/upload-file`,
-      formData,
-      {
-        title: "Success",
-        description: "Template file uploaded successfully",
-      },
-      {
-        title: "Upload Failed",
-        description: "Failed to upload template file",
-      },
-      options
-    );
+    return this.post(`/${formatKuisionerId}/upload-file`, formData);
   }
 
   // Delete format kuisioner
   async deleteFormatKuisioner(
-    formatKuisionerId: string,
-    options?: FormatKuisionerServiceOptions
+    formatKuisionerId: string
   ): Promise<MessageResponse> {
-    return this.delete(
-      `/${formatKuisionerId}`,
-      {
-        title: "Success",
-        description: "Format kuisioner deleted successfully",
-      },
-      {
-        title: "Error",
-        description: "Failed to delete format kuisioner",
-      },
-      options
-    );
+    return this.delete(`/${formatKuisionerId}`);
   }
 
   // Download template file
   async downloadTemplate(
-    formatKuisionerId: string,
-    options?: FormatKuisionerServiceOptions
+    formatKuisionerId: string
   ): Promise<Blob> {
-    return this.get(
-      `/download/${formatKuisionerId}`,
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to download template file",
-      },
-      options
-    );
+    return this.get(`/download/${formatKuisionerId}`);
   }
 
   // Get admin statistics
-  async getAdminStatistics(
-    options?: FormatKuisionerServiceOptions
-  ): Promise<FormatKuisionerStatisticsResponse> {
-    return this.get(
-      "/admin/statistics",
-      undefined,
-      {
-        title: "Error",
-        description: "Failed to fetch template statistics",
-      },
-      options
-    );
+  async getAdminStatistics(): Promise<FormatKuisionerStatisticsResponse> {
+    return this.get("/admin/statistics");
   }
 }
 

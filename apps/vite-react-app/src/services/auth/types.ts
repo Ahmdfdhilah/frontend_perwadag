@@ -79,6 +79,3 @@ export interface TokenVerificationResponse {
   message: string;
 }
 
-export interface AuthServiceOptions {
-  showToast?: boolean;
-}
