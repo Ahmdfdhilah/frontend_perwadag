@@ -19,7 +19,7 @@ import { CalendarIcon, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
-import { EntryMeeting } from '@/mocks/entryMeeting';
+import { MeetingResponse } from '@/services/meeting/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDate, formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
@@ -27,9 +27,9 @@ import FileUpload from '@/components/common/FileUpload';
 interface EntryMeetingDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  item: EntryMeeting | null;
+  item: MeetingResponse | null;
   mode: 'view' | 'edit';
-  onSave: (data: Partial<EntryMeeting>) => void;
+  onSave: (data: any) => void;
 }
 
 const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
@@ -40,32 +40,40 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
   onSave,
 }) => {
   const { canEditForm } = useFormPermissions();
-  const [formData, setFormData] = useState<Partial<EntryMeeting>>({});
+  const [formData, setFormData] = useState<any>({});
   const [selectedEntryDate, setSelectedEntryDate] = useState<Date>();
   const [isEntryDatePickerOpen, setIsEntryDatePickerOpen] = useState(false);
-  const [buktiHadirFiles, setBuktiHadirFiles] = useState<File[]>([]);
-  const [existingBuktiHadir, setExistingBuktiHadir] = useState<Array<{ name: string; url?: string }>>([]);
+  const [meetingFiles, setMeetingFiles] = useState<File[]>([]);
+  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string }>>([]);
 
   useEffect(() => {
     if (item && open) {
-      setFormData({ ...item });
-      setSelectedEntryDate(item.tanggal ? new Date(item.tanggal) : undefined);
+      setFormData({
+        tanggal_meeting: item.tanggal_meeting,
+        link_zoom: item.link_zoom || '',
+        link_daftar_hadir: item.link_daftar_hadir || '',
+      });
+      setSelectedEntryDate(item.tanggal_meeting ? new Date(item.tanggal_meeting) : undefined);
       
       // Set existing files for display
-      setExistingBuktiHadir(item.buktiImageUrls ? item.buktiImageUrls.map((url, index) => ({ name: `Bukti ${index + 1}`, url })) : []);
+      setExistingFiles(item.files_info?.files ? item.files_info.files.map((file, index) => ({ 
+        name: file.original_filename || `File ${index + 1}`, 
+        url: file.download_url 
+      })) : []);
     } else {
       setFormData({});
       setSelectedEntryDate(undefined);
-      setBuktiHadirFiles([]);
-      setExistingBuktiHadir([]);
+      setMeetingFiles([]);
+      setExistingFiles([]);
     }
   }, [item, open]);
 
   const handleSave = () => {
     const dataToSave = {
-      ...formData,
-      tanggal: selectedEntryDate ? selectedEntryDate.toISOString().split('T')[0] : formData.tanggal,
-      buktiHadirFiles,
+      tanggal_meeting: selectedEntryDate ? selectedEntryDate.toISOString().split('T')[0] : formData.tanggal_meeting,
+      link_zoom: formData.link_zoom,
+      link_daftar_hadir: formData.link_daftar_hadir,
+      files: meetingFiles,
     };
     onSave(dataToSave);
   };
@@ -81,12 +89,12 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
     }
   };
 
-  const handleBuktiHadirFilesChange = (files: File[]) => {
-    setBuktiHadirFiles(files);
+  const handleMeetingFilesChange = (files: File[]) => {
+    setMeetingFiles(files);
   };
 
-  const handleExistingBuktiHadirRemove = (index: number) => {
-    setExistingBuktiHadir(prev => prev.filter((_, i) => i !== index));
+  const handleExistingFilesRemove = (index: number) => {
+    setExistingFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const isEditable = mode === 'edit';
@@ -109,7 +117,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
               <div className="space-y-2">
                 <Label>Nama Perwadag</Label>
                 <div className="p-3 bg-muted rounded-md">
-                  {item?.perwadagName}
+                  {item?.nama_perwadag}
                 </div>
               </div>
             </div>
@@ -118,7 +126,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
               <div className="space-y-2">
                 <Label>Tanggal Evaluasi</Label>
                 <div className="p-3 bg-muted rounded-md">
-                  {item ? formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi) : '-'}
+                  {item ? formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai) : '-'}
                 </div>
               </div>
               <div className="space-y-2">
@@ -156,7 +164,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
                   </Popover>
                 ) : (
                   <div className="p-3 bg-muted rounded-md">
-                    {item ? formatIndonesianDate(item.tanggal) : '-'}
+                    {item?.tanggal_meeting ? formatIndonesianDate(item.tanggal_meeting) : '-'}
                   </div>
                 )}
               </div>
@@ -169,16 +177,16 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
                 <div className="flex gap-2">
                   <Input
                     id="linkZoom"
-                    value={formData.linkZoom || ''}
-                    onChange={(e) => setFormData({ ...formData, linkZoom: e.target.value })}
+                    value={formData.link_zoom || ''}
+                    onChange={(e) => setFormData({ ...formData, link_zoom: e.target.value })}
                     placeholder="https://zoom.us/j/..."
                   />
-                  {formData.linkZoom && (
+                  {formData.link_zoom && (
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => handleOpenLink(formData.linkZoom!)}
+                      onClick={() => handleOpenLink(formData.link_zoom!)}
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
@@ -187,14 +195,14 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
               ) : (
                 <div className="flex gap-2">
                   <div className="p-3 bg-muted rounded-md flex-1">
-                    {item?.linkZoom || '-'}
+                    {item?.link_zoom || '-'}
                   </div>
-                  {item?.linkZoom && (
+                  {item?.link_zoom && (
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => handleOpenLink(item.linkZoom!)}
+                      onClick={() => handleOpenLink(item.link_zoom!)}
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
@@ -210,16 +218,16 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
                 <div className="flex gap-2">
                   <Input
                     id="linkDaftarHadir"
-                    value={formData.linkDaftarHadir || ''}
-                    onChange={(e) => setFormData({ ...formData, linkDaftarHadir: e.target.value })}
+                    value={formData.link_daftar_hadir || ''}
+                    onChange={(e) => setFormData({ ...formData, link_daftar_hadir: e.target.value })}
                     placeholder="https://forms.google.com/..."
                   />
-                  {formData.linkDaftarHadir && (
+                  {formData.link_daftar_hadir && (
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => handleOpenLink(formData.linkDaftarHadir!)}
+                      onClick={() => handleOpenLink(formData.link_daftar_hadir!)}
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
@@ -228,14 +236,14 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
               ) : (
                 <div className="flex gap-2">
                   <div className="p-3 bg-muted rounded-md flex-1">
-                    {item?.linkDaftarHadir || '-'}
+                    {item?.link_daftar_hadir || '-'}
                   </div>
-                  {item?.linkDaftarHadir && (
+                  {item?.link_daftar_hadir && (
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={() => handleOpenLink(item.linkDaftarHadir!)}
+                      onClick={() => handleOpenLink(item.link_daftar_hadir!)}
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
@@ -244,20 +252,20 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
               )}
             </div>
 
-            {/* Upload Bukti Hadir */}
+            {/* Upload Files */}
             <FileUpload
-              label="Upload Bukti Hadir (Maksimal 2 gambar)"
-              accept="image/*"
+              label="Upload Files Meeting"
+              accept="*/*"
               multiple={true}
-              maxSize={5 * 1024 * 1024} // 5MB
-              maxFiles={2}
-              files={buktiHadirFiles}
-              existingFiles={existingBuktiHadir}
+              maxSize={10 * 1024 * 1024} // 10MB
+              maxFiles={5}
+              files={meetingFiles}
+              existingFiles={existingFiles}
               mode={canEdit ? 'edit' : 'view'}
               disabled={!canEdit}
-              onFilesChange={handleBuktiHadirFilesChange}
-              onExistingFileRemove={handleExistingBuktiHadirRemove}
-              description="Format gambar: JPG, PNG, GIF (Max 5MB per file)"
+              onFilesChange={handleMeetingFilesChange}
+              onExistingFileRemove={handleExistingFilesRemove}
+              description="Upload dokumen meeting (Max 10MB per file)"
             />
           </div>
         </div>

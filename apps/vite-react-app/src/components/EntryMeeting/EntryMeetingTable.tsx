@@ -8,22 +8,37 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { EntryMeeting, getEntryMeetingStatus } from '@/mocks/entryMeeting';
+import { MeetingResponse } from '@/services/meeting/types';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface EntryMeetingTableProps {
-  data: EntryMeeting[];
-  onView?: (item: EntryMeeting) => void;
-  onEdit?: (item: EntryMeeting) => void;
-  canEdit?: (item: EntryMeeting) => boolean;
+  data: MeetingResponse[];
+  loading?: boolean;
+  onView?: (item: MeetingResponse) => void;
+  onEdit?: (item: MeetingResponse) => void;
+  canEdit?: (item: MeetingResponse) => boolean;
 }
 
 const EntryMeetingTable: React.FC<EntryMeetingTableProps> = ({
   data,
+  loading = false,
   onView,
   onEdit,
   canEdit,
 }) => {
+  
+  const getStatusBadge = (meeting: MeetingResponse) => {
+    const isCompleted = meeting.is_completed;
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+        isCompleted
+          ? 'bg-green-100 text-green-800' 
+          : 'bg-red-100 text-red-800'
+      }`}>
+        {isCompleted ? 'Lengkap' : 'Belum Lengkap'}
+      </span>
+    );
+  };
 
   return (
     <div className="rounded-md border">
@@ -41,9 +56,15 @@ const EntryMeetingTable: React.FC<EntryMeetingTableProps> = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.length === 0 ? (
+          {loading ? (
             <TableRow>
-              <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                Loading meetings...
+              </TableCell>
+            </TableRow>
+          ) : data.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                 Tidak ada data entry meeting
               </TableCell>
             </TableRow>
@@ -52,13 +73,13 @@ const EntryMeetingTable: React.FC<EntryMeetingTableProps> = ({
               return (
                 <TableRow key={item.id}>
                   <TableCell className="font-medium">{index + 1}</TableCell>
-                  <TableCell>{item.perwadagName}</TableCell>
-                  <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
-                  <TableCell>{formatIndonesianDate(item.tanggal)}</TableCell>
+                  <TableCell>{item.nama_perwadag}</TableCell>
+                  <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
+                  <TableCell>{item.tanggal_meeting ? formatIndonesianDate(item.tanggal_meeting) : '-'}</TableCell>
                   <TableCell>
-                    {item.linkZoom ? (
+                    {item.link_zoom ? (
                       <a
-                        href={item.linkZoom}
+                        href={item.link_zoom}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 underline"
@@ -70,9 +91,9 @@ const EntryMeetingTable: React.FC<EntryMeetingTableProps> = ({
                     )}
                   </TableCell>
                   <TableCell>
-                    {item.linkDaftarHadir ? (
+                    {item.link_daftar_hadir ? (
                       <a
-                        href={item.linkDaftarHadir}
+                        href={item.link_daftar_hadir}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-blue-600 hover:text-blue-800 underline"
@@ -84,15 +105,7 @@ const EntryMeetingTable: React.FC<EntryMeetingTableProps> = ({
                     )}
                   </TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      getEntryMeetingStatus(item) === 'Lengkap' 
-                        ? 'bg-green-100 text-green-800' 
-                        : getEntryMeetingStatus(item) === 'Sebagian'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {getEntryMeetingStatus(item)}
-                    </span>
+                    {getStatusBadge(item)}
                   </TableCell>
                   <TableCell>
                     <ActionDropdown

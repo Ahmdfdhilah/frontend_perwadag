@@ -1,5 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRole } from '@/hooks/useRole';
+import { useURLFilters } from '@/hooks/useURLFilters';
+import { useToast } from '@workspace/ui/components/sonner';
+import { MeetingResponse, MeetingFilterParams } from '@/services/meeting/types';
+import { meetingService } from '@/services/meeting';
 import Filtering from '@/components/common/Filtering';
 import SearchContainer from '@/components/common/SearchContainer';
 import Pagination from '@/components/common/Pagination';
@@ -11,35 +15,208 @@ import {
   SelectTrigger,
   SelectValue
 } from '@workspace/ui/components/select';
-import { Combobox } from '@workspace/ui/components/combobox';
 import { Label } from '@workspace/ui/components/label';
-import {
-  ENTRY_MEETING_DATA,
-  YEARS_ENTRY_MEETING,
-  EntryMeeting
-} from '@/mocks/entryMeeting';
-import { PERWADAG_DATA } from '@/mocks/perwadag';
-import { INSPEKTORATS } from '@/mocks/riskAssessment';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import EntryMeetingTable from '@/components/EntryMeeting/EntryMeetingTable';
 import EntryMeetingCards from '@/components/EntryMeeting/EntryMeetingCards';
 import EntryMeetingDialog from '@/components/EntryMeeting/EntryMeetingDialog';
 
+interface EntryMeetingPageFilters {
+  search: string;
+  inspektorat: string;
+  user_perwadag_id: string;
+  tahun_evaluasi: string;
+  has_files: string;
+  has_date: string;
+  has_links: string;
+  is_completed: string;
+  page: number;
+  size: number;
+  [key: string]: string | number;
+}
+
 const EntryMeetingPage: React.FC = () => {
   const { isAdmin, isInspektorat, isPerwadag } = useRole();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedYear, setSelectedYear] = useState<string>('all');
-  const [selectedInspektorat, setSelectedInspektorat] = useState<string>('all');
-  const [selectedPerwadag, setSelectedPerwadag] = useState<string>('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const { toast } = useToast();
+  
+  // URL Filters configuration
+  const { updateURL, getCurrentFilters } = useURLFilters<EntryMeetingPageFilters>({
+    defaults: {
+      search: '',
+      inspektorat: 'all',
+      user_perwadag_id: 'all',
+      tahun_evaluasi: 'all',
+      has_files: 'all',
+      has_date: 'all',
+      has_links: 'all',
+      is_completed: 'all',
+      page: 1,
+      size: 10,
+    },
+    cleanDefaults: true,
+  });
+
+  // Get current filters from URL
+  const filters = getCurrentFilters();
+  
+  const [meetings, setMeetings] = useState<MeetingResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [totalItems, setTotalItems] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<EntryMeeting | null>(null);
+  const [editingItem, setEditingItem] = useState<MeetingResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
 
-  // Check access - only admin, inspektorat, and perwadag can access this page
-  if (!isAdmin() && !isInspektorat() && !isPerwadag()) {
+  // Calculate access control
+  const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
+
+  // Fetch meetings function
+  const fetchMeetings = async () => {
+    setLoading(true);
+    try {
+      const params: MeetingFilterParams = {
+        page: filters.page,
+        size: filters.size,
+        search: filters.search || undefined,
+        meeting_type: "ENTRY",
+        inspektorat: filters.inspektorat !== 'all' ? filters.inspektorat : undefined,
+        user_perwadag_id: filters.user_perwadag_id !== 'all' ? filters.user_perwadag_id : undefined,
+        tahun_evaluasi: filters.tahun_evaluasi !== 'all' ? parseInt(filters.tahun_evaluasi) : undefined,
+        has_files: filters.has_files !== 'all' ? filters.has_files === 'true' : undefined,
+        has_date: filters.has_date !== 'all' ? filters.has_date === 'true' : undefined,
+        has_links: filters.has_links !== 'all' ? filters.has_links === 'true' : undefined,
+        is_completed: filters.is_completed !== 'all' ? filters.is_completed === 'true' : undefined,
+      };
+
+      const response = await meetingService.getMeetingList(params);
+      setMeetings(response.items);
+      setTotalItems(response.total);
+    } catch (error) {
+      console.error('Failed to fetch meetings:', error);
+      toast({
+        title: 'Error',
+        description: 'Gagal memuat data entry meeting. Silakan coba lagi.',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Effect to fetch meetings when filters change
+  useEffect(() => {
+    if (hasAccess) {
+      fetchMeetings();
+    }
+  }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, filters.has_files, filters.has_date, filters.has_links, filters.is_completed, hasAccess]);
+
+  // Pagination
+  const totalPages = Math.ceil(totalItems / filters.size);
+
+  const handleView = (item: MeetingResponse) => {
+    setEditingItem(item);
+    setDialogMode('view');
+    setIsDialogOpen(true);
+  };
+
+  const handleEdit = (item: MeetingResponse) => {
+    setEditingItem(item);
+    setDialogMode('edit');
+    setIsDialogOpen(true);
+  };
+
+  const handleSave = async (data: any) => {
+    if (!editingItem) return;
+    
+    try {
+      const updateData = {
+        tanggal_meeting: data.tanggal_meeting,
+        link_zoom: data.link_zoom || undefined,
+        link_daftar_hadir: data.link_daftar_hadir || undefined,
+      };
+
+      await meetingService.updateMeeting(editingItem.id, updateData);
+      
+      // Handle file uploads if any
+      if (data.files && data.files.length > 0) {
+        await meetingService.uploadFiles(editingItem.id, data.files);
+      }
+      
+      setIsDialogOpen(false);
+      setEditingItem(null);
+      fetchMeetings(); // Refresh the list
+      
+      toast({
+        title: 'Berhasil diperbarui',
+        description: `Data entry meeting ${editingItem.nama_perwadag} telah diperbarui.`,
+        variant: 'default'
+      });
+    } catch (error) {
+      console.error('Failed to save meeting:', error);
+    }
+  };
+
+  // Filter handlers
+  const handleSearchChange = (search: string) => {
+    updateURL({ search, page: 1 });
+  };
+
+  const handleInspektoratChange = (inspektorat: string) => {
+    updateURL({ inspektorat, page: 1 });
+  };
+
+
+  const handleTahunEvaluasiChange = (tahun_evaluasi: string) => {
+    updateURL({ tahun_evaluasi, page: 1 });
+  };
+
+  const handleStatusChange = (status: string, type: 'has_files' | 'has_date' | 'has_links' | 'is_completed') => {
+    updateURL({ [type]: status, page: 1 });
+  };
+
+  const handlePageChange = (page: number) => {
+    updateURL({ page });
+  };
+
+  const handleItemsPerPageChange = (value: string) => {
+    updateURL({ size: parseInt(value), page: 1 });
+  };
+
+  // Generate composite title
+  const getCompositeTitle = () => {
+    let title = "Daftar Entry Meeting";
+    const activeFilters = [];
+    
+    if (filters.inspektorat !== 'all') {
+      activeFilters.push(`Inspektorat ${filters.inspektorat}`);
+    }
+    
+    if (filters.tahun_evaluasi !== 'all') {
+      activeFilters.push(`Tahun ${filters.tahun_evaluasi}`);
+    }
+    
+    if (filters.is_completed !== 'all') {
+      activeFilters.push(filters.is_completed === 'true' ? 'Lengkap' : 'Belum Lengkap');
+    }
+    
+    if (activeFilters.length > 0) {
+      title += " - " + activeFilters.join(" - ");
+    }
+    
+    return title;
+  };
+
+  const canEdit = (item: MeetingResponse) => {
+    if (isAdmin()) return true;
+    if (isInspektorat()) {
+      // Check if user can edit this meeting based on inspektorat
+      return true; // Implement proper logic based on user's inspektorat
+    }
+    return false;
+  };
+
+  // Check access after all hooks have been called
+  if (!hasAccess) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
@@ -52,127 +229,6 @@ const EntryMeetingPage: React.FC = () => {
     );
   }
 
-  // Get available perwadag based on role
-  const availablePerwadag = useMemo(() => {
-    if (isAdmin()) {
-      return PERWADAG_DATA;
-    }
-    if (isInspektorat()) {
-      // For demo, assume inspektorat 1
-      return PERWADAG_DATA.filter(p => p.inspektorat === 1);
-    }
-    if (isPerwadag()) {
-      // For demo, assume current user is PWD001
-      return PERWADAG_DATA.filter(p => p.id === 'PWD001');
-    }
-    return [];
-  }, [isAdmin, isInspektorat, isPerwadag]);
-
-  // Filter and sort data
-  const filteredData = useMemo(() => {
-    let filtered = [...ENTRY_MEETING_DATA];
-
-    // Filter by search query
-    if (searchQuery) {
-      filtered = filtered.filter(item =>
-        item.perwadagName.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // Filter by year
-    if (selectedYear !== 'all') {
-      filtered = filtered.filter(item => item.year === parseInt(selectedYear));
-    }
-
-    // Filter by inspektorat (only for admin)
-    if (isAdmin() && selectedInspektorat !== 'all') {
-      filtered = filtered.filter(item => item.inspektorat === parseInt(selectedInspektorat));
-    }
-
-    // Filter by perwadag
-    if (selectedPerwadag !== 'all') {
-      filtered = filtered.filter(item => item.perwadagId === selectedPerwadag);
-    }
-
-    // Role-based filtering
-    if (isInspektorat()) {
-      // For demo, show inspektorat 1 data
-      filtered = filtered.filter(item => item.inspektorat === 1);
-    }
-
-    if (isPerwadag()) {
-      // For demo, show only PWD001 data
-      filtered = filtered.filter(item => item.perwadagId === 'PWD001');
-    }
-
-    // Sort by tanggal (newest first)
-    filtered.sort((a, b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime());
-
-    return filtered;
-  }, [searchQuery, selectedYear, selectedInspektorat, selectedPerwadag, isAdmin, isInspektorat, isPerwadag]);
-
-  // Pagination
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
-
-  const handleView = (item: EntryMeeting) => {
-    setEditingItem(item);
-    setDialogMode('view');
-    setIsDialogOpen(true);
-  };
-
-  const handleEdit = (item: EntryMeeting) => {
-    setEditingItem(item);
-    setDialogMode('edit');
-    setIsDialogOpen(true);
-  };
-
-  const handleSave = (data: Partial<EntryMeeting>) => {
-    console.log('Save:', data);
-    // Implement save logic
-    setIsDialogOpen(false);
-    setEditingItem(null);
-  };
-
-  const handleItemsPerPageChange = (value: string) => {
-    setItemsPerPage(parseInt(value));
-    setCurrentPage(1);
-  };
-
-  // Generate composite title
-  const getCompositeTitle = () => {
-    let title = "Daftar Entry Meeting";
-    const filters = [];
-    
-    if (isInspektorat()) {
-      filters.push("Inspektorat I");
-    } else if (isAdmin() && selectedInspektorat !== 'all') {
-      filters.push(`Inspektorat ${selectedInspektorat}`);
-    }
-    
-    if (selectedYear !== 'all') {
-      filters.push(selectedYear);
-    }
-    
-    if (selectedPerwadag !== 'all') {
-      const perwadag = PERWADAG_DATA.find(p => p.id === selectedPerwadag);
-      if (perwadag) filters.push(perwadag.name);
-    }
-    
-    if (filters.length > 0) {
-      title += " - " + filters.join(" - ");
-    }
-    
-    return title;
-  };
-
-  const canEdit = (item: EntryMeeting) => {
-    if (isAdmin()) return true;
-    if (isInspektorat()) return item.inspektorat === 1;
-    return false;
-  };
-
   return (
     <div className="space-y-6">
       <PageHeader
@@ -182,18 +238,16 @@ const EntryMeetingPage: React.FC = () => {
 
       <Filtering>
         <div className="space-y-2">
-          <Label htmlFor="year-filter">Periode (Tahun)</Label>
-          <Select value={selectedYear} onValueChange={setSelectedYear}>
-            <SelectTrigger id="year-filter">
+          <Label htmlFor="tahun-filter">Tahun Evaluasi</Label>
+          <Select value={filters.tahun_evaluasi} onValueChange={handleTahunEvaluasiChange}>
+            <SelectTrigger id="tahun-filter">
               <SelectValue placeholder="Pilih tahun" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Tahun</SelectItem>
-              {YEARS_ENTRY_MEETING.map(year => (
-                <SelectItem key={year} value={year.toString()}>
-                  {year}
-                </SelectItem>
-              ))}
+              <SelectItem value="2024">2024</SelectItem>
+              <SelectItem value="2023">2023</SelectItem>
+              <SelectItem value="2022">2022</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -202,41 +256,47 @@ const EntryMeetingPage: React.FC = () => {
         {isAdmin() && (
           <div className="space-y-2">
             <Label htmlFor="inspektorat-filter">Inspektorat</Label>
-            <Select value={selectedInspektorat} onValueChange={setSelectedInspektorat}>
+            <Select value={filters.inspektorat} onValueChange={handleInspektoratChange}>
               <SelectTrigger id="inspektorat-filter">
                 <SelectValue placeholder="Pilih inspektorat" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Semua Inspektorat</SelectItem>
-                {INSPEKTORATS.map(inspektorat => (
-                  <SelectItem key={inspektorat.value} value={inspektorat.value.toString()}>
-                    {inspektorat.label}
-                  </SelectItem>
-                ))}
+                <SelectItem value="1">Inspektorat I</SelectItem>
+                <SelectItem value="2">Inspektorat II</SelectItem>
+                <SelectItem value="3">Inspektorat III</SelectItem>
               </SelectContent>
             </Select>
           </div>
         )}
 
-        {/* Show perwadag filter for admin and inspektorat */}
-        {(isAdmin() || isInspektorat()) && (
-          <div className="space-y-2">
-            <Label htmlFor="perwadag-filter">Perwadag</Label>
-            <Combobox
-              options={[
-                { value: 'all', label: 'Semua Perwadag' },
-                ...availablePerwadag.map(perwadag => ({
-                  value: perwadag.id,
-                  label: perwadag.name
-                }))
-              ]}
-              value={selectedPerwadag}
-              onChange={(value) => setSelectedPerwadag(value.toString())}
-              placeholder="Pilih perwadag"
-              searchPlaceholder="Cari perwadag..."
-            />
-          </div>
-        )}
+        <div className="space-y-2">
+          <Label htmlFor="status-filter">Status Kelengkapan</Label>
+          <Select value={filters.is_completed} onValueChange={(value) => handleStatusChange(value, 'is_completed')}>
+            <SelectTrigger id="status-filter">
+              <SelectValue placeholder="Pilih status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Status</SelectItem>
+              <SelectItem value="true">Lengkap</SelectItem>
+              <SelectItem value="false">Belum Lengkap</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="files-filter">Status Files</Label>
+          <Select value={filters.has_files} onValueChange={(value) => handleStatusChange(value, 'has_files')}>
+            <SelectTrigger id="files-filter">
+              <SelectValue placeholder="Pilih status files" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua</SelectItem>
+              <SelectItem value="true">Ada Files</SelectItem>
+              <SelectItem value="false">Belum Ada Files</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </Filtering>
 
       <Card>
@@ -248,15 +308,16 @@ const EntryMeetingPage: React.FC = () => {
             />
 
             <SearchContainer
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
+              searchQuery={filters.search}
+              onSearchChange={handleSearchChange}
               placeholder="Cari nama perwadag..."
             />
 
             {/* Desktop Table */}
             <div className="hidden md:block">
               <EntryMeetingTable
-                data={paginatedData}
+                data={meetings}
+                loading={loading}
                 onView={handleView}
                 onEdit={handleEdit}
                 canEdit={canEdit}
@@ -266,7 +327,8 @@ const EntryMeetingPage: React.FC = () => {
             {/* Mobile Cards */}
             <div className="md:hidden">
               <EntryMeetingCards
-                data={paginatedData}
+                data={meetings}
+                loading={loading}
                 onView={handleView}
                 onEdit={handleEdit}
                 canEdit={canEdit}
@@ -276,11 +338,11 @@ const EntryMeetingPage: React.FC = () => {
             {/* Pagination */}
             {totalPages > 1 && (
               <Pagination
-                currentPage={currentPage}
+                currentPage={filters.page}
                 totalPages={totalPages}
-                itemsPerPage={itemsPerPage}
-                totalItems={filteredData.length}
-                onPageChange={setCurrentPage}
+                itemsPerPage={filters.size}
+                totalItems={totalItems}
+                onPageChange={handlePageChange}
                 onItemsPerPageChange={handleItemsPerPageChange}
               />
             )}

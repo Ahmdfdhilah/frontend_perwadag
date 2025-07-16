@@ -11,7 +11,7 @@ import {
 
 class MeetingService extends BaseService {
   constructor() {
-    super("/meeting");
+    super("/evaluasi/meeting");
   }
 
   // Get all meetings with filters
