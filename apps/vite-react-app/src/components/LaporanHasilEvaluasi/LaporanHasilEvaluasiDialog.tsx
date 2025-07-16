@@ -9,20 +9,13 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@workspace/ui/components/select';
 import { Calendar } from '@workspace/ui/components/calendar';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@workspace/ui/components/popover';
-import { CalendarIcon, Download } from 'lucide-react';
+import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
@@ -50,7 +43,8 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
   const [formData, setFormData] = useState<any>({});
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
+  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string }>>([]);
 
   useEffect(() => {
     if (item && open) {
@@ -59,13 +53,24 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
         tanggal_laporan: item.tanggal_laporan,
       });
       setSelectedDate(item.tanggal_laporan ? new Date(item.tanggal_laporan) : undefined);
+
+      // Set existing files for display
+      if (item.has_file && item.file_metadata) {
+        setExistingFiles([{
+          name: item.file_metadata.original_filename || item.file_metadata.filename || 'Laporan Hasil Evaluasi',
+          url: item.file_urls?.download_url
+        }]);
+      } else {
+        setExistingFiles([]);
+      }
     } else {
       setFormData({
         nomor_laporan: '',
         tanggal_laporan: '',
       });
       setSelectedDate(undefined);
-      setUploadFile(null);
+      setUploadFiles([]);
+      setExistingFiles([]);
     }
   }, [item, open]);
 
@@ -73,7 +78,7 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
     const dataToSave = {
       nomor_laporan: formData.nomor_laporan,
       tanggal_laporan: selectedDate ? selectedDate.toISOString().split('T')[0] : formData.tanggal_laporan,
-      file: uploadFile,
+      files: uploadFiles,
     };
     onSave(dataToSave);
   };
@@ -82,23 +87,12 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
     onOpenChange(false);
   };
 
-  const handleUploadFileChange = (files: File[]) => {
-    setUploadFile(files[0] || null);
+  const handleUploadFilesChange = (files: File[]) => {
+    setUploadFiles(files);
   };
 
-  const handleDownloadFile = () => {
-    if (item?.file_urls?.download_url) {
-      const link = document.createElement('a');
-      link.href = item.file_urls.download_url;
-      link.download = item.file_metadata?.original_filename || 'laporan-hasil-evaluasi';
-      link.click();
-    }
-  };
-
-  const handleViewFile = () => {
-    if (item?.file_urls?.view_url) {
-      window.open(item.file_urls.view_url, '_blank');
-    }
+  const handleExistingFilesRemove = (index: number) => {
+    setExistingFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const isEditable = mode === 'edit';
@@ -188,79 +182,21 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
               )}
             </div>
 
-            {/* Current File Display */}
-            {item?.has_file && (
-              <div className="space-y-2">
-                <Label>File Laporan Saat Ini</Label>
-                <div className="p-3 bg-muted rounded-md">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium">{item.file_metadata?.original_filename || 'Laporan Hasil Evaluasi'}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {item.file_metadata?.size_mb ? `${item.file_metadata.size_mb.toFixed(2)} MB` : ''}
-                        {item.file_metadata?.uploaded_at ? ` • Uploaded ${format(new Date(item.file_metadata.uploaded_at), 'dd MMM yyyy')}` : ''}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      {item.file_urls?.view_url && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={handleViewFile}
-                        >
-                          View
-                        </Button>
-                      )}
-                      {item.file_urls?.download_url && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={handleDownloadFile}
-                        >
-                          <Download className="w-4 h-4 mr-1" />
-                          Download
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* File Upload */}
-            {canEdit && (
-              <FileUpload
-                label="Upload File Laporan (Optional)"
-                accept=".pdf,.doc,.docx,.xls,.xlsx"
-                multiple={false}
-                maxSize={10 * 1024 * 1024} // 10MB
-                files={uploadFile ? [uploadFile] : []}
-                mode="edit"
-                onFilesChange={handleUploadFileChange}
-                description="Format yang didukung: PDF, DOC, DOCX, XLS, XLSX (Max 10MB)"
-              />
-            )}
-
-            {/* Status Information */}
-            <div className="space-y-2">
-              <Label>Status Kelengkapan</Label>
-              <div className="p-3 bg-muted rounded-md">
-                <div className="flex items-center gap-2">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    item?.is_completed
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
-                    {item?.is_completed ? 'Lengkap' : 'Belum Lengkap'}
-                  </span>
-                  <span className="text-sm text-muted-foreground">
-                    ({item?.completion_percentage || 0}% lengkap)
-                  </span>
-                </div>
-              </div>
-            </div>
+            {/* Upload File Laporan */}
+            <FileUpload
+              label="Upload File Laporan Hasil Evaluasi"
+              accept=".pdf,.doc,.docx,.xls,.xlsx"
+              multiple={false}
+              maxSize={10 * 1024 * 1024} // 10MB
+              maxFiles={1}
+              files={uploadFiles}
+              existingFiles={existingFiles}
+              mode={canEdit ? 'edit' : 'view'}
+              disabled={!canEdit}
+              onFilesChange={handleUploadFilesChange}
+              onExistingFileRemove={handleExistingFilesRemove}
+              description="Format yang didukung: PDF, DOC, DOCX, XLS, XLSX (Max 10MB per file)"
+            />
           </div>
         </div>
 

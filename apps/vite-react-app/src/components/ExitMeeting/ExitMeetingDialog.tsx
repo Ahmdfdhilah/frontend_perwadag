@@ -43,7 +43,8 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   const [formData, setFormData] = useState<any>({});
   const [selectedExitDate, setSelectedExitDate] = useState<Date>();
   const [isExitDatePickerOpen, setIsExitDatePickerOpen] = useState(false);
-  const [files, setFiles] = useState<File[]>([]);
+  const [meetingFiles, setMeetingFiles] = useState<File[]>([]);
+  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string }>>([]);
 
   useEffect(() => {
     if (item && open) {
@@ -53,6 +54,12 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
         link_daftar_hadir: item.link_daftar_hadir || '',
       });
       setSelectedExitDate(item.tanggal_meeting ? new Date(item.tanggal_meeting) : undefined);
+      
+      // Set existing files for display
+      setExistingFiles(item.files_info?.files ? item.files_info.files.map((file, index) => ({ 
+        name: file.original_filename || `Bukti Hadir ${index + 1}`, 
+        url: file.download_url 
+      })) : []);
     } else {
       setFormData({
         tanggal_meeting: '',
@@ -60,7 +67,8 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
         link_daftar_hadir: '',
       });
       setSelectedExitDate(undefined);
-      setFiles([]);
+      setMeetingFiles([]);
+      setExistingFiles([]);
     }
   }, [item, open]);
 
@@ -69,7 +77,7 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
       tanggal_meeting: selectedExitDate ? selectedExitDate.toISOString().split('T')[0] : formData.tanggal_meeting,
       link_zoom: formData.link_zoom,
       link_daftar_hadir: formData.link_daftar_hadir,
-      files,
+      files: meetingFiles,
     };
     onSave(dataToSave);
   };
@@ -85,8 +93,12 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
     }
   };
 
-  const handleFilesChange = (newFiles: File[]) => {
-    setFiles(newFiles);
+  const handleMeetingFilesChange = (files: File[]) => {
+    setMeetingFiles(files);
+  };
+
+  const handleExistingFilesRemove = (index: number) => {
+    setExistingFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const isEditable = mode === 'edit';
@@ -243,19 +255,21 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
               )}
             </div>
 
-            {/* Upload Files */}
-            {canEdit && (
-              <FileUpload
-                label="Upload Files (Optional)"
-                accept="*/*"
-                multiple={true}
-                maxSize={10 * 1024 * 1024} // 10MB
-                files={files}
-                mode="edit"
-                onFilesChange={handleFilesChange}
-                description="Upload any relevant files for this meeting"
-              />
-            )}
+            {/* Upload Bukti Hadir */}
+            <FileUpload
+              label="Upload Bukti Hadir"
+              accept="*/*"
+              multiple={true}
+              maxSize={10 * 1024 * 1024} // 10MB
+              maxFiles={5}
+              files={meetingFiles}
+              existingFiles={existingFiles}
+              mode={canEdit ? 'edit' : 'view'}
+              disabled={!canEdit}
+              onFilesChange={handleMeetingFilesChange}
+              onExistingFileRemove={handleExistingFilesRemove}
+              description="Upload bukti hadir meeting (Max 10MB per file)"
+            />
           </div>
         </div>
 

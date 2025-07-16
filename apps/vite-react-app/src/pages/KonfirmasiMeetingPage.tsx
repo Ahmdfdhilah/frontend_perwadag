@@ -127,7 +127,7 @@ const KonfirmasiMeetingPage: React.FC = () => {
       fetchMeetings();
       fetchAvailablePerwadag();
     }
-  }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, hasAccess]);
+  }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, filters.has_files, filters.has_date, filters.has_links, filters.is_completed, hasAccess]);
 
   // Pagination
   const totalPages = Math.ceil(totalItems / filters.size);
