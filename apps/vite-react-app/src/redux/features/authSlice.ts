@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { authService } from '@/services/auth';
 import { userService } from '@/services/users';
-import { User, UserChangePassword } from '@/services/users/types';
+import { User, UserChangePassword, UserUpdate } from '@/services/users/types';
 import { 
   LoginRequest, 
   PasswordResetRequest, 
@@ -17,6 +17,18 @@ export interface AuthState {
   error: string | null;
   tokenExpiry: number | null;
 }
+
+export const updateProfileAsync = createAsyncThunk(
+  'auth/updateProfile',
+  async (profileData: UserUpdate, { rejectWithValue }) => {
+    try {
+      const response = await userService.updateCurrentUser(profileData);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Profile update failed');
+    }
+  }
+);
 
 const initialState: AuthState = {
   isAuthenticated: false,
@@ -188,14 +200,22 @@ const authSlice = createSlice({
           state.user = {
             id: action.payload.user.id,
             nama: action.payload.user.nama,
+            username: action.payload.user.username || '',
+            tempat_lahir: action.payload.user.tempat_lahir || '',
+            tanggal_lahir: action.payload.user.tanggal_lahir || '',
+            pangkat: action.payload.user.pangkat || '',
+            jabatan: action.payload.user.jabatan || '',
             email: action.payload.user.email,
+            is_active: action.payload.user.is_active,
             role: action.payload.user.role as "ADMIN" | "INSPEKTORAT" | "PERWADAG",
             inspektorat: action.payload.user.inspektorat,
-            wilayah: action.payload.user.wilayah || '',
-            perwadag_id: action.payload.user.perwadag_id || '',
-            is_active: action.payload.user.is_active,
+            display_name: action.payload.user.display_name || action.payload.user.nama,
+            age: action.payload.user.age || 0,
+            has_email: action.payload.user.has_email || false,
+            last_login: action.payload.user.last_login,
+            role_display: action.payload.user.role_display || action.payload.user.role,
             created_at: action.payload.user.created_at,
-            updated_at: action.payload.user.updated_at || new Date().toISOString(),
+            updated_at: action.payload.user.updated_at,
           };
         }
         state.error = null;
@@ -304,18 +324,58 @@ const authSlice = createSlice({
         state.user = {
           id: action.payload.id,
           nama: action.payload.nama,
-          email: action.payload.email || '',
+          username: action.payload.username,
+          tempat_lahir: action.payload.tempat_lahir,
+          tanggal_lahir: action.payload.tanggal_lahir,
+          pangkat: action.payload.pangkat,
+          jabatan: action.payload.jabatan,
+          email: action.payload.email,
+          is_active: action.payload.is_active,
           role: action.payload.role as "ADMIN" | "INSPEKTORAT" | "PERWADAG",
           inspektorat: action.payload.inspektorat,
-          wilayah: action.payload.wilayah,
-          perwadag_id: action.payload.perwadag_id,
-          is_active: action.payload.is_active,
+          display_name: action.payload.display_name,
+          age: action.payload.age,
+          has_email: action.payload.has_email,
+          last_login: action.payload.last_login,
+          role_display: action.payload.role_display,
           created_at: action.payload.created_at,
           updated_at: action.payload.updated_at,
         };
         state.error = null;
       })
       .addCase(getCurrentUserAsync.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(updateProfileAsync.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateProfileAsync.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = {
+          id: action.payload.id,
+          nama: action.payload.nama,
+          username: action.payload.username,
+          tempat_lahir: action.payload.tempat_lahir,
+          tanggal_lahir: action.payload.tanggal_lahir,
+          pangkat: action.payload.pangkat,
+          jabatan: action.payload.jabatan,
+          email: action.payload.email,
+          is_active: action.payload.is_active,
+          role: action.payload.role as "ADMIN" | "INSPEKTORAT" | "PERWADAG",
+          inspektorat: action.payload.inspektorat,
+          display_name: action.payload.display_name,
+          age: action.payload.age,
+          has_email: action.payload.has_email,
+          last_login: action.payload.last_login,
+          role_display: action.payload.role_display,
+          created_at: action.payload.created_at,
+          updated_at: action.payload.updated_at,
+        };
+        state.error = null;
+      })
+      .addCase(updateProfileAsync.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       });

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { useAppSelector, useAppDispatch } from '@/redux/hooks';
+import { selectUser, selectAuthLoading, updateProfileAsync, changePasswordAsync } from '@/redux/features/authSlice';
 import { useToast } from '@workspace/ui/components/sonner';
-import { USERS_DATA } from '@/mocks/users';
-import { useRole } from '@/hooks/useRole';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
@@ -11,6 +11,7 @@ import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
 import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { UserUpdate, UserChangePassword } from '@/services/users/types';
 import {
   Mail,
   Phone,
@@ -21,31 +22,19 @@ import {
   Lock,
   CheckCircle,
   XCircle,
+  Calendar,
+  MapPin,
+  Award,
+  IdCard,
 } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
-  // Using dummy data - in real app this would come from auth context
-  const user = USERS_DATA[0]; // Using first user as current user
-  const { currentRole } = useRole();
+  const dispatch = useAppDispatch();
+  const user = useAppSelector(selectUser);
+  const isLoading = useAppSelector(selectAuthLoading);
   const { toast } = useToast();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
-  
-  // Get current user info - in real app this would come from auth context
-  const currentUser = {
-    first_name: user.name.split(' ')[0],
-    last_name: user.name.split(' ').slice(1).join(' ') || '',
-    email: user.email,
-    role: currentRole.label,
-    phone: user.phone,
-    address: user.address,
-    avatar: user.avatar,
-    isActive: user.isActive,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-    lastLogin: user.lastLogin,
-    perwadagId: user.perwadagId
-  };
 
   if (!user) {
     return (
@@ -59,24 +48,44 @@ const ProfilePage: React.FC = () => {
   }
 
   const getFullName = () => {
-    return `${currentUser.first_name} ${currentUser.last_name}`.trim();
+    return user.nama;
   };
 
   const getStatusIcon = () => {
-    if (!user.isActive) {
+    if (!user.is_active) {
       return <XCircle className="w-4 h-4 text-red-500" />;
     }
     return <CheckCircle className="w-4 h-4 text-green-500" />;
   };
 
   const getStatusText = () => {
-    if (!user.isActive) return 'Tidak Aktif';
+    if (!user.is_active) return 'Tidak Aktif';
     return 'Aktif';
   };
 
   const getStatusBadgeVariant = () => {
-    if (!user.isActive) return 'destructive';
+    if (!user.is_active) return 'destructive';
     return 'default';
+  };
+
+  const getRoleDisplayName = () => {
+    return user.role_display || user.role;
+  };
+
+  const getInitials = () => {
+    const nameParts = user.nama.split(' ');
+    if (nameParts.length >= 2) {
+      return nameParts[0][0] + nameParts[1][0];
+    }
+    return nameParts[0][0];
+  };
+
+  const formatDate = (dateString: string) => {
+    return format(new Date(dateString), 'dd MMMM yyyy', { locale: id });
+  };
+
+  const formatDateTime = (dateString: string) => {
+    return format(new Date(dateString), 'dd MMMM yyyy, HH:mm', { locale: id });
   };
 
   const handleEditProfile = () => {
@@ -87,22 +96,40 @@ const ProfilePage: React.FC = () => {
     setIsPasswordDialogOpen(true);
   };
 
-  const handleProfileUpdate = () => {
-    toast({
-      title: 'Profil berhasil diperbarui',
-      description: 'Data profil Anda telah diperbarui.',
-      variant: 'default'
-    });
-    setIsEditDialogOpen(false);
+  const handleProfileUpdate = async (data: UserUpdate) => {
+    try {
+      await dispatch(updateProfileAsync(data)).unwrap();
+      toast({
+        title: 'Profil berhasil diperbarui',
+        description: 'Data profil Anda telah diperbarui.',
+        variant: 'default'
+      });
+      setIsEditDialogOpen(false);
+    } catch (error) {
+      toast({
+        title: 'Gagal memperbarui profil',
+        description: 'Terjadi kesalahan saat memperbarui profil.',
+        variant: 'destructive'
+      });
+    }
   };
 
-  const handlePasswordChange = () => {
-    toast({
-      title: 'Password berhasil diubah',
-      description: 'Password Anda telah berhasil diubah.',
-      variant: 'default'
-    });
-    setIsPasswordDialogOpen(false);
+  const handlePasswordChange = async (data: UserChangePassword) => {
+    try {
+      await dispatch(changePasswordAsync(data)).unwrap();
+      toast({
+        title: 'Password berhasil diubah',
+        description: 'Password Anda telah berhasil diubah.',
+        variant: 'default'
+      });
+      setIsPasswordDialogOpen(false);
+    } catch (error) {
+      toast({
+        title: 'Gagal mengubah password',
+        description: 'Terjadi kesalahan saat mengubah password.',
+        variant: 'destructive'
+      });
+    }
   };
 
   return (
@@ -130,13 +157,9 @@ const ProfilePage: React.FC = () => {
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
               <Avatar className="w-24 h-24">
-                {currentUser.avatar ? (
-                  <AvatarImage src={currentUser.avatar} alt={getFullName()} />
-                ) : (
-                  <AvatarFallback className="text-2xl">
-                    {currentUser.first_name[0]}{currentUser.last_name ? currentUser.last_name[0] : ''}
-                  </AvatarFallback>
-                )}
+                <AvatarFallback className="text-2xl">
+                  {getInitials()}
+                </AvatarFallback>
               </Avatar>
             </div>
             <CardTitle className="text-xl">{getFullName()}</CardTitle>
@@ -151,23 +174,30 @@ const ProfilePage: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">{currentUser.email}</span>
+                <span className="text-sm">{user.email || 'Tidak ada email'}</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">{currentUser.phone}</span>
+                <IdCard className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm">{user.username}</span>
               </div>
 
               <div className="flex items-center gap-2">
                 <Shield className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">{currentUser.role}</span>
+                <span className="text-sm">{getRoleDisplayName()}</span>
               </div>
 
               <div className="flex items-center gap-2">
-                <Building className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">Alamat: {currentUser.address}</span>
+                <Award className="w-4 h-4 text-muted-foreground" />
+                <span className="text-sm">{user.pangkat}</span>
               </div>
+
+              {user.inspektorat && (
+                <div className="flex items-center gap-2">
+                  <Building className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-sm">{user.inspektorat}</span>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -193,25 +223,37 @@ const ProfilePage: React.FC = () => {
                     <p className="text-sm text-muted-foreground">{getFullName()}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Email</label>
-                    <p className="text-sm text-muted-foreground">{currentUser.email}</p>
+                    <label className="text-sm font-medium">Username</label>
+                    <p className="text-sm text-muted-foreground">{user.username}</p>
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Telepon</label>
-                    <p className="text-sm text-muted-foreground">{currentUser.phone}</p>
+                    <label className="text-sm font-medium">Email</label>
+                    <p className="text-sm text-muted-foreground">{user.email || 'Tidak ada email'}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Tempat Lahir</label>
+                    <p className="text-sm text-muted-foreground">{user.tempat_lahir}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Tanggal Lahir</label>
+                    <p className="text-sm text-muted-foreground">{formatDate(user.tanggal_lahir)}</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Umur</label>
+                    <p className="text-sm text-muted-foreground">{user.age} tahun</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Pangkat</label>
+                    <p className="text-sm text-muted-foreground">{user.pangkat}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium">Jabatan</label>
-                    <p className="text-sm text-muted-foreground">{currentUser.role}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Alamat</label>
-                    <p className="text-sm text-muted-foreground">{currentUser.address}</p>
+                    <p className="text-sm text-muted-foreground">{user.jabatan}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium">Tanggal Bergabung</label>
                     <p className="text-sm text-muted-foreground">
-                      {format(currentUser.createdAt, 'dd MMMM yyyy', { locale: id })}
+                      {formatDate(user.created_at)}
                     </p>
                   </div>
                 </div>
@@ -227,28 +269,41 @@ const ProfilePage: React.FC = () => {
                     <label className="text-sm font-medium">Peran</label>
                     <div className="flex flex-wrap gap-1 mt-1">
                       <Badge variant="secondary" className="text-xs">
-                        {currentUser.role}
+                        {getRoleDisplayName()}
                       </Badge>
                     </div>
                   </div>
-                  {currentUser.perwadagId && (
+                  {user.inspektorat && (
                     <div>
-                      <label className="text-sm font-medium">Perwadag ID</label>
-                      <p className="text-sm text-muted-foreground">{currentUser.perwadagId}</p>
+                      <label className="text-sm font-medium">Inspektorat</label>
+                      <p className="text-sm text-muted-foreground">{user.inspektorat}</p>
                     </div>
                   )}
-                  {currentUser.lastLogin && (
+                  <div>
+                    <label className="text-sm font-medium">Status Email</label>
+                    <div className="flex items-center gap-2">
+                      {user.has_email ? (
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                      ) : (
+                        <XCircle className="w-4 h-4 text-red-500" />
+                      )}
+                      <span className="text-sm text-muted-foreground">
+                        {user.has_email ? 'Memiliki email' : 'Tidak memiliki email'}
+                      </span>
+                    </div>
+                  </div>
+                  {user.last_login && (
                     <div>
                       <label className="text-sm font-medium">Login Terakhir</label>
                       <p className="text-sm text-muted-foreground">
-                        {format(currentUser.lastLogin, 'dd MMMM yyyy, HH:mm', { locale: id })}
+                        {formatDateTime(user.last_login)}
                       </p>
                     </div>
                   )}
                   <div>
-                    <label className="text-sm font-medium">Password Terakhir Diubah</label>
+                    <label className="text-sm font-medium">Data Terakhir Diupdate</label>
                     <p className="text-sm text-muted-foreground">
-                      {format(currentUser.updatedAt, 'dd MMMM yyyy, HH:mm', { locale: id })}
+                      {user.updated_at ? formatDateTime(user.updated_at) : formatDateTime(user.created_at)}
                     </p>
                   </div>
                 </div>
@@ -269,14 +324,31 @@ const ProfilePage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  <span className="text-sm font-medium">Verifikasi Email</span>
+                  {user.has_email ? (
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <XCircle className="w-4 h-4 text-red-500" />
+                  )}
+                  <span className="text-sm font-medium">Status Email</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Email telah terverifikasi
+                  {user.has_email ? 'Email tersedia' : 'Email tidak tersedia'}
                 </p>
               </div>
 
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  {user.is_active ? (
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <XCircle className="w-4 h-4 text-red-500" />
+                  )}
+                  <span className="text-sm font-medium">Status Akun</span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {user.is_active ? 'Akun aktif' : 'Akun tidak aktif'}
+                </p>
+              </div>
 
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
@@ -298,12 +370,14 @@ const ProfilePage: React.FC = () => {
         onOpenChange={setIsEditDialogOpen}
         user={user}
         onSave={handleProfileUpdate}
+        loading={isLoading}
       />
 
       <ChangePasswordDialog
         open={isPasswordDialogOpen}
         onOpenChange={setIsPasswordDialogOpen}
         onSave={handlePasswordChange}
+        loading={isLoading}
       />
     </div>
   );
