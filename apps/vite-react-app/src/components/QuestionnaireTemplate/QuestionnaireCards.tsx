@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { FormatKuisionerResponse } from '@/services/formatKuisioner/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import FileViewLink from '@/components/common/FileViewLink';
 
 interface QuestionnaireCardsProps {
   data: FormatKuisionerResponse[];
@@ -48,19 +49,14 @@ const QuestionnaireCards: React.FC<QuestionnaireCardsProps> = ({
   };
 
   const renderDocumentLink = (template: FormatKuisionerResponse) => {
-    if (template.has_file && template.file_urls?.view_url) {
-      return (
-        <a
-          href={template.file_urls.view_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          Lihat Template
-        </a>
-      );
-    }
-    return <span className="text-muted-foreground">-</span>;
+    return (
+      <FileViewLink
+        hasFile={template.has_file}
+        fileUrls={template.file_urls}
+        fileName={template.file_metadata?.original_filename}
+        linkText="Lihat Template"
+      />
+    );
   };
 
   if (loading) {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import FileViewLink from '@/components/common/FileViewLink';
 import { MatriksResponse } from '@/services/matriks/types';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 
@@ -34,19 +35,14 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
 
 
   const renderDocumentLink = (matriks: MatriksResponse) => {
-    if (matriks.has_file && matriks.file_urls?.view_url) {
-      return (
-        <a
-          href={matriks.file_urls.view_url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-blue-600 hover:text-blue-800 underline"
-        >
-          Lihat Dokumen
-        </a>
-      );
-    }
-    return <span className="text-muted-foreground">Tidak ada dokumen</span>;
+    return (
+      <FileViewLink
+        hasFile={matriks.has_file}
+        fileUrls={matriks.file_urls}
+        fileName={matriks.file_metadata?.original_filename}
+        linkText="Lihat Dokumen"
+      />
+    );
   };
 
   if (loading) {

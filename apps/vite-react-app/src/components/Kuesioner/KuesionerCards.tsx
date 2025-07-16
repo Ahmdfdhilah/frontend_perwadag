@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { KuisionerResponse } from '@/services/kuisioner/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import FileViewLink from '@/components/common/FileViewLink';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface KuesionerCardsProps {
@@ -84,18 +85,14 @@ const KuesionerCards: React.FC<KuesionerCardsProps> = ({
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Dokumen:</span>
-                {item.has_file ? (
-                  <a
-                    href={item.file_urls?.view_url || '#'}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="ml-2 text-blue-600 hover:text-blue-800 underline"
-                  >
-                    Lihat Dokumen
-                  </a>
-                ) : (
-                  <span className="ml-2 text-muted-foreground">Tidak ada file</span>
-                )}
+                <span className="ml-2">
+                  <FileViewLink
+                    hasFile={item.has_file}
+                    fileUrls={item.file_urls}
+                    fileName={item.file_metadata?.original_filename}
+                    linkText="Lihat Dokumen"
+                  />
+                </span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Status:</span>

@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { LaporanHasilResponse } from '@/services/laporanHasil/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import FileViewLink from '@/components/common/FileViewLink';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface LaporanHasilEvaluasiCardsProps {
@@ -88,18 +89,14 @@ const LaporanHasilEvaluasiCards: React.FC<LaporanHasilEvaluasiCardsProps> = ({
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Laporan Hasil Evaluasi:</span>
-                {item.has_file ? (
-                  <a 
-                    href={item.file_urls?.view_url || '#'} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="ml-2 text-blue-600 hover:text-blue-800 underline"
-                  >
-                    Lihat Dokumen
-                  </a>
-                ) : (
-                  <span className="ml-2 text-muted-foreground">Tidak ada file</span>
-                )}
+                <span className="ml-2">
+                  <FileViewLink
+                    hasFile={item.has_file}
+                    fileUrls={item.file_urls}
+                    fileName={item.file_metadata?.original_filename}
+                    linkText="Lihat Dokumen"
+                  />
+                </span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Status:</span>

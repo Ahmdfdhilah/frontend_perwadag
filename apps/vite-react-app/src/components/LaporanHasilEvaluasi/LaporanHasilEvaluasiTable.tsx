@@ -8,6 +8,7 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import FileViewLink from '@/components/common/FileViewLink';
 import { LaporanHasilResponse } from '@/services/laporanHasil/types';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
@@ -80,18 +81,12 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
                 <TableCell>{item.nomor_laporan || '-'}</TableCell>
                 <TableCell>{item.tanggal_laporan ? formatIndonesianDate(item.tanggal_laporan) : '-'}</TableCell>
                 <TableCell>
-                  {item.has_file ? (
-                    <a
-                      href={item.file_urls?.view_url || '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 underline"
-                    >
-                      Lihat Dokumen
-                    </a>
-                  ) : (
-                    <span className="text-muted-foreground">Tidak ada file</span>
-                  )}
+                  <FileViewLink
+                    hasFile={item.has_file}
+                    fileUrls={item.file_urls}
+                    fileName={item.file_metadata?.original_filename}
+                    linkText="Lihat Dokumen"
+                  />
                 </TableCell>
                 <TableCell>
                   {getStatusBadge(item)}

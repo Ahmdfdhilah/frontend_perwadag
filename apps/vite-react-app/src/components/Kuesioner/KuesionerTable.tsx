@@ -8,6 +8,7 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import FileViewLink from '@/components/common/FileViewLink';
 import { KuisionerResponse } from '@/services/kuisioner/types';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
@@ -78,18 +79,12 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
                 <TableCell>{item.tanggal_kuisioner ? formatIndonesianDate(item.tanggal_kuisioner) : '-'}</TableCell>
                 <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
                 <TableCell>
-                  {item.has_file ? (
-                    <a
-                      href={item.file_urls?.view_url || '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 underline"
-                    >
-                      Lihat Dokumen
-                    </a>
-                  ) : (
-                    <span className="text-muted-foreground">Tidak ada file</span>
-                  )}
+                  <FileViewLink
+                    hasFile={item.has_file}
+                    fileUrls={item.file_urls}
+                    fileName={item.file_metadata?.original_filename}
+                    linkText="Lihat Dokumen"
+                  />
                 </TableCell>
                 <TableCell>
                   {getStatusBadge(item)}
