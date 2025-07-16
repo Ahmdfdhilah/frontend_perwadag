@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRole } from '@/hooks/useRole';
+import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import { User, UserFilterParams } from '@/services/users/types';
 import { userService } from '@/services/users';
@@ -34,17 +35,37 @@ import {
   AlertDialogTitle,
 } from '@workspace/ui/components/alert-dialog';
 
+interface UserPageFilters {
+  search: string;
+  role: string;
+  status: string;
+  page: number;
+  size: number;
+  [key: string]: string | number;
+}
+
 const UsersPage: React.FC = () => {
   const { isAdmin } = useRole();
   const { toast } = useToast();
+  
+  // URL Filters configuration
+  const { updateURL, getCurrentFilters } = useURLFilters<UserPageFilters>({
+    defaults: {
+      search: '',
+      role: 'all',
+      status: 'all',
+      page: 1,
+      size: 10,
+    },
+    cleanDefaults: true,
+  });
+
+  // Get current filters from URL
+  const filters = getCurrentFilters();
+  
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedRole, setSelectedRole] = useState<string>('all');
-  const [selectedStatus, setSelectedStatus] = useState<string>('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -59,11 +80,11 @@ const UsersPage: React.FC = () => {
     setLoading(true);
     try {
       const params: UserFilterParams = {
-        page: currentPage,
-        size: itemsPerPage,
-        search: searchQuery || undefined,
-        role: selectedRole !== 'all' ? selectedRole as 'ADMIN' | 'INSPEKTORAT' | 'PERWADAG' : undefined,
-        is_active: selectedStatus !== 'all' ? selectedStatus === 'active' : undefined,
+        page: filters.page,
+        size: filters.size,
+        search: filters.search || undefined,
+        role: filters.role !== 'all' ? filters.role as 'ADMIN' | 'INSPEKTORAT' | 'PERWADAG' : undefined,
+        is_active: filters.status !== 'all' ? filters.status === 'active' : undefined,
       };
 
       const response = await userService.getUsers(params);
@@ -81,10 +102,10 @@ const UsersPage: React.FC = () => {
     if (hasAccess) {
       fetchUsers();
     }
-  }, [currentPage, itemsPerPage, searchQuery, selectedRole, selectedStatus, hasAccess]);
+  }, [filters.page, filters.size, filters.search, filters.role, filters.status, hasAccess]);
 
   // Pagination
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const totalPages = Math.ceil(totalItems / filters.size);
 
   const handleView = (user: User) => {
     setViewingUser(user);
@@ -150,8 +171,24 @@ const UsersPage: React.FC = () => {
   };
 
   const handleItemsPerPageChange = (value: string) => {
-    setItemsPerPage(parseInt(value));
-    setCurrentPage(1);
+    updateURL({ size: parseInt(value), page: 1 });
+  };
+
+  // Filter handlers
+  const handleSearchChange = (search: string) => {
+    updateURL({ search, page: 1 });
+  };
+
+  const handleRoleChange = (role: string) => {
+    updateURL({ role, page: 1 });
+  };
+
+  const handleStatusChange = (status: string) => {
+    updateURL({ status, page: 1 });
+  };
+
+  const handlePageChange = (page: number) => {
+    updateURL({ page });
   };
 
   // Role options
@@ -164,19 +201,19 @@ const UsersPage: React.FC = () => {
   // Generate composite title
   const getCompositeTitle = () => {
     let title = "Daftar Pengguna";
-    const filters = [];
+    const activeFilters = [];
     
-    if (selectedRole !== 'all') {
-      const role = roleOptions.find(r => r.value === selectedRole);
-      if (role) filters.push(role.label);
+    if (filters.role !== 'all') {
+      const role = roleOptions.find(r => r.value === filters.role);
+      if (role) activeFilters.push(role.label);
     }
     
-    if (selectedStatus !== 'all') {
-      filters.push(selectedStatus === 'active' ? 'Aktif' : 'Tidak Aktif');
+    if (filters.status !== 'all') {
+      activeFilters.push(filters.status === 'active' ? 'Aktif' : 'Tidak Aktif');
     }
     
-    if (filters.length > 0) {
-      title += " - " + filters.join(" - ");
+    if (activeFilters.length > 0) {
+      title += " - " + activeFilters.join(" - ");
     }
     
     return title;
@@ -212,7 +249,7 @@ const UsersPage: React.FC = () => {
       <Filtering>
         <div className="space-y-2">
           <Label htmlFor="role-filter">Role</Label>
-          <Select value={selectedRole} onValueChange={setSelectedRole}>
+          <Select value={filters.role} onValueChange={handleRoleChange}>
             <SelectTrigger id="role-filter">
               <SelectValue placeholder="Pilih role" />
             </SelectTrigger>
@@ -229,7 +266,7 @@ const UsersPage: React.FC = () => {
 
         <div className="space-y-2">
           <Label htmlFor="status-filter">Status</Label>
-          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+          <Select value={filters.status} onValueChange={handleStatusChange}>
             <SelectTrigger id="status-filter">
               <SelectValue placeholder="Pilih status" />
             </SelectTrigger>
@@ -251,8 +288,8 @@ const UsersPage: React.FC = () => {
             />
 
             <SearchContainer
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
+              searchQuery={filters.search}
+              onSearchChange={handleSearchChange}
               placeholder="Cari nama, email, NIP, atau telepon..."
             />
 
@@ -281,11 +318,11 @@ const UsersPage: React.FC = () => {
             {/* Pagination */}
             {totalPages > 1 && (
               <Pagination
-                currentPage={currentPage}
+                currentPage={filters.page}
                 totalPages={totalPages}
-                itemsPerPage={itemsPerPage}
+                itemsPerPage={filters.size}
                 totalItems={totalItems}
-                onPageChange={setCurrentPage}
+                onPageChange={handlePageChange}
                 onItemsPerPageChange={handleItemsPerPageChange}
               />
             )}
