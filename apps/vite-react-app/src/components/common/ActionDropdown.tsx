@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit, Eye, Trash2 } from 'lucide-react';
+import { Edit, Eye, Trash2, Mail } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,18 +12,22 @@ interface ActionDropdownProps {
   onView?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  onComposeEmail?: () => void;
   showView?: boolean;
   showEdit?: boolean;
   showDelete?: boolean;
+  showComposeEmail?: boolean;
 }
 
 const ActionDropdown: React.FC<ActionDropdownProps> = ({
   onView,
   onEdit,
   onDelete,
+  onComposeEmail,
   showView = true,
   showEdit = true,
   showDelete = true,
+  showComposeEmail = false,
 }) => {
   return (
     <DropdownMenu>
@@ -43,6 +47,12 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
           <DropdownMenuItem onClick={onEdit}>
             <Edit className="mr-2 h-4 w-4" />
             Edit
+          </DropdownMenuItem>
+        )}
+        {showComposeEmail && (
+          <DropdownMenuItem onClick={onComposeEmail}>
+            <Mail className="mr-2 h-4 w-4" />
+            Kirim Email
           </DropdownMenuItem>
         )}
         {showDelete && (

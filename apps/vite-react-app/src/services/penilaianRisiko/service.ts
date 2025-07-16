@@ -7,7 +7,6 @@ import {
   PenilaianRisikoListResponse,
   PenilaianRisikoFilterParams,
   PeriodeSummaryStatistics,
-  RiskAssessmentChoices,
 } from "./types";
 
 class PenilaianRisikoService extends BaseService {
@@ -52,11 +51,6 @@ class PenilaianRisikoService extends BaseService {
     periodeId: string
   ): Promise<PeriodeSummaryStatistics> {
     return this.get(`/periode/${periodeId}/summary`);
-  }
-
-  // Get risk assessment choices/options for form dropdowns
-  async getChoices(): Promise<RiskAssessmentChoices> {
-    return this.get('/choices');
   }
 }
 

@@ -10,6 +10,7 @@ interface LaporanHasilEvaluasiCardsProps {
   loading?: boolean;
   onView?: (item: LaporanHasilResponse) => void;
   onEdit?: (item: LaporanHasilResponse) => void;
+  onComposeEmail?: (item: LaporanHasilResponse) => void;
   canEdit?: (item: LaporanHasilResponse) => boolean;
 }
 
@@ -18,6 +19,7 @@ const LaporanHasilEvaluasiCards: React.FC<LaporanHasilEvaluasiCardsProps> = ({
   loading = false,
   onView,
   onEdit,
+  onComposeEmail,
   canEdit,
 }) => {
 
@@ -63,9 +65,11 @@ const LaporanHasilEvaluasiCards: React.FC<LaporanHasilEvaluasiCardsProps> = ({
               <ActionDropdown
                 onView={() => onView?.(item)}
                 onEdit={canEdit?.(item) ? () => onEdit?.(item) : undefined}
+                onComposeEmail={() => onComposeEmail?.(item)}
                 showView={true}
                 showEdit={canEdit?.(item) && !!onEdit}
                 showDelete={false}
+                showComposeEmail={!!onComposeEmail}
               />
             </div>
           </CardHeader>

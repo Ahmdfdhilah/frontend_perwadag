@@ -17,6 +17,7 @@ interface LaporanHasilEvaluasiTableProps {
   loading?: boolean;
   onView?: (item: LaporanHasilResponse) => void;
   onEdit?: (item: LaporanHasilResponse) => void;
+  onComposeEmail?: (item: LaporanHasilResponse) => void;
   canEdit?: (item: LaporanHasilResponse) => boolean;
 }
 
@@ -25,6 +26,7 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
   loading = false,
   onView,
   onEdit,
+  onComposeEmail,
   canEdit,
 }) => {
 
@@ -95,9 +97,11 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
                   <ActionDropdown
                     onView={() => onView?.(item)}
                     onEdit={canEdit?.(item) ? () => onEdit?.(item) : undefined}
+                    onComposeEmail={() => onComposeEmail?.(item)}
                     showView={true}
                     showEdit={canEdit?.(item) && !!onEdit}
                     showDelete={false}
+                    showComposeEmail={!!onComposeEmail}
                   />
                 </TableCell>
               </TableRow>
