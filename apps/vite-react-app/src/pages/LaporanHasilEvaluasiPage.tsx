@@ -70,7 +70,17 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
-  const yearOptions = getDefaultYearOptions();
+  const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
+
+  // Fetch year options function
+  const fetchYearOptions = async () => {
+    try {
+      const options = await getDefaultYearOptions();
+      setYearOptions(options);
+    } catch (error) {
+      console.error('Failed to fetch year options:', error);
+    }
+  };
 
   // Calculate access control
   const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
@@ -135,6 +145,7 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
     if (hasAccess) {
       fetchLaporanHasil();
       fetchAvailablePerwadag();
+      fetchYearOptions();
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, filters.has_file, filters.has_nomor, filters.is_completed, hasAccess]);
 

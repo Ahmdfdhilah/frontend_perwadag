@@ -190,3 +190,21 @@ export interface PenilaianRisikoFilterParams {
 export interface MessageResponse {
   message: string;
 }
+
+// Choice/Option Types for Form Dropdowns
+export interface ChoiceOption {
+  value: string;
+  label: string;
+  score: number;
+}
+
+export interface RiskAssessmentChoices {
+  trend_choices: ChoiceOption[];
+  budget_choices: ChoiceOption[];
+  export_trend_choices: ChoiceOption[];
+  audit_choices: ChoiceOption[];
+  trade_agreement_choices: ChoiceOption[];
+  export_ranking_choices: ChoiceOption[];
+  ik_choices: ChoiceOption[];
+  tei_choices: ChoiceOption[];
+}

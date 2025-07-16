@@ -1,6 +1,7 @@
 // apps/vite-react-app/src/utils/yearUtils.ts
 
 import { PeriodeEvaluasi } from '../services/periodeEvaluasi/types';
+import { periodeEvaluasiService } from '../services/periodeEvaluasi/service';
 
 export const getYearsFromPeriodeEvaluasi = (periodeEvaluasi: PeriodeEvaluasi[]): number[] => {
   return periodeEvaluasi
@@ -37,17 +38,36 @@ export const getYearRange = (startYear: number, endYear?: number): number[] => {
   return years.sort((a, b) => b - a);
 };
 
-export const getDefaultYearOptions = (): { value: string; label: string }[] => {
-  const currentYear = getCurrentYear();
-  const years = getYearRange(currentYear - 2, currentYear);
-  
-  return [
-    { value: 'all', label: 'Semua Tahun' },
-    ...years.map(year => ({
-      value: year.toString(),
-      label: year.toString()
-    }))
-  ];
+export const getDefaultYearOptions = async (): Promise<{ value: string; label: string }[]> => {
+  try {
+    const response = await periodeEvaluasiService.getPeriodeEvaluasi({ 
+      size: 100, 
+      include_statistics: true 
+    });
+    
+    const years = getYearsFromPeriodeEvaluasi(response.items);
+    
+    return [
+      { value: 'all', label: 'Semua Tahun' },
+      ...years.map(year => ({
+        value: year.toString(),
+        label: year.toString()
+      }))
+    ];
+  } catch (error) {
+    console.error('Failed to fetch periode evaluasi for year options:', error);
+    // Fallback to static years
+    const currentYear = getCurrentYear();
+    const years = getYearRange(currentYear - 2, currentYear);
+    
+    return [
+      { value: 'all', label: 'Semua Tahun' },
+      ...years.map(year => ({
+        value: year.toString(),
+        label: year.toString()
+      }))
+    ];
+  }
 };
 
 export const getPeriodeEvaluasiYearOptions = (periodeEvaluasi: PeriodeEvaluasi[]): { value: string; label: string }[] => {
@@ -60,6 +80,28 @@ export const getPeriodeEvaluasiYearOptions = (periodeEvaluasi: PeriodeEvaluasi[]
       label: year.toString()
     }))
   ];
+};
+
+export const fetchPeriodeEvaluasiYearOptions = async (): Promise<{ value: string; label: string }[]> => {
+  try {
+    const response = await periodeEvaluasiService.getPeriodeEvaluasi({ 
+      size: 100, 
+      include_statistics: true 
+    });
+    
+    const years = getYearsFromPeriodeEvaluasi(response.items);
+    
+    return [
+      { value: 'all', label: 'Semua Tahun' },
+      ...years.map(year => ({
+        value: year.toString(),
+        label: year.toString()
+      }))
+    ];
+  } catch (error) {
+    console.error('Failed to fetch periode evaluasi for year options:', error);
+    return getDefaultYearOptions();
+  }
 };
 
 export const findPeriodeByYear = (periodeEvaluasi: PeriodeEvaluasi[], year: number): PeriodeEvaluasi | undefined => {

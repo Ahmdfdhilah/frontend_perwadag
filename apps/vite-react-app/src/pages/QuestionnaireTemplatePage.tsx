@@ -59,7 +59,17 @@ const QuestionnaireTemplatePage: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<FormatKuisionerResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
-  const yearOptions = getDefaultYearOptions();
+  const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
+
+  // Fetch year options function
+  const fetchYearOptions = async () => {
+    try {
+      const options = await getDefaultYearOptions();
+      setYearOptions(options);
+    } catch (error) {
+      console.error('Failed to fetch year options:', error);
+    }
+  };
 
   // Calculate access control
   const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
@@ -95,6 +105,7 @@ const QuestionnaireTemplatePage: React.FC = () => {
   useEffect(() => {
     if (hasAccess) {
       fetchTemplates();
+      fetchYearOptions();
     }
   }, [filters.page, filters.size, filters.search, filters.tahun, filters.has_file, hasAccess]);
 

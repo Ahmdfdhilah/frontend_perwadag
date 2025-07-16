@@ -17,19 +17,10 @@ import {
 } from '@workspace/ui/components/select';
 import { Separator } from '@workspace/ui/components/separator';
 import { ArrowLeft, Save, Calculator, Loader2 } from 'lucide-react';
-import {
-  TREND_CHOICES,
-  BUDGET_CHOICES,
-  EXPORT_TREND_CHOICES,
-  AUDIT_CHOICES,
-  TRADE_AGREEMENT_CHOICES,
-  EXPORT_RANKING_CHOICES,
-  IK_CHOICES,
-  TEI_CHOICES,
-} from '@/mocks';
+// Choice imports removed - now loaded dynamically from API
 import { formatNumber, handleNumberInput, parseFormattedNumber } from '@/utils/numberUtils';
 import { penilaianRisikoService } from '@/services/penilaianRisiko';
-import { PenilaianRisiko, KriteriaData } from '@/services/penilaianRisiko/types';
+import { PenilaianRisiko, KriteriaData, RiskAssessmentChoices, ChoiceOption } from '@/services/penilaianRisiko/types';
 import { useToast } from '@workspace/ui/components/sonner';
 
 const RiskAssessmentInputPage: React.FC = () => {
@@ -38,6 +29,7 @@ const RiskAssessmentInputPage: React.FC = () => {
   const { currentRole } = useRole();
   const { toast } = useToast();
   const [penilaianData, setPenilaianData] = useState<PenilaianRisiko | null>(null);
+  const [choices, setChoices] = useState<RiskAssessmentChoices | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [formattedValues, setFormattedValues] = useState({
@@ -54,9 +46,9 @@ const RiskAssessmentInputPage: React.FC = () => {
   const userIsInspektorat = currentRole === 'INSPEKTORAT';
   const hasAccess = userIsAdmin || userIsInspektorat;
 
-  // Load penilaian data from API
+  // Load penilaian data and choices from API
   useEffect(() => {
-    const loadPenilaianData = async () => {
+    const loadData = async () => {
       if (!id) {
         navigate('/penilaian-resiko');
         return;
@@ -64,11 +56,18 @@ const RiskAssessmentInputPage: React.FC = () => {
 
       try {
         setIsLoading(true);
-        const response = await penilaianRisikoService.getPenilaianRisikoById(id);
-        setPenilaianData(response);
+        
+        // Load both penilaian data and choices in parallel
+        const [penilaianResponse, choicesResponse] = await Promise.all([
+          penilaianRisikoService.getPenilaianRisikoById(id),
+          penilaianRisikoService.getChoices()
+        ]);
+        
+        setPenilaianData(penilaianResponse);
+        setChoices(choicesResponse);
         
         // Initialize formatted values
-        const kriteria = response.kriteria_data;
+        const kriteria = penilaianResponse.kriteria_data;
         setFormattedValues({
           budgetRealization2024: formatNumber(kriteria.realisasi_anggaran?.realisasi || 0),
           budgetPagu2024: formatNumber(kriteria.realisasi_anggaran?.pagu || 0),
@@ -78,7 +77,7 @@ const RiskAssessmentInputPage: React.FC = () => {
           ikTotal: formatNumber(kriteria.persentase_ik?.total_ik || 0),
         });
       } catch (error) {
-        console.error('Error loading penilaian data:', error);
+        console.error('Error loading data:', error);
         toast({
           title: 'Error',
           description: 'Gagal memuat data penilaian risiko',
@@ -90,7 +89,7 @@ const RiskAssessmentInputPage: React.FC = () => {
       }
     };
 
-    loadPenilaianData();
+    loadData();
   }, [id, navigate]);
 
   const handleInputChange = (section: keyof KriteriaData, field: string, value: any) => {
@@ -134,7 +133,7 @@ const RiskAssessmentInputPage: React.FC = () => {
   }, [penilaianData?.kriteria_data.tren_capaian.capaian_tahun_1, penilaianData?.kriteria_data.tren_capaian.capaian_tahun_2]);
 
   useEffect(() => {
-    if (!penilaianData) return;
+    if (!penilaianData || !choices) return;
     
     // Auto-calculate trend category based on trendAchievement - Updated rules
     const trendPercentage = penilaianData.kriteria_data.tren_capaian.tren || 0;
@@ -146,13 +145,13 @@ const RiskAssessmentInputPage: React.FC = () => {
     else if (trendPercentage <= -25) trendChoice = 'Turun >= 25%';
     
     if (trendChoice) {
-      const choice = TREND_CHOICES.find(c => c.label === trendChoice);
+      const choice = choices.trend_choices.find(c => c.label === trendChoice);
       if (choice) {
         handleInputChange('tren_capaian', 'pilihan', trendChoice);
         handleInputChange('tren_capaian', 'nilai', choice.score);
       }
     }
-  }, [penilaianData?.kriteria_data.tren_capaian.tren]);
+  }, [penilaianData?.kriteria_data.tren_capaian.tren, choices]);
 
   useEffect(() => {
     if (!penilaianData) return;
@@ -169,7 +168,7 @@ const RiskAssessmentInputPage: React.FC = () => {
   }, [penilaianData?.kriteria_data.realisasi_anggaran.realisasi, penilaianData?.kriteria_data.realisasi_anggaran.pagu]);
 
   useEffect(() => {
-    if (!penilaianData) return;
+    if (!penilaianData || !choices) return;
     
     // Auto-calculate budget category based on budgetPercentage - Updated rules
     const percentage = penilaianData.kriteria_data.realisasi_anggaran.persentase || 0;
@@ -181,13 +180,13 @@ const RiskAssessmentInputPage: React.FC = () => {
     else if (percentage < 85) budgetChoice = '<85%';
     
     if (budgetChoice) {
-      const choice = BUDGET_CHOICES.find(c => c.label === budgetChoice);
+      const choice = choices.budget_choices.find(c => c.label === budgetChoice);
       if (choice) {
         handleInputChange('realisasi_anggaran', 'pilihan', budgetChoice);
         handleInputChange('realisasi_anggaran', 'nilai', choice.score);
       }
     }
-  }, [penilaianData?.kriteria_data.realisasi_anggaran.persentase]);
+  }, [penilaianData?.kriteria_data.realisasi_anggaran.persentase, choices]);
 
   useEffect(() => {
     if (!penilaianData) return;
@@ -204,7 +203,7 @@ const RiskAssessmentInputPage: React.FC = () => {
   }, [penilaianData?.kriteria_data.persentase_ik.ik_tidak_tercapai, penilaianData?.kriteria_data.persentase_ik.total_ik]);
 
   useEffect(() => {
-    if (!penilaianData) return;
+    if (!penilaianData || !choices) return;
     
     // Auto-calculate IK category based on ikPercentage - Updated rules
     const percentage = penilaianData.kriteria_data.persentase_ik.persentase || 0;
@@ -216,13 +215,13 @@ const RiskAssessmentInputPage: React.FC = () => {
     else if (percentage > 20) ikChoice = '> 20%';
     
     if (ikChoice) {
-      const choice = IK_CHOICES.find(c => c.label === ikChoice);
+      const choice = choices.ik_choices.find(c => c.label === ikChoice);
       if (choice) {
         handleInputChange('persentase_ik', 'pilihan', ikChoice);
         handleInputChange('persentase_ik', 'nilai', choice.score);
       }
     }
-  }, [penilaianData?.kriteria_data.persentase_ik.persentase]);
+  }, [penilaianData?.kriteria_data.persentase_ik.persentase, choices]);
 
   useEffect(() => {
     if (!penilaianData) return;
@@ -241,7 +240,7 @@ const RiskAssessmentInputPage: React.FC = () => {
   }, [penilaianData?.kriteria_data.realisasi_tei.nilai_realisasi, penilaianData?.kriteria_data.realisasi_tei.nilai_potensi]);
 
   useEffect(() => {
-    if (!penilaianData) return;
+    if (!penilaianData || !choices) return;
     
     // Auto-calculate TEI category based on teiPercentage - Updated rules
     const percentage = penilaianData.kriteria_data.realisasi_tei.deskripsi || 0;
@@ -253,17 +252,17 @@ const RiskAssessmentInputPage: React.FC = () => {
     else if (percentage < 25) teiChoice = '< 25%';
     
     if (teiChoice) {
-      const choice = TEI_CHOICES.find(c => c.label === teiChoice);
+      const choice = choices.tei_choices.find(c => c.label === teiChoice);
       if (choice) {
         handleInputChange('realisasi_tei', 'pilihan', teiChoice);
         handleInputChange('realisasi_tei', 'nilai', choice.score);
       }
     }
-  }, [penilaianData?.kriteria_data.realisasi_tei.deskripsi]);
+  }, [penilaianData?.kriteria_data.realisasi_tei.deskripsi, choices]);
 
   // Auto-calculate export trend category based on description percentage
   useEffect(() => {
-    if (!penilaianData) return;
+    if (!penilaianData || !choices) return;
     
     const trenEkspor = penilaianData.kriteria_data.tren_ekspor;
     const deskripsi = trenEkspor.deskripsi;
@@ -278,18 +277,18 @@ const RiskAssessmentInputPage: React.FC = () => {
       else if (percentage <= -25) exportChoice = 'Turun >= 25%';
       
       if (exportChoice) {
-        const choice = EXPORT_TREND_CHOICES.find(c => c.label === exportChoice);
+        const choice = choices.export_trend_choices.find(c => c.label === exportChoice);
         if (choice) {
           handleInputChange('tren_ekspor', 'pilihan', exportChoice);
           handleInputChange('tren_ekspor', 'nilai', choice.score);
         }
       }
     }
-  }, [penilaianData?.kriteria_data.tren_ekspor.deskripsi]);
+  }, [penilaianData?.kriteria_data.tren_ekspor.deskripsi, choices]);
 
   // Auto-calculate export ranking category based on ranking number
   useEffect(() => {
-    if (!penilaianData) return;
+    if (!penilaianData || !choices) return;
     
     const peringkatEkspor = penilaianData.kriteria_data.peringkat_ekspor;
     const deskripsi = peringkatEkspor.deskripsi;
@@ -304,46 +303,46 @@ const RiskAssessmentInputPage: React.FC = () => {
       else if (ranking > 23) exportRankingChoice = 'Peringkat diatas 23';
       
       if (exportRankingChoice) {
-        const choice = EXPORT_RANKING_CHOICES.find(c => c.label === exportRankingChoice);
+        const choice = choices.export_ranking_choices.find(c => c.label === exportRankingChoice);
         if (choice) {
           handleInputChange('peringkat_ekspor', 'pilihan', exportRankingChoice);
           handleInputChange('peringkat_ekspor', 'nilai', choice.score);
         }
       }
     }
-  }, [penilaianData?.kriteria_data.peringkat_ekspor.deskripsi]);
+  }, [penilaianData?.kriteria_data.peringkat_ekspor.deskripsi, choices]);
 
   // Auto-calculate audit category based on audit description
   useEffect(() => {
-    if (!penilaianData) return;
+    if (!penilaianData || !choices) return;
     
     const auditItjen = penilaianData.kriteria_data.audit_itjen;
     const deskripsi = auditItjen.deskripsi;
     
     if (deskripsi) {
-      const choice = AUDIT_CHOICES.find(c => c.label === deskripsi);
+      const choice = choices.audit_choices.find(c => c.label === deskripsi);
       if (choice) {
         handleInputChange('audit_itjen', 'pilihan', deskripsi);
         handleInputChange('audit_itjen', 'nilai', choice.score);
       }
     }
-  }, [penilaianData?.kriteria_data.audit_itjen.deskripsi]);
+  }, [penilaianData?.kriteria_data.audit_itjen.deskripsi, choices]);
 
   // Auto-calculate trade agreement category based on trade agreement description
   useEffect(() => {
-    if (!penilaianData) return;
+    if (!penilaianData || !choices) return;
     
     const perjanjianPerdagangan = penilaianData.kriteria_data.perjanjian_perdagangan;
     const deskripsi = perjanjianPerdagangan.deskripsi;
     
     if (deskripsi) {
-      const choice = TRADE_AGREEMENT_CHOICES.find(c => c.label === deskripsi);
+      const choice = choices.trade_agreement_choices.find(c => c.label === deskripsi);
       if (choice) {
         handleInputChange('perjanjian_perdagangan', 'pilihan', deskripsi);
         handleInputChange('perjanjian_perdagangan', 'nilai', choice.score);
       }
     }
-  }, [penilaianData?.kriteria_data.perjanjian_perdagangan.deskripsi]);
+  }, [penilaianData?.kriteria_data.perjanjian_perdagangan.deskripsi, choices]);
 
   const calculateTotalRisk = () => {
     if (!penilaianData) return;
@@ -422,7 +421,7 @@ const RiskAssessmentInputPage: React.FC = () => {
     );
   }
 
-  if (!penilaianData) {
+  if (!penilaianData || !choices) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
@@ -617,7 +616,7 @@ const RiskAssessmentInputPage: React.FC = () => {
                   <SelectValue placeholder="Pilih status audit" />
                 </SelectTrigger>
                 <SelectContent>
-                  {AUDIT_CHOICES.map((choice) => (
+                  {choices.audit_choices.map((choice) => (
                     <SelectItem key={choice.value} value={choice.label}>
                       {choice.label} (Nilai: {choice.score})
                     </SelectItem>
@@ -666,7 +665,7 @@ const RiskAssessmentInputPage: React.FC = () => {
                   <SelectValue placeholder="Pilih status perjanjian" />
                 </SelectTrigger>
                 <SelectContent>
-                  {TRADE_AGREEMENT_CHOICES.map((choice) => (
+                  {choices.trade_agreement_choices.map((choice) => (
                     <SelectItem key={choice.value} value={choice.label}>
                       {choice.label} (Nilai: {choice.score})
                     </SelectItem>

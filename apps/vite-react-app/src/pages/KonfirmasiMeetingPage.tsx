@@ -65,7 +65,17 @@ const KonfirmasiMeetingPage: React.FC = () => {
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
 
   // Get year options from utility
-  const yearOptions = getDefaultYearOptions();
+  const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
+
+  // Fetch year options function
+  const fetchYearOptions = async () => {
+    try {
+      const options = await getDefaultYearOptions();
+      setYearOptions(options);
+    } catch (error) {
+      console.error('Failed to fetch year options:', error);
+    }
+  };
 
   // Calculate access control
   const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
@@ -130,6 +140,7 @@ const KonfirmasiMeetingPage: React.FC = () => {
     if (hasAccess) {
       fetchMeetings();
       fetchAvailablePerwadag();
+      fetchYearOptions();
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, filters.has_files, filters.has_date, filters.has_links, filters.is_completed, hasAccess]);
 
