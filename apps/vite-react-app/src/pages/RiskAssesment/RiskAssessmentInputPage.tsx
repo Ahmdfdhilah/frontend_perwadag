@@ -503,6 +503,23 @@ const RiskAssessmentInputPage: React.FC = () => {
                 className="bg-muted"
               />
             </div>
+            <div>
+              <Label>Pilihan Kategori - Otomatis</Label>
+              <Input
+                value={penilaianData.kriteria_data.tren_capaian.pilihan || 'Belum dihitung'}
+                disabled
+                className="bg-muted"
+              />
+            </div>
+            <div>
+              <Label>Nilai</Label>
+              <Input
+                type="number"
+                value={penilaianData.kriteria_data.tren_capaian.nilai || ''}
+                disabled
+                className="bg-muted"
+              />
+            </div>
           </CardContent>
         </Card>
 
@@ -540,6 +557,23 @@ const RiskAssessmentInputPage: React.FC = () => {
                 className="bg-muted"
               />
             </div>
+            <div>
+              <Label>Pilihan Kategori - Otomatis</Label>
+              <Input
+                value={penilaianData.kriteria_data.realisasi_anggaran.pilihan || 'Belum dihitung'}
+                disabled
+                className="bg-muted"
+              />
+            </div>
+            <div>
+              <Label>Nilai</Label>
+              <Input
+                type="number"
+                value={penilaianData.kriteria_data.realisasi_anggaran.nilai || ''}
+                disabled
+                className="bg-muted"
+              />
+            </div>
           </CardContent>
         </Card>
 
@@ -557,6 +591,23 @@ const RiskAssessmentInputPage: React.FC = () => {
                 value={penilaianData.kriteria_data.tren_ekspor.deskripsi || ''}
                 onChange={(e) => handleInputChange('tren_ekspor', 'deskripsi', parseFloat(e.target.value))}
                 placeholder="Contoh: 4.71"
+              />
+            </div>
+            <div>
+              <Label>Pilihan Kategori - Otomatis</Label>
+              <Input
+                value={penilaianData.kriteria_data.tren_ekspor.pilihan || 'Belum dihitung'}
+                disabled
+                className="bg-muted"
+              />
+            </div>
+            <div>
+              <Label>Nilai</Label>
+              <Input
+                type="number"
+                value={penilaianData.kriteria_data.tren_ekspor.nilai || ''}
+                disabled
+                className="bg-muted"
               />
             </div>
           </CardContent>
@@ -654,6 +705,23 @@ const RiskAssessmentInputPage: React.FC = () => {
                 placeholder="Contoh: 27"
               />
             </div>
+            <div>
+              <Label>Pilihan Kategori - Otomatis</Label>
+              <Input
+                value={penilaianData.kriteria_data.peringkat_ekspor.pilihan || 'Belum dihitung'}
+                disabled
+                className="bg-muted"
+              />
+            </div>
+            <div>
+              <Label>Nilai</Label>
+              <Input
+                type="number"
+                value={penilaianData.kriteria_data.peringkat_ekspor.nilai || ''}
+                disabled
+                className="bg-muted"
+              />
+            </div>
           </CardContent>
         </Card>
 
@@ -689,6 +757,23 @@ const RiskAssessmentInputPage: React.FC = () => {
                 type="number"
                 step="0.1"
                 value={penilaianData.kriteria_data.persentase_ik.persentase || ''}
+                disabled
+                className="bg-muted"
+              />
+            </div>
+            <div>
+              <Label>Pilihan Kategori - Otomatis</Label>
+              <Input
+                value={penilaianData.kriteria_data.persentase_ik.pilihan || 'Belum dihitung'}
+                disabled
+                className="bg-muted"
+              />
+            </div>
+            <div>
+              <Label>Nilai</Label>
+              <Input
+                type="number"
+                value={penilaianData.kriteria_data.persentase_ik.nilai || ''}
                 disabled
                 className="bg-muted"
               />
