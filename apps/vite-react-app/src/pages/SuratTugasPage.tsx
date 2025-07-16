@@ -5,7 +5,7 @@ import { useToast } from '@workspace/ui/components/sonner';
 import { SuratTugasResponse, SuratTugasFilterParams } from '@/services/suratTugas/types';
 import { suratTugasService } from '@/services/suratTugas';
 import { userService } from '@/services/users';
-import { PerwadagSummary } from '@/services/users/types';
+import { PerwadagSummary, PerwadagSearchParams } from '@/services/users/types';
 import Filtering from '@/components/common/Filtering';
 import SearchContainer from '@/components/common/SearchContainer';
 import Pagination from '@/components/common/Pagination';
@@ -49,7 +49,7 @@ interface SuratTugasPageFilters {
 }
 
 const SuratTugasPage: React.FC = () => {
-  const { isAdmin, isInspektorat, isPerwadag } = useRole();
+  const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
   const { toast } = useToast();
 
   // URL Filters configuration
@@ -96,6 +96,15 @@ const SuratTugasPage: React.FC = () => {
         tahun_evaluasi: filters.tahun_evaluasi !== 'all' ? parseInt(filters.tahun_evaluasi) : undefined,
       };
 
+      // Auto-apply role-based filtering
+      if (isInspektorat() && user?.inspektorat && !params.inspektorat) {
+        // If inspektorat user and no specific inspektorat filter, apply their inspektorat
+        params.inspektorat = user.inspektorat;
+      } else if (isPerwadag() && user?.id && !params.user_perwadag_id) {
+        // If perwadag user and no specific perwadag filter, apply their user ID
+        params.user_perwadag_id = user.id;
+      }
+
       const response = await suratTugasService.getSuratTugasList(params);
       setSuratTugasList(response.items);
       setTotalItems(response.total);
@@ -114,7 +123,14 @@ const SuratTugasPage: React.FC = () => {
   // Fetch available perwadag
   const fetchAvailablePerwadag = async () => {
     try {
-      const response = await userService.getPerwadagList();
+      const params: PerwadagSearchParams = {};
+      
+      // If current user is inspektorat, filter by their inspektorat
+      if (isInspektorat() && user?.inspektorat) {
+        params.inspektorat = user.inspektorat;
+      }
+      
+      const response = await userService.getPerwadagList(params);
       setAvailablePerwadag(response.items || []);
     } catch (error) {
       console.error('Failed to fetch perwadag list:', error);
@@ -203,14 +219,10 @@ const SuratTugasPage: React.FC = () => {
           nama_pengedali_mutu: data.nama_pengedali_mutu,
           nama_pengendali_teknis: data.nama_pengendali_teknis,
           nama_ketua_tim: data.nama_ketua_tim,
+          file: data.file, // Include file in create request
         };
 
-        const response = await suratTugasService.createSuratTugas(createData);
-
-        // Handle file upload if any
-        if (data.file && response.data) {
-          await suratTugasService.uploadFile(response.data.id, data.file);
-        }
+        await suratTugasService.createSuratTugas(createData);
 
         toast({
           title: 'Berhasil dibuat',
@@ -224,6 +236,18 @@ const SuratTugasPage: React.FC = () => {
       fetchSuratTugasList(); // Refresh the list
     } catch (error) {
       console.error('Failed to save surat tugas:', error);
+      
+      // Extract error message if available
+      let errorMessage = 'Gagal menyimpan surat tugas. Pastikan semua field sudah diisi dengan benar.';
+      if (error instanceof Error) {
+        errorMessage = error.message || errorMessage;
+      }
+      
+      toast({
+        title: 'Error',
+        description: errorMessage,
+        variant: 'destructive'
+      });
     }
   };
 

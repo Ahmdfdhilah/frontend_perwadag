@@ -4,6 +4,8 @@ import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import { MeetingResponse, MeetingFilterParams } from '@/services/meeting/types';
 import { meetingService } from '@/services/meeting';
+import { userService } from '@/services/users';
+import { PerwadagSummary, PerwadagSearchParams } from '@/services/users/types';
 import Filtering from '@/components/common/Filtering';
 import SearchContainer from '@/components/common/SearchContainer';
 import Pagination from '@/components/common/Pagination';
@@ -15,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@workspace/ui/components/select';
+import { Combobox } from '@workspace/ui/components/combobox';
 import { Label } from '@workspace/ui/components/label';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
@@ -27,19 +30,15 @@ interface EntryMeetingPageFilters {
   inspektorat: string;
   user_perwadag_id: string;
   tahun_evaluasi: string;
-  has_files: string;
-  has_date: string;
-  has_links: string;
-  is_completed: string;
   page: number;
   size: number;
   [key: string]: string | number;
 }
 
 const EntryMeetingPage: React.FC = () => {
-  const { isAdmin, isInspektorat, isPerwadag } = useRole();
+  const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
   const { toast } = useToast();
-  
+
   // URL Filters configuration
   const { updateURL, getCurrentFilters } = useURLFilters<EntryMeetingPageFilters>({
     defaults: {
@@ -47,10 +46,6 @@ const EntryMeetingPage: React.FC = () => {
       inspektorat: 'all',
       user_perwadag_id: 'all',
       tahun_evaluasi: 'all',
-      has_files: 'all',
-      has_date: 'all',
-      has_links: 'all',
-      is_completed: 'all',
       page: 1,
       size: 10,
     },
@@ -59,13 +54,15 @@ const EntryMeetingPage: React.FC = () => {
 
   // Get current filters from URL
   const filters = getCurrentFilters();
-  
+
   const [meetings, setMeetings] = useState<MeetingResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MeetingResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
+  const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
+  const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
 
   // Calculate access control
   const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
@@ -82,11 +79,16 @@ const EntryMeetingPage: React.FC = () => {
         inspektorat: filters.inspektorat !== 'all' ? filters.inspektorat : undefined,
         user_perwadag_id: filters.user_perwadag_id !== 'all' ? filters.user_perwadag_id : undefined,
         tahun_evaluasi: filters.tahun_evaluasi !== 'all' ? parseInt(filters.tahun_evaluasi) : undefined,
-        has_files: filters.has_files !== 'all' ? filters.has_files === 'true' : undefined,
-        has_date: filters.has_date !== 'all' ? filters.has_date === 'true' : undefined,
-        has_links: filters.has_links !== 'all' ? filters.has_links === 'true' : undefined,
-        is_completed: filters.is_completed !== 'all' ? filters.is_completed === 'true' : undefined,
       };
+
+      // Auto-apply role-based filtering
+      if (isInspektorat() && user?.inspektorat && !params.inspektorat) {
+        // If inspektorat user and no specific inspektorat filter, apply their inspektorat
+        params.inspektorat = user.inspektorat;
+      } else if (isPerwadag() && user?.id && !params.user_perwadag_id) {
+        // If perwadag user and no specific perwadag filter, apply their user ID
+        params.user_perwadag_id = user.id;
+      }
 
       const response = await meetingService.getMeetingList(params);
       setMeetings(response.items);
@@ -103,10 +105,28 @@ const EntryMeetingPage: React.FC = () => {
     }
   };
 
+  // Fetch available perwadag
+  const fetchAvailablePerwadag = async () => {
+    try {
+      const params: PerwadagSearchParams = {};
+
+      // If current user is inspektorat, filter by their inspektorat
+      if (isInspektorat() && user?.inspektorat) {
+        params.inspektorat = user.inspektorat;
+      }
+
+      const response = await userService.getPerwadagList(params);
+      setAvailablePerwadag(response.items || []);
+    } catch (error) {
+      console.error('Failed to fetch perwadag list:', error);
+    }
+  };
+
   // Effect to fetch meetings when filters change
   useEffect(() => {
     if (hasAccess) {
       fetchMeetings();
+      fetchAvailablePerwadag();
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, filters.has_files, filters.has_date, filters.has_links, filters.is_completed, hasAccess]);
 
@@ -127,7 +147,7 @@ const EntryMeetingPage: React.FC = () => {
 
   const handleSave = async (data: any) => {
     if (!editingItem) return;
-    
+
     try {
       const updateData = {
         tanggal_meeting: data.tanggal_meeting,
@@ -136,16 +156,16 @@ const EntryMeetingPage: React.FC = () => {
       };
 
       await meetingService.updateMeeting(editingItem.id, updateData);
-      
+
       // Handle file uploads if any
       if (data.files && data.files.length > 0) {
         await meetingService.uploadFiles(editingItem.id, data.files);
       }
-      
+
       setIsDialogOpen(false);
       setEditingItem(null);
       fetchMeetings(); // Refresh the list
-      
+
       toast({
         title: 'Berhasil diperbarui',
         description: `Data entry meeting ${editingItem.nama_perwadag} telah diperbarui.`,
@@ -165,14 +185,14 @@ const EntryMeetingPage: React.FC = () => {
     updateURL({ inspektorat, page: 1 });
   };
 
+  const handlePerwadagChange = (user_perwadag_id: string) => {
+    updateURL({ user_perwadag_id, page: 1 });
+  };
 
   const handleTahunEvaluasiChange = (tahun_evaluasi: string) => {
     updateURL({ tahun_evaluasi, page: 1 });
   };
 
-  const handleStatusChange = (status: string, type: 'has_files' | 'has_date' | 'has_links' | 'is_completed') => {
-    updateURL({ [type]: status, page: 1 });
-  };
 
   const handlePageChange = (page: number) => {
     updateURL({ page });
@@ -186,23 +206,30 @@ const EntryMeetingPage: React.FC = () => {
   const getCompositeTitle = () => {
     let title = "Daftar Entry Meeting";
     const activeFilters = [];
-    
+
     if (filters.inspektorat !== 'all') {
       activeFilters.push(`Inspektorat ${filters.inspektorat}`);
     }
-    
+
     if (filters.tahun_evaluasi !== 'all') {
       activeFilters.push(`Tahun ${filters.tahun_evaluasi}`);
     }
-    
+
+    if (filters.user_perwadag_id !== 'all') {
+      const selectedPerwadag = availablePerwadag.find(p => p.id === filters.user_perwadag_id);
+      if (selectedPerwadag) {
+        activeFilters.push(`Perwadag ${selectedPerwadag.nama}`);
+      }
+    }
+
     if (filters.is_completed !== 'all') {
       activeFilters.push(filters.is_completed === 'true' ? 'Lengkap' : 'Belum Lengkap');
     }
-    
+
     if (activeFilters.length > 0) {
       title += " - " + activeFilters.join(" - ");
     }
-    
+
     return title;
   };
 
@@ -270,33 +297,35 @@ const EntryMeetingPage: React.FC = () => {
           </div>
         )}
 
-        <div className="space-y-2">
-          <Label htmlFor="status-filter">Status Kelengkapan</Label>
-          <Select value={filters.is_completed} onValueChange={(value) => handleStatusChange(value, 'is_completed')}>
-            <SelectTrigger id="status-filter">
-              <SelectValue placeholder="Pilih status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Status</SelectItem>
-              <SelectItem value="true">Lengkap</SelectItem>
-              <SelectItem value="false">Belum Lengkap</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="files-filter">Status Files</Label>
-          <Select value={filters.has_files} onValueChange={(value) => handleStatusChange(value, 'has_files')}>
-            <SelectTrigger id="files-filter">
-              <SelectValue placeholder="Pilih status files" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua</SelectItem>
-              <SelectItem value="true">Ada Files</SelectItem>
-              <SelectItem value="false">Belum Ada Files</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Show perwadag filter for admin and inspektorat */}
+        {(isAdmin() || isInspektorat()) && (
+          <div className="space-y-2">
+            <Label htmlFor="perwadag-filter">Perwadag</Label>
+            <Combobox
+              options={[
+                { value: 'all', label: 'Semua Perwadag' },
+                ...availablePerwadag
+                  .filter(perwadag =>
+                    perwadagSearchValue === '' ||
+                    perwadag.nama.toLowerCase().includes(perwadagSearchValue.toLowerCase()) ||
+                    perwadag.inspektorat?.toLowerCase().includes(perwadagSearchValue.toLowerCase())
+                  )
+                  .map(perwadag => ({
+                    value: perwadag.id,
+                    label: perwadag.nama,
+                    description: perwadag.inspektorat || ''
+                  }))
+              ]}
+              value={filters.user_perwadag_id}
+              onChange={(value) => handlePerwadagChange(value.toString())}
+              placeholder="Pilih perwadag"
+              searchPlaceholder="Cari perwadag..."
+              searchValue={perwadagSearchValue}
+              onSearchChange={setPerwadagSearchValue}
+              emptyMessage="Tidak ada perwadag yang ditemukan"
+            />
+          </div>
+        )}
       </Filtering>
 
       <Card>

@@ -97,15 +97,21 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   }, [editingItem, open]);
 
   const handleSave = () => {
-    if (!formData.no_surat || !formData.user_perwadag_id || !formData.tanggal_evaluasi_mulai) {
+    // Validate all required fields
+    if (!formData.no_surat || !formData.user_perwadag_id || !formData.tanggal_evaluasi_mulai ||
+        !formData.nama_pengedali_mutu || !formData.nama_pengendali_teknis || !formData.nama_ketua_tim) {
       return;
     }
 
     const saveData = {
-      ...formData,
+      user_perwadag_id: formData.user_perwadag_id,
       tanggal_evaluasi_mulai: formData.tanggal_evaluasi_mulai.toISOString().split('T')[0],
       tanggal_evaluasi_selesai: formData.tanggal_evaluasi_selesai?.toISOString().split('T')[0],
-      file: uploadFiles.length > 0 ? uploadFiles[0] : undefined,
+      no_surat: formData.no_surat,
+      nama_pengedali_mutu: formData.nama_pengedali_mutu,
+      nama_pengendali_teknis: formData.nama_pengendali_teknis,
+      nama_ketua_tim: formData.nama_ketua_tim,
+      file: uploadFiles.length > 0 ? uploadFiles[0] : null, // Send null instead of undefined
     };
 
     onSave(saveData);

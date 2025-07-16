@@ -19,9 +19,30 @@ class SuratTugasService extends BaseService {
 
   // Create surat tugas
   async createSuratTugas(
-    data: SuratTugasCreate
+    data: SuratTugasCreate & { file?: File | null }
   ): Promise<SuratTugasCreateResponse> {
-    return this.post("/", data);
+    // If file is provided, send as FormData
+    if (data.file) {
+      const formData = new FormData();
+      
+      // Add all the regular fields
+      formData.append("user_perwadag_id", data.user_perwadag_id);
+      formData.append("tanggal_evaluasi_mulai", data.tanggal_evaluasi_mulai);
+      formData.append("tanggal_evaluasi_selesai", data.tanggal_evaluasi_selesai);
+      formData.append("no_surat", data.no_surat);
+      formData.append("nama_pengedali_mutu", data.nama_pengedali_mutu);
+      formData.append("nama_pengendali_teknis", data.nama_pengendali_teknis);
+      formData.append("nama_ketua_tim", data.nama_ketua_tim);
+      
+      // Add the file
+      formData.append("file", data.file);
+      
+      return this.post("/", formData);
+    } else {
+      // Send as JSON without file
+      const { file, ...createData } = data;
+      return this.post("/", createData);
+    }
   }
 
   // Get all surat tugas with filters
