@@ -7,21 +7,27 @@ import {
   TableHeader,
   TableRow,
 } from '@workspace/ui/components/table';
-import { RiskAssessment } from '@/mocks/riskAssessment';
+import { Skeleton } from '@workspace/ui/components/skeleton';
+import { Badge } from '@workspace/ui/components/badge';
+import { PenilaianRisikoResponse } from '@/services/penilaianRisiko/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
 
 interface RiskAssessmentTableProps {
-  data: RiskAssessment[];
-  onView?: (item: RiskAssessment) => void;
-  onEdit?: (item: RiskAssessment) => void;
-  onDelete?: (item: RiskAssessment) => void;
+  data: PenilaianRisikoResponse[];
+  loading?: boolean;
+  onView?: (item: PenilaianRisikoResponse) => void;
+  onEdit?: (item: PenilaianRisikoResponse) => void;
+  onDelete?: (item: PenilaianRisikoResponse) => void;
+  canEdit?: () => boolean;
 }
 
 const RiskAssessmentTable: React.FC<RiskAssessmentTableProps> = ({
   data,
+  loading = false,
   onView,
   onEdit,
   onDelete,
+  canEdit = () => true,
 }) => {
   return (
     <div className="rounded-md border">
@@ -38,7 +44,19 @@ const RiskAssessmentTable: React.FC<RiskAssessmentTableProps> = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.length === 0 ? (
+          {loading ? (
+            Array.from({ length: 5 }).map((_, index) => (
+              <TableRow key={index}>
+                <TableCell><Skeleton className="h-4 w-8" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-12" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-48" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                <TableCell className="text-right"><Skeleton className="h-8 w-24 ml-auto" /></TableCell>
+              </TableRow>
+            ))
+          ) : data.length === 0 ? (
             <TableRow>
               <TableCell colSpan={7} className="h-24 text-center">
                 Tidak ada data yang ditemukan.
@@ -48,16 +66,27 @@ const RiskAssessmentTable: React.FC<RiskAssessmentTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{item.year}</TableCell>
-                <TableCell>Inspektorat {item.inspektorat}</TableCell>
-                <TableCell>{item.perwadagName}</TableCell>
-                <TableCell>{item.score}</TableCell>
-                <TableCell>{item.riskProfile}</TableCell>
+                <TableCell>{item.tahun}</TableCell>
+                <TableCell>{item.inspektorat}</TableCell>
+                <TableCell>{item.nama_perwadag}</TableCell>
+                <TableCell>
+                  {item.skor_rata_rata?.toFixed(1) || '-'}
+                </TableCell>
+                <TableCell>
+                  <Badge 
+                    variant={
+                      item.profil_risiko_auditan === 'Tinggi' ? 'destructive' :
+                      item.profil_risiko_auditan === 'Sedang' ? 'default' : 'secondary'
+                    }
+                  >
+                    {item.profil_risiko_auditan || 'Belum Dinilai'}
+                  </Badge>
+                </TableCell>
                 <TableCell className="text-right">
                   <ActionDropdown
                     onView={() => onView?.(item)}
-                    onEdit={() => onEdit?.(item)}
-                    onDelete={() => onDelete?.(item)}
+                    onEdit={canEdit() ? () => onEdit?.(item) : undefined}
+                    onDelete={canEdit() ? () => onDelete?.(item) : undefined}
                   />
                 </TableCell>
               </TableRow>

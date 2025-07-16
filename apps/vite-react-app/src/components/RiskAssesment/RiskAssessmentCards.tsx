@@ -1,21 +1,68 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { RiskAssessment } from '@/mocks/riskAssessment';
+import { Skeleton } from '@workspace/ui/components/skeleton';
+import { Badge } from '@workspace/ui/components/badge';
+import { PenilaianRisikoResponse } from '@/services/penilaianRisiko/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
 
 interface RiskAssessmentCardsProps {
-  data: RiskAssessment[];
-  onView?: (item: RiskAssessment) => void;
-  onEdit?: (item: RiskAssessment) => void;
-  onDelete?: (item: RiskAssessment) => void;
+  data: PenilaianRisikoResponse[];
+  loading?: boolean;
+  onView?: (item: PenilaianRisikoResponse) => void;
+  onEdit?: (item: PenilaianRisikoResponse) => void;
+  onDelete?: (item: PenilaianRisikoResponse) => void;
+  canEdit?: () => boolean;
 }
 
 const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
   data,
+  loading = false,
   onView,
   onEdit,
   onDelete,
+  canEdit = () => true,
 }) => {
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 gap-4">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <Card key={index} className="w-full">
+            <CardHeader className="pb-3">
+              <div className="flex justify-between items-start">
+                <Skeleton className="h-6 w-48" />
+                <Skeleton className="h-8 w-24" />
+              </div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <Skeleton className="h-4 w-12" />
+                  <Skeleton className="h-4 w-8 mt-1" />
+                </div>
+                <div>
+                  <Skeleton className="h-4 w-12" />
+                  <Skeleton className="h-4 w-12 mt-1" />
+                </div>
+                <div>
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-4 w-24 mt-1" />
+                </div>
+                <div>
+                  <Skeleton className="h-4 w-12" />
+                  <Skeleton className="h-4 w-16 mt-1" />
+                </div>
+                <div className="col-span-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-4 w-20 mt-1" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-32 text-muted-foreground">
@@ -31,12 +78,12 @@ const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
           <CardHeader className="pb-3">
             <div className="flex justify-between items-start">
               <CardTitle className="text-lg font-semibold">
-                {item.perwadagName}
+                {item.nama_perwadag}
               </CardTitle>
               <ActionDropdown
                 onView={() => onView?.(item)}
-                onEdit={() => onEdit?.(item)}
-                onDelete={() => onDelete?.(item)}
+                onEdit={canEdit() ? () => onEdit?.(item) : undefined}
+                onDelete={canEdit() ? () => onDelete?.(item) : undefined}
               />
             </div>
           </CardHeader>
@@ -48,19 +95,27 @@ const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Tahun:</span>
-                <span className="ml-2">{item.year}</span>
+                <span className="ml-2">{item.tahun}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Inspektorat:</span>
-                <span className="ml-2">Inspektorat {item.inspektorat}</span>
+                <span className="ml-2">{item.inspektorat}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Skor:</span>
-                <span className="ml-2">{item.score}</span>
+                <span className="ml-2">{item.skor_rata_rata?.toFixed(1) || '-'}</span>
               </div>
               <div className="col-span-2">
                 <span className="font-medium text-muted-foreground">Profil Risiko:</span>
-                <span className="ml-2">{item.riskProfile}</span>
+                <Badge 
+                  className="ml-2"
+                  variant={
+                    item.profil_risiko_auditan === 'Tinggi' ? 'destructive' :
+                    item.profil_risiko_auditan === 'Sedang' ? 'default' : 'secondary'
+                  }
+                >
+                  {item.profil_risiko_auditan || 'Belum Dinilai'}
+                </Badge>
               </div>
             </div>
           </CardContent>

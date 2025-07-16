@@ -22,8 +22,11 @@ import { Combobox } from '@workspace/ui/components/combobox';
 import { Label } from '@workspace/ui/components/label';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
+import PeriodeManagementDialog from '@/components/common/PeriodeManagementDialog';
 import RiskAssessmentTable from '@/components/RiskAssesment/RiskAssessmentTable';
 import RiskAssessmentCards from '@/components/RiskAssesment/RiskAssessmentCards';
+import { Settings } from 'lucide-react';
+import { Button } from '@workspace/ui/components/button';
 
 interface RiskAssessmentPageFilters {
   search: string;
@@ -63,6 +66,7 @@ const RiskAssessmentPage: React.FC = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
+  const [isPeriodeDialogOpen, setIsPeriodeDialogOpen] = useState(false);
 
   // Calculate access control
   const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
@@ -128,7 +132,7 @@ const RiskAssessmentPage: React.FC = () => {
       fetchRiskAssessments();
       fetchAvailablePerwadag();
     }
-  }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun, filters.is_complete, filters.sort_by, hasAccess]);
+  }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun, filters.sort_by, hasAccess]);
 
   // Pagination
   const totalPages = Math.ceil(totalItems / filters.size);
@@ -158,9 +162,6 @@ const RiskAssessmentPage: React.FC = () => {
     updateURL({ tahun, page: 1 });
   };
 
-  const handleIsCompleteChange = (is_complete: string) => {
-    updateURL({ is_complete, page: 1 });
-  };
 
   const handleSortByChange = (sort_by: string) => {
     updateURL({ sort_by, page: 1 });
@@ -198,9 +199,6 @@ const RiskAssessmentPage: React.FC = () => {
       }
     }
 
-    if (filters.is_complete !== 'all') {
-      activeFilters.push(filters.is_complete === 'true' ? 'Lengkap' : 'Belum Lengkap');
-    }
 
     if (activeFilters.length > 0) {
       title += " - " + activeFilters.join(" - ");
@@ -237,6 +235,17 @@ const RiskAssessmentPage: React.FC = () => {
       <PageHeader
         title="Penilaian Risiko"
         description="Kelola data penilaian risiko audit"
+        actions={
+          isAdmin() ? (
+            <Button
+              variant="default"
+              onClick={() => setIsPeriodeDialogOpen(true)}
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              Manajemen Periode
+            </Button>
+          ) : undefined
+        }
       />
 
       <Filtering>
@@ -304,19 +313,6 @@ const RiskAssessmentPage: React.FC = () => {
           </div>
         )}
 
-        <div className="space-y-2">
-          <Label htmlFor="completion-filter">Status Kelengkapan</Label>
-          <Select value={filters.is_complete} onValueChange={handleIsCompleteChange}>
-            <SelectTrigger id="completion-filter">
-              <SelectValue placeholder="Pilih status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Semua Status</SelectItem>
-              <SelectItem value="true">Lengkap</SelectItem>
-              <SelectItem value="false">Belum Lengkap</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
 
         <div className="space-y-2">
           <Label htmlFor="sort-filter">Urutkan</Label>
@@ -327,8 +323,6 @@ const RiskAssessmentPage: React.FC = () => {
             <SelectContent>
               <SelectItem value="skor_tertinggi">Skor Tertinggi</SelectItem>
               <SelectItem value="skor_terendah">Skor Terendah</SelectItem>
-              <SelectItem value="nama">Nama Perwadag</SelectItem>
-              <SelectItem value="created_at">Tanggal Dibuat</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -386,6 +380,13 @@ const RiskAssessmentPage: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Periode Management Dialog */}
+      <PeriodeManagementDialog
+        open={isPeriodeDialogOpen}
+        onOpenChange={setIsPeriodeDialogOpen}
+        onRefresh={fetchRiskAssessments}
+      />
     </div>
   );
 };
