@@ -49,3 +49,29 @@ export interface SearchParams {
   filters?: Record<string, any>;
   sort?: SortOption[];
 }
+
+// Common shared types to avoid export conflicts
+export interface MessageResponse {
+  message: string;
+}
+
+export interface FileUrls {
+  preview?: string;
+  download?: string;
+}
+
+export interface FileMetadata {
+  filename: string;
+  size: number;
+  content_type: string;
+}
+
+export interface SuratTugasInfo {
+  id: number;
+  nomor_surat: string;
+  nama_kegiatan: string;
+  tempat_kegiatan: string;
+  waktu_mulai_kegiatan: string;
+  waktu_selesai_kegiatan: string;
+  tim_auditor: string[];
+}

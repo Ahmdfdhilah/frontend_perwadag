@@ -6,6 +6,174 @@ This document provides comprehensive mapping of all API endpoints in the Perwada
 ## Base URL
 All endpoints are prefixed with the base URL configured in your environment.
 
+## 1. Users Endpoints
+**Base Path**: `/users`
+
+| Method | Route | Request Schema | Response Schema | Auth Required | Description |
+|--------|-------|---------------|----------------|---------------|-------------|
+| GET | `/me` | None | `UserResponse` | JWT | Get current user profile |
+| PUT | `/me` | `UserUpdate` | `UserResponse` | JWT | Update current user profile |
+| POST | `/me/change-password` | `UserChangePassword` | `MessageResponse` | JWT | Change current user password |
+| GET | `/` | `UserFilterParams` | `UserListResponse` | Admin/Inspektorat | Get all users with filters |
+| GET | `/by-role/{role_name}` | None | `List[UserSummary]` | Admin/Inspektorat | Get users by role |
+| GET | `/statistics` | None | Dict | Admin | Get user statistics |
+| POST | `/preview-username` | `UsernameGenerationPreview` | `UsernameGenerationResponse` | Admin | Preview username generation |
+| POST | `/` | `UserCreate` | `UserResponse` | Admin | Create new user |
+| GET | `/{user_id}` | None | `UserResponse` | JWT + Access Control | Get user by ID |
+| PUT | `/{user_id}` | `UserUpdate` | `UserResponse` | Admin | Update user |
+| POST | `/{user_id}/reset-password` | None | `MessageResponse` | Admin | Reset user password |
+| POST | `/{user_id}/activate` | None | `UserResponse` | Admin | Activate user |
+| POST | `/{user_id}/deactivate` | None | `UserResponse` | Admin | Deactivate user |
+| DELETE | `/{user_id}` | None | `MessageResponse` | Admin | Soft delete user |
+
+### Key Features:
+- Role-based user management (Admin, Inspektorat, Perwadag)
+- Auto-generated usernames based on nama and tanggal_lahir
+- Comprehensive filtering and search capabilities
+- Profile self-management
+- Password management with default password system
+- User statistics and analytics
+
+### Request/Response Schemas:
+
+#### **UserCreate**
+```json
+{
+  "nama": "string (1-200 chars)",
+  "tempat_lahir": "string (1-100 chars)",
+  "tanggal_lahir": "date",
+  "pangkat": "string (1-100 chars)",
+  "jabatan": "string (1-200 chars)",
+  "email": "string? (valid email)",
+  "is_active": "bool (default: true)",
+  "role": "enum (admin/inspektorat/perwadag)",
+  "inspektorat": "string? (required for perwadag role)"
+}
+```
+
+#### **UserUpdate**
+```json
+{
+  "nama": "string? (1-200 chars)",
+  "tempat_lahir": "string? (1-100 chars)",
+  "tanggal_lahir": "date?",
+  "pangkat": "string? (1-100 chars)",
+  "jabatan": "string? (1-200 chars)",
+  "email": "string? (valid email)",
+  "is_active": "bool?",
+  "role": "enum? (admin/inspektorat/perwadag)",
+  "inspektorat": "string? (max 100 chars)"
+}
+```
+
+#### **UserChangePassword**
+```json
+{
+  "current_password": "string",
+  "new_password": "string (min 6 chars)"
+}
+```
+
+#### **UserResponse**
+```json
+{
+  "id": "string",
+  "nama": "string",
+  "username": "string",
+  "tempat_lahir": "string",
+  "tanggal_lahir": "date",
+  "pangkat": "string",
+  "jabatan": "string",
+  "email": "string?",
+  "is_active": "bool",
+  "role": "enum",
+  "inspektorat": "string?",
+  "display_name": "string",
+  "age": "int",
+  "has_email": "bool",
+  "last_login": "datetime?",
+  "role_display": "string",
+  "created_at": "datetime",
+  "updated_at": "datetime?"
+}
+```
+
+#### **UserListResponse**
+```json
+{
+  "items": ["UserResponse"],
+  "total": "int",
+  "page": "int",
+  "size": "int",
+  "pages": "int"
+}
+```
+
+#### **UserSummary**
+```json
+{
+  "id": "string",
+  "nama": "string",
+  "username": "string",
+  "pangkat": "string",
+  "jabatan": "string",
+  "role": "enum",
+  "role_display": "string",
+  "inspektorat": "string?",
+  "has_email": "bool",
+  "is_active": "bool"
+}
+```
+
+#### **UsernameGenerationPreview**
+```json
+{
+  "nama": "string",
+  "tanggal_lahir": "date",
+  "role": "enum (admin/inspektorat/perwadag)"
+}
+```
+
+#### **UsernameGenerationResponse**
+```json
+{
+  "generated_username": "string",
+  "is_available": "bool",
+  "existing_username": "string?",
+  "format_explanation": "string"
+}
+```
+
+#### **UserFilterParams** (Query Parameters)
+- **page**: Page number (default: 1)
+- **size**: Items per page (default: 20, max: 100)
+- **search**: Search in nama, username, tempat_lahir, pangkat, jabatan, email, inspektorat
+- **role**: Filter by role (admin/inspektorat/perwadag)
+- **inspektorat**: Filter by inspektorat
+- **pangkat**: Filter by pangkat
+- **jabatan**: Filter by jabatan
+- **tempat_lahir**: Filter by tempat_lahir
+- **has_email**: Filter by email status (true/false)
+- **is_active**: Filter by active status (true/false)
+- **min_age**: Minimum age filter (17-70)
+- **max_age**: Maximum age filter (17-70)
+
+### Access Control Rules:
+- **Personal Profile** (`/me`): All authenticated users can view/update their own profile
+- **View User by ID**: Users can view their own profile; Admin/Inspektorat can view any user
+- **User Management**: Admin-only for create, update, activate, deactivate, delete, reset password
+- **User Listing**: Admin and Inspektorat can list users
+- **Statistics**: Admin-only
+
+### Username Generation Rules:
+- **Admin/Inspektorat**: `{nama_depan}{dd}{mm}{yyyy}` (e.g., "daffa01082003")
+- **Perwadag**: Extracted from organization name (e.g., "ITPC Lagos" → "itpc_lagos")
+
+### Default Password:
+All users are created with default password: `@Kemendag123`
+
+---
+
 ## 5. Surat Tugas Endpoints
 **Base Path**: `/surat-tugas`
 
