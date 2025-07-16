@@ -23,7 +23,6 @@ import { SuratTugasResponse } from '@/services/suratTugas/types';
 import { PerwadagSummary } from '@/services/users/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import FileUpload from '@/components/common/FileUpload';
-import { suratTugasService } from '@/services/suratTugas';
 
 interface SuratTugasDialogProps {
   open: boolean;
@@ -129,24 +128,6 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
 
   const handleExistingFileRemove = (index: number) => {
     setExistingFiles(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
-    if (!editingItem?.id) return;
-    
-    try {
-      const blob = await suratTugasService.downloadFile(editingItem.id);
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = file.name;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading file:', error);
-    }
   };
 
 
@@ -323,7 +304,6 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
               disabled={!canEdit}
               onFilesChange={handleUploadFilesChange}
               onExistingFileRemove={handleExistingFileRemove}
-              onFileDownload={handleFileDownload}
               description="Format yang didukung: PDF, DOC, DOCX (Max 10MB)"
             />
           </div>

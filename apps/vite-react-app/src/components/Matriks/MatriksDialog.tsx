@@ -59,7 +59,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     onOpenChange(false);
   };
 
-  const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }, index: number) => {
+  const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
     if (!item?.id) return;
     
     try {

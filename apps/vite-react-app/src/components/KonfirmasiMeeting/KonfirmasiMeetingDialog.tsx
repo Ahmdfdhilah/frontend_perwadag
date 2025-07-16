@@ -104,7 +104,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
     setExistingFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }, index: number) => {
+  const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
     if (!item?.id) return;
     
     try {
