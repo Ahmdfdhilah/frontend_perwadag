@@ -7,7 +7,6 @@ This directory contains the service layer for API communication in the Perwadag 
 ### Base Service Pattern
 All services extend the `BaseService` class which provides:
 - Consistent HTTP method wrappers (GET, POST, PUT, PATCH, DELETE)
-- Integrated toast notifications for success/error states
 - Centralized error handling
 - Type-safe request/response handling
 - Automatic API endpoint prefixing
@@ -48,21 +47,12 @@ export abstract class BaseService {
   constructor(baseEndpoint: string) {
     this.baseEndpoint = `/api/v1${baseEndpoint}`;
   }
-
-  // HTTP method wrappers with toast integration
-  protected async get<T>(endpoint, successConfig?, errorConfig?, options?): Promise<T>
-  protected async post<T>(endpoint, data?, successConfig?, errorConfig?, options?): Promise<T>
-  protected async put<T>(endpoint, data?, successConfig?, errorConfig?, options?): Promise<T>
-  protected async patch<T>(endpoint, data?, successConfig?, errorConfig?, options?): Promise<T>
-  protected async delete<T>(endpoint, successConfig?, errorConfig?, options?): Promise<T>
 }
 ```
 
 **Key Features:**
-- **Automatic Error Handling**: Catches errors and shows toast notifications
-- **Success Notifications**: Optional success toast messages
+- **Automatic Error Handling**: Catches errors
 - **Type Safety**: Generic types for request/response handling
-- **Options Support**: Control toast behavior and other service options
 
 ### 2. Service Implementation Pattern
 
@@ -77,10 +67,7 @@ class UserService extends BaseService {
 
   async getUsers(params?: UserFilterParams, options?: UserServiceOptions): Promise<UserListResponse> {
     return this.get(
-      endpoint,
-      successToastConfig,    // Optional success toast
-      errorToastConfig,      // Optional error toast
-      options               // Service options
+      endpoint
     );
   }
 }
@@ -106,10 +93,6 @@ export interface UserUpdate { /* ... */ }
 export interface UserResponse { /* ... */ }
 export interface UserListResponse { /* ... */ }
 
-// Service options
-export interface UserServiceOptions extends ServiceOptions {
-  showToast?: boolean;
-}
 ```
 
 ## Available Services
@@ -176,7 +159,7 @@ import { userService, UserCreate } from '@/services';
 // Get current user
 const currentUser = await userService.getCurrentUser();
 
-// Create new user with toast notifications
+// Create new user 
 const newUserData: UserCreate = {
   nama_lengkap: "John Doe",
   email: "john@example.com",
@@ -184,26 +167,8 @@ const newUserData: UserCreate = {
 };
 
 const createdUser = await userService.createUser(newUserData);
-// Automatically shows success toast: "User created successfully"
 ```
 
-### Service Options
-
-```typescript
-// Disable toast notifications
-const users = await userService.getUsers(
-  { page: 1, limit: 10 },
-  { showToast: false }
-);
-
-// Custom error handling without service toasts
-try {
-  const user = await userService.getUserById("123", { showToast: false });
-} catch (error) {
-  // Handle error manually
-  console.error("Failed to get user:", error.message);
-}
-```
 
 ### Authentication Flow
 
@@ -240,35 +205,19 @@ const usersResponse = await userService.getUsers(filterParams);
 const { items, total, page, limit, pages } = usersResponse;
 ```
 
-## Toast Integration
-
-Services automatically show toast notifications for:
-- **Success Operations**: Create, update, delete confirmations
-- **Error Handling**: API errors, validation failures, network issues
-
-Toast behavior can be controlled via `ServiceOptions`:
-
-```typescript
-interface ServiceOptions {
-  showToast?: boolean;  // Default: true
-}
-```
-
 ## Error Handling
 
 The BaseService provides consistent error handling:
 
 1. **HTTP Errors**: Automatically caught and parsed
 2. **Error Messages**: Extracted from API response or fallback to generic messages
-3. **Toast Notifications**: Error toasts shown by default
-4. **Error Propagation**: Errors re-thrown for component-level handling
+3. **Error Propagation**: Errors re-thrown for component-level handling
 
 ```typescript
 // Error handling example
 try {
   await userService.createUser(userData);
 } catch (error) {
-  // Error message already shown via toast
   // Additional error handling if needed
   console.error("User creation failed:", error.message);
 }
@@ -329,10 +278,9 @@ export type { NewEntity, NewEntityCreate } from "./newEntity";
 
 1. **Type Safety**: Always define comprehensive TypeScript types
 2. **Consistent Naming**: Follow the established naming conventions
-3. **Error Handling**: Use appropriate toast configurations for UX
-4. **Service Options**: Support options parameter for flexibility
-5. **Documentation**: Include JSDoc comments for complex methods
-6. **Testing**: Write unit tests for service methods (when applicable)
+3. **Service Options**: Support options parameter for flexibility
+4. **Documentation**: Include JSDoc comments for complex methods
+5. **Testing**: Write unit tests for service methods (when applicable)
 
 ## Common Patterns
 
