@@ -7,57 +7,64 @@ import {
   DialogTitle,
 } from '@workspace/ui/components/dialog';
 import { Button } from '@workspace/ui/components/button';
-import { Matriks } from '@/mocks/matriks';
+import { Label } from '@workspace/ui/components/label';
+import { Download } from 'lucide-react';
+import { MatriksResponse } from '@/services/matriks/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 
 interface MatriksDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  item: Matriks | null;
-  mode?: 'view' | 'edit' | 'create';
-  onSave: (data: Partial<Matriks>) => void;
+  item: MatriksResponse | null;
+  mode: 'view' | 'edit';
+  onSave?: (data: any) => void;
 }
 
 const MatriksDialog: React.FC<MatriksDialogProps> = ({
   open,
   onOpenChange,
   item,
-  mode = item ? 'edit' : 'create',
+  mode,
   onSave,
 }) => {
   const { canEditForm } = useFormPermissions();
-  const isEditable = mode !== 'view';
+  const isEditable = mode === 'edit';
   const canEdit = canEditForm('matriks') && isEditable;
-  const [formData, setFormData] = useState<Partial<Matriks>>({});
-  const [uploadFiles, setUploadFiles] = useState<File[]>([]);
-  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string }>>([]);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (item && open) {
-      setFormData({
-        ...item,
-      });
-      setExistingFiles(item.uploadFile ? [{ name: item.uploadFile, url: item.uploadFileUrl }] : []);
     } else {
-      setFormData({});
-      setUploadFiles([]);
-      setExistingFiles([]);
+      setUploadFile(null);
     }
   }, [item, open]);
 
-  const handleUploadFilesChange = (files: File[]) => {
-    setUploadFiles(files);
+  const handleUploadFileChange = (files: File[]) => {
+    setUploadFile(files[0] || null);
   };
 
-  const handleExistingFileRemove = (index: number) => {
-    setExistingFiles(prev => prev.filter((_, i) => i !== index));
+  const handleDownloadFile = () => {
+    if (item?.file_urls?.download_url) {
+      const link = document.createElement('a');
+      link.href = item.file_urls.download_url;
+      link.download = item.file_metadata?.original_filename || 'matriks';
+      link.click();
+    }
+  };
+
+  const handleViewFile = () => {
+    if (item?.file_urls?.view_url) {
+      window.open(item.file_urls.view_url, '_blank');
+    }
   };
 
   const handleSave = () => {
-    const dataToSave = { 
-      ...formData,
-      uploadFiles
+    if (!onSave) return;
+
+    const dataToSave = {
+      file: uploadFile,
     };
     onSave(dataToSave);
   };
@@ -70,33 +77,108 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0 border-b pb-4">
-          <DialogTitle>Edit Matriks</DialogTitle>
+          <DialogTitle>
+            {mode === 'edit' ? 'Edit Matriks' : 'Detail Matriks'}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto py-4">
           <div className="space-y-6">
-            <FileUpload
-              label="Upload Dokumen Matriks"
-              accept=".pdf,.doc,.docx,.xls,.xlsx"
-              multiple={false}
-              maxSize={10 * 1024 * 1024} // 10MB
-              maxFiles={1}
-              files={uploadFiles}
-              existingFiles={existingFiles}
-              mode={canEdit ? 'edit' : 'view'}
-              disabled={!canEdit}
-              onFilesChange={handleUploadFilesChange}
-              onExistingFileRemove={handleExistingFileRemove}
-              description="Format yang didukung: PDF, DOC, DOCX, XLS, XLSX (Max 10MB)"
-            />
+            {/* Basic Info - Read Only */}
+            <div className="grid grid-cols-1 gap-4">
+              <div className="space-y-2">
+                <Label>Nama Perwadag</Label>
+                <div className="p-3 bg-muted rounded-md">
+                  {item?.nama_perwadag}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Periode Evaluasi</Label>
+              <div className="p-3 bg-muted rounded-md">
+                {item ? formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai) : '-'}
+              </div>
+            </div>
+
+
+            {/* Current File Display */}
+            {item?.has_file && (
+              <div className="space-y-2">
+                <Label>File Matriks Saat Ini</Label>
+                <div className="p-3 bg-muted rounded-md">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">{item.file_metadata?.original_filename || 'Matriks'}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.file_metadata?.size_mb ? `${item.file_metadata.size_mb.toFixed(2)} MB` : ''}
+                        {item.file_metadata?.uploaded_at ? ` • Uploaded ${new Date(item.file_metadata.uploaded_at).toLocaleDateString()}` : ''}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      {item.file_urls?.view_url && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleViewFile}
+                        >
+                          View
+                        </Button>
+                      )}
+                      {item.file_urls?.download_url && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleDownloadFile}
+                        >
+                          <Download className="w-4 h-4 mr-1" />
+                          Download
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* File Upload */}
+            {canEdit && (
+              <FileUpload
+                label="Upload File Matriks (Optional)"
+                accept=".pdf,.doc,.docx,.xls,.xlsx"
+                multiple={false}
+                maxSize={10 * 1024 * 1024} // 10MB
+                files={uploadFile ? [uploadFile] : []}
+                mode="edit"
+                onFilesChange={handleUploadFileChange}
+                description="Format yang didukung: PDF, DOC, DOCX, XLS, XLSX (Max 10MB)"
+              />
+            )}
+
+            {/* Status Information */}
+            <div className="space-y-2">
+              <Label>Status Kelengkapan</Label>
+              <div className="p-3 bg-muted rounded-md">
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${item?.is_completed
+                    ? 'bg-green-100 text-green-800'
+                    : 'bg-red-100 text-red-800'
+                    }`}>
+                    {item?.is_completed ? 'Lengkap' : 'Belum Lengkap'}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
           <Button variant="outline" onClick={handleCancel}>
-            Batal
+            {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
-          {canEdit && (
+          {canEdit && onSave && (
             <Button onClick={handleSave}>
               Simpan
             </Button>
