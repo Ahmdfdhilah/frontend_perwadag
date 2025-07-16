@@ -153,8 +153,8 @@ const SuratPemberitahuanPage: React.FC = () => {
       await suratPemberitahuanService.updateSuratPemberitahuan(selectedItem.id, updateData);
 
       // Handle file upload if any
-      if (data.file) {
-        await suratPemberitahuanService.uploadFile(selectedItem.id, data.file);
+      if (data.files && data.files.length > 0) {
+        await suratPemberitahuanService.uploadFile(selectedItem.id, data.files[0]);
       }
 
       setIsDialogOpen(false);
