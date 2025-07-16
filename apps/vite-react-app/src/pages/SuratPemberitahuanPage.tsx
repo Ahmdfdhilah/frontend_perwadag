@@ -24,6 +24,7 @@ import SearchContainer from '@/components/common/SearchContainer';
 import SuratPemberitahuanTable from '@/components/SuratPemberitahuan/SuratPemberitahuanTable';
 import SuratPemberitahuanCards from '@/components/SuratPemberitahuan/SuratPemberitahuanCards';
 import SuratPemberitahuanDialog from '@/components/SuratPemberitahuan/SuratPemberitahuanDialog';
+import { getDefaultYearOptions } from '@/utils/yearUtils';
 
 interface SuratPemberitahuanPageFilters {
   search: string;
@@ -63,6 +64,7 @@ const SuratPemberitahuanPage: React.FC = () => {
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
+  const yearOptions = getDefaultYearOptions();
 
   // Calculate access control
   const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
@@ -271,10 +273,11 @@ const SuratPemberitahuanPage: React.FC = () => {
               <SelectValue placeholder="Pilih tahun" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua Tahun</SelectItem>
-              <SelectItem value="2024">2024</SelectItem>
-              <SelectItem value="2023">2023</SelectItem>
-              <SelectItem value="2022">2022</SelectItem>
+              {yearOptions.map(option => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

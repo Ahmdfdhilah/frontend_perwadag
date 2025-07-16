@@ -23,6 +23,7 @@ import QuestionnaireCards from '@/components/QuestionnaireTemplate/Questionnaire
 import QuestionnaireDialog from '@/components/QuestionnaireTemplate/QuestionnaireDialog';
 import { Button } from '@workspace/ui/components/button';
 import { Plus } from 'lucide-react';
+import { getDefaultYearOptions } from '@/utils/yearUtils';
 
 interface QuestionnaireTemplatePageFilters {
   search: string;
@@ -58,6 +59,7 @@ const QuestionnaireTemplatePage: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<FormatKuisionerResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
+  const yearOptions = getDefaultYearOptions();
 
   // Calculate access control
   const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
@@ -274,11 +276,11 @@ const QuestionnaireTemplatePage: React.FC = () => {
               <SelectValue placeholder="Pilih tahun" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua Tahun</SelectItem>
-              <SelectItem value="2024">2024</SelectItem>
-              <SelectItem value="2023">2023</SelectItem>
-              <SelectItem value="2022">2022</SelectItem>
-              <SelectItem value="2021">2021</SelectItem>
+              {yearOptions.map(option => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

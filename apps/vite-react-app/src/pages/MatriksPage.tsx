@@ -24,6 +24,7 @@ import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import MatriksTable from '@/components/Matriks/MatriksTable';
 import MatriksCards from '@/components/Matriks/MatriksCards';
 import MatriksDialog from '@/components/Matriks/MatriksDialog';
+import { getDefaultYearOptions } from '@/utils/yearUtils';
 
 interface MatriksPageFilters {
   search: string;
@@ -66,6 +67,7 @@ const MatriksPage: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<MatriksResponse | null>(null);
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
+  const yearOptions = getDefaultYearOptions();
 
   // Calculate access control
   const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
@@ -265,10 +267,11 @@ const MatriksPage: React.FC = () => {
               <SelectValue placeholder="Pilih tahun" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua Tahun</SelectItem>
-              <SelectItem value="2024">2024</SelectItem>
-              <SelectItem value="2023">2023</SelectItem>
-              <SelectItem value="2022">2022</SelectItem>
+              {yearOptions.map(option => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

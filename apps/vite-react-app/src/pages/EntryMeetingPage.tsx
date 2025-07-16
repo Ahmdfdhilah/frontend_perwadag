@@ -6,6 +6,7 @@ import { MeetingResponse, MeetingFilterParams } from '@/services/meeting/types';
 import { meetingService } from '@/services/meeting';
 import { userService } from '@/services/users';
 import { PerwadagSummary, PerwadagSearchParams } from '@/services/users/types';
+import { getDefaultYearOptions } from '@/utils/yearUtils';
 import Filtering from '@/components/common/Filtering';
 import Pagination from '@/components/common/Pagination';
 import { Card, CardContent } from '@workspace/ui/components/card';
@@ -62,6 +63,9 @@ const EntryMeetingPage: React.FC = () => {
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
+
+  // Get year options from utility
+  const yearOptions = getDefaultYearOptions();
 
   // Calculate access control
   const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
@@ -261,10 +265,11 @@ const EntryMeetingPage: React.FC = () => {
               <SelectValue placeholder="Pilih tahun" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua Tahun</SelectItem>
-              <SelectItem value="2024">2024</SelectItem>
-              <SelectItem value="2023">2023</SelectItem>
-              <SelectItem value="2022">2022</SelectItem>
+              {yearOptions.map(option => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

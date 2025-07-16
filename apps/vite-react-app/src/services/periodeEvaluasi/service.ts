@@ -28,7 +28,7 @@ class PeriodeEvaluasiService extends BaseService {
   // Get all periode evaluasi with filtering
   async getPeriodeEvaluasi(
     params?: PeriodeEvaluasiFilterParams
-  ): Promise<PeriodeEvaluasiListResponse> {
+): Promise<PeriodeEvaluasiListResponse> {
     const queryParams = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, value]) => {

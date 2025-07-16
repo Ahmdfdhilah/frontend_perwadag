@@ -23,6 +23,7 @@ import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import KuesionerTable from '@/components/Kuesioner/KuesionerTable';
 import KuesionerCards from '@/components/Kuesioner/KuesionerCards';
 import KuesionerDialog from '@/components/Kuesioner/KuesionerDialog';
+import { getDefaultYearOptions } from '@/utils/yearUtils';
 
 interface KuesionerPageFilters {
   search: string;
@@ -64,6 +65,7 @@ const KuesionerPage: React.FC = () => {
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
+  const yearOptions = getDefaultYearOptions();
 
   // Calculate access control
   const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
@@ -273,10 +275,11 @@ const KuesionerPage: React.FC = () => {
               <SelectValue placeholder="Pilih tahun" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua Tahun</SelectItem>
-              <SelectItem value="2024">2024</SelectItem>
-              <SelectItem value="2023">2023</SelectItem>
-              <SelectItem value="2022">2022</SelectItem>
+              {yearOptions.map(option => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

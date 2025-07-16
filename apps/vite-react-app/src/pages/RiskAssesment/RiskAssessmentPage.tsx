@@ -27,6 +27,7 @@ import RiskAssessmentTable from '@/components/RiskAssesment/RiskAssessmentTable'
 import RiskAssessmentCards from '@/components/RiskAssesment/RiskAssessmentCards';
 import { Settings } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
+import { getDefaultYearOptions } from '@/utils/yearUtils';
 
 interface RiskAssessmentPageFilters {
   search: string;
@@ -67,6 +68,7 @@ const RiskAssessmentPage: React.FC = () => {
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
   const [isPeriodeDialogOpen, setIsPeriodeDialogOpen] = useState(false);
+  const yearOptions = getDefaultYearOptions();
 
   // Calculate access control
   const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
@@ -256,11 +258,11 @@ const RiskAssessmentPage: React.FC = () => {
               <SelectValue placeholder="Pilih tahun" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua Tahun</SelectItem>
-              <SelectItem value="2024">2024</SelectItem>
-              <SelectItem value="2023">2023</SelectItem>
-              <SelectItem value="2022">2022</SelectItem>
-              <SelectItem value="2021">2021</SelectItem>
+              {yearOptions.map(option => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
