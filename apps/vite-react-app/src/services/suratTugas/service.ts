@@ -88,6 +88,16 @@ class SuratTugasService extends BaseService {
     return this.post(`/${suratTugasId}/upload-file`, formData);
   }
 
+  // Download file
+  async downloadFile(suratTugasId: string): Promise<Blob> {
+    return this.downloadBlob(`/${suratTugasId}/download`);
+  }
+
+  // View file
+  async viewFile(suratTugasId: string): Promise<Blob> {
+    return this.downloadBlob(`/${suratTugasId}/view`);
+  }
+
   // Delete surat tugas
   async deleteSuratTugas(
     suratTugasId: string

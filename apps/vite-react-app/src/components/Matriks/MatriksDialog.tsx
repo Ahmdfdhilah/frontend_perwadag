@@ -12,6 +12,7 @@ import { MatriksResponse } from '@/services/matriks/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
+import { matriksService } from '@/services/matriks';
 
 interface MatriksDialogProps {
   open: boolean;
@@ -58,6 +59,24 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     onOpenChange(false);
   };
 
+  const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }, index: number) => {
+    if (!item?.id) return;
+    
+    try {
+      const blob = await matriksService.downloadFile(item.id);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
@@ -102,6 +121,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                 }] : []}
                 mode="edit"
                 onFilesChange={handleUploadFileChange}
+                onFileDownload={handleFileDownload}
                 description="Format yang didukung: PDF, DOC, DOCX, XLS, XLSX (Max 10MB)"
               />
             )}

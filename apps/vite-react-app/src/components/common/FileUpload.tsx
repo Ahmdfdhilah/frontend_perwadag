@@ -172,6 +172,13 @@ const FileUpload: React.FC<FileUploadProps> = ({
   };
 
   const handleDownloadFile = (file: { name: string; url?: string; viewUrl?: string }, index: number) => {
+    // Use custom download handler if provided
+    if (onFileDownload) {
+      onFileDownload(file, index);
+      return;
+    }
+
+    // Fallback to direct URL download
     if (file.url) {
       // Construct full URL if url is relative
       const fullUrl = file.url.startsWith('http') ? file.url : `${API_BASE_URL}${file.url}`;
@@ -180,17 +187,22 @@ const FileUpload: React.FC<FileUploadProps> = ({
       link.download = file.name;
       link.click();
     }
-    onFileDownload?.(file, index);
   };
 
   const handleViewFile = (file: { name: string; url?: string; viewUrl?: string }, index: number) => {
+    // Use custom view handler if provided
+    if (onFileView) {
+      onFileView(file, index);
+      return;
+    }
+
+    // Fallback to direct URL view
     const viewUrl = file.viewUrl || file.url;
     if (viewUrl) {
       // Construct full URL if viewUrl is relative
       const fullUrl = viewUrl.startsWith('http') ? viewUrl : `${API_BASE_URL}${viewUrl}`;
       window.open(fullUrl, '_blank');
     }
-    onFileView?.(file, index);
   };
 
   const triggerFileInput = () => {

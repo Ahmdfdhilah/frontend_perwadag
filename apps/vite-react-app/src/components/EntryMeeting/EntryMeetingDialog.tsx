@@ -23,6 +23,7 @@ import { MeetingResponse } from '@/services/meeting/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDate, formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
+import { meetingService } from '@/services/meeting';
 
 interface EntryMeetingDialogProps {
   open: boolean;
@@ -96,6 +97,24 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
 
   const handleExistingFilesRemove = (index: number) => {
     setExistingFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }, index: number) => {
+    if (!item?.id) return;
+    
+    try {
+      const blob = await meetingService.downloadFile(item.id, file.name);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
   };
 
   const isEditable = mode === 'edit';
@@ -266,6 +285,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
               disabled={!canEdit}
               onFilesChange={handleMeetingFilesChange}
               onExistingFileRemove={handleExistingFilesRemove}
+              onFileDownload={handleFileDownload}
               description="Upload bukti hadir meeting (Max 10MB per file)"
             />
           </div>

@@ -22,6 +22,7 @@ import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import { cn } from '@workspace/ui/lib/utils';
 import FileUpload from '@/components/common/FileUpload';
+import { suratPemberitahuanService } from '@/services/suratPemberitahuan';
 
 interface SuratPemberitahuanDialogProps {
   open: boolean;
@@ -90,6 +91,24 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
 
   const handleExistingFilesRemove = (index: number) => {
     setExistingFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
+    if (!item?.id) return;
+    
+    try {
+      const blob = await suratPemberitahuanService.downloadFile(item.id);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
   };
 
 
@@ -177,6 +196,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
               disabled={!canEdit}
               onFilesChange={handleUploadFilesChange}
               onExistingFileRemove={handleExistingFilesRemove}
+              onFileDownload={handleFileDownload}
               description="Format yang didukung: PDF, DOC, DOCX (Max 10MB per file)"
             />
           </div>

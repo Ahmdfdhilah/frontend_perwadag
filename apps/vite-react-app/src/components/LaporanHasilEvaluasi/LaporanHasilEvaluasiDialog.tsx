@@ -23,6 +23,7 @@ import { LaporanHasilResponse } from '@/services/laporanHasil/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
+import { laporanHasilService } from '@/services/laporanHasil';
 
 interface LaporanHasilEvaluasiDialogProps {
   open: boolean;
@@ -94,6 +95,24 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
 
   const handleExistingFilesRemove = (index: number) => {
     setExistingFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
+    if (!item?.id) return;
+    
+    try {
+      const blob = await laporanHasilService.downloadFile(item.id);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
   };
 
   const isEditable = mode === 'edit';
@@ -196,6 +215,7 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
               disabled={!canEdit}
               onFilesChange={handleUploadFilesChange}
               onExistingFileRemove={handleExistingFilesRemove}
+              onFileDownload={handleFileDownload}
               description="Format yang didukung: PDF, DOC, DOCX, XLS, XLSX (Max 10MB per file)"
             />
           </div>

@@ -23,6 +23,7 @@ import { SuratTugasResponse } from '@/services/suratTugas/types';
 import { PerwadagSummary } from '@/services/users/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import FileUpload from '@/components/common/FileUpload';
+import { suratTugasService } from '@/services/suratTugas';
 
 interface SuratTugasDialogProps {
   open: boolean;
@@ -128,6 +129,37 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
 
   const handleExistingFileRemove = (index: number) => {
     setExistingFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }, index: number) => {
+    if (!editingItem?.id) return;
+    
+    try {
+      const blob = await suratTugasService.downloadFile(editingItem.id);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
+
+  const handleFileView = async (file: { name: string; url?: string; viewUrl?: string }, index: number) => {
+    if (!editingItem?.id) return;
+    
+    try {
+      const blob = await suratTugasService.viewFile(editingItem.id);
+      const url = window.URL.createObjectURL(blob);
+      window.open(url, '_blank');
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error viewing file:', error);
+    }
   };
 
   const isFormValid = formData.no_surat && formData.user_perwadag_id && formData.tanggal_evaluasi_mulai &&
@@ -303,6 +335,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
               disabled={!canEdit}
               onFilesChange={handleUploadFilesChange}
               onExistingFileRemove={handleExistingFileRemove}
+              onFileDownload={handleFileDownload}
+              onFileView={handleFileView}
               description="Format yang didukung: PDF, DOC, DOCX (Max 10MB)"
             />
           </div>
