@@ -1,22 +1,45 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { Kuesioner, getKuesionerStatus } from '@/mocks/kuesioner';
+import { KuisionerResponse } from '@/services/kuisioner/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface KuesionerCardsProps {
-  data: Kuesioner[];
-  onView?: (item: Kuesioner) => void;
-  onEdit?: (item: Kuesioner) => void;
-  canEdit?: (item: Kuesioner) => boolean;
+  data: KuisionerResponse[];
+  loading?: boolean;
+  onView?: (item: KuisionerResponse) => void;
+  onEdit?: (item: KuisionerResponse) => void;
+  canEdit?: (item: KuisionerResponse) => boolean;
 }
 
 const KuesionerCards: React.FC<KuesionerCardsProps> = ({
   data,
+  loading = false,
   onView,
   onEdit,
   canEdit,
 }) => {
+
+  const getStatusBadge = (kuisioner: KuisionerResponse) => {
+    const isCompleted = kuisioner.is_completed;
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+        isCompleted
+          ? 'bg-green-100 text-green-800' 
+          : 'bg-red-100 text-red-800'
+      }`}>
+        {isCompleted ? 'Lengkap' : 'Belum Lengkap'}
+      </span>
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-32 text-muted-foreground">
+        Loading kuisioner...
+      </div>
+    );
+  }
 
 
   if (data.length === 0) {
@@ -34,7 +57,7 @@ const KuesionerCards: React.FC<KuesionerCardsProps> = ({
           <CardHeader className="pb-3">
             <div className="flex justify-between items-start">
               <CardTitle className="text-lg font-semibold">
-                {item.perwadagName}
+                {item.nama_perwadag}
               </CardTitle>
               <ActionDropdown
                 onView={() => onView?.(item)}
@@ -53,36 +76,31 @@ const KuesionerCards: React.FC<KuesionerCardsProps> = ({
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Tanggal Kuesioner:</span>
-                <span className="ml-2">{formatIndonesianDate(item.tanggal)}</span>
+                <span className="ml-2">{item.tanggal_kuisioner ? formatIndonesianDate(item.tanggal_kuisioner) : '-'}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
-                <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
+                <span className="ml-2">{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Dokumen:</span>
-                {item.dokumen ? (
-                  <button
-                    onClick={() => {
-                      console.log('Lihat dokumen:', item.dokumen);
-                      // Implement view/download logic here
-                    }}
+                {item.has_file ? (
+                  <a
+                    href={item.file_urls?.view_url || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="ml-2 text-blue-600 hover:text-blue-800 underline"
                   >
                     Lihat Dokumen
-                  </button>
+                  </a>
                 ) : (
-                  <span className="ml-2 text-muted-foreground">-</span>
+                  <span className="ml-2 text-muted-foreground">Tidak ada file</span>
                 )}
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Status:</span>
-                <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                  getKuesionerStatus(item) === 'Tersedia'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {getKuesionerStatus(item)}
+                <span className="ml-2">
+                  {getStatusBadge(item)}
                 </span>
               </div>
             </div>

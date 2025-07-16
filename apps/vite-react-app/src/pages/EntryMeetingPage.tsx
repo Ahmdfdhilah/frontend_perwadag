@@ -7,7 +7,6 @@ import { meetingService } from '@/services/meeting';
 import { userService } from '@/services/users';
 import { PerwadagSummary, PerwadagSearchParams } from '@/services/users/types';
 import Filtering from '@/components/common/Filtering';
-import SearchContainer from '@/components/common/SearchContainer';
 import Pagination from '@/components/common/Pagination';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import {
@@ -176,11 +175,6 @@ const EntryMeetingPage: React.FC = () => {
     }
   };
 
-  // Filter handlers
-  const handleSearchChange = (search: string) => {
-    updateURL({ search, page: 1 });
-  };
-
   const handleInspektoratChange = (inspektorat: string) => {
     updateURL({ inspektorat, page: 1 });
   };
@@ -334,12 +328,6 @@ const EntryMeetingPage: React.FC = () => {
             <ListHeaderComposite
               title={getCompositeTitle()}
               subtitle="Kelola data entry meeting audit berdasarkan filter yang dipilih"
-            />
-
-            <SearchContainer
-              searchQuery={filters.search}
-              onSearchChange={handleSearchChange}
-              placeholder="Cari nama perwadag..."
             />
 
             {/* Desktop Table */}

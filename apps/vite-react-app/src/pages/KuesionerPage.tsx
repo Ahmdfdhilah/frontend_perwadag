@@ -1,7 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRole } from '@/hooks/useRole';
+import { useURLFilters } from '@/hooks/useURLFilters';
+import { useToast } from '@workspace/ui/components/sonner';
 import Filtering from '@/components/common/Filtering';
-import SearchContainer from '@/components/common/SearchContainer';
 import Pagination from '@/components/common/Pagination';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import {
@@ -13,33 +14,238 @@ import {
 } from '@workspace/ui/components/select';
 import { Combobox } from '@workspace/ui/components/combobox';
 import { Label } from '@workspace/ui/components/label';
-import {
-  KUESIONER_DATA,
-  YEARS_KUESIONER,
-  Kuesioner
-} from '@/mocks/kuesioner';
-import { PERWADAG_DATA } from '@/mocks/perwadag';
-import { INSPEKTORATS } from '@/mocks/riskAssessment';
+import { KuisionerResponse, KuisionerFilterParams } from '@/services/kuisioner/types';
+import { kuisionerService } from '@/services/kuisioner';
+import { userService } from '@/services/users';
+import { PerwadagSummary, PerwadagSearchParams } from '@/services/users/types';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import KuesionerTable from '@/components/Kuesioner/KuesionerTable';
 import KuesionerCards from '@/components/Kuesioner/KuesionerCards';
 import KuesionerDialog from '@/components/Kuesioner/KuesionerDialog';
 
-const KuesionerPage: React.FC = () => {
-  const { isAdmin, isInspektorat, isPerwadag } = useRole();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedYear, setSelectedYear] = useState<string>('all');
-  const [selectedInspektorat, setSelectedInspektorat] = useState<string>('all');
-  const [selectedPerwadag, setSelectedPerwadag] = useState<string>('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<Kuesioner | null>(null);
-  const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
+interface KuesionerPageFilters {
+  search: string;
+  inspektorat: string;
+  user_perwadag_id: string;
+  tahun_evaluasi: string;
+  has_file: string;
+  page: number;
+  size: number;
+  [key: string]: string | number;
+}
 
-  // Check access - only admin, inspektorat, and perwadag can access this page
-  if (!isAdmin() && !isInspektorat() && !isPerwadag()) {
+const KuesionerPage: React.FC = () => {
+  const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
+  const { toast } = useToast();
+
+  // URL Filters configuration
+  const { updateURL, getCurrentFilters } = useURLFilters<KuesionerPageFilters>({
+    defaults: {
+      search: '',
+      inspektorat: 'all',
+      user_perwadag_id: 'all',
+      tahun_evaluasi: 'all',
+      has_file: 'all',
+      page: 1,
+      size: 10,
+    },
+    cleanDefaults: true,
+  });
+
+  // Get current filters from URL
+  const filters = getCurrentFilters();
+
+  const [kuisioner, setKuisioner] = useState<KuisionerResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [totalItems, setTotalItems] = useState(0);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<KuisionerResponse | null>(null);
+  const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
+  const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
+  const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
+
+  // Calculate access control
+  const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
+
+  // Fetch kuisioner function
+  const fetchKuisioner = async () => {
+    setLoading(true);
+    try {
+      const params: KuisionerFilterParams = {
+        page: filters.page,
+        size: filters.size,
+        search: filters.search || undefined,
+        inspektorat: filters.inspektorat !== 'all' ? filters.inspektorat : undefined,
+        user_perwadag_id: filters.user_perwadag_id !== 'all' ? filters.user_perwadag_id : undefined,
+        tahun_evaluasi: filters.tahun_evaluasi !== 'all' ? parseInt(filters.tahun_evaluasi) : undefined,
+        has_file: filters.has_file !== 'all' ? filters.has_file === 'true' : undefined,
+      };
+
+      // Auto-apply role-based filtering
+      if (isInspektorat() && user?.inspektorat && !params.inspektorat) {
+        params.inspektorat = user.inspektorat;
+      } else if (isPerwadag() && user?.id && !params.user_perwadag_id) {
+        params.user_perwadag_id = user.id;
+      }
+
+      const response = await kuisionerService.getKuisionerList(params);
+      setKuisioner(response.items);
+      setTotalItems(response.total);
+    } catch (error) {
+      console.error('Failed to fetch kuisioner:', error);
+      toast({
+        title: 'Error',
+        description: 'Gagal memuat data kuisioner. Silakan coba lagi.',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch available perwadag
+  const fetchAvailablePerwadag = async () => {
+    try {
+      const params: PerwadagSearchParams = {};
+
+      // If current user is inspektorat, filter by their inspektorat
+      if (isInspektorat() && user?.inspektorat) {
+        params.inspektorat = user.inspektorat;
+      }
+
+      const response = await userService.getPerwadagList(params);
+      setAvailablePerwadag(response.items || []);
+    } catch (error) {
+      console.error('Failed to fetch perwadag list:', error);
+    }
+  };
+
+  // Effect to fetch data when filters change
+  useEffect(() => {
+    if (hasAccess) {
+      fetchKuisioner();
+      fetchAvailablePerwadag();
+    }
+  }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, filters.has_file, hasAccess]);
+
+  // Pagination
+  const totalPages = Math.ceil(totalItems / filters.size);
+
+  const handleView = (item: KuisionerResponse) => {
+    setEditingItem(item);
+    setDialogMode('view');
+    setIsDialogOpen(true);
+  };
+
+  const handleEdit = (item: KuisionerResponse) => {
+    setEditingItem(item);
+    setDialogMode('edit');
+    setIsDialogOpen(true);
+  };
+
+  const handleSave = async (data: any) => {
+    if (!editingItem) return;
+
+    try {
+      const updateData = {
+        tanggal_kuisioner: data.tanggal_kuisioner || undefined,
+      };
+
+      await kuisionerService.updateKuisioner(editingItem.id, updateData);
+
+      // Handle file upload if any
+      if (data.file) {
+        await kuisionerService.uploadFile(editingItem.id, data.file);
+      }
+
+      setIsDialogOpen(false);
+      setEditingItem(null);
+      fetchKuisioner(); // Refresh the list
+
+      toast({
+        title: 'Berhasil diperbarui',
+        description: `Data kuisioner ${editingItem.nama_perwadag} telah diperbarui.`,
+        variant: 'default'
+      });
+    } catch (error) {
+      console.error('Failed to save kuisioner:', error);
+      toast({
+        title: 'Error',
+        description: 'Gagal menyimpan data kuisioner. Silakan coba lagi.',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  // Filter handlers
+  const handleInspektoratChange = (inspektorat: string) => {
+    updateURL({ inspektorat, page: 1 });
+  };
+
+  const handlePerwadagChange = (user_perwadag_id: string) => {
+    updateURL({ user_perwadag_id, page: 1 });
+  };
+
+  const handleTahunEvaluasiChange = (tahun_evaluasi: string) => {
+    updateURL({ tahun_evaluasi, page: 1 });
+  };
+
+
+  const handlePageChange = (page: number) => {
+    updateURL({ page });
+  };
+
+  const handleItemsPerPageChange = (value: string) => {
+    updateURL({ size: parseInt(value), page: 1 });
+  };
+
+  // Generate composite title
+  const getCompositeTitle = () => {
+    let title = "Daftar Kuesioner";
+    const activeFilters = [];
+
+    if (filters.inspektorat !== 'all') {
+      activeFilters.push(`Inspektorat ${filters.inspektorat}`);
+    }
+
+    if (filters.tahun_evaluasi !== 'all') {
+      activeFilters.push(`Tahun ${filters.tahun_evaluasi}`);
+    }
+
+    if (filters.user_perwadag_id !== 'all') {
+      const selectedPerwadag = availablePerwadag.find(p => p.id === filters.user_perwadag_id);
+      if (selectedPerwadag) {
+        activeFilters.push(`Perwadag ${selectedPerwadag.nama}`);
+      }
+    }
+
+    if (filters.has_file !== 'all') {
+      activeFilters.push(filters.has_file === 'true' ? 'Ada File' : 'Belum Ada File');
+    }
+
+    if (activeFilters.length > 0) {
+      title += " - " + activeFilters.join(" - ");
+    }
+
+    return title;
+  };
+
+  const canEdit = (item: KuisionerResponse) => {
+    if (isAdmin()) return true;
+    if (isInspektorat()) {
+      // Check if user can edit this kuisioner based on inspektorat
+      return user?.inspektorat === item.inspektorat;
+    }
+    if (isPerwadag()) {
+      // Check if user can edit their own kuisioner
+      return user?.id === item.surat_tugas_info?.nama_perwadag;
+    }
+    return false;
+  };
+
+  // Check access after all hooks have been called
+  if (!hasAccess) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
@@ -50,136 +256,6 @@ const KuesionerPage: React.FC = () => {
         </div>
       </div>
     );
-  }
-
-  // Get available perwadag based on role
-  const availablePerwadag = useMemo(() => {
-    if (isAdmin()) {
-      return PERWADAG_DATA;
-    }
-    if (isInspektorat()) {
-      // For demo, assume inspektorat 1
-      return PERWADAG_DATA.filter(p => p.inspektorat === 1);
-    }
-    if (isPerwadag()) {
-      // For demo, assume current user is PWD001
-      return PERWADAG_DATA.filter(p => p.id === 'PWD001');
-    }
-    return [];
-  }, [isAdmin, isInspektorat, isPerwadag]);
-
-  // Filter and sort data
-  const filteredData = useMemo(() => {
-    let filtered = [...KUESIONER_DATA];
-
-    // Filter by search query
-    if (searchQuery) {
-      filtered = filtered.filter(item =>
-        item.perwadagName.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // Filter by year
-    if (selectedYear !== 'all') {
-      filtered = filtered.filter(item => item.year === parseInt(selectedYear));
-    }
-
-    // Filter by inspektorat (only for admin)
-    if (isAdmin() && selectedInspektorat !== 'all') {
-      filtered = filtered.filter(item => item.inspektorat === parseInt(selectedInspektorat));
-    }
-
-    // Filter by perwadag
-    if (selectedPerwadag !== 'all') {
-      filtered = filtered.filter(item => item.perwadagId === selectedPerwadag);
-    }
-
-    // Role-based filtering
-    if (isInspektorat()) {
-      // For demo, show inspektorat 1 data
-      filtered = filtered.filter(item => item.inspektorat === 1);
-    }
-
-    if (isPerwadag()) {
-      // For demo, show only PWD001 data
-      filtered = filtered.filter(item => item.perwadagId === 'PWD001');
-    }
-
-    // Sort by tanggal (newest first)
-    filtered.sort((a, b) => new Date(b.tanggal).getTime() - new Date(a.tanggal).getTime());
-
-    return filtered;
-  }, [searchQuery, selectedYear, selectedInspektorat, selectedPerwadag, isAdmin, isInspektorat, isPerwadag]);
-
-  // Pagination
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
-
-  const handleView = (item: Kuesioner) => {
-    setEditingItem(item);
-    setDialogMode('view');
-    setIsDialogOpen(true);
-  };
-
-  const handleEdit = (item: Kuesioner) => {
-    setEditingItem(item);
-    setDialogMode('edit');
-    setIsDialogOpen(true);
-  };
-
-  const handleSave = (data: Partial<Kuesioner>) => {
-    console.log('Save:', data);
-    // Implement save logic
-    setIsDialogOpen(false);
-    setEditingItem(null);
-  };
-
-  const handleItemsPerPageChange = (value: string) => {
-    setItemsPerPage(parseInt(value));
-    setCurrentPage(1);
-  };
-
-  // Generate composite title
-  const getCompositeTitle = () => {
-    let title = "Daftar Kuesioner";
-    const filters = [];
-    
-    if (isInspektorat()) {
-      filters.push("Inspektorat I");
-    } else if (isAdmin() && selectedInspektorat !== 'all') {
-      filters.push(`Inspektorat ${selectedInspektorat}`);
-    }
-    
-    if (selectedYear !== 'all') {
-      filters.push(selectedYear);
-    }
-    
-    if (selectedPerwadag !== 'all') {
-      const perwadag = PERWADAG_DATA.find(p => p.id === selectedPerwadag);
-      if (perwadag) filters.push(perwadag.name);
-    }
-    
-    if (filters.length > 0) {
-      title += " - " + filters.join(" - ");
-    }
-    
-    return title;
-  };
-
-  const canEdit = (item: Kuesioner) => {
-    if (isAdmin()) return true;
-    if (isInspektorat()) {
-      // Inspektorat can edit items from their affiliated inspektorat
-      // For demo, assume current user is inspektorat 1
-      return item.inspektorat === 1;
-    }
-    if (isPerwadag()) {
-      // Perwadag can edit their own data
-      // For demo, assume current user is PWD001
-      return item.perwadagId === 'PWD001';
-    }
-    return false;
   };
 
   return (
@@ -192,17 +268,15 @@ const KuesionerPage: React.FC = () => {
       <Filtering>
         <div className="space-y-2">
           <Label htmlFor="year-filter">Periode (Tahun)</Label>
-          <Select value={selectedYear} onValueChange={setSelectedYear}>
+          <Select value={filters.tahun_evaluasi} onValueChange={handleTahunEvaluasiChange}>
             <SelectTrigger id="year-filter">
               <SelectValue placeholder="Pilih tahun" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Tahun</SelectItem>
-              {YEARS_KUESIONER.map(year => (
-                <SelectItem key={year} value={year.toString()}>
-                  {year}
-                </SelectItem>
-              ))}
+              <SelectItem value="2024">2024</SelectItem>
+              <SelectItem value="2023">2023</SelectItem>
+              <SelectItem value="2022">2022</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -211,17 +285,15 @@ const KuesionerPage: React.FC = () => {
         {isAdmin() && (
           <div className="space-y-2">
             <Label htmlFor="inspektorat-filter">Inspektorat</Label>
-            <Select value={selectedInspektorat} onValueChange={setSelectedInspektorat}>
+            <Select value={filters.inspektorat} onValueChange={handleInspektoratChange}>
               <SelectTrigger id="inspektorat-filter">
                 <SelectValue placeholder="Pilih inspektorat" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Semua Inspektorat</SelectItem>
-                {INSPEKTORATS.map(inspektorat => (
-                  <SelectItem key={inspektorat.value} value={inspektorat.value.toString()}>
-                    {inspektorat.label}
-                  </SelectItem>
-                ))}
+                <SelectItem value="1">Inspektorat I</SelectItem>
+                <SelectItem value="2">Inspektorat II</SelectItem>
+                <SelectItem value="3">Inspektorat III</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -234,15 +306,25 @@ const KuesionerPage: React.FC = () => {
             <Combobox
               options={[
                 { value: 'all', label: 'Semua Perwadag' },
-                ...availablePerwadag.map(perwadag => ({
-                  value: perwadag.id,
-                  label: perwadag.name
-                }))
+                ...availablePerwadag
+                  .filter(perwadag =>
+                    perwadagSearchValue === '' ||
+                    perwadag.nama.toLowerCase().includes(perwadagSearchValue.toLowerCase()) ||
+                    perwadag.inspektorat?.toLowerCase().includes(perwadagSearchValue.toLowerCase())
+                  )
+                  .map(perwadag => ({
+                    value: perwadag.id,
+                    label: perwadag.nama,
+                    description: perwadag.inspektorat || ''
+                  }))
               ]}
-              value={selectedPerwadag}
-              onChange={(value) => setSelectedPerwadag(value.toString())}
+              value={filters.user_perwadag_id}
+              onChange={(value) => handlePerwadagChange(value.toString())}
               placeholder="Pilih perwadag"
               searchPlaceholder="Cari perwadag..."
+              searchValue={perwadagSearchValue}
+              onSearchChange={setPerwadagSearchValue}
+              emptyMessage="Tidak ada perwadag yang ditemukan"
             />
           </div>
         )}
@@ -256,16 +338,11 @@ const KuesionerPage: React.FC = () => {
               subtitle="Kelola data kuesioner audit berdasarkan filter yang dipilih"
             />
 
-            <SearchContainer
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              placeholder="Cari nama perwadag..."
-            />
-
             {/* Desktop Table */}
             <div className="hidden md:block">
               <KuesionerTable
-                data={paginatedData}
+                data={kuisioner}
+                loading={loading}
                 onView={handleView}
                 onEdit={handleEdit}
                 canEdit={canEdit}
@@ -275,7 +352,8 @@ const KuesionerPage: React.FC = () => {
             {/* Mobile Cards */}
             <div className="md:hidden">
               <KuesionerCards
-                data={paginatedData}
+                data={kuisioner}
+                loading={loading}
                 onView={handleView}
                 onEdit={handleEdit}
                 canEdit={canEdit}
@@ -285,11 +363,11 @@ const KuesionerPage: React.FC = () => {
             {/* Pagination */}
             {totalPages > 1 && (
               <Pagination
-                currentPage={currentPage}
+                currentPage={filters.page}
                 totalPages={totalPages}
-                itemsPerPage={itemsPerPage}
-                totalItems={filteredData.length}
-                onPageChange={setCurrentPage}
+                itemsPerPage={filters.size}
+                totalItems={totalItems}
+                onPageChange={handlePageChange}
                 onItemsPerPageChange={handleItemsPerPageChange}
               />
             )}
@@ -304,7 +382,6 @@ const KuesionerPage: React.FC = () => {
         item={editingItem}
         mode={dialogMode}
         onSave={handleSave}
-        availablePerwadag={availablePerwadag}
       />
     </div>
   );

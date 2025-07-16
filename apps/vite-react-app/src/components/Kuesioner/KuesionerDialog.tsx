@@ -28,17 +28,16 @@ import { CalendarIcon, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
-import { Kuesioner } from '@/mocks/kuesioner';
-import { Perwadag } from '@/mocks/perwadag';
+import { KuisionerResponse } from '@/services/kuisioner/types';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 
 interface KuesionerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  item: Kuesioner | null;
+  item: KuisionerResponse | null;
   mode: 'view' | 'edit';
-  onSave: (data: Partial<Kuesioner>) => void;
-  availablePerwadag: Perwadag[];
+  onSave: (data: any) => void;
 }
 
 const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
@@ -47,58 +46,32 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   item,
   mode,
   onSave,
-  availablePerwadag,
 }) => {
   const { canEditForm } = useFormPermissions();
-  const { isAdmin, isInspektorat, isPerwadag } = useRole();
-  const [formData, setFormData] = useState<Partial<Kuesioner>>({});
+  const [formData, setFormData] = useState<any>({});
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-  const [dokumenFiles, setDokumenFiles] = useState<File[]>([]);
-  const [existingDokumen, setExistingDokumen] = useState<Array<{ name: string; url?: string }>>([]);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (item && open) {
       setFormData({
-        ...item,
+        tanggal_kuisioner: item.tanggal_kuisioner,
       });
-      setSelectedDate(new Date(item.tanggal));
-      setDokumenFiles([]);
-      setExistingDokumen(item.dokumen ? [{ name: item.dokumen, url: item.dokumen }] : []);
+      setSelectedDate(item.tanggal_kuisioner ? new Date(item.tanggal_kuisioner) : undefined);
     } else {
-      setFormData({});
+      setFormData({
+        tanggal_kuisioner: '',
+      });
       setSelectedDate(undefined);
-      setDokumenFiles([]);
-      setExistingDokumen([]);
+      setUploadFile(null);
     }
   }, [item, open]);
 
   const handleSave = () => {
-    // Basic validation for all roles
-    if (!selectedDate) {
-      alert('Tanggal harus diisi');
-      return;
-    }
-
-    // Role-based validation
-    if (isPerwadag()) {
-      // Perwadag can edit tanggal and dokumen for their own data
-      if (dokumenFiles.length === 0 && existingDokumen.length === 0) {
-        alert('Dokumen harus diupload');
-        return;
-      }
-    } else if (isAdmin() || isInspektorat()) {
-      // Admin/Inspektorat can edit all fields including dokumen
-      if (!formData.perwadagId) {
-        alert('Nama perwadag harus dipilih');
-        return;
-      }
-    }
-
     const dataToSave = {
-      ...formData,
-      tanggal: selectedDate.toISOString().split('T')[0],
-      dokumenFiles,
+      tanggal_kuisioner: selectedDate ? selectedDate.toISOString().split('T')[0] : formData.tanggal_kuisioner,
+      file: uploadFile,
     };
     onSave(dataToSave);
   };
@@ -107,29 +80,28 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
     onOpenChange(false);
   };
 
-  const handleDokumenFilesChange = (files: File[]) => {
-    setDokumenFiles(files);
+  const handleUploadFileChange = (files: File[]) => {
+    setUploadFile(files[0] || null);
   };
 
-  const handleExistingDokumenRemove = (index: number) => {
-    setExistingDokumen(prev => prev.filter((_, i) => i !== index));
+  const handleDownloadFile = () => {
+    if (item?.file_urls?.download_url) {
+      const link = document.createElement('a');
+      link.href = item.file_urls.download_url;
+      link.download = item.file_metadata?.original_filename || 'kuisioner';
+      link.click();
+    }
   };
 
-  const handleDownloadDokumen = () => {
-    if (formData.dokumen) {
-      console.log('Download dokumen:', formData.dokumen);
-      // Implement download logic here
+  const handleViewFile = () => {
+    if (item?.file_urls?.view_url) {
+      window.open(item.file_urls.view_url, '_blank');
     }
   };
 
 
   const isEditable = mode === 'edit';
-
-  // Role-based field permissions
-  const baseCanEdit = canEditForm('kuesioner') && isEditable;
-  const canEditDate = baseCanEdit && (isAdmin() || isInspektorat() || isPerwadag());
-  const canEditPerwadag = baseCanEdit && (isAdmin() || isInspektorat());
-  const canEditDokumen = baseCanEdit && (isAdmin() || isInspektorat() || isPerwadag());
+  const canEdit = canEditForm('kuisioner') && isEditable;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -142,28 +114,43 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
 
         <div className="flex-1 overflow-y-auto py-4">
           <div className="space-y-6">
+            {/* Basic Info - Read Only */}
+            <div className="grid grid-cols-1 gap-4">
+              <div className="space-y-2">
+                <Label>Nama Perwadag</Label>
+                <div className="p-3 bg-muted rounded-md">
+                  {item?.nama_perwadag}
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-2">
-              <Label htmlFor="tanggal">Tanggal Kuesioner</Label>
-              <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full justify-start text-left font-normal",
-                      !selectedDate && "text-muted-foreground",
-                      !canEditDate && "bg-muted cursor-not-allowed"
-                    )}
-                    disabled={!canEditDate}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? (
-                      format(selectedDate, "dd MMMM yyyy", { locale: id })
-                    ) : (
-                      <span>Pilih tanggal</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                {canEditDate && (
+              <Label>Periode Evaluasi</Label>
+              <div className="p-3 bg-muted rounded-md">
+                {item ? formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai) : '-'}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="tanggal_kuisioner">Tanggal Kuesioner</Label>
+              {canEdit ? (
+                <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !selectedDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {selectedDate ? (
+                        format(selectedDate, "dd MMMM yyyy", { locale: id })
+                      ) : (
+                        <span>Pilih tanggal</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
@@ -176,60 +163,87 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
                       locale={id}
                     />
                   </PopoverContent>
-                )}
-              </Popover>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="perwadag">Nama Perwadag</Label>
-              {canEditPerwadag ? (
-                <Select
-                  value={formData.perwadagId || ''}
-                  onValueChange={(value) => {
-                    const selected = availablePerwadag.find(p => p.id === value);
-                    setFormData({
-                      ...formData,
-                      perwadagId: value,
-                      perwadagName: selected?.name || '',
-                    });
-                  }}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Pilih perwadag" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {availablePerwadag.map((perwadag) => (
-                      <SelectItem key={perwadag.id} value={perwadag.id}>
-                        {perwadag.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                </Popover>
               ) : (
-                <Input
-                  value={formData.perwadagName || ''}
-                  disabled
-                  className="bg-muted"
-                />
+                <div className="p-3 bg-muted rounded-md">
+                  {item?.tanggal_kuisioner ? format(new Date(item.tanggal_kuisioner), "dd MMMM yyyy", { locale: id }) : '-'}
+                </div>
               )}
             </div>
 
+            {/* Current File Display */}
+            {item?.has_file && (
+              <div className="space-y-2">
+                <Label>File Kuesioner Saat Ini</Label>
+                <div className="p-3 bg-muted rounded-md">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">{item.file_metadata?.original_filename || 'Kuesioner'}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.file_metadata?.size_mb ? `${item.file_metadata.size_mb.toFixed(2)} MB` : ''}
+                        {item.file_metadata?.uploaded_at ? ` • Uploaded ${format(new Date(item.file_metadata.uploaded_at), 'dd MMM yyyy')}` : ''}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      {item.file_urls?.view_url && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleViewFile}
+                        >
+                          View
+                        </Button>
+                      )}
+                      {item.file_urls?.download_url && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleDownloadFile}
+                        >
+                          <Download className="w-4 h-4 mr-1" />
+                          Download
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
 
-            <FileUpload
-              label="Upload Dokumen Kuesioner"
-              accept=".pdf,.doc,.docx"
-              multiple={false}
-              maxSize={10 * 1024 * 1024} // 10MB
-              maxFiles={1}
-              files={dokumenFiles}
-              existingFiles={existingDokumen}
-              mode={canEditDokumen ? 'edit' : 'view'}
-              disabled={!canEditDokumen}
-              onFilesChange={handleDokumenFilesChange}
-              onExistingFileRemove={handleExistingDokumenRemove}
-              description="Format yang didukung: PDF, DOC, DOCX (Max 10MB)"
-            />
+            {/* File Upload */}
+            {canEdit && (
+              <FileUpload
+                label="Upload File Kuesioner (Optional)"
+                accept=".pdf,.doc,.docx"
+                multiple={false}
+                maxSize={10 * 1024 * 1024} // 10MB
+                files={uploadFile ? [uploadFile] : []}
+                mode="edit"
+                onFilesChange={handleUploadFileChange}
+                description="Format yang didukung: PDF, DOC, DOCX (Max 10MB)"
+              />
+            )}
 
+            {/* Status Information */}
+            <div className="space-y-2">
+              <Label>Status Kelengkapan</Label>
+              <div className="p-3 bg-muted rounded-md">
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    item?.is_completed
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {item?.is_completed ? 'Lengkap' : 'Belum Lengkap'}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    ({item?.completion_percentage || 0}% lengkap)
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -237,13 +251,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
           <Button variant="outline" onClick={handleCancel}>
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
-          {mode === 'view' && formData.dokumen && (
-            <Button onClick={handleDownloadDokumen}>
-              <Download className="w-4 h-4 mr-2" />
-              Download Dokumen
-            </Button>
-          )}
-          {baseCanEdit && (
+          {canEdit && (
             <Button onClick={handleSave}>
               Simpan
             </Button>
