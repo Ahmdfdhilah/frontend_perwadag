@@ -8,7 +8,6 @@ import {
 } from '@workspace/ui/components/dialog';
 import { Button } from '@workspace/ui/components/button';
 import { Label } from '@workspace/ui/components/label';
-import { Download } from 'lucide-react';
 import { MatriksResponse } from '@/services/matriks/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
