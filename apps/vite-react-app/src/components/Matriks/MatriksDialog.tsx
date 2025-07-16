@@ -18,7 +18,7 @@ interface MatriksDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   item: MatriksResponse | null;
-  mode: 'view' | 'edit';
+  mode: 'edit';
   onSave?: (data: any) => void;
 }
 
@@ -45,20 +45,6 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     setUploadFile(files[0] || null);
   };
 
-  const handleDownloadFile = () => {
-    if (item?.file_urls?.download_url) {
-      const link = document.createElement('a');
-      link.href = item.file_urls.download_url;
-      link.download = item.file_metadata?.original_filename || 'matriks';
-      link.click();
-    }
-  };
-
-  const handleViewFile = () => {
-    if (item?.file_urls?.view_url) {
-      window.open(item.file_urls.view_url, '_blank');
-    }
-  };
 
   const handleSave = () => {
     if (!onSave) return;
@@ -78,7 +64,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0 border-b pb-4">
           <DialogTitle>
-            {mode === 'edit' ? 'Edit Matriks' : 'Detail Matriks'}
+            Edit Matriks
           </DialogTitle>
         </DialogHeader>
 
@@ -102,47 +88,6 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
             </div>
 
 
-            {/* Current File Display */}
-            {item?.has_file && (
-              <div className="space-y-2">
-                <Label>File Matriks Saat Ini</Label>
-                <div className="p-3 bg-muted rounded-md">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium">{item.file_metadata?.original_filename || 'Matriks'}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {item.file_metadata?.size_mb ? `${item.file_metadata.size_mb.toFixed(2)} MB` : ''}
-                        {item.file_metadata?.uploaded_at ? ` • Uploaded ${new Date(item.file_metadata.uploaded_at).toLocaleDateString()}` : ''}
-                      </p>
-                    </div>
-                    <div className="flex gap-2">
-                      {item.file_urls?.view_url && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={handleViewFile}
-                        >
-                          View
-                        </Button>
-                      )}
-                      {item.file_urls?.download_url && (
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={handleDownloadFile}
-                        >
-                          <Download className="w-4 h-4 mr-1" />
-                          Download
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* File Upload */}
             {canEdit && (
               <FileUpload
@@ -151,6 +96,11 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                 multiple={false}
                 maxSize={10 * 1024 * 1024} // 10MB
                 files={uploadFile ? [uploadFile] : []}
+                existingFiles={item?.has_file ? [{
+                  name: item.file_metadata?.original_filename || 'Matriks',
+                  url: item.file_urls?.view_url,
+                  size: item.file_metadata?.size_mb ? Math.round(item.file_metadata.size_mb * 1024 * 1024) : undefined
+                }] : []}
                 mode="edit"
                 onFilesChange={handleUploadFileChange}
                 description="Format yang didukung: PDF, DOC, DOCX, XLS, XLSX (Max 10MB)"
@@ -176,7 +126,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
           <Button variant="outline" onClick={handleCancel}>
-            {mode === 'view' ? 'Tutup' : 'Batal'}
+            Batal
           </Button>
           {canEdit && onSave && (
             <Button onClick={handleSave}>

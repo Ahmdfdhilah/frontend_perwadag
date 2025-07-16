@@ -14,7 +14,6 @@ import { formatIndonesianDateRange } from '@/utils/timeFormat';
 interface MatriksTableProps {
   data: MatriksResponse[];
   loading?: boolean;
-  onView?: (item: MatriksResponse) => void;
   onEdit?: (item: MatriksResponse) => void;
   canEdit?: (item: MatriksResponse) => boolean;
   userRole: 'admin' | 'inspektorat' | 'perwadag';
@@ -23,7 +22,6 @@ interface MatriksTableProps {
 const MatriksTable: React.FC<MatriksTableProps> = ({
   data,
   loading = false,
-  onView,
   onEdit,
   canEdit,
   userRole,
@@ -96,9 +94,8 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
       </TableCell>
       <TableCell>
         <ActionDropdown
-          onView={onView ? () => onView(item) : undefined}
           onEdit={canEdit?.(item) ? () => onEdit?.(item) : undefined}
-          showView={!!onView}
+          showView={false}
           showEdit={canEdit?.(item) && !!onEdit}
           showDelete={false}
         />

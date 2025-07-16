@@ -7,7 +7,6 @@ import { formatIndonesianDateRange } from '@/utils/timeFormat';
 interface MatriksCardsProps {
   data: MatriksResponse[];
   loading?: boolean;
-  onView?: (item: MatriksResponse) => void;
   onEdit?: (item: MatriksResponse) => void;
   canEdit?: (item: MatriksResponse) => boolean;
   userRole: 'admin' | 'inspektorat' | 'perwadag';
@@ -16,7 +15,6 @@ interface MatriksCardsProps {
 const MatriksCards: React.FC<MatriksCardsProps> = ({
   data,
   loading = false,
-  onView,
   onEdit,
   canEdit,
   userRole,
@@ -75,9 +73,8 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
             {item.nama_perwadag}
           </CardTitle>
           <ActionDropdown
-            onView={onView ? () => onView(item) : undefined}
             onEdit={canEdit?.(item) ? () => onEdit?.(item) : undefined}
-            showView={!!onView}
+            showView={false}
             showEdit={canEdit?.(item) && !!onEdit}
             showDelete={false}
           />

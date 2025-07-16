@@ -64,7 +64,6 @@ const MatriksPage: React.FC = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MatriksResponse | null>(null);
-  const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
 
@@ -136,15 +135,8 @@ const MatriksPage: React.FC = () => {
   // Pagination
   const totalPages = Math.ceil(totalItems / filters.size);
 
-  const handleView = (item: MatriksResponse) => {
-    setSelectedItem(item);
-    setDialogMode('view');
-    setIsDialogOpen(true);
-  };
-
   const handleEdit = (item: MatriksResponse) => {
     setSelectedItem(item);
-    setDialogMode('edit');
     setIsDialogOpen(true);
   };
 
@@ -349,7 +341,6 @@ const MatriksPage: React.FC = () => {
               <MatriksTable
                 data={matriks}
                 loading={loading}
-                onView={isAdmin() ? handleView : undefined}
                 onEdit={handleEdit}
                 canEdit={canEdit}
                 userRole={isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : 'perwadag'}
@@ -361,7 +352,6 @@ const MatriksPage: React.FC = () => {
               <MatriksCards
                 data={matriks}
                 loading={loading}
-                onView={isAdmin() ? handleView : undefined}
                 onEdit={handleEdit}
                 canEdit={canEdit}
                 userRole={isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : 'perwadag'}
@@ -383,14 +373,14 @@ const MatriksPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Unified Dialog - For Admin and Inspektorat */}
+      {/* Edit Dialog - For Admin and Inspektorat */}
       {(isAdmin() || isInspektorat()) && (
         <MatriksDialog
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}
           item={selectedItem}
-          onSave={dialogMode === 'edit' ? handleSave : undefined}
-          mode={dialogMode}
+          onSave={handleSave}
+          mode="edit"
         />
       )}
     </div>
