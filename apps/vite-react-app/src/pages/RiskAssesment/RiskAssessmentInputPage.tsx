@@ -22,6 +22,17 @@ import {
   TRADE_AGREEMENT_CHOICES,
 } from '@/mocks';
 import { formatNumber, handleNumberInput, parseFormattedNumber } from '@/utils/numberUtils';
+import {
+  calculateTrendChoice,
+  calculateBudgetChoice,
+  calculateExportTrendChoice,
+  calculateAuditValue,
+  calculateTradeAgreementValue,
+  calculateExportRankingChoice,
+  calculateIKChoice,
+  calculateTEIChoice,
+  calculateTotalRisk
+} from '@/utils/riskCalculationUtils';
 import { penilaianRisikoService } from '@/services/penilaianRisiko';
 import { PenilaianRisiko, KriteriaData } from '@/services/penilaianRisiko/types';
 import { useToast } from '@workspace/ui/components/sonner';
@@ -113,7 +124,7 @@ const RiskAssessmentInputPage: React.FC = () => {
     });
   };
 
-  // Auto-calculate trend percentage when input values change
+  // Auto-calculate trend values when input values change
   useEffect(() => {
     if (!penilaianData) return;
 
@@ -123,12 +134,25 @@ const RiskAssessmentInputPage: React.FC = () => {
 
     if (capaian1 > 0) {
       const percentage = ((capaian2 - capaian1) / capaian1) * 100;
-      handleInputChange('tren_capaian', 'tren', percentage);
+      const { pilihan, nilai } = calculateTrendChoice(percentage);
+      
+      setPenilaianData(prev => ({
+        ...prev!,
+        kriteria_data: {
+          ...prev!.kriteria_data,
+          tren_capaian: {
+            ...prev!.kriteria_data.tren_capaian,
+            tren: percentage,
+            pilihan,
+            nilai
+          }
+        }
+      }));
     }
   }, [penilaianData?.kriteria_data.tren_capaian.capaian_tahun_1, penilaianData?.kriteria_data.tren_capaian.capaian_tahun_2]);
 
 
-  // Auto-calculate budget percentage when input values change
+  // Auto-calculate budget values when input values change
   useEffect(() => {
     if (!penilaianData) return;
 
@@ -138,12 +162,119 @@ const RiskAssessmentInputPage: React.FC = () => {
 
     if (pagu > 0) {
       const percentage = (realisasi / pagu) * 100;
-      handleInputChange('realisasi_anggaran', 'persentase', percentage);
+      const { pilihan, nilai } = calculateBudgetChoice(percentage);
+      
+      setPenilaianData(prev => ({
+        ...prev!,
+        kriteria_data: {
+          ...prev!.kriteria_data,
+          realisasi_anggaran: {
+            ...prev!.kriteria_data.realisasi_anggaran,
+            persentase: percentage,
+            pilihan,
+            nilai
+          }
+        }
+      }));
     }
   }, [penilaianData?.kriteria_data.realisasi_anggaran.realisasi, penilaianData?.kriteria_data.realisasi_anggaran.pagu]);
 
 
-  // Auto-calculate IK percentage when input values change
+  // Auto-calculate export trend values when deskripsi changes
+  useEffect(() => {
+    if (!penilaianData) return;
+
+    const trenEkspor = penilaianData.kriteria_data.tren_ekspor;
+    const deskripsi = trenEkspor.deskripsi;
+
+    if (deskripsi !== undefined && deskripsi !== null) {
+      const { pilihan, nilai } = calculateExportTrendChoice(deskripsi);
+      
+      setPenilaianData(prev => ({
+        ...prev!,
+        kriteria_data: {
+          ...prev!.kriteria_data,
+          tren_ekspor: {
+            ...prev!.kriteria_data.tren_ekspor,
+            pilihan,
+            nilai
+          }
+        }
+      }));
+    }
+  }, [penilaianData?.kriteria_data.tren_ekspor.deskripsi]);
+
+  // Auto-calculate audit nilai when pilihan changes
+  useEffect(() => {
+    if (!penilaianData) return;
+
+    const auditItjen = penilaianData.kriteria_data.audit_itjen;
+    const pilihan = auditItjen.pilihan;
+
+    if (pilihan) {
+      const nilai = calculateAuditValue(pilihan);
+      
+      setPenilaianData(prev => ({
+        ...prev!,
+        kriteria_data: {
+          ...prev!.kriteria_data,
+          audit_itjen: {
+            ...prev!.kriteria_data.audit_itjen,
+            nilai
+          }
+        }
+      }));
+    }
+  }, [penilaianData?.kriteria_data.audit_itjen.pilihan]);
+
+  // Auto-calculate trade agreement nilai when pilihan changes
+  useEffect(() => {
+    if (!penilaianData) return;
+
+    const perjanjianPerdagangan = penilaianData.kriteria_data.perjanjian_perdagangan;
+    const pilihan = perjanjianPerdagangan.pilihan;
+
+    if (pilihan) {
+      const nilai = calculateTradeAgreementValue(pilihan);
+      
+      setPenilaianData(prev => ({
+        ...prev!,
+        kriteria_data: {
+          ...prev!.kriteria_data,
+          perjanjian_perdagangan: {
+            ...prev!.kriteria_data.perjanjian_perdagangan,
+            nilai
+          }
+        }
+      }));
+    }
+  }, [penilaianData?.kriteria_data.perjanjian_perdagangan.pilihan]);
+
+  // Auto-calculate export ranking values when deskripsi changes
+  useEffect(() => {
+    if (!penilaianData) return;
+
+    const peringkatEkspor = penilaianData.kriteria_data.peringkat_ekspor;
+    const deskripsi = peringkatEkspor.deskripsi;
+
+    if (deskripsi !== undefined && deskripsi !== null) {
+      const { pilihan, nilai } = calculateExportRankingChoice(deskripsi);
+      
+      setPenilaianData(prev => ({
+        ...prev!,
+        kriteria_data: {
+          ...prev!.kriteria_data,
+          peringkat_ekspor: {
+            ...prev!.kriteria_data.peringkat_ekspor,
+            pilihan,
+            nilai
+          }
+        }
+      }));
+    }
+  }, [penilaianData?.kriteria_data.peringkat_ekspor.deskripsi]);
+
+  // Auto-calculate IK values when input values change
   useEffect(() => {
     if (!penilaianData) return;
 
@@ -153,40 +284,98 @@ const RiskAssessmentInputPage: React.FC = () => {
 
     if (totalIk > 0) {
       const percentage = (ikTidakTercapai / totalIk) * 100;
-      handleInputChange('persentase_ik', 'persentase', percentage);
+      const { pilihan, nilai } = calculateIKChoice(percentage);
+      
+      setPenilaianData(prev => ({
+        ...prev!,
+        kriteria_data: {
+          ...prev!.kriteria_data,
+          persentase_ik: {
+            ...prev!.kriteria_data.persentase_ik,
+            persentase: percentage,
+            pilihan,
+            nilai
+          }
+        }
+      }));
     }
   }, [penilaianData?.kriteria_data.persentase_ik.ik_tidak_tercapai, penilaianData?.kriteria_data.persentase_ik.total_ik]);
 
-
-  const calculateTotalRisk = async () => {
+  // Auto-calculate TEI values when input values change
+  useEffect(() => {
     if (!penilaianData) return;
 
-    try {
-      setIsSaving(true);
-      const updateData = {
-        kriteria_data: penilaianData.kriteria_data,
-        catatan: penilaianData.catatan,
-        auto_calculate: true
-      };
+    const realisasiTei = penilaianData.kriteria_data.realisasi_tei;
+    const nilaiRealisasi = realisasiTei.nilai_realisasi || 0;
+    const nilaiPotensi = realisasiTei.nilai_potensi || 0;
 
-      const response = await penilaianRisikoService.updatePenilaianRisiko(penilaianData.id, updateData);
-      setPenilaianData(response);
+    let percentage = 0;
+    let isZeroDivision = false;
 
-      toast({
-        title: 'Berhasil',
-        description: 'Nilai risiko berhasil dihitung',
-        variant: 'default'
-      });
-    } catch (error) {
-      console.error('Error calculating risk:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal menghitung nilai risiko',
-        variant: 'destructive'
-      });
-    } finally {
-      setIsSaving(false);
+    if (nilaiPotensi > 0) {
+      percentage = (nilaiRealisasi / nilaiPotensi) * 100;
+    } else if (nilaiRealisasi === 0 && nilaiPotensi === 0) {
+      isZeroDivision = true;
     }
+
+    const { pilihan, nilai } = calculateTEIChoice(percentage, isZeroDivision);
+
+    setPenilaianData(prev => ({
+      ...prev!,
+      kriteria_data: {
+        ...prev!.kriteria_data,
+        realisasi_tei: {
+          ...prev!.kriteria_data.realisasi_tei,
+          deskripsi: percentage,
+          pilihan,
+          nilai
+        }
+      }
+    }));
+  }, [penilaianData?.kriteria_data.realisasi_tei.nilai_realisasi, penilaianData?.kriteria_data.realisasi_tei.nilai_potensi]);
+
+  // Auto-calculate total risk when any nilai changes
+  useEffect(() => {
+    if (!penilaianData) return;
+
+    const kriteria = penilaianData.kriteria_data;
+    const totalRisk = calculateTotalRisk(
+      kriteria.tren_capaian.nilai || 0,
+      kriteria.realisasi_anggaran.nilai || 0,
+      kriteria.tren_ekspor.nilai || 0,
+      kriteria.audit_itjen.nilai || 0,
+      kriteria.perjanjian_perdagangan.nilai || 0,
+      kriteria.peringkat_ekspor.nilai || 0,
+      kriteria.persentase_ik.nilai || 0,
+      kriteria.realisasi_tei.nilai || 0
+    );
+
+    setPenilaianData(prev => ({
+      ...prev!,
+      total_nilai_risiko: totalRisk
+    }));
+  }, [
+    penilaianData?.kriteria_data.tren_capaian.nilai,
+    penilaianData?.kriteria_data.realisasi_anggaran.nilai,
+    penilaianData?.kriteria_data.tren_ekspor.nilai,
+    penilaianData?.kriteria_data.audit_itjen.nilai,
+    penilaianData?.kriteria_data.perjanjian_perdagangan.nilai,
+    penilaianData?.kriteria_data.peringkat_ekspor.nilai,
+    penilaianData?.kriteria_data.persentase_ik.nilai,
+    penilaianData?.kriteria_data.realisasi_tei.nilai
+  ]);
+
+
+  const triggerCalculation = () => {
+    // Force re-calculation by updating a state that triggers all useEffects
+    // This will recalculate all values based on current inputs
+    if (!penilaianData) return;
+    
+    toast({
+      title: 'Berhasil',
+      description: 'Nilai risiko berhasil dihitung ulang',
+      variant: 'default'
+    });
   };
 
   const handleSave = async () => {
@@ -397,6 +586,15 @@ const RiskAssessmentInputPage: React.FC = () => {
                 </SelectContent>
               </Select>
             </div>
+            <div>
+              <Label>Nilai</Label>
+              <Input
+                type="number"
+                value={penilaianData.kriteria_data.audit_itjen.nilai || ''}
+                disabled
+                className="bg-muted"
+              />
+            </div>
           </CardContent>
         </Card>
 
@@ -428,6 +626,15 @@ const RiskAssessmentInputPage: React.FC = () => {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div>
+              <Label>Nilai</Label>
+              <Input
+                type="number"
+                value={penilaianData.kriteria_data.perjanjian_perdagangan.nilai || ''}
+                disabled
+                className="bg-muted"
+              />
             </div>
           </CardContent>
         </Card>
@@ -515,6 +722,33 @@ const RiskAssessmentInputPage: React.FC = () => {
                 />
               </div>
             </div>
+            <div>
+              <Label>Deskripsi (%) - Otomatis</Label>
+              <Input
+                type="number"
+                step="0.1"
+                value={penilaianData.kriteria_data.realisasi_tei.deskripsi || ''}
+                disabled
+                className="bg-muted"
+              />
+            </div>
+            <div>
+              <Label>Pilihan Kategori - Otomatis</Label>
+              <Input
+                value={penilaianData.kriteria_data.realisasi_tei.pilihan || 'Belum dihitung'}
+                disabled
+                className="bg-muted"
+              />
+            </div>
+            <div>
+              <Label>Nilai</Label>
+              <Input
+                type="number"
+                value={penilaianData.kriteria_data.realisasi_tei.nilai || ''}
+                disabled
+                className="bg-muted"
+              />
+            </div>
           </CardContent>
         </Card>
 
@@ -530,18 +764,19 @@ const RiskAssessmentInputPage: React.FC = () => {
             <Button
               type="button"
               variant="outline"
-              onClick={calculateTotalRisk}
+              onClick={triggerCalculation}
             >
               <Calculator className="mr-2 h-4 w-4" />
-              Hitung Total Nilai Risiko
+              Hitung Ulang Nilai Risiko
             </Button>
             <div className="flex items-center gap-2">
               <Label>Total Nilai Risiko:</Label>
               <Input
                 type="number"
-                value={penilaianData.total_nilai_risiko || ''}
+                step="0.01"
+                value={penilaianData.total_nilai_risiko ? Number(penilaianData.total_nilai_risiko).toFixed(2) : ''}
                 disabled
-                className="w-24 bg-muted font-bold"
+                className="w-32 bg-muted font-bold text-center"
               />
             </div>
           </div>
