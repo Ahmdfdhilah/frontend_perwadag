@@ -43,7 +43,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
-  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string }>>([]);
+  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
 
   useEffect(() => {
     if (item && open) {
@@ -56,7 +56,8 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
       if (item.has_file && item.file_metadata) {
         setExistingFiles([{
           name: item.file_metadata.original_filename || item.file_metadata.filename || 'Kuesioner',
-          url: item.file_urls?.download_url
+          url: item.file_urls?.download_url,
+          viewUrl: item.file_urls?.file_url
         }]);
       } else {
         setExistingFiles([]);

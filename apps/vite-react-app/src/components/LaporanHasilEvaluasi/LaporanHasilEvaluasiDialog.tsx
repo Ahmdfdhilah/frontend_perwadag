@@ -44,7 +44,7 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
-  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string }>>([]);
+  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
 
   useEffect(() => {
     if (item && open) {
@@ -58,7 +58,8 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
       if (item.has_file && item.file_metadata) {
         setExistingFiles([{
           name: item.file_metadata.original_filename || item.file_metadata.filename || 'Laporan Hasil Evaluasi',
-          url: item.file_urls?.download_url
+          url: item.file_urls?.download_url,
+          viewUrl: item.file_urls?.file_url
         }]);
       } else {
         setExistingFiles([]);

@@ -44,7 +44,7 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   const [selectedExitDate, setSelectedExitDate] = useState<Date>();
   const [isExitDatePickerOpen, setIsExitDatePickerOpen] = useState(false);
   const [meetingFiles, setMeetingFiles] = useState<File[]>([]);
-  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string }>>([]);
+  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
 
   useEffect(() => {
     if (item && open) {
@@ -58,7 +58,8 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
       // Set existing files for display
       setExistingFiles(item.files_info?.files ? item.files_info.files.map((file, index) => ({ 
         name: file.original_filename || `Bukti Hadir ${index + 1}`, 
-        url: file.download_url 
+        url: file.download_url,
+        viewUrl: file.file_url
       })) : []);
     } else {
       setFormData({
@@ -167,7 +168,7 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
                   </Popover>
                 ) : (
                   <div className="p-3 bg-muted rounded-md">
-                    {item ? formatIndonesianDate(item.tanggal_meeting) : '-'}
+                    {item?.tanggal_meeting ? formatIndonesianDate(item.tanggal_meeting) : '-'}
                   </div>
                 )}
               </div>

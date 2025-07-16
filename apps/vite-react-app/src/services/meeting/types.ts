@@ -24,6 +24,7 @@ export interface MeetingFile {
   uploaded_at: string;
   uploaded_by?: string;
   download_url: string;
+  file_url?: string;
   view_url?: string;
   is_viewable: boolean;
 }

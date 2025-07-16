@@ -44,7 +44,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
   const [selectedEntryDate, setSelectedEntryDate] = useState<Date>();
   const [isEntryDatePickerOpen, setIsEntryDatePickerOpen] = useState(false);
   const [meetingFiles, setMeetingFiles] = useState<File[]>([]);
-  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string }>>([]);
+  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
 
   useEffect(() => {
     if (item && open) {
@@ -58,7 +58,8 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
       // Set existing files for display
       setExistingFiles(item.files_info?.files ? item.files_info.files.map((file, index) => ({ 
         name: file.original_filename || `Bukti Hadir ${index + 1}`, 
-        url: file.download_url 
+        url: file.download_url,
+        viewUrl: file.file_url
       })) : []);
     } else {
       setFormData({});

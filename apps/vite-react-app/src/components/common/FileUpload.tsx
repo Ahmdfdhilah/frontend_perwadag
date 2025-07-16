@@ -17,6 +17,7 @@ export interface FileUploadProps {
   existingFiles?: Array<{
     name: string;
     url?: string;
+    viewUrl?: string;
     size?: number;
   }>;
   mode?: 'input' | 'view' | 'edit';
@@ -29,7 +30,8 @@ export interface FileUploadProps {
   onFilesChange?: (files: File[]) => void;
   onFileRemove?: (index: number) => void;
   onExistingFileRemove?: (index: number) => void;
-  onFileDownload?: (file: { name: string; url?: string }, index: number) => void;
+  onFileDownload?: (file: { name: string; url?: string; viewUrl?: string }, index: number) => void;
+  onFileView?: (file: { name: string; url?: string; viewUrl?: string }, index: number) => void;
   onError?: (error: string) => void;
 }
 
@@ -54,6 +56,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   onFileRemove,
   onExistingFileRemove,
   onFileDownload,
+  onFileView,
   onError,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
@@ -167,7 +170,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
     onExistingFileRemove?.(index);
   };
 
-  const handleDownloadFile = (file: { name: string; url?: string }, index: number) => {
+  const handleDownloadFile = (file: { name: string; url?: string; viewUrl?: string }, index: number) => {
     if (file.url) {
       const link = document.createElement('a');
       link.href = file.url;
@@ -175,6 +178,14 @@ const FileUpload: React.FC<FileUploadProps> = ({
       link.click();
     }
     onFileDownload?.(file, index);
+  };
+
+  const handleViewFile = (file: { name: string; url?: string; viewUrl?: string }, index: number) => {
+    const viewUrl = file.viewUrl || file.url;
+    if (viewUrl) {
+      window.open(viewUrl, '_blank');
+    }
+    onFileView?.(file, index);
   };
 
   const triggerFileInput = () => {
@@ -291,12 +302,24 @@ const FileUpload: React.FC<FileUploadProps> = ({
           </div>
         </div>
         <div className="flex items-center space-x-2 flex-shrink-0 sm:ml-auto">
+          {(file.viewUrl || file.url) && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => handleViewFile(file, index)}
+              className="h-8 w-8 p-0"
+              title="View file"
+            >
+              <Eye className="w-4 h-4" />
+            </Button>
+          )}
           {file.url && (
             <Button
               size="sm"
               variant="ghost"
               onClick={() => handleDownloadFile(file, index)}
               className="h-8 w-8 p-0"
+              title="Download file"
             >
               <Download className="w-4 h-4" />
             </Button>
@@ -307,6 +330,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
               variant="ghost"
               onClick={() => handleRemoveExistingFile(index)}
               className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
+              title="Remove file"
             >
               <X className="w-4 h-4" />
             </Button>
