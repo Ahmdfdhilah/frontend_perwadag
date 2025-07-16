@@ -28,8 +28,6 @@ const userSchema = z.object({
     required_error: 'Please select a role',
   }),
   inspektorat: z.string().optional(),
-  wilayah: z.string().optional(),
-  perwadag_id: z.string().optional(),
 });
 
 type UserFormData = z.infer<typeof userSchema>;
@@ -50,9 +48,6 @@ export const UserForm: React.FC<UserFormProps> = ({
   loading = false,
   disabled = false,
 }) => {
-  const [showPerwadagSelect, setShowPerwadagSelect] = useState(
-    initialData?.role === 'PERWADAG' || false
-  );
   const [showInspektoratSelect, setShowInspektoratSelect] = useState(
     initialData?.role === 'INSPEKTORAT' || false
   );
@@ -64,20 +59,14 @@ export const UserForm: React.FC<UserFormProps> = ({
       email: initialData?.email || '',
       role: initialData?.role || 'PERWADAG',
       inspektorat: initialData?.inspektorat || '',
-      wilayah: initialData?.wilayah || '',
-      perwadag_id: initialData?.perwadag_id || '',
     }
   });
 
   useEffect(() => {
     const role = form.watch('role');
     
-    setShowPerwadagSelect(role === 'PERWADAG');
     setShowInspektoratSelect(role === 'INSPEKTORAT');
     
-    if (role !== 'PERWADAG') {
-      form.setValue('perwadag_id', '');
-    }
     if (role !== 'INSPEKTORAT') {
       form.setValue('inspektorat', '');
     }
@@ -123,19 +112,6 @@ export const UserForm: React.FC<UserFormProps> = ({
           />
         </div>
 
-        <FormField
-          control={form.control}
-          name="wilayah"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Wilayah</FormLabel>
-              <FormControl>
-                <Input placeholder="Masukkan wilayah" disabled={loading || disabled} {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         {/* Role Selection */}
         <FormField
@@ -161,26 +137,6 @@ export const UserForm: React.FC<UserFormProps> = ({
           )}
         />
 
-        {/* Perwadag Assignment */}
-        {showPerwadagSelect && (
-          <FormField
-            control={form.control}
-            name="perwadag_id"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>ID Perwadag</FormLabel>
-                <FormControl>
-                  <Input 
-                    placeholder="Masukkan ID perwadag" 
-                    disabled={loading || disabled} 
-                    {...field} 
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        )}
 
         {/* Inspektorat Selection */}
         {showInspektoratSelect && (

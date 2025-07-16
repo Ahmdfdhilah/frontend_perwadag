@@ -59,8 +59,8 @@ export const UserTable: React.FC<UserTableProps> = ({
             <TableHead>User</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Role</TableHead>
-            <TableHead>Wilayah</TableHead>
-            <TableHead>Inspektorat/Perwadag</TableHead>
+            <TableHead>Tempat Lahir</TableHead>
+            <TableHead>Inspektorat</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -101,11 +101,11 @@ export const UserTable: React.FC<UserTableProps> = ({
                   {getRoleBadge(user.role)}
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">{user.wilayah || '-'}</span>
+                  <span className="text-sm">{user.tempat_lahir || '-'}</span>
                 </TableCell>
                 <TableCell>
                   <span className="text-sm">
-                    {user.inspektorat || user.perwadag_id || '-'}
+                    {user.inspektorat || '-'}
                   </span>
                 </TableCell>
                 <TableCell>

@@ -62,7 +62,7 @@ const UsersPage: React.FC = () => {
         page: currentPage,
         size: itemsPerPage,
         search: searchQuery || undefined,
-        role: selectedRole !== 'all' ? selectedRole : undefined,
+        role: selectedRole !== 'all' ? selectedRole as 'ADMIN' | 'INSPEKTORAT' | 'PERWADAG' : undefined,
         is_active: selectedStatus !== 'all' ? selectedStatus === 'active' : undefined,
       };
 

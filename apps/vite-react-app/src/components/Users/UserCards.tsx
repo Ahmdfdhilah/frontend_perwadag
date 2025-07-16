@@ -109,11 +109,11 @@ export const UserCards: React.FC<UserCardsProps> = ({
               </div>
             )}
 
-            {/* Wilayah */}
-            {user.wilayah && (
+            {/* Tempat Lahir */}
+            {user.tempat_lahir && (
               <div className="flex items-start space-x-2 text-sm text-muted-foreground mb-2">
                 <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span className="line-clamp-2">{user.wilayah}</span>
+                <span className="line-clamp-2">{user.tempat_lahir}</span>
               </div>
             )}
 
@@ -122,14 +122,6 @@ export const UserCards: React.FC<UserCardsProps> = ({
               <div className="flex items-start space-x-2 text-sm text-muted-foreground mb-2">
                 <Building className="w-4 h-4 mt-0.5 flex-shrink-0" />
                 <span className="line-clamp-2">Inspektorat: {user.inspektorat}</span>
-              </div>
-            )}
-
-            {/* Perwadag ID */}
-            {user.perwadag_id && (
-              <div className="flex items-start space-x-2 text-sm text-muted-foreground mb-2">
-                <Building className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span className="line-clamp-2">Perwadag ID: {user.perwadag_id}</span>
               </div>
             )}
 

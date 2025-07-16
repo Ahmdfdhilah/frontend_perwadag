@@ -41,8 +41,6 @@ export const UserDialog: React.FC<UserDialogProps> = ({
         email: data.email || undefined,
         role: data.role,
         inspektorat: data.inspektorat || undefined,
-        wilayah: data.wilayah || undefined,
-        perwadag_id: data.perwadag_id || undefined,
       };
 
       onSave(transformedData);
