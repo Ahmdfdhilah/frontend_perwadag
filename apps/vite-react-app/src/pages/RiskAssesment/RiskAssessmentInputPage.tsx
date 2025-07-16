@@ -58,10 +58,10 @@ const RiskAssessmentInputPage: React.FC = () => {
 
       try {
         setIsLoading(true);
-        
+
         const penilaianResponse = await penilaianRisikoService.getPenilaianRisikoById(id);
         setPenilaianData(penilaianResponse);
-        
+
         // Initialize formatted values
         const kriteria = penilaianResponse.kriteria_data;
         setFormattedValues({
@@ -90,7 +90,7 @@ const RiskAssessmentInputPage: React.FC = () => {
 
   const handleInputChange = (section: keyof KriteriaData, field: string, value: any) => {
     if (!penilaianData) return;
-    
+
     setPenilaianData(prev => ({
       ...prev!,
       kriteria_data: {
@@ -116,11 +116,11 @@ const RiskAssessmentInputPage: React.FC = () => {
   // Auto-calculate trend percentage when input values change
   useEffect(() => {
     if (!penilaianData) return;
-    
+
     const trenCapaian = penilaianData.kriteria_data.tren_capaian;
     const capaian1 = trenCapaian.capaian_tahun_1 || 0;
     const capaian2 = trenCapaian.capaian_tahun_2 || 0;
-    
+
     if (capaian1 > 0) {
       const percentage = ((capaian2 - capaian1) / capaian1) * 100;
       handleInputChange('tren_capaian', 'tren', percentage);
@@ -131,11 +131,11 @@ const RiskAssessmentInputPage: React.FC = () => {
   // Auto-calculate budget percentage when input values change
   useEffect(() => {
     if (!penilaianData) return;
-    
+
     const realisasiAnggaran = penilaianData.kriteria_data.realisasi_anggaran;
     const realisasi = realisasiAnggaran.realisasi || 0;
     const pagu = realisasiAnggaran.pagu || 0;
-    
+
     if (pagu > 0) {
       const percentage = (realisasi / pagu) * 100;
       handleInputChange('realisasi_anggaran', 'persentase', percentage);
@@ -146,11 +146,11 @@ const RiskAssessmentInputPage: React.FC = () => {
   // Auto-calculate IK percentage when input values change
   useEffect(() => {
     if (!penilaianData) return;
-    
+
     const persentaseIk = penilaianData.kriteria_data.persentase_ik;
     const ikTidakTercapai = persentaseIk.ik_tidak_tercapai || 0;
     const totalIk = persentaseIk.total_ik || 0;
-    
+
     if (totalIk > 0) {
       const percentage = (ikTidakTercapai / totalIk) * 100;
       handleInputChange('persentase_ik', 'persentase', percentage);
@@ -160,7 +160,7 @@ const RiskAssessmentInputPage: React.FC = () => {
 
   const calculateTotalRisk = async () => {
     if (!penilaianData) return;
-    
+
     try {
       setIsSaving(true);
       const updateData = {
@@ -168,10 +168,10 @@ const RiskAssessmentInputPage: React.FC = () => {
         catatan: penilaianData.catatan,
         auto_calculate: true
       };
-      
+
       const response = await penilaianRisikoService.updatePenilaianRisiko(penilaianData.id, updateData);
       setPenilaianData(response);
-      
+
       toast({
         title: 'Berhasil',
         description: 'Nilai risiko berhasil dihitung',
@@ -191,7 +191,7 @@ const RiskAssessmentInputPage: React.FC = () => {
 
   const handleSave = async () => {
     if (!penilaianData) return;
-    
+
     setIsSaving(true);
     try {
       const updateData = {
@@ -199,16 +199,15 @@ const RiskAssessmentInputPage: React.FC = () => {
         catatan: penilaianData.catatan,
         auto_calculate: true
       };
-      
+
       const response = await penilaianRisikoService.updatePenilaianRisiko(penilaianData.id, updateData);
       setPenilaianData(response);
-      
+
       toast({
         title: 'Berhasil',
         description: 'Data penilaian risiko berhasil disimpan',
         variant: 'default'
       });
-      navigate('/penilaian-resiko');
     } catch (error) {
       console.error('Error saving assessment:', error);
       toast({
