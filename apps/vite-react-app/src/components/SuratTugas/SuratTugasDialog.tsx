@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@workspace/ui/components/select';
+import { Combobox } from '@workspace/ui/components/combobox';
 import { Calendar } from '@workspace/ui/components/calendar';
 import {
   Popover,
@@ -25,18 +26,18 @@ import {
 import { CalendarIcon } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { SuratTugas } from '@/mocks/suratTugas';
-import { Perwadag } from '@/mocks/perwadag';
+import { SuratTugasResponse } from '@/services/suratTugas/types';
+import { PerwadagSummary } from '@/services/users/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import FileUpload from '@/components/common/FileUpload';
 
 interface SuratTugasDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  editingItem: SuratTugas | null;
+  editingItem: SuratTugasResponse | null;
   mode?: 'view' | 'edit' | 'create';
-  onSave: (data: Partial<SuratTugas>) => void;
-  availablePerwadag: Perwadag[];
+  onSave: (data: any) => void;
+  availablePerwadag: PerwadagSummary[];
 }
 
 const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
@@ -49,75 +50,63 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
 }) => {
   const { canEditForm } = useFormPermissions();
   const [formData, setFormData] = useState({
-    nomor: '',
-    perwadagId: '',
-    tanggalPelaksanaanEvaluasi: undefined as Date | undefined,
-    tanggalSelesaiEvaluasi: undefined as Date | undefined,
-    pengendaliMutu: '',
-    pengendaliTeknis: '',
-    ketuaTim: '',
-    fileName: '',
-    fileUrl: '',
+    no_surat: '',
+    user_perwadag_id: '',
+    tanggal_evaluasi_mulai: undefined as Date | undefined,
+    tanggal_evaluasi_selesai: undefined as Date | undefined,
+    nama_pengedali_mutu: '',
+    nama_pengendali_teknis: '',
+    nama_ketua_tim: '',
   });
 
   const [isStartCalendarOpen, setIsStartCalendarOpen] = useState(false);
   const [isEndCalendarOpen, setIsEndCalendarOpen] = useState(false);
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string }>>([]);
+  const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
 
   useEffect(() => {
     if (editingItem) {
       setFormData({
-        nomor: editingItem.nomor,
-        perwadagId: editingItem.perwadagId,
-        tanggalPelaksanaanEvaluasi: new Date(editingItem.tanggalPelaksanaanEvaluasi),
-        tanggalSelesaiEvaluasi: editingItem.tanggalSelesaiEvaluasi ? new Date(editingItem.tanggalSelesaiEvaluasi) : undefined,
-        pengendaliMutu: editingItem.pengendaliMutu,
-        pengendaliTeknis: editingItem.pengendaliTeknis,
-        ketuaTim: editingItem.ketuaTim,
-        fileName: editingItem.fileName || '',
-        fileUrl: editingItem.fileUrl || '',
+        no_surat: editingItem.no_surat,
+        user_perwadag_id: editingItem.user_perwadag_id,
+        tanggal_evaluasi_mulai: new Date(editingItem.tanggal_evaluasi_mulai),
+        tanggal_evaluasi_selesai: editingItem.tanggal_evaluasi_selesai ? new Date(editingItem.tanggal_evaluasi_selesai) : undefined,
+        nama_pengedali_mutu: editingItem.nama_pengedali_mutu,
+        nama_pengendali_teknis: editingItem.nama_pengendali_teknis,
+        nama_ketua_tim: editingItem.nama_ketua_tim,
       });
       
       // Set existing files for display
-      setExistingFiles(editingItem.fileName ? [{ name: editingItem.fileName, url: editingItem.fileUrl }] : []);
+      setExistingFiles(editingItem.file_surat_tugas ? [{ name: 'Surat Tugas', url: editingItem.file_surat_tugas_url }] : []);
     } else {
       setFormData({
-        nomor: '',
-        perwadagId: '',
-        tanggalPelaksanaanEvaluasi: undefined,
-        tanggalSelesaiEvaluasi: undefined,
-        pengendaliMutu: '',
-        pengendaliTeknis: '',
-        ketuaTim: '',
-        fileName: '',
-        fileUrl: '',
+        no_surat: '',
+        user_perwadag_id: '',
+        tanggal_evaluasi_mulai: undefined,
+        tanggal_evaluasi_selesai: undefined,
+        nama_pengedali_mutu: '',
+        nama_pengendali_teknis: '',
+        nama_ketua_tim: '',
       });
       setUploadFiles([]);
       setExistingFiles([]);
     }
+    // Reset search when dialog opens/closes
+    setPerwadagSearchValue('');
   }, [editingItem, open]);
 
   const handleSave = () => {
-    if (!formData.nomor || !formData.perwadagId || !formData.tanggalPelaksanaanEvaluasi) {
+    if (!formData.no_surat || !formData.user_perwadag_id || !formData.tanggal_evaluasi_mulai) {
       return;
     }
 
-    const selectedPerwadag = availablePerwadag.find(p => p.id === formData.perwadagId);
-
-    const saveData: Partial<SuratTugas> = {
+    const saveData = {
       ...formData,
-      tanggalPelaksanaanEvaluasi: formData.tanggalPelaksanaanEvaluasi.toISOString().split('T')[0],
-      tanggalSelesaiEvaluasi: formData.tanggalSelesaiEvaluasi?.toISOString().split('T')[0],
-      perwadagName: selectedPerwadag?.name || '',
-      year: formData.tanggalPelaksanaanEvaluasi.getFullYear(),
-      inspektorat: selectedPerwadag?.inspektorat || 1,
-      uploadFiles,
+      tanggal_evaluasi_mulai: formData.tanggal_evaluasi_mulai.toISOString().split('T')[0],
+      tanggal_evaluasi_selesai: formData.tanggal_evaluasi_selesai?.toISOString().split('T')[0],
+      file: uploadFiles.length > 0 ? uploadFiles[0] : undefined,
     };
-
-    if (editingItem) {
-      saveData.id = editingItem.id;
-    }
 
     onSave(saveData);
   };
@@ -134,8 +123,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
     setExistingFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const isFormValid = formData.nomor && formData.perwadagId && formData.tanggalPelaksanaanEvaluasi &&
-    formData.pengendaliMutu && formData.pengendaliTeknis && formData.ketuaTim;
+  const isFormValid = formData.no_surat && formData.user_perwadag_id && formData.tanggal_evaluasi_mulai &&
+    formData.nama_pengedali_mutu && formData.nama_pengendali_teknis && formData.nama_ketua_tim;
   const isEditable = mode !== 'view';
   const canEdit = canEditForm('surat_tugas') && isEditable;
 
@@ -151,11 +140,11 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
         <div className="flex-1 overflow-y-auto py-4">
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="nomor">Nomor Surat Tugas *</Label>
+              <Label htmlFor="no_surat">Nomor Surat Tugas *</Label>
               <Input
-                id="nomor"
-                value={formData.nomor}
-                onChange={(e) => setFormData(prev => ({ ...prev, nomor: e.target.value }))}
+                id="no_surat"
+                value={formData.no_surat}
+                onChange={(e) => setFormData(prev => ({ ...prev, no_surat: e.target.value }))}
                 placeholder="Contoh: ST/001/I/2024"
                 disabled={!canEdit}
               />
@@ -163,22 +152,27 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
 
             <div className="space-y-2">
               <Label htmlFor="perwadag">Perwadag *</Label>
-              <Select
-                value={formData.perwadagId}
-                onValueChange={(value) => setFormData(prev => ({ ...prev, perwadagId: value }))}
+              <Combobox
+                options={availablePerwadag
+                  .filter(perwadag => 
+                    perwadagSearchValue === '' || 
+                    perwadag.nama.toLowerCase().includes(perwadagSearchValue.toLowerCase()) ||
+                    perwadag.inspektorat?.toLowerCase().includes(perwadagSearchValue.toLowerCase())
+                  )
+                  .map(perwadag => ({
+                    value: perwadag.id,
+                    label: perwadag.nama,
+                    description: perwadag.inspektorat || ''
+                  }))}
+                value={formData.user_perwadag_id}
+                onChange={(value) => setFormData(prev => ({ ...prev, user_perwadag_id: value.toString() }))}
+                placeholder="Pilih perwadag"
+                searchPlaceholder="Cari perwadag..."
+                searchValue={perwadagSearchValue}
+                onSearchChange={setPerwadagSearchValue}
+                emptyMessage="Tidak ada perwadag yang ditemukan"
                 disabled={!canEdit}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih perwadag" />
-                </SelectTrigger>
-                <SelectContent>
-                  {availablePerwadag.map((perwadag) => (
-                    <SelectItem key={perwadag.id} value={perwadag.id}>
-                      {perwadag.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              />
             </div>
 
             <div className="grid grid-cols-1 gap-4">
@@ -192,8 +186,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                       disabled={!canEdit}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {formData.tanggalPelaksanaanEvaluasi ? (
-                        format(formData.tanggalPelaksanaanEvaluasi, 'dd MMM yyyy', { locale: id })
+                      {formData.tanggal_evaluasi_mulai ? (
+                        format(formData.tanggal_evaluasi_mulai, 'dd MMM yyyy', { locale: id })
                       ) : (
                         <span>Pilih tanggal mulai</span>
                       )}
@@ -202,9 +196,9 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={formData.tanggalPelaksanaanEvaluasi}
+                      selected={formData.tanggal_evaluasi_mulai}
                       onSelect={(date) => {
-                        setFormData(prev => ({ ...prev, tanggalPelaksanaanEvaluasi: date }));
+                        setFormData(prev => ({ ...prev, tanggal_evaluasi_mulai: date }));
                         setIsStartCalendarOpen(false);
                       }}
                       initialFocus
@@ -223,8 +217,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                       disabled={!canEdit}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {formData.tanggalSelesaiEvaluasi ? (
-                        format(formData.tanggalSelesaiEvaluasi, 'dd MMM yyyy', { locale: id })
+                      {formData.tanggal_evaluasi_selesai ? (
+                        format(formData.tanggal_evaluasi_selesai, 'dd MMM yyyy', { locale: id })
                       ) : (
                         <span>Pilih tanggal selesai</span>
                       )}
@@ -233,14 +227,14 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                   <PopoverContent className="w-auto p-0" align="start">
                     <Calendar
                       mode="single"
-                      selected={formData.tanggalSelesaiEvaluasi}
+                      selected={formData.tanggal_evaluasi_selesai}
                       onSelect={(date) => {
-                        setFormData(prev => ({ ...prev, tanggalSelesaiEvaluasi: date }));
+                        setFormData(prev => ({ ...prev, tanggal_evaluasi_selesai: date }));
                         setIsEndCalendarOpen(false);
                       }}
                       disabled={(date) => {
-                        if (!formData.tanggalPelaksanaanEvaluasi) return false;
-                        return date < formData.tanggalPelaksanaanEvaluasi;
+                        if (!formData.tanggal_evaluasi_mulai) return false;
+                        return date < formData.tanggal_evaluasi_mulai;
                       }}
                       initialFocus
                     />
@@ -250,33 +244,33 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="pengendaliMutu">Nama Pengendali Mutu *</Label>
+              <Label htmlFor="nama_pengedali_mutu">Nama Pengendali Mutu *</Label>
               <Input
-                id="pengendaliMutu"
-                value={formData.pengendaliMutu}
-                onChange={(e) => setFormData(prev => ({ ...prev, pengendaliMutu: e.target.value }))}
+                id="nama_pengedali_mutu"
+                value={formData.nama_pengedali_mutu}
+                onChange={(e) => setFormData(prev => ({ ...prev, nama_pengedali_mutu: e.target.value }))}
                 placeholder="Contoh: Dr. Ahmad Sutanto"
                 disabled={!canEdit}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="pengendaliTeknis">Nama Pengendali Teknis *</Label>
+              <Label htmlFor="nama_pengendali_teknis">Nama Pengendali Teknis *</Label>
               <Input
-                id="pengendaliTeknis"
-                value={formData.pengendaliTeknis}
-                onChange={(e) => setFormData(prev => ({ ...prev, pengendaliTeknis: e.target.value }))}
+                id="nama_pengendali_teknis"
+                value={formData.nama_pengendali_teknis}
+                onChange={(e) => setFormData(prev => ({ ...prev, nama_pengendali_teknis: e.target.value }))}
                 placeholder="Contoh: Ir. Budi Setiawan"
                 disabled={!canEdit}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="ketuaTim">Nama Ketua Tim *</Label>
+              <Label htmlFor="nama_ketua_tim">Nama Ketua Tim *</Label>
               <Input
-                id="ketuaTim"
-                value={formData.ketuaTim}
-                onChange={(e) => setFormData(prev => ({ ...prev, ketuaTim: e.target.value }))}
+                id="nama_ketua_tim"
+                value={formData.nama_ketua_tim}
+                onChange={(e) => setFormData(prev => ({ ...prev, nama_ketua_tim: e.target.value }))}
                 placeholder="Contoh: Drs. Chandra Kusuma"
                 disabled={!canEdit}
               />

@@ -12,6 +12,9 @@ import {
   UsernameGenerationPreview,
   UsernameGenerationResponse,
   MessageResponse,
+  PerwadagSummary,
+  PerwadagListResponse,
+  PerwadagSearchParams,
 } from "./types";
 
 class UserService extends BaseService {
@@ -110,6 +113,23 @@ class UserService extends BaseService {
     userId: string
   ): Promise<MessageResponse> {
     return this.delete(`/${userId}`);
+  }
+
+  // Perwadag search methods
+  async getPerwadagList(
+    params?: PerwadagSearchParams
+  ): Promise<PerwadagListResponse> {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          queryParams.append(key, value.toString());
+        }
+      });
+    }
+    
+    const endpoint = queryParams.toString() ? `/perwadag?${queryParams.toString()}` : "/perwadag";
+    return this.get(endpoint);
   }
 }
 

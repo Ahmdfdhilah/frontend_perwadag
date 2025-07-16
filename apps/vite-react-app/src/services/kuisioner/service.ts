@@ -9,7 +9,7 @@ import {
 
 class KuisionerService extends BaseService {
   constructor() {
-    super("/kuisioner");
+    super("/evaluasi/kuisioner");
   }
 
   // Get all kuisioner with filters

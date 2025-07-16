@@ -9,7 +9,7 @@ import {
 
 class MatriksService extends BaseService {
   constructor() {
-    super("/matriks");
+    super("/evaluasi/matriks");
   }
 
   // Get all matriks with filters

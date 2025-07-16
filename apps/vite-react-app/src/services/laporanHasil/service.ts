@@ -9,7 +9,7 @@ import {
 
 class LaporanHasilService extends BaseService {
   constructor() {
-    super("/laporan-hasil");
+    super("/evaluasi/laporan-hasil");
   }
 
   // Get all laporan hasil with filters

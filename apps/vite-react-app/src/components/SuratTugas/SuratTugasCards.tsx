@@ -1,24 +1,34 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { SuratTugas } from '@/mocks/suratTugas';
+import { SuratTugasResponse } from '@/services/suratTugas/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface SuratTugasCardsProps {
-  data: SuratTugas[];
-  onView?: (item: SuratTugas) => void;
-  onEdit?: (item: SuratTugas) => void;
-  onDelete?: (item: SuratTugas) => void;
+  data: SuratTugasResponse[];
+  loading?: boolean;
+  onView?: (item: SuratTugasResponse) => void;
+  onEdit?: (item: SuratTugasResponse) => void;
+  onDelete?: (item: SuratTugasResponse) => void;
   isPerwadag?: boolean;
 }
 
 const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
   data,
+  loading = false,
   onView,
   onEdit,
   onDelete,
   isPerwadag = false,
 }) => {
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-32 text-muted-foreground">
+        Loading surat tugas...
+      </div>
+    );
+  }
 
   if (data.length === 0) {
     return (
@@ -35,7 +45,7 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
           <CardHeader className="pb-3">
             <div className="flex justify-between items-start">
               <CardTitle className="text-lg font-semibold">
-                {item.perwadagName}
+                {item.nama_perwadag}
               </CardTitle>
               <ActionDropdown
                 onView={() => onView?.(item)}
@@ -56,28 +66,28 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
                 </div>
                 <div>
                   <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
-                  <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
+                  <span className="ml-2">{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</span>
                 </div>
               </div>
               
               <div>
                 <span className="font-medium text-muted-foreground">No Surat:</span>
-                <span className="ml-2">{item.nomor}</span>
+                <span className="ml-2">{item.no_surat}</span>
               </div>
               
               <div>
                 <span className="font-medium text-muted-foreground">Pengendali Mutu:</span>
-                <span className="ml-2">{item.pengendaliMutu}</span>
+                <span className="ml-2">{item.nama_pengedali_mutu}</span>
               </div>
               
               <div>
                 <span className="font-medium text-muted-foreground">Pengendali Teknis:</span>
-                <span className="ml-2">{item.pengendaliTeknis}</span>
+                <span className="ml-2">{item.nama_pengendali_teknis}</span>
               </div>
               
               <div>
                 <span className="font-medium text-muted-foreground">Ketua Tim:</span>
-                <span className="ml-2">{item.ketuaTim}</span>
+                <span className="ml-2">{item.nama_ketua_tim}</span>
               </div>
             </div>
           </CardContent>

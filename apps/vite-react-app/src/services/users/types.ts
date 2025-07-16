@@ -37,6 +37,15 @@ export interface UserSummary {
   is_active: boolean;
 }
 
+export interface PerwadagSummary {
+  id: string;
+  nama: string;
+  pangkat: string;
+  jabatan: string;
+  inspektorat?: string;
+  is_active: boolean;
+}
+
 // Request Types
 export interface UserCreate {
   nama: string; // 1-200 chars
@@ -47,7 +56,7 @@ export interface UserCreate {
   email?: string; // valid email
   is_active?: boolean; // default: true
   role: "ADMIN" | "INSPEKTORAT" | "PERWADAG";
-  inspektorat?: string; // required for perwadag, inspectorat role
+  inspektorat: string; // required for PERWADAG and INSPEKTORAT roles
 }
 
 export interface UserUpdate {
@@ -85,6 +94,8 @@ export interface UsernameGenerationResponse {
 
 export interface UserListResponse extends PaginatedResponse<User> {};
 
+export interface PerwadagListResponse extends PaginatedResponse<PerwadagSummary> {};
+
 export interface UserStatistics {
   total_users: number;
   active_users: number;
@@ -107,6 +118,14 @@ export interface UserFilterParams {
   is_active?: boolean;
   min_age?: number; // 17-70
   max_age?: number; // 17-70
+}
+
+export interface PerwadagSearchParams {
+  page?: number; // default: 1
+  size?: number; // default: 20, max: 100
+  search?: string; // Search in nama, pangkat, jabatan, inspektorat
+  inspektorat?: string;
+  is_active?: boolean;
 }
 
 

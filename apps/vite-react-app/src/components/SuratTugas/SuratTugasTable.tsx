@@ -8,19 +8,21 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { SuratTugas } from '@/mocks/suratTugas';
+import { SuratTugasResponse } from '@/services/suratTugas/types';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface SuratTugasTableProps {
-  data: SuratTugas[];
-  onView?: (item: SuratTugas) => void;
-  onEdit?: (item: SuratTugas) => void;
-  onDelete?: (item: SuratTugas) => void;
+  data: SuratTugasResponse[];
+  loading?: boolean;
+  onView?: (item: SuratTugasResponse) => void;
+  onEdit?: (item: SuratTugasResponse) => void;
+  onDelete?: (item: SuratTugasResponse) => void;
   isPerwadag?: boolean;
 }
 
 const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
   data,
+  loading = false,
   onView,
   onEdit,
   onDelete,
@@ -43,7 +45,13 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.length === 0 ? (
+          {loading ? (
+            <TableRow>
+              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                Loading surat tugas...
+              </TableCell>
+            </TableRow>
+          ) : data.length === 0 ? (
             <TableRow>
               <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                 Tidak ada data surat tugas
@@ -53,12 +61,12 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{item.perwadagName}</TableCell>
-                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
-                <TableCell>{item.nomor}</TableCell>
-                <TableCell>{item.pengendaliMutu}</TableCell>
-                <TableCell>{item.pengendaliTeknis}</TableCell>
-                <TableCell>{item.ketuaTim}</TableCell>
+                <TableCell>{item.nama_perwadag}</TableCell>
+                <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
+                <TableCell>{item.no_surat}</TableCell>
+                <TableCell>{item.nama_pengedali_mutu}</TableCell>
+                <TableCell>{item.nama_pengendali_teknis}</TableCell>
+                <TableCell>{item.nama_ketua_tim}</TableCell>
                 <TableCell>
                   <ActionDropdown
                     onView={() => onView?.(item)}

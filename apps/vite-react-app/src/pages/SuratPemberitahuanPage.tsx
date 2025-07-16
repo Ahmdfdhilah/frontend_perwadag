@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useRole } from '@/hooks/useRole';
 import Filtering from '@/components/common/Filtering';
-import SearchContainer from '@/components/common/SearchContainer';
 import Pagination from '@/components/common/Pagination';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import {
@@ -28,7 +27,6 @@ import SuratPemberitahuanDialog from '@/components/SuratPemberitahuan/SuratPembe
 
 const SuratPemberitahuanPage: React.FC = () => {
   const { isAdmin, isInspektorat, isPerwadag } = useRole();
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [selectedInspektorat, setSelectedInspektorat] = useState<string>('all');
   const [selectedPerwadag, setSelectedPerwadag] = useState<string>('all');
@@ -72,13 +70,6 @@ const SuratPemberitahuanPage: React.FC = () => {
   const filteredData = useMemo(() => {
     let filtered = [...SURAT_PEMBERITAHUAN_DATA];
 
-    // Filter by search query
-    if (searchQuery) {
-      filtered = filtered.filter(item =>
-        item.perwadagName.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
     // Filter by year
     if (selectedYear !== 'all') {
       filtered = filtered.filter(item => item.year === parseInt(selectedYear));
@@ -109,7 +100,7 @@ const SuratPemberitahuanPage: React.FC = () => {
     filtered.sort((a, b) => new Date(b.tanggalSuratPemberitahuan).getTime() - new Date(a.tanggalSuratPemberitahuan).getTime());
 
     return filtered;
-  }, [searchQuery, selectedYear, selectedInspektorat, selectedPerwadag, isAdmin, isInspektorat, isPerwadag]);
+  }, [selectedYear, selectedInspektorat, selectedPerwadag, isAdmin, isInspektorat, isPerwadag]);
 
   // Pagination
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -158,26 +149,26 @@ const SuratPemberitahuanPage: React.FC = () => {
   const getCompositeTitle = () => {
     let title = "Daftar Surat Pemberitahuan";
     const filters = [];
-    
+
     if (isInspektorat()) {
       filters.push("Inspektorat I");
     } else if (isAdmin() && selectedInspektorat !== 'all') {
       filters.push(`Inspektorat ${selectedInspektorat}`);
     }
-    
+
     if (selectedYear !== 'all') {
       filters.push(selectedYear);
     }
-    
+
     if (selectedPerwadag !== 'all') {
       const perwadag = PERWADAG_DATA.find(p => p.id === selectedPerwadag);
       if (perwadag) filters.push(perwadag.name);
     }
-    
+
     if (filters.length > 0) {
       title += " - " + filters.join(" - ");
     }
-    
+
     return title;
   };
 
@@ -253,12 +244,6 @@ const SuratPemberitahuanPage: React.FC = () => {
             <ListHeaderComposite
               title={getCompositeTitle()}
               subtitle="Kelola data surat pemberitahuan audit berdasarkan filter yang dipilih"
-            />
-
-            <SearchContainer
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              placeholder="Cari nama perwadag..."
             />
 
             {/* Desktop Table */}

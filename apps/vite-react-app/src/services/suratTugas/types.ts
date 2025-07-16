@@ -102,7 +102,7 @@ export interface SuratTugasCreateResponse {
   };
 }
 
-export interface SuratTugasListResponse extends PaginatedResponse<SuratTugasResponse> {}
+export interface SuratTugasListResponse extends PaginatedResponse<SuratTugasResponse> { }
 
 export interface SuratTugasDashboardSummary {
   total_surat_tugas: number;
@@ -124,8 +124,6 @@ export interface SuratTugasFilterParams {
   search?: string;
   inspektorat?: string;
   user_perwadag_id?: string;
-  evaluation_status?: string;
-  is_evaluation_active?: boolean;
   tahun_evaluasi?: number;
   tanggal_mulai_from?: string;
   tanggal_mulai_to?: string;

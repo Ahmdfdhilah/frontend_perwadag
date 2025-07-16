@@ -9,7 +9,7 @@ import {
 
 class SuratPemberitahuanService extends BaseService {
   constructor() {
-    super("/surat-pemberitahuan");
+    super("/evaluasi/surat-pemberitahuan");
   }
 
   // Get all surat pemberitahuan with filters

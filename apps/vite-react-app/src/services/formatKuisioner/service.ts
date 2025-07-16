@@ -13,7 +13,7 @@ import {
 
 class FormatKuisionerService extends BaseService {
   constructor() {
-    super("/format-kuisioner");
+    super("/evaluasi/format-kuisioner");
   }
 
   // Create format kuisioner template

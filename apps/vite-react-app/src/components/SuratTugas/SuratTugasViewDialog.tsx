@@ -12,12 +12,12 @@ import { Label } from '@workspace/ui/components/label';
 import { Download, File } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { SuratTugas } from '@/mocks/suratTugas';
+import { SuratTugasResponse } from '@/services/suratTugas/types';
 
 interface SuratTugasViewDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  item: SuratTugas | null;
+  item: SuratTugasResponse | null;
 }
 
 const SuratTugasViewDialog: React.FC<SuratTugasViewDialogProps> = ({
@@ -26,10 +26,10 @@ const SuratTugasViewDialog: React.FC<SuratTugasViewDialogProps> = ({
   item,
 }) => {
   const handleDownloadFile = () => {
-    if (item?.fileUrl && item?.fileName) {
+    if (item?.file_surat_tugas_url) {
       const link = document.createElement('a');
-      link.href = item.fileUrl;
-      link.download = item.fileName;
+      link.href = item.file_surat_tugas_url;
+      link.download = item.file_surat_tugas || 'surat-tugas.pdf';
       link.click();
     }
   };
@@ -50,7 +50,7 @@ const SuratTugasViewDialog: React.FC<SuratTugasViewDialogProps> = ({
             <div className="space-y-2">
               <Label>Nomor Surat Tugas</Label>
               <Input
-                value={item?.nomor || ''}
+                value={item?.no_surat || ''}
                 disabled
                 className="bg-muted"
               />
@@ -59,7 +59,7 @@ const SuratTugasViewDialog: React.FC<SuratTugasViewDialogProps> = ({
             <div className="space-y-2">
               <Label>Nama Perwadag</Label>
               <Input
-                value={item?.perwadagName || ''}
+                value={item?.nama_perwadag || ''}
                 disabled
                 className="bg-muted"
               />
@@ -69,7 +69,7 @@ const SuratTugasViewDialog: React.FC<SuratTugasViewDialogProps> = ({
               <div className="space-y-2">
                 <Label>Tanggal Mulai Evaluasi</Label>
                 <Input
-                  value={item ? format(new Date(item.tanggalPelaksanaanEvaluasi), 'dd MMMM yyyy', { locale: id }) : ''}
+                  value={item ? format(new Date(item.tanggal_evaluasi_mulai), 'dd MMMM yyyy', { locale: id }) : ''}
                   disabled
                   className="bg-muted"
                 />
@@ -78,7 +78,7 @@ const SuratTugasViewDialog: React.FC<SuratTugasViewDialogProps> = ({
               <div className="space-y-2">
                 <Label>Tanggal Selesai Evaluasi</Label>
                 <Input
-                  value={item?.tanggalSelesaiEvaluasi ? format(new Date(item.tanggalSelesaiEvaluasi), 'dd MMMM yyyy', { locale: id }) : 'Belum ditentukan'}
+                  value={item?.tanggal_evaluasi_selesai ? format(new Date(item.tanggal_evaluasi_selesai), 'dd MMMM yyyy', { locale: id }) : 'Belum ditentukan'}
                   disabled
                   className="bg-muted"
                 />
@@ -88,7 +88,7 @@ const SuratTugasViewDialog: React.FC<SuratTugasViewDialogProps> = ({
             <div className="space-y-2">
               <Label>Nama Pengendali Mutu</Label>
               <Input
-                value={item?.pengendaliMutu || ''}
+                value={item?.nama_pengedali_mutu || ''}
                 disabled
                 className="bg-muted"
               />
@@ -97,7 +97,7 @@ const SuratTugasViewDialog: React.FC<SuratTugasViewDialogProps> = ({
             <div className="space-y-2">
               <Label>Nama Pengendali Teknis</Label>
               <Input
-                value={item?.pengendaliTeknis || ''}
+                value={item?.nama_pengendali_teknis || ''}
                 disabled
                 className="bg-muted"
               />
@@ -106,7 +106,7 @@ const SuratTugasViewDialog: React.FC<SuratTugasViewDialogProps> = ({
             <div className="space-y-2">
               <Label>Nama Ketua Tim</Label>
               <Input
-                value={item?.ketuaTim || ''}
+                value={item?.nama_ketua_tim || ''}
                 disabled
                 className="bg-muted"
               />
@@ -123,11 +123,11 @@ const SuratTugasViewDialog: React.FC<SuratTugasViewDialogProps> = ({
               <Label>File Surat Tugas</Label>
               <div className="flex gap-2">
                 <Input
-                  value={item?.fileName || 'Tidak ada file'}
+                  value={item?.file_surat_tugas || 'Tidak ada file'}
                   disabled
                   className="bg-muted flex-1"
                 />
-                {item?.fileName && (
+                {item?.file_surat_tugas && (
                   <Button
                     variant="outline"
                     size="icon"
@@ -138,10 +138,10 @@ const SuratTugasViewDialog: React.FC<SuratTugasViewDialogProps> = ({
                   </Button>
                 )}
               </div>
-              {item?.fileName && (
+              {item?.file_surat_tugas && (
                 <div className="text-sm text-muted-foreground flex items-center gap-1">
                   <File className="w-3 h-3" />
-                  File: {item.fileName}
+                  File: {item.file_surat_tugas}
                 </div>
               )}
             </div>
@@ -152,7 +152,7 @@ const SuratTugasViewDialog: React.FC<SuratTugasViewDialogProps> = ({
           <Button variant="outline" onClick={handleCancel}>
             Tutup
           </Button>
-          {item?.fileName && (
+          {item?.file_surat_tugas && (
             <Button onClick={handleDownloadFile}>
               <Download className="w-4 h-4 mr-2" />
               Download File

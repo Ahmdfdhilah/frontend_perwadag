@@ -19,6 +19,7 @@ All endpoints are prefixed with the base URL configured in your environment.
 | GET | `/statistics` | None | Dict | Admin | Get user statistics |
 | POST | `/preview-username` | `UsernameGenerationPreview` | `UsernameGenerationResponse` | Admin | Preview username generation |
 | POST | `/` | `UserCreate` | `UserResponse` | Admin | Create new user |
+| GET | `/perwadag` | `PerwadagSearchParams` | `PerwadagListResponse` | JWT | Search perwadag users |
 | GET | `/{user_id}` | None | `UserResponse` | JWT + Access Control | Get user by ID |
 | PUT | `/{user_id}` | `UserUpdate` | `UserResponse` | Admin | Update user |
 | POST | `/{user_id}/reset-password` | None | `MessageResponse` | Admin | Reset user password |
@@ -30,6 +31,7 @@ All endpoints are prefixed with the base URL configured in your environment.
 - Role-based user management (ADMIN, INSPEKTORAT, PERWADAG)
 - Auto-generated usernames based on nama and tanggal_lahir
 - Comprehensive filtering and search capabilities
+- Dedicated perwadag search endpoint with pagination
 - Profile self-management
 - Password management with default password system
 - User statistics and analytics
@@ -47,7 +49,7 @@ All endpoints are prefixed with the base URL configured in your environment.
   "email": "string? (valid email)",
   "is_active": "bool (default: true)",
   "role": "enum (ADMIN/INSPEKTORAT/PERWADAG)",
-  "inspektorat": "string? (required for PERWADAG role)"
+  "inspektorat": "string? (required for PERWADAG and INSPEKTORAT roles)"
 }
 ```
 
@@ -144,6 +146,27 @@ All endpoints are prefixed with the base URL configured in your environment.
 }
 ```
 
+#### **PerwadagSummary**
+```json
+{
+  "id": "string",
+  "nama": "string",
+  "inspektorat": "string",
+  "is_active": "bool"
+}
+```
+
+#### **PerwadagListResponse**
+```json
+{
+  "items": ["PerwadagSummary"],
+  "total": "int",
+  "page": "int",
+  "size": "int",
+  "pages": "int"
+}
+```
+
 #### **UserFilterParams** (Query Parameters)
 - **page**: Page number (default: 1)
 - **size**: Items per page (default: 20, max: 100)
@@ -158,11 +181,19 @@ All endpoints are prefixed with the base URL configured in your environment.
 - **min_age**: Minimum age filter (17-70)
 - **max_age**: Maximum age filter (17-70)
 
+#### **PerwadagSearchParams** (Query Parameters)
+- **search**: Search term for nama perwadag or inspektorat
+- **inspektorat**: Filter by specific inspektorat
+- **is_active**: Filter by active status (default: true)
+- **page**: Page number (default: 1)
+- **size**: Items per page (default: 50, max: 100)
+
 ### Access Control Rules:
 - **Personal Profile** (`/me`): All authenticated users can view/update their own profile
 - **View User by ID**: Users can view their own profile; Admin/Inspektorat can view any user
 - **User Management**: Admin-only for create, update, activate, deactivate, delete, reset password
 - **User Listing**: Admin and Inspektorat can list users
+- **Perwadag Search**: All authenticated users can search perwadag users
 - **Statistics**: Admin-only
 
 ### Username Generation Rules:
@@ -1056,7 +1087,7 @@ All users are created with default password: `@Kemendag123`
 
 ## Common Response Patterns
 
-### Success Response:
+### Success Response (MessageResponse):
 ```json
 {
   "success": true,
@@ -1068,7 +1099,8 @@ All users are created with default password: `@Kemendag123`
 ### Error Response:
 ```json
 {
-  "detail": "Error message describing what went wrong"
+  "detail": "Error message describing what went wrong",
+  "error_code": "string?"
 }
 ```
 

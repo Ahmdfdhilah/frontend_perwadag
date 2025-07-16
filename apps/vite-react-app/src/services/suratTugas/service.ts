@@ -14,7 +14,7 @@ import {
 
 class SuratTugasService extends BaseService {
   constructor() {
-    super("/surat-tugas");
+    super("/evaluasi/surat-tugas");
   }
 
   // Create surat tugas
