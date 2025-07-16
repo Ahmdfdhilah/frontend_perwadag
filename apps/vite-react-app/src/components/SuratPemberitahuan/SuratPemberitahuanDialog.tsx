@@ -18,15 +18,17 @@ import {
 import { CalendarIcon, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { SuratPemberitahuan } from '@/mocks/suratPemberitahuan';
+import { SuratPemberitahuanResponse } from '@/services/suratPemberitahuan/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
+import { cn } from '@workspace/ui/lib/utils';
 import FileUpload from '@/components/common/FileUpload';
 
 interface SuratPemberitahuanDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  item: SuratPemberitahuan | null;
-  onSave?: (data: Partial<SuratPemberitahuan>) => void;
+  item: SuratPemberitahuanResponse | null;
+  onSave?: (data: any) => void;
   mode: 'view' | 'edit';
 }
 
@@ -38,85 +40,57 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
   mode,
 }) => {
   const { canEditForm } = useFormPermissions();
-  const [formData, setFormData] = useState({
-    tanggalEvaluasi: undefined as Date | undefined,
-    tanggalSuratPemberitahuan: undefined as Date | undefined,
-    fileName: '',
-    fileUrl: '',
-  });
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-
-  const [isSuratCalendarOpen, setIsSuratCalendarOpen] = useState(false);
+  const [formData, setFormData] = useState<any>({});
+  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
 
   useEffect(() => {
-    if (item) {
+    if (item && open) {
       setFormData({
-        tanggalEvaluasi: item.tanggalEvaluasi ? new Date(item.tanggalEvaluasi) : undefined,
-        tanggalSuratPemberitahuan: item.tanggalSuratPemberitahuan ? new Date(item.tanggalSuratPemberitahuan) : undefined,
-        fileName: item.fileName || '',
-        fileUrl: item.fileUrl || '',
+        tanggal_surat_pemberitahuan: item.tanggal_surat_pemberitahuan,
       });
+      setSelectedDate(item.tanggal_surat_pemberitahuan ? new Date(item.tanggal_surat_pemberitahuan) : undefined);
     } else {
       setFormData({
-        tanggalEvaluasi: undefined,
-        tanggalSuratPemberitahuan: undefined,
-        fileName: '',
-        fileUrl: '',
+        tanggal_surat_pemberitahuan: '',
       });
+      setSelectedDate(undefined);
+      setUploadFile(null);
     }
   }, [item, open]);
 
   const handleSave = () => {
-    if (!formData.tanggalEvaluasi || !formData.tanggalSuratPemberitahuan || !item) {
-      return;
-    }
-
-    const saveData: Partial<SuratPemberitahuan> = {
-      id: item.id,
-      tanggalEvaluasi: formData.tanggalEvaluasi.toISOString().split('T')[0],
-      tanggalSuratPemberitahuan: formData.tanggalSuratPemberitahuan.toISOString().split('T')[0],
-      fileName: formData.fileName,
-      fileUrl: formData.fileUrl,
-      year: formData.tanggalEvaluasi.getFullYear(),
+    const dataToSave = {
+      tanggal_surat_pemberitahuan: selectedDate ? selectedDate.toISOString().split('T')[0] : formData.tanggal_surat_pemberitahuan,
+      file: uploadFile,
     };
-
-    onSave?.(saveData);
+    onSave?.(dataToSave);
   };
 
   const handleCancel = () => {
     onOpenChange(false);
   };
 
-  const handleFilesChange = (files: File[]) => {
-    setUploadedFiles(files);
-    if (files.length > 0) {
-      const file = files[0];
-      const fileUrl = URL.createObjectURL(file);
-      const fileName = file.name;
-      setFormData({
-        ...formData,
-        fileName,
-        fileUrl,
-      });
-    } else {
-      setFormData({
-        ...formData,
-        fileName: '',
-        fileUrl: '',
-      });
-    }
+  const handleUploadFileChange = (files: File[]) => {
+    setUploadFile(files[0] || null);
   };
 
   const handleDownloadFile = () => {
-    if (formData.fileUrl && formData.fileName) {
+    if (item?.file_urls?.download_url) {
       const link = document.createElement('a');
-      link.href = formData.fileUrl;
-      link.download = formData.fileName;
+      link.href = item.file_urls.download_url;
+      link.download = item.file_metadata?.original_filename || 'surat-pemberitahuan';
       link.click();
     }
   };
 
-  const isFormValid = formData.tanggalEvaluasi && formData.tanggalSuratPemberitahuan && formData.fileName;
+  const handleViewFile = () => {
+    if (item?.file_urls?.view_url) {
+      window.open(item.file_urls.view_url, '_blank');
+    }
+  };
+
   const isEditable = mode === 'edit';
   const canEdit = canEditForm('surat_pemberitahuan') && isEditable;
 
@@ -131,102 +105,146 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
 
         <div className="flex-1 overflow-y-auto py-4">
           <div className="space-y-6">
+            {/* Basic Info - Read Only */}
+            <div className="grid grid-cols-1 gap-4">
+              <div className="space-y-2">
+                <Label>Nama Perwadag</Label>
+                <div className="p-3 bg-muted rounded-md">
+                  {item?.nama_perwadag}
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-2">
-              <Label>Nama Perwadag</Label>
-              <Input
-                value={item?.perwadagName || ''}
-                disabled
-                className="bg-muted"
-              />
-            </div>
-
-            <div>
-              <div className="space-y-2">
-                <Label>Tanggal Surat {canEdit && '*'}</Label>
-                {canEdit ? (
-                  <Popover open={isSuratCalendarOpen} onOpenChange={setIsSuratCalendarOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-left font-normal"
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {formData.tanggalSuratPemberitahuan ? (
-                          format(formData.tanggalSuratPemberitahuan, 'dd MMM yyyy', { locale: id })
-                        ) : (
-                          <span>Pilih tanggal</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={formData.tanggalSuratPemberitahuan}
-                        onSelect={(date) => {
-                          setFormData(prev => ({ ...prev, tanggalSuratPemberitahuan: date }));
-                          setIsSuratCalendarOpen(false);
-                        }}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                ) : (
-                  <Input
-                    value={item?.tanggalSuratPemberitahuan ? format(new Date(item.tanggalSuratPemberitahuan), 'dd MMM yyyy', { locale: id }) : 'Tidak ada data'}
-                    disabled
-                    className="bg-muted"
-                  />
-                )}
+              <Label>Periode Evaluasi</Label>
+              <div className="p-3 bg-muted rounded-md">
+                {item ? formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai) : '-'}
               </div>
             </div>
 
-            {!canEdit && (
+            <div className="space-y-2">
+              <Label htmlFor="tanggal_surat_pemberitahuan">Tanggal Surat Pemberitahuan</Label>
+              {canEdit ? (
+                <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !selectedDate && "text-muted-foreground"
+                      )}
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {selectedDate ? (
+                        format(selectedDate, "dd MMMM yyyy", { locale: id })
+                      ) : (
+                        <span>Pilih tanggal</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={(date) => {
+                        setSelectedDate(date);
+                        setIsDatePickerOpen(false);
+                      }}
+                      initialFocus
+                      locale={id}
+                    />
+                  </PopoverContent>
+                </Popover>
+              ) : (
+                <div className="p-3 bg-muted rounded-md">
+                  {item?.tanggal_surat_pemberitahuan ? format(new Date(item.tanggal_surat_pemberitahuan), "dd MMMM yyyy", { locale: id }) : '-'}
+                </div>
+              )}
+            </div>
+
+            {/* Current File Display */}
+            {item?.has_file && (
               <div className="space-y-2">
-                <Label>Informasi Surat Pemberitahuan</Label>
-                <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
-                  Klik tombol "Download" di bawah untuk mengunduh surat pemberitahuan.
+                <Label>File Surat Pemberitahuan Saat Ini</Label>
+                <div className="p-3 bg-muted rounded-md">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">{item.file_metadata?.original_filename || 'Surat Pemberitahuan'}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {item.file_metadata?.size_mb ? `${item.file_metadata.size_mb.toFixed(2)} MB` : ''}
+                        {item.file_metadata?.uploaded_at ? ` • Uploaded ${format(new Date(item.file_metadata.uploaded_at), 'dd MMM yyyy')}` : ''}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      {item.file_urls?.view_url && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleViewFile}
+                        >
+                          View
+                        </Button>
+                      )}
+                      {item.file_urls?.download_url && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={handleDownloadFile}
+                        >
+                          <Download className="w-4 h-4 mr-1" />
+                          Download
+                        </Button>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
 
+            {/* File Upload */}
             {canEdit && (
-              <div className="space-y-2">
-                <Label>Informasi Upload Surat Pemberitahuan</Label>
-                <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
-                  Silakan upload file surat pemberitahuan. File yang didukung: PDF, DOC, DOCX.
-                </div>
-              </div>
+              <FileUpload
+                label="Upload File Surat Pemberitahuan (Optional)"
+                accept=".pdf,.doc,.docx"
+                multiple={false}
+                maxSize={10 * 1024 * 1024} // 10MB
+                files={uploadFile ? [uploadFile] : []}
+                mode="edit"
+                onFilesChange={handleUploadFileChange}
+                description="Format yang didukung: PDF, DOC, DOCX (Max 10MB)"
+              />
             )}
 
-            <FileUpload
-              label={`File Surat Pemberitahuan ${canEdit ? '*' : ''}`}
-              accept=".pdf,.doc,.docx"
-              maxSize={10 * 1024 * 1024}
-              multiple={false}
-              mode={canEdit ? 'edit' : 'view'}
-              disabled={!canEdit}
-              files={uploadedFiles}
-              existingFiles={formData.fileName ? [{ name: formData.fileName, url: formData.fileUrl }] : []}
-              onFilesChange={handleFilesChange}
-              onFileDownload={handleDownloadFile}
-              description="Format yang didukung: PDF, DOC, DOCX (Max 10MB)"
-            />
+            {/* Status Information */}
+            <div className="space-y-2">
+              <Label>Status Kelengkapan</Label>
+              <div className="p-3 bg-muted rounded-md">
+                <div className="flex items-center gap-2">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    item?.is_completed
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {item?.is_completed ? 'Lengkap' : 'Belum Lengkap'}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    ({item?.completion_percentage || 0}% lengkap)
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
           <Button variant="outline" onClick={handleCancel}>
-{canEdit ? 'Batal' : 'Tutup'}
+            {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
           {canEdit && (
-            <Button onClick={handleSave} disabled={!isFormValid}>
+            <Button onClick={handleSave}>
               Simpan
-            </Button>
-          )}
-          {!canEdit && formData.fileName && (
-            <Button onClick={handleDownloadFile}>
-              <Download className="w-4 h-4 mr-2" />
-              Download File
             </Button>
           )}
         </DialogFooter>

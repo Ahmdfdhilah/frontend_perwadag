@@ -1,5 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRole } from '@/hooks/useRole';
+import { useURLFilters } from '@/hooks/useURLFilters';
+import { useToast } from '@workspace/ui/components/sonner';
 import Filtering from '@/components/common/Filtering';
 import Pagination from '@/components/common/Pagination';
 import { Card, CardContent } from '@workspace/ui/components/card';
@@ -12,32 +14,236 @@ import {
 } from '@workspace/ui/components/select';
 import { Combobox } from '@workspace/ui/components/combobox';
 import { Label } from '@workspace/ui/components/label';
-import {
-  SURAT_PEMBERITAHUAN_DATA,
-  YEARS_SURAT_PEMBERITAHUAN,
-  SuratPemberitahuan
-} from '@/mocks/suratPemberitahuan';
-import { PERWADAG_DATA } from '@/mocks/perwadag';
-import { INSPEKTORATS } from '@/mocks/riskAssessment';
+import { SuratPemberitahuanResponse, SuratPemberitahuanFilterParams } from '@/services/suratPemberitahuan/types';
+import { suratPemberitahuanService } from '@/services/suratPemberitahuan';
+import { userService } from '@/services/users';
+import { PerwadagSummary, PerwadagSearchParams } from '@/services/users/types';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
+import SearchContainer from '@/components/common/SearchContainer';
 import SuratPemberitahuanTable from '@/components/SuratPemberitahuan/SuratPemberitahuanTable';
 import SuratPemberitahuanCards from '@/components/SuratPemberitahuan/SuratPemberitahuanCards';
 import SuratPemberitahuanDialog from '@/components/SuratPemberitahuan/SuratPemberitahuanDialog';
 
-const SuratPemberitahuanPage: React.FC = () => {
-  const { isAdmin, isInspektorat, isPerwadag } = useRole();
-  const [selectedYear, setSelectedYear] = useState<string>('all');
-  const [selectedInspektorat, setSelectedInspektorat] = useState<string>('all');
-  const [selectedPerwadag, setSelectedPerwadag] = useState<string>('all');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<SuratPemberitahuan | null>(null);
-  const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
+interface SuratPemberitahuanPageFilters {
+  search: string;
+  inspektorat: string;
+  user_perwadag_id: string;
+  tahun_evaluasi: string;
+  page: number;
+  size: number;
+  [key: string]: string | number;
+}
 
-  // Check access - admin, inspektorat, and perwadag can access this page
-  if (!isAdmin() && !isInspektorat() && !isPerwadag()) {
+const SuratPemberitahuanPage: React.FC = () => {
+  const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
+  const { toast } = useToast();
+
+  // URL Filters configuration
+  const { updateURL, getCurrentFilters } = useURLFilters<SuratPemberitahuanPageFilters>({
+    defaults: {
+      search: '',
+      inspektorat: 'all',
+      user_perwadag_id: 'all',
+      tahun_evaluasi: 'all',
+      page: 1,
+      size: 10,
+    },
+    cleanDefaults: true,
+  });
+
+  // Get current filters from URL
+  const filters = getCurrentFilters();
+
+  const [suratPemberitahuan, setSuratPemberitahuan] = useState<SuratPemberitahuanResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [totalItems, setTotalItems] = useState(0);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<SuratPemberitahuanResponse | null>(null);
+  const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
+  const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
+  const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
+
+  // Calculate access control
+  const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
+
+  // Fetch surat pemberitahuan function
+  const fetchSuratPemberitahuan = async () => {
+    setLoading(true);
+    try {
+      const params: SuratPemberitahuanFilterParams = {
+        page: filters.page,
+        size: filters.size,
+        search: filters.search || undefined,
+        inspektorat: filters.inspektorat !== 'all' ? filters.inspektorat : undefined,
+        user_perwadag_id: filters.user_perwadag_id !== 'all' ? filters.user_perwadag_id : undefined,
+        tahun_evaluasi: filters.tahun_evaluasi !== 'all' ? parseInt(filters.tahun_evaluasi) : undefined,
+      };
+
+      // Auto-apply role-based filtering
+      if (isInspektorat() && user?.inspektorat && !params.inspektorat) {
+        params.inspektorat = user.inspektorat;
+      } else if (isPerwadag() && user?.id && !params.user_perwadag_id) {
+        params.user_perwadag_id = user.id;
+      }
+
+      const response = await suratPemberitahuanService.getSuratPemberitahuanList(params);
+      setSuratPemberitahuan(response.items);
+      setTotalItems(response.total);
+    } catch (error) {
+      console.error('Failed to fetch surat pemberitahuan:', error);
+      toast({
+        title: 'Error',
+        description: 'Gagal memuat data surat pemberitahuan. Silakan coba lagi.',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch available perwadag
+  const fetchAvailablePerwadag = async () => {
+    try {
+      const params: PerwadagSearchParams = {};
+
+      // If current user is inspektorat, filter by their inspektorat
+      if (isInspektorat() && user?.inspektorat) {
+        params.inspektorat = user.inspektorat;
+      }
+
+      const response = await userService.getPerwadagList(params);
+      setAvailablePerwadag(response.items || []);
+    } catch (error) {
+      console.error('Failed to fetch perwadag list:', error);
+    }
+  };
+
+  // Effect to fetch data when filters change
+  useEffect(() => {
+    if (hasAccess) {
+      fetchSuratPemberitahuan();
+      fetchAvailablePerwadag();
+    }
+  }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, hasAccess]);
+
+  // Pagination
+  const totalPages = Math.ceil(totalItems / filters.size);
+
+  const handleView = (item: SuratPemberitahuanResponse) => {
+    setSelectedItem(item);
+    setDialogMode('view');
+    setIsDialogOpen(true);
+  };
+
+  const handleEdit = (item: SuratPemberitahuanResponse) => {
+    setSelectedItem(item);
+    setDialogMode('edit');
+    setIsDialogOpen(true);
+  };
+
+  const handleSave = async (data: any) => {
+    if (!selectedItem) return;
+
+    try {
+      const updateData = {
+        tanggal_surat_pemberitahuan: data.tanggal_surat_pemberitahuan || undefined,
+      };
+
+      await suratPemberitahuanService.updateSuratPemberitahuan(selectedItem.id, updateData);
+
+      // Handle file upload if any
+      if (data.file) {
+        await suratPemberitahuanService.uploadFile(selectedItem.id, data.file);
+      }
+
+      setIsDialogOpen(false);
+      setSelectedItem(null);
+      fetchSuratPemberitahuan(); // Refresh the list
+
+      toast({
+        title: 'Berhasil diperbarui',
+        description: `Data surat pemberitahuan ${selectedItem.nama_perwadag} telah diperbarui.`,
+        variant: 'default'
+      });
+    } catch (error) {
+      console.error('Failed to save surat pemberitahuan:', error);
+      toast({
+        title: 'Error',
+        description: 'Gagal menyimpan data surat pemberitahuan. Silakan coba lagi.',
+        variant: 'destructive'
+      });
+    }
+  };
+
+  // Check if user can edit this item based on role
+  const canEdit = (item: SuratPemberitahuanResponse) => {
+    if (isAdmin()) return true;
+    if (isInspektorat()) {
+      // Check if user can edit this surat pemberitahuan based on inspektorat
+      return user?.inspektorat === item.inspektorat;
+    }
+    if (isPerwadag()) {
+      // Check if user can edit their own surat pemberitahuan
+      return user?.id === item.surat_tugas_info?.nama_perwadag;
+    }
+    return false;
+  };
+
+  // Filter handlers
+  const handleSearchChange = (search: string) => {
+    updateURL({ search, page: 1 });
+  };
+
+  const handleInspektoratChange = (inspektorat: string) => {
+    updateURL({ inspektorat, page: 1 });
+  };
+
+  const handlePerwadagChange = (user_perwadag_id: string) => {
+    updateURL({ user_perwadag_id, page: 1 });
+  };
+
+  const handleTahunEvaluasiChange = (tahun_evaluasi: string) => {
+    updateURL({ tahun_evaluasi, page: 1 });
+  };
+
+  const handlePageChange = (page: number) => {
+    updateURL({ page });
+  };
+
+  const handleItemsPerPageChange = (value: string) => {
+    updateURL({ size: parseInt(value), page: 1 });
+  };
+
+  // Generate composite title
+  const getCompositeTitle = () => {
+    let title = "Daftar Surat Pemberitahuan";
+    const activeFilters = [];
+
+    if (filters.inspektorat !== 'all') {
+      activeFilters.push(`Inspektorat ${filters.inspektorat}`);
+    }
+
+    if (filters.tahun_evaluasi !== 'all') {
+      activeFilters.push(`Tahun ${filters.tahun_evaluasi}`);
+    }
+
+    if (filters.user_perwadag_id !== 'all') {
+      const selectedPerwadag = availablePerwadag.find(p => p.id === filters.user_perwadag_id);
+      if (selectedPerwadag) {
+        activeFilters.push(`Perwadag ${selectedPerwadag.nama}`);
+      }
+    }
+
+    if (activeFilters.length > 0) {
+      title += " - " + activeFilters.join(" - ");
+    }
+
+    return title;
+  };
+
+  // Check access after all hooks have been called
+  if (!hasAccess) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
@@ -48,128 +254,6 @@ const SuratPemberitahuanPage: React.FC = () => {
         </div>
       </div>
     );
-  }
-
-  // Get available perwadag based on role
-  const availablePerwadag = useMemo(() => {
-    if (isAdmin()) {
-      return PERWADAG_DATA;
-    }
-    if (isInspektorat()) {
-      // For demo, assume inspektorat 1
-      return PERWADAG_DATA.filter(p => p.inspektorat === 1);
-    }
-    if (isPerwadag()) {
-      // For demo, assume current user is PWD001
-      return PERWADAG_DATA.filter(p => p.id === 'PWD001');
-    }
-    return [];
-  }, [isAdmin, isInspektorat, isPerwadag]);
-
-  // Filter and sort data
-  const filteredData = useMemo(() => {
-    let filtered = [...SURAT_PEMBERITAHUAN_DATA];
-
-    // Filter by year
-    if (selectedYear !== 'all') {
-      filtered = filtered.filter(item => item.year === parseInt(selectedYear));
-    }
-
-    // Filter by inspektorat (only for admin)
-    if (isAdmin() && selectedInspektorat !== 'all') {
-      filtered = filtered.filter(item => item.inspektorat === parseInt(selectedInspektorat));
-    }
-
-    // Filter by perwadag
-    if (selectedPerwadag !== 'all') {
-      filtered = filtered.filter(item => item.perwadagId === selectedPerwadag);
-    }
-
-    // Role-based filtering
-    if (isInspektorat()) {
-      // For demo, show inspektorat 1 data
-      filtered = filtered.filter(item => item.inspektorat === 1);
-    }
-
-    if (isPerwadag()) {
-      // For demo, show only PWD001 data
-      filtered = filtered.filter(item => item.perwadagId === 'PWD001');
-    }
-
-    // Sort by tanggalSuratPemberitahuan (newest first)
-    filtered.sort((a, b) => new Date(b.tanggalSuratPemberitahuan).getTime() - new Date(a.tanggalSuratPemberitahuan).getTime());
-
-    return filtered;
-  }, [selectedYear, selectedInspektorat, selectedPerwadag, isAdmin, isInspektorat, isPerwadag]);
-
-  // Pagination
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
-
-  const handleView = (item: SuratPemberitahuan) => {
-    setSelectedItem(item);
-    setDialogMode('view');
-    setIsDialogOpen(true);
-  };
-
-  const handleEdit = (item: SuratPemberitahuan) => {
-    setSelectedItem(item);
-    setDialogMode('edit');
-    setIsDialogOpen(true);
-  };
-
-  const handleSave = (data: Partial<SuratPemberitahuan>) => {
-    console.log('Save:', data);
-    // Implement save logic
-    setIsDialogOpen(false);
-    setSelectedItem(null);
-  };
-
-  // Check if user can edit this item based on role
-  const canEdit = (item: SuratPemberitahuan) => {
-    if (isAdmin()) return true;
-    if (isInspektorat()) {
-      // For demo, assume inspektorat 1
-      return item.inspektorat === 1;
-    }
-    if (isPerwadag()) {
-      // For demo, assume current user is PWD001
-      return item.perwadagId === 'PWD001';
-    }
-    return false;
-  };
-
-  const handleItemsPerPageChange = (value: string) => {
-    setItemsPerPage(parseInt(value));
-    setCurrentPage(1);
-  };
-
-  // Generate composite title
-  const getCompositeTitle = () => {
-    let title = "Daftar Surat Pemberitahuan";
-    const filters = [];
-
-    if (isInspektorat()) {
-      filters.push("Inspektorat I");
-    } else if (isAdmin() && selectedInspektorat !== 'all') {
-      filters.push(`Inspektorat ${selectedInspektorat}`);
-    }
-
-    if (selectedYear !== 'all') {
-      filters.push(selectedYear);
-    }
-
-    if (selectedPerwadag !== 'all') {
-      const perwadag = PERWADAG_DATA.find(p => p.id === selectedPerwadag);
-      if (perwadag) filters.push(perwadag.name);
-    }
-
-    if (filters.length > 0) {
-      title += " - " + filters.join(" - ");
-    }
-
-    return title;
   };
 
   return (
@@ -182,17 +266,15 @@ const SuratPemberitahuanPage: React.FC = () => {
       <Filtering>
         <div className="space-y-2">
           <Label htmlFor="year-filter">Periode (Tahun)</Label>
-          <Select value={selectedYear} onValueChange={setSelectedYear}>
+          <Select value={filters.tahun_evaluasi} onValueChange={handleTahunEvaluasiChange}>
             <SelectTrigger id="year-filter">
               <SelectValue placeholder="Pilih tahun" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Tahun</SelectItem>
-              {YEARS_SURAT_PEMBERITAHUAN.map(year => (
-                <SelectItem key={year} value={year.toString()}>
-                  {year}
-                </SelectItem>
-              ))}
+              <SelectItem value="2024">2024</SelectItem>
+              <SelectItem value="2023">2023</SelectItem>
+              <SelectItem value="2022">2022</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -201,17 +283,15 @@ const SuratPemberitahuanPage: React.FC = () => {
         {isAdmin() && (
           <div className="space-y-2">
             <Label htmlFor="inspektorat-filter">Inspektorat</Label>
-            <Select value={selectedInspektorat} onValueChange={setSelectedInspektorat}>
+            <Select value={filters.inspektorat} onValueChange={handleInspektoratChange}>
               <SelectTrigger id="inspektorat-filter">
                 <SelectValue placeholder="Pilih inspektorat" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Semua Inspektorat</SelectItem>
-                {INSPEKTORATS.map(inspektorat => (
-                  <SelectItem key={inspektorat.value} value={inspektorat.value.toString()}>
-                    {inspektorat.label}
-                  </SelectItem>
-                ))}
+                <SelectItem value="1">Inspektorat I</SelectItem>
+                <SelectItem value="2">Inspektorat II</SelectItem>
+                <SelectItem value="3">Inspektorat III</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -224,15 +304,25 @@ const SuratPemberitahuanPage: React.FC = () => {
             <Combobox
               options={[
                 { value: 'all', label: 'Semua Perwadag' },
-                ...availablePerwadag.map(perwadag => ({
-                  value: perwadag.id,
-                  label: perwadag.name
-                }))
+                ...availablePerwadag
+                  .filter(perwadag =>
+                    perwadagSearchValue === '' ||
+                    perwadag.nama.toLowerCase().includes(perwadagSearchValue.toLowerCase()) ||
+                    perwadag.inspektorat?.toLowerCase().includes(perwadagSearchValue.toLowerCase())
+                  )
+                  .map(perwadag => ({
+                    value: perwadag.id,
+                    label: perwadag.nama,
+                    description: perwadag.inspektorat || ''
+                  }))
               ]}
-              value={selectedPerwadag}
-              onChange={(value) => setSelectedPerwadag(value.toString())}
+              value={filters.user_perwadag_id}
+              onChange={(value) => handlePerwadagChange(value.toString())}
               placeholder="Pilih perwadag"
               searchPlaceholder="Cari perwadag..."
+              searchValue={perwadagSearchValue}
+              onSearchChange={setPerwadagSearchValue}
+              emptyMessage="Tidak ada perwadag yang ditemukan"
             />
           </div>
         )}
@@ -246,10 +336,17 @@ const SuratPemberitahuanPage: React.FC = () => {
               subtitle="Kelola data surat pemberitahuan audit berdasarkan filter yang dipilih"
             />
 
+            <SearchContainer
+              searchQuery={filters.search}
+              onSearchChange={handleSearchChange}
+              placeholder="Cari nama perwadag..."
+            />
+
             {/* Desktop Table */}
             <div className="hidden md:block">
               <SuratPemberitahuanTable
-                data={paginatedData}
+                data={suratPemberitahuan}
+                loading={loading}
                 onView={handleView}
                 onEdit={handleEdit}
                 canEdit={canEdit}
@@ -259,7 +356,8 @@ const SuratPemberitahuanPage: React.FC = () => {
             {/* Mobile Cards */}
             <div className="md:hidden">
               <SuratPemberitahuanCards
-                data={paginatedData}
+                data={suratPemberitahuan}
+                loading={loading}
                 onView={handleView}
                 onEdit={handleEdit}
                 canEdit={canEdit}
@@ -269,11 +367,11 @@ const SuratPemberitahuanPage: React.FC = () => {
             {/* Pagination */}
             {totalPages > 1 && (
               <Pagination
-                currentPage={currentPage}
+                currentPage={filters.page}
                 totalPages={totalPages}
-                itemsPerPage={itemsPerPage}
-                totalItems={filteredData.length}
-                onPageChange={setCurrentPage}
+                itemsPerPage={filters.size}
+                totalItems={totalItems}
+                onPageChange={handlePageChange}
                 onItemsPerPageChange={handleItemsPerPageChange}
               />
             )}
