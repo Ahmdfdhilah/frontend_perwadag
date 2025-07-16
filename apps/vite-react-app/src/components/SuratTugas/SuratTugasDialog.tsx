@@ -9,13 +9,6 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@workspace/ui/components/select';
 import { Combobox } from '@workspace/ui/components/combobox';
 import { Calendar } from '@workspace/ui/components/calendar';
 import {
@@ -35,7 +28,7 @@ interface SuratTugasDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   editingItem: SuratTugasResponse | null;
-  mode?: 'view' | 'edit' | 'create';
+  mode: 'view' | 'edit' | 'create';
   onSave: (data: any) => void;
   availablePerwadag: PerwadagSummary[];
 }
@@ -44,7 +37,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   open,
   onOpenChange,
   editingItem,
-  mode = editingItem ? 'edit' : 'create',
+  mode,
   onSave,
   availablePerwadag,
 }) => {
@@ -62,7 +55,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   const [isStartCalendarOpen, setIsStartCalendarOpen] = useState(false);
   const [isEndCalendarOpen, setIsEndCalendarOpen] = useState(false);
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
-  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string }>>([]);
+  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
 
   useEffect(() => {
@@ -78,7 +71,15 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       });
       
       // Set existing files for display
-      setExistingFiles(editingItem.file_surat_tugas ? [{ name: 'Surat Tugas', url: editingItem.file_surat_tugas_url }] : []);
+      if (editingItem.file_surat_tugas) {
+        setExistingFiles([{ 
+          name: 'Surat Tugas', 
+          url: editingItem.file_surat_tugas_url,
+          viewUrl: editingItem.file_surat_tugas_url
+        }]);
+      } else {
+        setExistingFiles([]);
+      }
     } else {
       setFormData({
         no_surat: '',
@@ -139,7 +140,9 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0 border-b pb-4">
           <DialogTitle>
-            {editingItem ? 'Edit Surat Tugas' : 'Tambah Surat Tugas'}
+            {mode === 'view' ? 'Lihat Surat Tugas' : 
+             mode === 'edit' ? 'Edit Surat Tugas' : 
+             'Tambah Surat Tugas'}
           </DialogTitle>
         </DialogHeader>
 
@@ -177,7 +180,6 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                 searchValue={perwadagSearchValue}
                 onSearchChange={setPerwadagSearchValue}
                 emptyMessage="Tidak ada perwadag yang ditemukan"
-                disabled={!canEdit}
               />
             </div>
 
@@ -308,11 +310,11 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
           <Button variant="outline" onClick={handleCancel}>
-            Batal
+            {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
           {canEdit && (
             <Button onClick={handleSave} disabled={!isFormValid}>
-              {editingItem ? 'Simpan' : 'Buat'}
+              {mode === 'edit' ? 'Simpan' : 'Buat'}
             </Button>
           )}
         </DialogFooter>

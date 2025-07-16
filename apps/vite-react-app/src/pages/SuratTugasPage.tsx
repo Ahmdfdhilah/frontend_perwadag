@@ -26,7 +26,6 @@ import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import SuratTugasTable from '@/components/SuratTugas/SuratTugasTable';
 import SuratTugasCards from '@/components/SuratTugas/SuratTugasCards';
 import SuratTugasDialog from '@/components/SuratTugas/SuratTugasDialog';
-import SuratTugasViewDialog from '@/components/SuratTugas/SuratTugasViewDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -72,9 +71,8 @@ const SuratTugasPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<SuratTugasResponse | null>(null);
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
-  const [viewingItem, setViewingItem] = useState<SuratTugasResponse | null>(null);
+  const [selectedItem, setSelectedItem] = useState<SuratTugasResponse | null>(null);
+  const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
   const [itemToDelete, setItemToDelete] = useState<SuratTugasResponse | null>(null);
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
@@ -149,12 +147,14 @@ const SuratTugasPage: React.FC = () => {
   const totalPages = Math.ceil(totalItems / filters.size);
 
   const handleView = (item: SuratTugasResponse) => {
-    setViewingItem(item);
-    setIsViewDialogOpen(true);
+    setSelectedItem(item);
+    setDialogMode('view');
+    setIsDialogOpen(true);
   };
 
   const handleEdit = (item: SuratTugasResponse) => {
-    setEditingItem(item);
+    setSelectedItem(item);
+    setDialogMode('edit');
     setIsDialogOpen(true);
   };
 
@@ -180,13 +180,14 @@ const SuratTugasPage: React.FC = () => {
   };
 
   const handleCreate = () => {
-    setEditingItem(null);
+    setSelectedItem(null);
+    setDialogMode('create');
     setIsDialogOpen(true);
   };
 
   const handleSave = async (data: any) => {
     try {
-      if (editingItem) {
+      if (selectedItem && dialogMode === 'edit') {
         // Update existing surat tugas
         const updateData = {
           tanggal_evaluasi_mulai: data.tanggal_evaluasi_mulai,
@@ -197,11 +198,11 @@ const SuratTugasPage: React.FC = () => {
           nama_ketua_tim: data.nama_ketua_tim,
         };
 
-        await suratTugasService.updateSuratTugas(editingItem.id, updateData);
+        await suratTugasService.updateSuratTugas(selectedItem.id, updateData);
 
         // Handle file upload if any
         if (data.file) {
-          await suratTugasService.uploadFile(editingItem.id, data.file);
+          await suratTugasService.uploadFile(selectedItem.id, data.file);
         }
 
         toast({
@@ -209,7 +210,7 @@ const SuratTugasPage: React.FC = () => {
           description: `Surat tugas ${data.no_surat} telah diperbarui.`,
           variant: 'default'
         });
-      } else {
+      } else if (dialogMode === 'create') {
         // Create new surat tugas
         const createData = {
           user_perwadag_id: data.user_perwadag_id,
@@ -232,7 +233,7 @@ const SuratTugasPage: React.FC = () => {
       }
 
       setIsDialogOpen(false);
-      setEditingItem(null);
+      setSelectedItem(null);
       fetchSuratTugasList(); // Refresh the list
     } catch (error) {
       console.error('Failed to save surat tugas:', error);
@@ -446,20 +447,14 @@ const SuratTugasPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Edit/Create Dialog */}
+      {/* Dialog */}
       <SuratTugasDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        editingItem={editingItem}
+        editingItem={selectedItem}
+        mode={dialogMode}
         onSave={handleSave}
         availablePerwadag={availablePerwadag}
-      />
-
-      {/* View Dialog */}
-      <SuratTugasViewDialog
-        open={isViewDialogOpen}
-        onOpenChange={setIsViewDialogOpen}
-        item={viewingItem}
       />
 
       {/* Delete Confirmation Dialog */}
