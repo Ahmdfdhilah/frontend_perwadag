@@ -8,7 +8,6 @@ import { Badge } from '@workspace/ui/components/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@workspace/ui/components/avatar';
 import { PageHeader } from '@/components/common/PageHeader';
 import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
-import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { UserUpdate, UserChangePassword } from '@/services/users/types';
@@ -34,7 +33,8 @@ const ProfilePage: React.FC = () => {
   const isLoading = useAppSelector(selectAuthLoading);
   const { toast } = useToast();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  // Skip password dialog for now
+  // const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
 
   if (!user) {
     return (
@@ -81,20 +81,35 @@ const ProfilePage: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    return format(new Date(dateString), 'dd MMMM yyyy', { locale: id });
+    if (!dateString) return '-';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '-';
+      return format(date, 'dd MMMM yyyy', { locale: id });
+    } catch {
+      return '-';
+    }
   };
 
   const formatDateTime = (dateString: string) => {
-    return format(new Date(dateString), 'dd MMMM yyyy, HH:mm', { locale: id });
+    if (!dateString) return '-';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '-';
+      return format(date, 'dd MMMM yyyy, HH:mm', { locale: id });
+    } catch {
+      return '-';
+    }
   };
 
   const handleEditProfile = () => {
     setIsEditDialogOpen(true);
   };
 
-  const handleChangePassword = () => {
-    setIsPasswordDialogOpen(true);
-  };
+  // Skip password change for now
+  // const handleChangePassword = () => {
+  //   setIsPasswordDialogOpen(true);
+  // };
 
   const handleProfileUpdate = async (data: UserUpdate) => {
     try {
@@ -143,10 +158,11 @@ const ProfilePage: React.FC = () => {
               <Edit className="w-4 h-4 mr-2" />
               Edit Profil
             </Button>
-            <Button onClick={handleChangePassword}>
+            {/* Skip password change for now */}
+            {/* <Button onClick={handleChangePassword}>
               <Lock className="w-4 h-4 mr-2" />
               Ganti Password
-            </Button>
+            </Button> */}
           </div>
         }
       />
@@ -373,12 +389,7 @@ const ProfilePage: React.FC = () => {
         loading={isLoading}
       />
 
-      <ChangePasswordDialog
-        open={isPasswordDialogOpen}
-        onOpenChange={setIsPasswordDialogOpen}
-        onSave={handlePasswordChange}
-        loading={isLoading}
-      />
+      {/* Skip ChangePasswordDialog for now */}
     </div>
   );
 };

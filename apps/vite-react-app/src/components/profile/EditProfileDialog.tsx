@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useToast } from '@workspace/ui/components/sonner';
-import { User } from '@/mocks/users';
+import { User, UserUpdate } from '@/services/users/types';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from '@workspace/ui/components/dialog';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
@@ -23,14 +24,15 @@ import {
   FormMessage,
 } from '@workspace/ui/components/form';
 import { Avatar, AvatarImage, AvatarFallback } from '@workspace/ui/components/avatar';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, CalendarDays, MapPin } from 'lucide-react';
 
 const editProfileSchema = z.object({
-  name: z.string().min(1, 'Nama wajib diisi').min(2, 'Nama minimal 2 karakter'),
-  phone: z.string().min(1, 'Telepon wajib diisi').regex(/^\+?\d{10,15}$/, 'Masukkan nomor telepon yang valid'),
-  address: z.string().min(1, 'Alamat wajib diisi'),
-  nip: z.string().min(1, 'NIP wajib diisi').regex(/^\d{18}$/, 'NIP harus 18 digit'),
-  avatar: z.instanceof(File).optional(),
+  nama: z.string().min(1, 'Nama wajib diisi').min(2, 'Nama minimal 2 karakter'),
+  tempat_lahir: z.string().min(1, 'Tempat lahir wajib diisi'),
+  tanggal_lahir: z.string().min(1, 'Tanggal lahir wajib diisi'),
+  pangkat: z.string().min(1, 'Pangkat wajib diisi'),
+  jabatan: z.string().min(1, 'Jabatan wajib diisi'),
+  email: z.string().email('Format email tidak valid').optional().or(z.literal('')),
 });
 
 type EditProfileData = z.infer<typeof editProfileSchema>;
@@ -39,248 +41,245 @@ interface EditProfileDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   user: User;
-  onSave: () => void;
+  onSave: (data: UserUpdate) => void;
+  loading?: boolean;
 }
 
 export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
   open,
   onOpenChange,
   user,
-  onSave
+  onSave,
+  loading = false
 }) => {
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-  const [avatarPreview, setAvatarPreview] = useState<string | undefined>(user?.avatar);
-
   const form = useForm<EditProfileData>({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
-      name: user?.name || '',
-      phone: user?.phone || '',
-      address: user?.address || '',
-      nip: user?.nip || '',
-    }
+      nama: user.nama,
+      tempat_lahir: user.tempat_lahir,
+      tanggal_lahir: user.tanggal_lahir,
+      pangkat: user.pangkat,
+      jabatan: user.jabatan,
+      email: user.email || '',
+    },
   });
 
-  const handleAvatarUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      // Check file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
-        toast({
-          title: 'File terlalu besar',
-          description: 'Ukuran file maksimal 5MB',
-          variant: 'destructive'
-        });
-        return;
-      }
-
-      // Check file type
-      if (!file.type.startsWith('image/')) {
-        toast({
-          title: 'Format file tidak didukung',
-          description: 'Harap pilih file gambar (JPG, PNG, dll)',
-          variant: 'destructive'
-        });
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setAvatarPreview(result);
-        form.setValue('avatar', file);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const removeAvatar = () => {
-    setAvatarPreview(user?.avatar);
-    form.setValue('avatar', undefined);
-  };
-
-  const handleSubmit = async (data: EditProfileData) => {
-    if (!user) return;
-
-    setLoading(true);
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // In real app, this would update the user data in context/state
-      console.log('Updated profile data:', data);
-      
-      onSave();
-      toast({
-        title: 'Profil berhasil diperbarui',
-        description: 'Data profil Anda telah diperbarui.',
-        variant: 'default'
+  useEffect(() => {
+    if (open && user) {
+      form.reset({
+        nama: user.nama,
+        tempat_lahir: user.tempat_lahir,
+        tanggal_lahir: user.tanggal_lahir,
+        pangkat: user.pangkat,
+        jabatan: user.jabatan,
+        email: user.email || '',
       });
-      
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      toast({
-        title: 'Gagal memperbarui profil',
-        description: 'Terjadi kesalahan saat memperbarui profil',
-        variant: 'destructive'
-      });
-    } finally {
-      setLoading(false);
     }
+  }, [open, user, form]);
+
+  const onSubmit = (data: EditProfileData) => {
+    const updateData: UserUpdate = {
+      nama: data.nama,
+      tempat_lahir: data.tempat_lahir,
+      tanggal_lahir: data.tanggal_lahir,
+      pangkat: data.pangkat,
+      jabatan: data.jabatan,
+      email: data.email || undefined,
+    };
+    onSave(updateData);
   };
 
-  const handleCancel = () => {
-    if (!loading) {
-      form.reset();
-      setAvatarPreview(user?.avatar);
-      onOpenChange(false);
+  const getInitials = () => {
+    const nameParts = user.nama.split(' ');
+    if (nameParts.length >= 2) {
+      return nameParts[0][0] + nameParts[1][0];
     }
+    return nameParts[0][0];
   };
-
-  if (!user) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
-        <DialogHeader>
+      <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0 border-b pb-4">
           <DialogTitle>Edit Profil</DialogTitle>
         </DialogHeader>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-            {/* Avatar Upload */}
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Avatar className="w-20 h-20">
-                  {avatarPreview ? (
-                    <AvatarImage src={avatarPreview} alt="Avatar preview" />
-                  ) : (
-                    <AvatarFallback className="text-lg">
-                      {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                    </AvatarFallback>
-                  )}
+        <div className="flex-1 overflow-y-auto py-4">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Profile Avatar */}
+              <div className="flex justify-center mb-6">
+                <Avatar className="w-24 h-24">
+                  <AvatarFallback className="text-2xl">
+                    {getInitials()}
+                  </AvatarFallback>
                 </Avatar>
-                {avatarPreview && avatarPreview !== user.avatar && (
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
-                    onClick={removeAvatar}
-                    disabled={loading}
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                )}
               </div>
-              <div>
-                <Label htmlFor="avatar-upload" className="cursor-pointer">
-                  <div className="flex items-center space-x-2 px-4 py-2 border border-dashed border-gray-300 rounded-lg hover:bg-gray-50">
-                    <Upload className="h-4 w-4" />
-                    <span>Upload Avatar</span>
-                  </div>
-                </Label>
-                <input
-                  id="avatar-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleAvatarUpload}
-                  className="hidden"
-                  disabled={loading}
+
+              {/* Form Fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="nama"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nama Lengkap</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Masukkan nama lengkap"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Maksimal 5MB, format JPG/PNG
-                </p>
+
+                <FormField
+                  control={form.control}
+                  name="tempat_lahir"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tempat Lahir</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Masukkan tempat lahir"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="tanggal_lahir"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tanggal Lahir</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="pangkat"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Pangkat</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Masukkan pangkat"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="jabatan"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Jabatan</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Masukkan jabatan"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email (Opsional)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="Masukkan email"
+                          disabled={loading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
-            </div>
 
-            {/* Personal Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nama Lengkap</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Masukkan nama lengkap" disabled={loading} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+              {/* Read-only fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label>Username</Label>
+                  <div className="p-3 bg-muted rounded-md text-sm">
+                    {user.username}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Role</Label>
+                  <div className="p-3 bg-muted rounded-md text-sm">
+                    {user.role_display}
+                  </div>
+                </div>
+
+                {user.inspektorat && (
+                  <div className="space-y-2">
+                    <Label>Inspektorat</Label>
+                    <div className="p-3 bg-muted rounded-md text-sm">
+                      {user.inspektorat}
+                    </div>
+                  </div>
                 )}
-              />
 
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nomor Telepon</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Masukkan nomor telepon" disabled={loading} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <div className="space-y-2">
+                  <Label>Umur</Label>
+                  <div className="p-3 bg-muted rounded-md text-sm">
+                    {user.age} tahun
+                  </div>
+                </div>
+              </div>
+            </form>
+          </Form>
+        </div>
 
-              <FormField
-                control={form.control}
-                name="nip"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>NIP</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Masukkan NIP" disabled={loading} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Address */}
-            <FormField
-              control={form.control}
-              name="address"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Alamat</FormLabel>
-                  <FormControl>
-                    <Textarea placeholder="Masukkan alamat" disabled={loading} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Email (Read-only) */}
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={user.email}
-                disabled
-                className="bg-muted"
-              />
-              <p className="text-xs text-muted-foreground">
-                Email tidak dapat diubah. Hubungi administrator jika perlu mengubah email.
-              </p>
-            </div>
-
-            {/* Form Actions */}
-            <div className="flex justify-end space-x-4 pt-4">
-              <Button type="button" variant="outline" onClick={handleCancel} disabled={loading}>
-                Batal
-              </Button>
-              <Button type="submit" disabled={loading}>
-                {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
-              </Button>
-            </div>
-          </form>
-        </Form>
+        <DialogFooter className="flex-shrink-0 border-t pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={loading}
+          >
+            Batal
+          </Button>
+          <Button
+            onClick={form.handleSubmit(onSubmit)}
+            disabled={loading}
+          >
+            {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
