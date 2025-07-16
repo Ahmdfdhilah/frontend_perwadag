@@ -1,5 +1,6 @@
 import React from 'react';
 import { User } from '@/services/users/types';
+import { ROLE_LABELS } from '@/lib/constants';
 import {
   Table,
   TableBody,
@@ -38,14 +39,9 @@ export const UserTable: React.FC<UserTableProps> = ({
   };
 
   const getRoleBadge = (role: string) => {
-    const roleLabels = {
-      'ADMIN': 'Admin',
-      'INSPEKTORAT': 'Inspektorat', 
-      'PERWADAG': 'Perwadag'
-    };
     return (
       <Badge variant="secondary" className="text-xs">
-        {roleLabels[role as keyof typeof roleLabels] || role}
+        {ROLE_LABELS[role as keyof typeof ROLE_LABELS] || role}
       </Badge>
     );
   };
@@ -57,6 +53,7 @@ export const UserTable: React.FC<UserTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>User</TableHead>
+            <TableHead>Pangkat/Jabatan</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Role</TableHead>
             <TableHead>Tempat Lahir</TableHead>
@@ -68,13 +65,13 @@ export const UserTable: React.FC<UserTableProps> = ({
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                 Loading users...
               </TableCell>
             </TableRow>
           ) : users.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                 Tidak ada user ditemukan
               </TableCell>
             </TableRow>
@@ -90,8 +87,14 @@ export const UserTable: React.FC<UserTableProps> = ({
                     </Avatar>
                     <div>
                       <p className="font-medium">{user.nama}</p>
-                      <p className="text-sm text-muted-foreground">ID: {user.id}</p>
+                      <p className="text-sm text-muted-foreground">@{user.username}</p>
                     </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <div>
+                    <p className="text-sm font-medium">{user.pangkat}</p>
+                    <p className="text-sm text-muted-foreground">{user.jabatan}</p>
                   </div>
                 </TableCell>
                 <TableCell>

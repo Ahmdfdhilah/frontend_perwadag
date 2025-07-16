@@ -38,7 +38,12 @@ export const UserDialog: React.FC<UserDialogProps> = ({
       // Transform data to match API requirements
       const transformedData = {
         nama: data.nama,
+        tempat_lahir: data.tempat_lahir,
+        tanggal_lahir: data.tanggal_lahir,
+        pangkat: data.pangkat,
+        jabatan: data.jabatan,
         email: data.email || undefined,
+        is_active: data.is_active,
         role: data.role,
         inspektorat: data.inspektorat || undefined,
       };

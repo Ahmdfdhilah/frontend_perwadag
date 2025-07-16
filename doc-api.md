@@ -27,7 +27,7 @@ All endpoints are prefixed with the base URL configured in your environment.
 | DELETE | `/{user_id}` | None | `MessageResponse` | Admin | Soft delete user |
 
 ### Key Features:
-- Role-based user management (Admin, Inspektorat, Perwadag)
+- Role-based user management (ADMIN, INSPEKTORAT, PERWADAG)
 - Auto-generated usernames based on nama and tanggal_lahir
 - Comprehensive filtering and search capabilities
 - Profile self-management
@@ -46,8 +46,8 @@ All endpoints are prefixed with the base URL configured in your environment.
   "jabatan": "string (1-200 chars)",
   "email": "string? (valid email)",
   "is_active": "bool (default: true)",
-  "role": "enum (admin/inspektorat/perwadag)",
-  "inspektorat": "string? (required for perwadag role)"
+  "role": "enum (ADMIN/INSPEKTORAT/PERWADAG)",
+  "inspektorat": "string? (required for PERWADAG role)"
 }
 ```
 
@@ -61,7 +61,7 @@ All endpoints are prefixed with the base URL configured in your environment.
   "jabatan": "string? (1-200 chars)",
   "email": "string? (valid email)",
   "is_active": "bool?",
-  "role": "enum? (admin/inspektorat/perwadag)",
+  "role": "enum? (ADMIN/INSPEKTORAT/PERWADAG)",
   "inspektorat": "string? (max 100 chars)"
 }
 ```
@@ -130,7 +130,7 @@ All endpoints are prefixed with the base URL configured in your environment.
 {
   "nama": "string",
   "tanggal_lahir": "date",
-  "role": "enum (admin/inspektorat/perwadag)"
+  "role": "enum (ADMIN/INSPEKTORAT/PERWADAG)"
 }
 ```
 
@@ -148,7 +148,7 @@ All endpoints are prefixed with the base URL configured in your environment.
 - **page**: Page number (default: 1)
 - **size**: Items per page (default: 20, max: 100)
 - **search**: Search in nama, username, tempat_lahir, pangkat, jabatan, email, inspektorat
-- **role**: Filter by role (admin/inspektorat/perwadag)
+- **role**: Filter by role (ADMIN/INSPEKTORAT/PERWADAG)
 - **inspektorat**: Filter by inspektorat
 - **pangkat**: Filter by pangkat
 - **jabatan**: Filter by jabatan
@@ -875,7 +875,7 @@ All users are created with default password: `@Kemendag123`
 | GET | `/{meeting_id}/files/download-all` | None | `FileResponse` | JWT + Role Scope | Download all files as ZIP |
 
 ### Key Features:
-- Three meeting types: Entry, Konfirmasi, Exit
+- Three meeting types: ENTRY, KONFIRMASI, EXIT
 - Multiple file support per meeting
 - ZIP download for all files
 - Meeting-specific file management
@@ -886,7 +886,7 @@ All users are created with default password: `@Kemendag123`
 ```json
 {
   "surat_tugas_id": "string",
-  "meeting_type": "enum (entry/konfirmasi/exit)"
+  "meeting_type": "enum (ENTRY/KONFIRMASI/EXIT)"
 }
 ```
 

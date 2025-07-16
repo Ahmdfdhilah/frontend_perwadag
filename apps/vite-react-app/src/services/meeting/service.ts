@@ -60,7 +60,7 @@ class MeetingService extends BaseService {
   // Get meeting by surat tugas ID and type
   async getMeetingBySuratTugasAndType(
     suratTugasId: string,
-    meetingType: "entry" | "konfirmasi" | "exit",
+    meetingType: "ENTRY" | "KONFIRMASI" | "EXIT",
     options?: MeetingServiceOptions
   ): Promise<MeetingResponse> {
     return this.get(

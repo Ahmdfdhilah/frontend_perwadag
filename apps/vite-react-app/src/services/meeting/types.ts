@@ -4,7 +4,7 @@ import { ServiceOptions, PaginatedResponse } from "../base/types";
 export interface Meeting {
   id: string;
   surat_tugas_id: string;
-  meeting_type: "entry" | "konfirmasi" | "exit";
+  meeting_type: "ENTRY" | "KONFIRMASI" | "EXIT";
   tanggal_meeting?: string;
   link_zoom?: string;
   link_daftar_hadir?: string;
@@ -61,7 +61,7 @@ export interface MeetingStatistics {
 // Request Types
 export interface MeetingCreate {
   surat_tugas_id: string;
-  meeting_type: "entry" | "konfirmasi" | "exit";
+  meeting_type: "ENTRY" | "KONFIRMASI" | "EXIT";
 }
 
 export interface MeetingUpdate {
@@ -78,7 +78,7 @@ export interface MeetingFileUploadRequest {
 export interface MeetingResponse {
   id: string;
   surat_tugas_id: string;
-  meeting_type: "entry" | "konfirmasi" | "exit";
+  meeting_type: "ENTRY" | "KONFIRMASI" | "EXIT";
   tanggal_meeting?: string;
   link_zoom?: string;
   link_daftar_hadir?: string;
@@ -140,7 +140,7 @@ export interface MeetingFilterParams {
   page?: number;
   size?: number;
   search?: string;
-  meeting_type?: "entry" | "konfirmasi" | "exit";
+  meeting_type?: "ENTRY" | "KONFIRMASI" | "EXIT";
   inspektorat?: string;
   user_perwadag_id?: string;
   has_files?: boolean;

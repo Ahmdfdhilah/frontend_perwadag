@@ -1,5 +1,6 @@
 import React from 'react';
 import { User } from '@/services/users/types';
+import { ROLE_LABELS } from '@/lib/constants';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@workspace/ui/components/avatar';
@@ -39,14 +40,9 @@ export const UserCards: React.FC<UserCardsProps> = ({
   };
 
   const getRoleBadge = (role: string) => {
-    const roleLabels = {
-      'ADMIN': 'Admin',
-      'INSPEKTORAT': 'Inspektorat', 
-      'PERWADAG': 'Perwadag'
-    };
     return (
       <Badge variant="secondary" className="text-xs">
-        {roleLabels[role as keyof typeof roleLabels] || role}
+        {ROLE_LABELS[role as keyof typeof ROLE_LABELS] || role}
       </Badge>
     );
   };
@@ -95,10 +91,16 @@ export const UserCards: React.FC<UserCardsProps> = ({
               />
             </div>
 
-            {/* User ID */}
+            {/* Username */}
             <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
               <CreditCard className="w-4 h-4" />
-              <span>ID: {user.id}</span>
+              <span>@{user.username}</span>
+            </div>
+
+            {/* Pangkat & Jabatan */}
+            <div className="mb-2">
+              <p className="text-sm font-medium">{user.pangkat}</p>
+              <p className="text-sm text-muted-foreground">{user.jabatan}</p>
             </div>
 
             {/* Email */}

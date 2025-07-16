@@ -152,6 +152,20 @@ Multiple services for document management:
 - **Format Kuisioner** (`formatKuisioner/`) - Questionnaire templates
 - **Laporan Hasil** (`laporanHasil/`) - Evaluation reports
 
+## Enum Values Reference
+
+### Role Enum Values
+```typescript
+type Role = "ADMIN" | "INSPEKTORAT" | "PERWADAG";
+```
+
+### Meeting Type Enum Values
+```typescript
+type MeetingType = "ENTRY" | "KONFIRMASI" | "EXIT";
+```
+
+**Important**: All enum values use UPPERCASE format for consistency across the application.
+
 ## Usage Examples
 
 ### Basic Service Usage

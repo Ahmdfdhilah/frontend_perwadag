@@ -47,7 +47,7 @@ export interface UserCreate {
   email?: string; // valid email
   is_active?: boolean; // default: true
   role: "ADMIN" | "INSPEKTORAT" | "PERWADAG";
-  inspektorat?: string; // required for perwadag role
+  inspektorat?: string; // required for perwadag, inspectorat role
 }
 
 export interface UserUpdate {
