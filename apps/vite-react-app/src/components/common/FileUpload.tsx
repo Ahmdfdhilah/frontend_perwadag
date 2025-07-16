@@ -4,6 +4,7 @@ import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Upload, Download, File, X, Eye } from 'lucide-react';
 import { cn } from '@workspace/ui/lib/utils';
+import { API_BASE_URL } from '@/config/api';
 
 export interface FileUploadProps {
   id?: string;
@@ -172,8 +173,10 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
   const handleDownloadFile = (file: { name: string; url?: string; viewUrl?: string }, index: number) => {
     if (file.url) {
+      // Construct full URL if url is relative
+      const fullUrl = file.url.startsWith('http') ? file.url : `${API_BASE_URL}${file.url}`;
       const link = document.createElement('a');
-      link.href = file.url;
+      link.href = fullUrl;
       link.download = file.name;
       link.click();
     }
@@ -183,7 +186,9 @@ const FileUpload: React.FC<FileUploadProps> = ({
   const handleViewFile = (file: { name: string; url?: string; viewUrl?: string }, index: number) => {
     const viewUrl = file.viewUrl || file.url;
     if (viewUrl) {
-      window.open(viewUrl, '_blank');
+      // Construct full URL if viewUrl is relative
+      const fullUrl = viewUrl.startsWith('http') ? viewUrl : `${API_BASE_URL}${viewUrl}`;
+      window.open(fullUrl, '_blank');
     }
     onFileView?.(file, index);
   };

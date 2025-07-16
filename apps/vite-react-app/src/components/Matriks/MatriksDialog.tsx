@@ -97,7 +97,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                 files={uploadFile ? [uploadFile] : []}
                 existingFiles={item?.has_file ? [{
                   name: item.file_metadata?.original_filename || 'Matriks',
-                  url: item.file_urls?.view_url,
+                  url: item.file_urls?.file_url,
                   size: item.file_metadata?.size_mb ? Math.round(item.file_metadata.size_mb * 1024 * 1024) : undefined
                 }] : []}
                 mode="edit"

@@ -163,8 +163,8 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
       await laporanHasilService.updateLaporanHasil(editingItem.id, updateData);
 
       // Handle file upload if any
-      if (data.file) {
-        await laporanHasilService.uploadFile(editingItem.id, data.file);
+      if (data.files && data.files.length > 0) {
+        await laporanHasilService.uploadFile(editingItem.id, data.files[0]);
       }
 
       setIsDialogOpen(false);

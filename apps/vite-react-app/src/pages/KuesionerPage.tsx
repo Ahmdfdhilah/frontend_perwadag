@@ -155,8 +155,8 @@ const KuesionerPage: React.FC = () => {
       await kuisionerService.updateKuisioner(editingItem.id, updateData);
 
       // Handle file upload if any
-      if (data.file) {
-        await kuisionerService.uploadFile(editingItem.id, data.file);
+      if (data.files && data.files.length > 0) {
+        await kuisionerService.uploadFile(editingItem.id, data.files[0]);
       }
 
       setIsDialogOpen(false);
