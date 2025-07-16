@@ -330,7 +330,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
               <Eye className="w-4 h-4" />
             </Button>
           )}
-          {file.url && (
+          {/* {file.url && (
             <Button
               size="sm"
               variant="ghost"
@@ -340,7 +340,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
             >
               <Download className="w-4 h-4" />
             </Button>
-          )}
+          )} */}
           {allowRemove && (mode === 'input' || mode === 'edit') && (
             <Button
               size="sm"

@@ -131,7 +131,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
     setExistingFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }, index: number) => {
+  const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
     if (!editingItem?.id) return;
     
     try {
@@ -149,18 +149,6 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
     }
   };
 
-  const handleFileView = async (file: { name: string; url?: string; viewUrl?: string }, index: number) => {
-    if (!editingItem?.id) return;
-    
-    try {
-      const blob = await suratTugasService.viewFile(editingItem.id);
-      const url = window.URL.createObjectURL(blob);
-      window.open(url, '_blank');
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error viewing file:', error);
-    }
-  };
 
   const isFormValid = formData.no_surat && formData.user_perwadag_id && formData.tanggal_evaluasi_mulai &&
     formData.nama_pengedali_mutu && formData.nama_pengendali_teknis && formData.nama_ketua_tim;
@@ -336,7 +324,6 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
               onFilesChange={handleUploadFilesChange}
               onExistingFileRemove={handleExistingFileRemove}
               onFileDownload={handleFileDownload}
-              onFileView={handleFileView}
               description="Format yang didukung: PDF, DOC, DOCX (Max 10MB)"
             />
           </div>
