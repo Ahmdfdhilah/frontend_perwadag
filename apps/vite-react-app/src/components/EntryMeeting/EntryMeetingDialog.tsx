@@ -57,7 +57,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
       
       // Set existing files for display
       setExistingFiles(item.files_info?.files ? item.files_info.files.map((file, index) => ({ 
-        name: file.original_filename || `File ${index + 1}`, 
+        name: file.original_filename || `Bukti Hadir ${index + 1}`, 
         url: file.download_url 
       })) : []);
     } else {
@@ -252,9 +252,9 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
               )}
             </div>
 
-            {/* Upload Files */}
+            {/* Upload Bukti Hadir */}
             <FileUpload
-              label="Upload Files Meeting"
+              label="Upload Bukti Hadir"
               accept="*/*"
               multiple={true}
               maxSize={10 * 1024 * 1024} // 10MB
@@ -265,7 +265,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
               disabled={!canEdit}
               onFilesChange={handleMeetingFilesChange}
               onExistingFileRemove={handleExistingFilesRemove}
-              description="Upload dokumen meeting (Max 10MB per file)"
+              description="Upload bukti hadir meeting (Max 10MB per file)"
             />
           </div>
         </div>

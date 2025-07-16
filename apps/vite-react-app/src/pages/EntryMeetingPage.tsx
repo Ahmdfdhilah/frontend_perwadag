@@ -233,7 +233,7 @@ const EntryMeetingPage: React.FC = () => {
     return title;
   };
 
-  const canEdit = (item: MeetingResponse) => {
+  const canEdit = () => {
     if (isAdmin()) return true;
     if (isInspektorat()) {
       // Check if user can edit this meeting based on inspektorat
