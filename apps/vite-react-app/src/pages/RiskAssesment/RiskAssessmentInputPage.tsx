@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
-import { ROLE_LABELS } from '@/lib/constants';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Button } from '@workspace/ui/components/button';
@@ -451,7 +450,7 @@ const RiskAssessmentInputPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title={`Input Penilaian Risiko - ${penilaianData.nama_perwadag}`}
-        description={`Tahun ${penilaianData.tahun} | Role: ${ROLE_LABELS[currentRole as keyof typeof ROLE_LABELS]}`}
+        description={`Tahun ${penilaianData.tahun}`}
         actions={
           <Button
             variant="outline"

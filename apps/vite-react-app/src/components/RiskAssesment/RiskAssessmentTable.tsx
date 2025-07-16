@@ -70,7 +70,7 @@ const RiskAssessmentTable: React.FC<RiskAssessmentTableProps> = ({
                 <TableCell>{item.inspektorat}</TableCell>
                 <TableCell>{item.nama_perwadag}</TableCell>
                 <TableCell>
-                  {item.skor_rata_rata?.toFixed(1) || '-'}
+                  {item.skor_rata_rata ? Number(item.skor_rata_rata).toFixed(1) : '-'}
                 </TableCell>
                 <TableCell>
                   <Badge 

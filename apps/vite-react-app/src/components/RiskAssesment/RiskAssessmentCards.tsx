@@ -103,7 +103,7 @@ const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Skor:</span>
-                <span className="ml-2">{item.skor_rata_rata?.toFixed(1) || '-'}</span>
+                <span className="ml-2">{item.skor_rata_rata ? Number(item.skor_rata_rata).toFixed(1) : '-'}</span>
               </div>
               <div className="col-span-2">
                 <span className="font-medium text-muted-foreground">Profil Risiko:</span>

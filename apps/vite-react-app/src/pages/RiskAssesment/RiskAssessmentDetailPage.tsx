@@ -1,46 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
-import { ROLE_LABELS } from '@/lib/constants';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Button } from '@workspace/ui/components/button';
 import { Label } from '@workspace/ui/components/label';
 import { Separator } from '@workspace/ui/components/separator';
-import { ArrowLeft, Edit, FileText } from 'lucide-react';
-import {
-  RISK_ASSESSMENTS,
-  DUMMY_RISK_ASSESSMENT_DETAIL,
-  RiskAssessmentDetail,
-} from '@/mocks';
+import { ArrowLeft, Edit, FileText, Loader2 } from 'lucide-react';
+import { penilaianRisikoService } from '@/services/penilaianRisiko';
+import { PenilaianRisiko } from '@/services/penilaianRisiko/types';
+import { useToast } from '@workspace/ui/components/sonner';
 
 const RiskAssessmentDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { currentRole } = useRole();
-  const [formData] = useState<RiskAssessmentDetail>(DUMMY_RISK_ASSESSMENT_DETAIL);
+  const { toast } = useToast();
+  const [penilaianData, setPenilaianData] = useState<PenilaianRisiko | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Calculate role values once to avoid hooks being called conditionally
   const userIsAdmin = currentRole === 'ADMIN';
   const userIsInspektorat = currentRole === 'INSPEKTORAT';
   const hasAccess = userIsAdmin || userIsInspektorat;
 
-  // Check if user can access this specific assessment
+  // Load penilaian data from API
   useEffect(() => {
-    if (id && !userIsAdmin) {
-      const assessment = RISK_ASSESSMENTS.find(item => item.id === id);
-      if (assessment && userIsInspektorat) {
-        // For inspektorat, only allow access to inspektorat 1 data (as example)
-        if (assessment.inspektorat !== 1) {
-          navigate('/penilaian-resiko');
-          return;
-        }
+    const loadData = async () => {
+      if (!id) {
+        navigate('/penilaian-resiko');
+        return;
       }
-    }
-  }, [id, userIsAdmin, userIsInspektorat, navigate]);
 
-  // Get basic assessment info
-  const basicAssessment = RISK_ASSESSMENTS.find(item => item.id === id);
+      try {
+        setIsLoading(true);
+        const response = await penilaianRisikoService.getPenilaianRisikoById(id);
+        setPenilaianData(response);
+      } catch (error) {
+        console.error('Error loading penilaian data:', error);
+        toast({
+          title: 'Error',
+          description: 'Gagal memuat data penilaian risiko',
+          variant: 'destructive'
+        });
+        navigate('/penilaian-resiko');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [id, navigate]);
 
   const handleEdit = () => {
     navigate(`/penilaian-resiko/${id}/edit`);
@@ -60,7 +70,18 @@ const RiskAssessmentDetailPage: React.FC = () => {
     );
   }
 
-  if (!basicAssessment) {
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Memuat data penilaian risiko...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!penilaianData) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
@@ -76,8 +97,8 @@ const RiskAssessmentDetailPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={`Detail Penilaian Risiko - ${basicAssessment.perwadagName}`}
-        description={`Tahun ${basicAssessment.year} | Role: ${ROLE_LABELS[currentRole as keyof typeof ROLE_LABELS]}`}
+        title={`Detail Penilaian Risiko - ${penilaianData.nama_perwadag}`}
+        description={`Tahun ${penilaianData.tahun} | Total Risiko: ${penilaianData.total_nilai_risiko ? Number(penilaianData.total_nilai_risiko).toFixed(2) : '-'}`}
         actions={
           <div className="flex gap-2">
             <Button
@@ -103,31 +124,31 @@ const RiskAssessmentDetailPage: React.FC = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            1. Tren Capaian Tahun 2024 vs 2023
+            1. Tren Capaian Tahun {penilaianData.kriteria_data.tren_capaian.tahun_pembanding_2} vs {penilaianData.kriteria_data.tren_capaian.tahun_pembanding_1}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Capaian 2023 (%)</Label>
-              <div className="mt-1 text-lg font-semibold">{formData.achievement2023}%</div>
+              <Label className="text-sm font-medium text-muted-foreground">Capaian {penilaianData.kriteria_data.tren_capaian.tahun_pembanding_1} (%)</Label>
+              <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.tren_capaian.capaian_tahun_1 || '-'}%</div>
             </div>
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Capaian 2024 (%)</Label>
-              <div className="mt-1 text-lg font-semibold">{formData.achievement2024}%</div>
+              <Label className="text-sm font-medium text-muted-foreground">Capaian {penilaianData.kriteria_data.tren_capaian.tahun_pembanding_2} (%)</Label>
+              <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.tren_capaian.capaian_tahun_2 || '-'}%</div>
             </div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Tren Capaian (%)</Label>
-            <div className="mt-1 text-lg font-semibold">{formData.trendAchievement}%</div>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.tren_capaian.tren ? Number(penilaianData.kriteria_data.tren_capaian.tren).toFixed(2) : '-'}%</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Kategori</Label>
-            <div className="mt-1 text-lg font-semibold">{formData.trendChoice}</div>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.tren_capaian.pilihan || 'Belum dihitung'}</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Nilai</Label>
-            <div className="mt-1 text-2xl font-bold text-blue-600">{formData.trendValue}</div>
+            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.tren_capaian.nilai || '-'}</div>
           </div>
         </CardContent>
       </Card>
@@ -137,31 +158,31 @@ const RiskAssessmentDetailPage: React.FC = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            2. Persentase Realisasi Anggaran 2024
+            2. Persentase Realisasi Anggaran {penilaianData.kriteria_data.realisasi_anggaran.tahun_pembanding}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Realisasi 2024 (Rp)</Label>
-              <div className="mt-1 text-lg font-semibold">{formData.budgetRealization2024.toLocaleString('id-ID')}</div>
+              <Label className="text-sm font-medium text-muted-foreground">Realisasi {penilaianData.kriteria_data.realisasi_anggaran.tahun_pembanding} (Rp)</Label>
+              <div className="mt-1 text-lg font-semibold">{(penilaianData.kriteria_data.realisasi_anggaran.realisasi || 0).toLocaleString('id-ID')}</div>
             </div>
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Pagu 2024 (Rp)</Label>
-              <div className="mt-1 text-lg font-semibold">{formData.budgetPagu2024.toLocaleString('id-ID')}</div>
+              <Label className="text-sm font-medium text-muted-foreground">Pagu {penilaianData.kriteria_data.realisasi_anggaran.tahun_pembanding} (Rp)</Label>
+              <div className="mt-1 text-lg font-semibold">{(penilaianData.kriteria_data.realisasi_anggaran.pagu || 0).toLocaleString('id-ID')}</div>
             </div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Persentase Realisasi (%)</Label>
-            <div className="mt-1 text-lg font-semibold">{formData.budgetPercentage}%</div>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.realisasi_anggaran.persentase ? Number(penilaianData.kriteria_data.realisasi_anggaran.persentase).toFixed(2) : '-'}%</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Kategori</Label>
-            <div className="mt-1 text-lg font-semibold">{formData.budgetChoice}</div>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.realisasi_anggaran.pilihan || 'Belum dihitung'}</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Nilai</Label>
-            <div className="mt-1 text-2xl font-bold text-blue-600">{formData.budgetValue}</div>
+            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.realisasi_anggaran.nilai || '-'}</div>
           </div>
         </CardContent>
       </Card>
@@ -171,21 +192,21 @@ const RiskAssessmentDetailPage: React.FC = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            3. Tren Nilai Ekspor ke Negara Akreditasi 5 Tahun Terakhir
+            3. Tren Nilai Ekspor ke Negara Akreditasi (Tahun {penilaianData.kriteria_data.tren_ekspor.tahun_pembanding})
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Deskripsi Tren</Label>
-            <div className="mt-1 text-lg font-semibold">{formData.exportTrendDescription}</div>
+            <Label className="text-sm font-medium text-muted-foreground">Deskripsi Tren (%)</Label>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.tren_ekspor.deskripsi || '-'}</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Kategori</Label>
-            <div className="mt-1 text-lg font-semibold">{formData.exportChoice}</div>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.tren_ekspor.pilihan || 'Belum dihitung'}</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Nilai</Label>
-            <div className="mt-1 text-2xl font-bold text-blue-600">{formData.exportValue}</div>
+            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.tren_ekspor.nilai || '-'}</div>
           </div>
         </CardContent>
       </Card>
@@ -195,21 +216,17 @@ const RiskAssessmentDetailPage: React.FC = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            4. Pelaksanaan Audit Itjen Tahun Sebelumnya
+            4. Pelaksanaan Audit Itjen (Tahun {penilaianData.kriteria_data.audit_itjen.tahun_pembanding})
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Deskripsi Audit</Label>
-            <div className="mt-1 text-lg font-semibold">{formData.auditDescription}</div>
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-muted-foreground">Kategori</Label>
-            <div className="mt-1 text-lg font-semibold">{formData.auditChoice}</div>
+            <Label className="text-sm font-medium text-muted-foreground">Status Audit</Label>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.audit_itjen.pilihan || 'Belum dipilih'}</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Nilai</Label>
-            <div className="mt-1 text-2xl font-bold text-blue-600">{formData.auditValue}</div>
+            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.audit_itjen.nilai || '-'}</div>
           </div>
         </CardContent>
       </Card>
@@ -224,16 +241,12 @@ const RiskAssessmentDetailPage: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Deskripsi Perjanjian</Label>
-            <div className="mt-1 text-lg font-semibold">{formData.tradeAgreementDescription}</div>
-          </div>
-          <div>
-            <Label className="text-sm font-medium text-muted-foreground">Kategori</Label>
-            <div className="mt-1 text-lg font-semibold">{formData.tradeAgreementChoice}</div>
+            <Label className="text-sm font-medium text-muted-foreground">Status Perjanjian</Label>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.perjanjian_perdagangan.pilihan || 'Belum dipilih'}</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Nilai</Label>
-            <div className="mt-1 text-2xl font-bold text-blue-600">{formData.tradeAgreementValue}</div>
+            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.perjanjian_perdagangan.nilai || '-'}</div>
           </div>
         </CardContent>
       </Card>
@@ -243,21 +256,21 @@ const RiskAssessmentDetailPage: React.FC = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            6. Peringkat Nilai Ekspor Non Migas Tahun 2024
+            6. Peringkat Nilai Ekspor Non Migas Tahun {penilaianData.kriteria_data.peringkat_ekspor.tahun_pembanding}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Deskripsi Peringkat</Label>
-            <div className="mt-1 text-lg font-semibold">{formData.exportRankingDescription}</div>
+            <Label className="text-sm font-medium text-muted-foreground">Peringkat</Label>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.peringkat_ekspor.deskripsi || '-'}</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Kategori</Label>
-            <div className="mt-1 text-lg font-semibold">{formData.exportRankingChoice}</div>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.peringkat_ekspor.pilihan || 'Belum dihitung'}</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Nilai</Label>
-            <div className="mt-1 text-2xl font-bold text-blue-600">{formData.exportRankingValue}</div>
+            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.peringkat_ekspor.nilai || '-'}</div>
           </div>
         </CardContent>
       </Card>
@@ -267,31 +280,31 @@ const RiskAssessmentDetailPage: React.FC = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            7. Persentase Jumlah IK yang Tidak Mencapai Target Tahun 2024
+            7. Persentase Jumlah IK yang Tidak Mencapai Target Tahun {penilaianData.kriteria_data.persentase_ik.tahun_pembanding}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label className="text-sm font-medium text-muted-foreground">IK Tidak Tercapai</Label>
-              <div className="mt-1 text-lg font-semibold">{formData.ikNotAchieved}</div>
+              <div className="mt-1 text-lg font-semibold">{(penilaianData.kriteria_data.persentase_ik.ik_tidak_tercapai || 0).toLocaleString('id-ID')}</div>
             </div>
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Total IK</Label>
-              <div className="mt-1 text-lg font-semibold">{formData.ikTotal}</div>
+              <div className="mt-1 text-lg font-semibold">{(penilaianData.kriteria_data.persentase_ik.total_ik || 0).toLocaleString('id-ID')}</div>
             </div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Persentase IK Tidak Tercapai (%)</Label>
-            <div className="mt-1 text-lg font-semibold">{formData.ikPercentage}%</div>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.persentase_ik.persentase ? Number(penilaianData.kriteria_data.persentase_ik.persentase).toFixed(2) : '-'}%</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Kategori</Label>
-            <div className="mt-1 text-lg font-semibold">{formData.ikChoice}</div>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.persentase_ik.pilihan || 'Belum dihitung'}</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Nilai</Label>
-            <div className="mt-1 text-2xl font-bold text-blue-600">{formData.ikValue}</div>
+            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.persentase_ik.nilai || '-'}</div>
           </div>
         </CardContent>
       </Card>
@@ -301,31 +314,31 @@ const RiskAssessmentDetailPage: React.FC = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            8. Persentase Realisasi Nilai Transaksi TEI 2024
+            8. Persentase Realisasi Nilai Transaksi TEI {penilaianData.kriteria_data.realisasi_tei.tahun_pembanding}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Nilai Realisasi</Label>
-              <div className="mt-1 text-lg font-semibold">{formData.teiRealizationValue.toLocaleString('id-ID')}</div>
+              <Label className="text-sm font-medium text-muted-foreground">Nilai Realisasi (Rp)</Label>
+              <div className="mt-1 text-lg font-semibold">{(penilaianData.kriteria_data.realisasi_tei.nilai_realisasi || 0).toLocaleString('id-ID')}</div>
             </div>
             <div>
-              <Label className="text-sm font-medium text-muted-foreground">Nilai Potensi</Label>
-              <div className="mt-1 text-lg font-semibold">{formData.teiPotentialValue.toLocaleString('id-ID')}</div>
+              <Label className="text-sm font-medium text-muted-foreground">Nilai Potensi (Rp)</Label>
+              <div className="mt-1 text-lg font-semibold">{(penilaianData.kriteria_data.realisasi_tei.nilai_potensi || 0).toLocaleString('id-ID')}</div>
             </div>
           </div>
           <div>
-            <Label className="text-sm font-medium text-muted-foreground">Deskripsi</Label>
-            <div className="mt-1 text-lg font-semibold">{formData.teiDescription}</div>
+            <Label className="text-sm font-medium text-muted-foreground">Deskripsi (%)</Label>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.realisasi_tei.deskripsi ? Number(penilaianData.kriteria_data.realisasi_tei.deskripsi).toFixed(2) : '-'}%</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Kategori</Label>
-            <div className="mt-1 text-lg font-semibold">{formData.teiChoice}</div>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.realisasi_tei.pilihan || 'Belum dihitung'}</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Nilai</Label>
-            <div className="mt-1 text-2xl font-bold text-blue-600">{formData.teiValue}</div>
+            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.realisasi_tei.nilai || '-'}</div>
           </div>
         </CardContent>
       </Card>
@@ -339,13 +352,15 @@ const RiskAssessmentDetailPage: React.FC = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Label className="text-sm font-medium text-muted-foreground">Total Nilai Risiko</Label>
-          <div className="mt-1 text-4xl font-bold text-blue-600">{formData.totalRiskValue}</div>
+          <div>
+            <Label className="text-sm font-medium text-muted-foreground">Total Nilai Risiko</Label>
+            <div className="mt-1 text-4xl font-bold text-blue-600">{penilaianData.total_nilai_risiko ? Number(penilaianData.total_nilai_risiko).toFixed(2) : '-'}</div>
+          </div>
           <Separator />
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Keterangan / Catatan</Label>
             <div className="mt-1 bg-gray-50 p-3 rounded-md">
-              <p className="text-sm">{formData.notes || 'Tidak ada catatan'}</p>
+              <p className="text-sm">{penilaianData.catatan || 'Tidak ada catatan'}</p>
             </div>
           </div>
         </CardContent>
