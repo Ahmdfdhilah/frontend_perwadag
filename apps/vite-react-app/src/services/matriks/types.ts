@@ -1,4 +1,4 @@
-import { ServiceOptions, PaginatedResponse } from "../base/types";
+import { PaginatedResponse } from "../base/types";
 
 // Base Types
 export interface Matriks {
@@ -111,9 +111,6 @@ export interface MatriksFilterParams {
   is_completed?: boolean;
   tahun_evaluasi?: number;
 }
-
-// Service Options
-export interface MatriksServiceOptions extends ServiceOptions {}
 
 // Message Response
 export interface MessageResponse {

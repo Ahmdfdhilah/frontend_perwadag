@@ -1,4 +1,4 @@
-import { ServiceOptions, PaginatedResponse } from "../base/types";
+import { PaginatedResponse } from "../base/types";
 
 // Base Types
 export interface SuratPemberitahuan {
@@ -114,8 +114,6 @@ export interface SuratPemberitahuanFilterParams {
   tanggal_to?: string;
 }
 
-// Service Options
-export interface SuratPemberitahuanServiceOptions extends ServiceOptions {}
 
 // Message Response
 export interface MessageResponse {

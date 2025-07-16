@@ -1,4 +1,4 @@
-import { ServiceOptions, PaginatedResponse } from "../base/types";
+import { PaginatedResponse } from "../base/types";
 
 // Base Types
 export interface Meeting {
@@ -151,9 +151,6 @@ export interface MeetingFilterParams {
   tanggal_from?: string;
   tanggal_to?: string;
 }
-
-// Service Options
-export interface MeetingServiceOptions extends ServiceOptions {}
 
 // Message Response
 export interface MessageResponse {

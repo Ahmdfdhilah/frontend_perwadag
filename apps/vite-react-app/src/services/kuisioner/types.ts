@@ -1,4 +1,4 @@
-import { ServiceOptions, PaginatedResponse } from "../base/types";
+import {  PaginatedResponse } from "../base/types";
 
 // Base Types
 export interface Kuisioner {
@@ -111,9 +111,6 @@ export interface KuisionerFilterParams {
   tanggal_from?: string;
   tanggal_to?: string;
 }
-
-// Service Options
-export interface KuisionerServiceOptions extends ServiceOptions {}
 
 // Message Response
 export interface MessageResponse {

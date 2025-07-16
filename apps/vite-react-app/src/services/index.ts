@@ -54,7 +54,6 @@ export type {
   PerwadagListResponse,
   SuratTugasFilterParams,
   SuratTugasFileUploadResponse,
-  SuratTugasServiceOptions
 } from "./suratTugas";
 
 export type {
@@ -68,7 +67,6 @@ export type {
   FormatKuisionerByYearResponse,
   FormatKuisionerStatisticsResponse,
   FormatKuisionerFilterParams,
-  FormatKuisionerServiceOptions
 } from "./formatKuisioner";
 
 export type {
@@ -80,7 +78,6 @@ export type {
   KuisionerListResponse,
   KuisionerFileUploadResponse,
   KuisionerFilterParams,
-  KuisionerServiceOptions
 } from "./kuisioner";
 
 export type {
@@ -92,7 +89,6 @@ export type {
   LaporanHasilListResponse,
   LaporanHasilFileUploadResponse,
   LaporanHasilFilterParams,
-  LaporanHasilServiceOptions
 } from "./laporanHasil";
 
 export type {
@@ -104,7 +100,7 @@ export type {
   MatriksListResponse,
   MatriksFileUploadResponse,
   MatriksFilterParams,
-  MatriksServiceOptions
+
 } from "./matriks";
 
 export type {
@@ -116,7 +112,6 @@ export type {
   SuratPemberitahuanListResponse,
   SuratPemberitahuanFileUploadResponse,
   SuratPemberitahuanFilterParams,
-  SuratPemberitahuanServiceOptions
 } from "./suratPemberitahuan";
 
 export type {
@@ -132,5 +127,4 @@ export type {
   MeetingFileUploadResponse,
   MeetingFileDeleteResponse,
   MeetingFilterParams,
-  MeetingServiceOptions
 } from "./meeting";

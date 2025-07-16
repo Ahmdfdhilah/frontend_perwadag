@@ -1,4 +1,4 @@
-import { ServiceOptions, PaginatedResponse } from "../base/types";
+import { PaginatedResponse } from "../base/types";
 
 // Base Types
 export interface LaporanHasil {
@@ -116,9 +116,6 @@ export interface LaporanHasilFilterParams {
   tanggal_from?: string;
   tanggal_to?: string;
 }
-
-// Service Options
-export interface LaporanHasilServiceOptions extends ServiceOptions {}
 
 // Message Response
 export interface MessageResponse {

@@ -1,4 +1,4 @@
-import { ServiceOptions, PaginatedResponse } from "../base/types";
+import { PaginatedResponse } from "../base/types";
 
 // Base Types
 export interface FormatKuisioner {
@@ -106,8 +106,6 @@ export interface FormatKuisionerFilterParams {
   created_before?: string;
 }
 
-// Service Options
-export interface FormatKuisionerServiceOptions extends ServiceOptions {}
 
 // Message Response
 export interface MessageResponse {
