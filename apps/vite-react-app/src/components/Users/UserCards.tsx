@@ -1,6 +1,5 @@
 import React from 'react';
-import { User } from '@/mocks/users';
-import { PERWADAG_DATA } from '@/mocks/perwadag';
+import { User } from '@/services/users/types';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import { Badge } from '@workspace/ui/components/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@workspace/ui/components/avatar';
@@ -18,6 +17,7 @@ import {
 
 interface UserCardsProps {
   users: User[];
+  loading?: boolean;
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
   onView: (user: User) => void;
@@ -25,41 +25,45 @@ interface UserCardsProps {
 
 export const UserCards: React.FC<UserCardsProps> = ({
   users,
+  loading = false,
   onEdit,
   onDelete,
   onView
 }) => {
-  const getPerwadagName = (perwadagId?: string) => {
-    if (!perwadagId) return null;
-    const perwadag = PERWADAG_DATA.find(p => p.id === perwadagId);
-    return perwadag?.name || null;
-  };
-
   const getStatusBadge = (isActive: boolean) => {
     return (
       <Badge variant={isActive ? 'default' : 'destructive'} className="text-xs">
-        {isActive ? 'Active' : 'Inactive'}
+        {isActive ? 'Aktif' : 'Tidak Aktif'}
       </Badge>
     );
   };
 
-  const getRolesBadges = (roles: User['roles']) => {
+  const getRoleBadge = (role: string) => {
+    const roleLabels = {
+      'ADMIN': 'Admin',
+      'INSPEKTORAT': 'Inspektorat', 
+      'PERWADAG': 'Perwadag'
+    };
     return (
-      <div className="flex flex-wrap gap-1">
-        {roles.map((role) => (
-          <Badge key={role.id} variant="secondary" className="text-xs">
-            {role.label}
-          </Badge>
-        ))}
-      </div>
+      <Badge variant="secondary" className="text-xs">
+        {roleLabels[role as keyof typeof roleLabels] || role}
+      </Badge>
     );
   };
 
 
+  if (loading) {
+    return (
+      <div className="text-center py-8 text-muted-foreground">
+        Loading users...
+      </div>
+    );
+  }
+
   if (users.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
-        No users found
+        Tidak ada user ditemukan
       </div>
     );
   }
@@ -73,18 +77,14 @@ export const UserCards: React.FC<UserCardsProps> = ({
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center space-x-3">
                 <Avatar className="w-10 h-10">
-                  {user.avatar ? (
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                  ) : (
-                    <AvatarFallback className="text-sm">
-                      {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                    </AvatarFallback>
-                  )}
+                  <AvatarFallback className="text-sm">
+                    {user.nama.split(' ').map(n => n[0]).join('').toUpperCase()}
+                  </AvatarFallback>
                 </Avatar>
                 <div>
-                  <h3 className="font-medium text-sm">{user.name}</h3>
+                  <h3 className="font-medium text-sm">{user.nama}</h3>
                   <div className="flex items-center space-x-2 mt-1">
-                    {getStatusBadge(user.isActive)}
+                    {getStatusBadge(user.is_active)}
                   </div>
                 </div>
               </div>
@@ -95,52 +95,55 @@ export const UserCards: React.FC<UserCardsProps> = ({
               />
             </div>
 
-            {/* NIP */}
+            {/* User ID */}
             <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
               <CreditCard className="w-4 h-4" />
-              <span>NIP: {user.nip}</span>
+              <span>ID: {user.id}</span>
             </div>
 
             {/* Email */}
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
-              <Mail className="w-4 h-4" />
-              <span className="truncate">{user.email}</span>
-            </div>
-
-            {/* Phone */}
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
-              <Phone className="w-4 h-4" />
-              <span>{user.phone}</span>
-            </div>
-
-            {/* Address */}
-            <div className="flex items-start space-x-2 text-sm text-muted-foreground mb-3">
-              <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-              <span className="line-clamp-2">{user.address}</span>
-            </div>
-
-            {/* Perwadag */}
-            {getPerwadagName(user.perwadagId) && (
-              <div className="flex items-start space-x-2 text-sm text-muted-foreground mb-3">
-                <Building className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span className="line-clamp-2">{getPerwadagName(user.perwadagId)}</span>
+            {user.email && (
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
+                <Mail className="w-4 h-4" />
+                <span className="truncate">{user.email}</span>
               </div>
             )}
 
-            {/* Roles */}
+            {/* Wilayah */}
+            {user.wilayah && (
+              <div className="flex items-start space-x-2 text-sm text-muted-foreground mb-2">
+                <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span className="line-clamp-2">{user.wilayah}</span>
+              </div>
+            )}
+
+            {/* Inspektorat */}
+            {user.inspektorat && (
+              <div className="flex items-start space-x-2 text-sm text-muted-foreground mb-2">
+                <Building className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span className="line-clamp-2">Inspektorat: {user.inspektorat}</span>
+              </div>
+            )}
+
+            {/* Perwadag ID */}
+            {user.perwadag_id && (
+              <div className="flex items-start space-x-2 text-sm text-muted-foreground mb-2">
+                <Building className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span className="line-clamp-2">Perwadag ID: {user.perwadag_id}</span>
+              </div>
+            )}
+
+            {/* Role */}
             <div className="mb-3">
-              <p className="text-xs text-muted-foreground mb-1">Roles:</p>
-              {getRolesBadges(user.roles)}
+              <p className="text-xs text-muted-foreground mb-1">Role:</p>
+              {getRoleBadge(user.role)}
             </div>
 
-            {/* Last Login */}
+            {/* Created At */}
             <div className="flex items-center space-x-2 text-xs text-muted-foreground pt-2 border-t">
               <Calendar className="w-3 h-3" />
               <span>
-                Last login: {user.lastLogin ? 
-                  format(user.lastLogin, 'dd MMM yyyy, HH:mm', { locale: id }) : 
-                  'Never'
-                }
+                Dibuat: {format(new Date(user.created_at), 'dd MMM yyyy', { locale: id })}
               </span>
             </div>
           </CardContent>

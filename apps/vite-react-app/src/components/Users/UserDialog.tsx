@@ -6,8 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@workspace/ui/components/dialog';
-import { User } from '@/mocks/users';
-import { ROLES } from '@/mocks/roles';
+import { User } from '@/services/users/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { UserForm } from './UserForm';
 
@@ -36,20 +35,15 @@ export const UserDialog: React.FC<UserDialogProps> = ({
     setLoading(true);
 
     try {
-      // Transform role from string ID to Role object
+      // Transform data to match API requirements
       const transformedData = {
-        ...data,
-        roles: [ROLES.find(role => role.id === data.roles)!],
-        id: editingUser?.id || `USR${Date.now()}`,
-        createdAt: editingUser?.createdAt || new Date(),
-        updatedAt: new Date(),
-        lastLogin: editingUser?.lastLogin || undefined,
-        perwadagId: data.perwadagId || undefined,
-        inspektoratLevel: data.inspektoratLevel || undefined
+        nama: data.nama,
+        email: data.email || undefined,
+        role: data.role,
+        inspektorat: data.inspektorat || undefined,
+        wilayah: data.wilayah || undefined,
+        perwadag_id: data.perwadag_id || undefined,
       };
-
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
 
       onSave(transformedData);
       onOpenChange(false);

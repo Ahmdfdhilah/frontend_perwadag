@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { User } from '@/mocks/users';
-import { ROLES } from '@/mocks/roles';
+import { User } from '@/services/users/types';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
-import { Textarea } from '@workspace/ui/components/textarea';
 import {
   Select,
   SelectContent,
@@ -14,7 +12,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@workspace/ui/components/select';
-import { Switch } from '@workspace/ui/components/switch';
 import {
   Form,
   FormControl,
@@ -25,15 +22,14 @@ import {
 } from '@workspace/ui/components/form';
 
 const userSchema = z.object({
-  email: z.string().email('Please enter a valid email address').min(1, 'Email is required'),
-  nip: z.string().min(1, 'NIP is required').regex(/^\d{18}$/, 'NIP must be 18 digits'),
-  name: z.string().min(1, 'Name is required').min(2, 'Name must be at least 2 characters'),
-  phone: z.string().min(1, 'Phone is required').regex(/^\+?\d{10,15}$/, 'Please enter a valid phone number'),
-  address: z.string().min(1, 'Address is required'),
-  roles: z.string().min(1, 'Please select a role'),
-  perwadagId: z.string().optional(),
-  inspektoratLevel: z.string().optional(),
-  isActive: z.boolean(),
+  nama: z.string().min(1, 'Nama is required').min(2, 'Nama must be at least 2 characters'),
+  email: z.string().email('Please enter a valid email address').optional().or(z.literal('')),
+  role: z.enum(['ADMIN', 'INSPEKTORAT', 'PERWADAG'], {
+    required_error: 'Please select a role',
+  }),
+  inspektorat: z.string().optional(),
+  wilayah: z.string().optional(),
+  perwadag_id: z.string().optional(),
 });
 
 type UserFormData = z.infer<typeof userSchema>;
@@ -55,40 +51,37 @@ export const UserForm: React.FC<UserFormProps> = ({
   disabled = false,
 }) => {
   const [showPerwadagSelect, setShowPerwadagSelect] = useState(
-    initialData?.roles?.some(role => role.name === 'perwadag') || false
+    initialData?.role === 'PERWADAG' || false
   );
   const [showInspektoratSelect, setShowInspektoratSelect] = useState(
-    initialData?.roles?.some(role => role.name === 'perwadag') || false
+    initialData?.role === 'INSPEKTORAT' || false
   );
 
   const form = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
     defaultValues: {
+      nama: initialData?.nama || '',
       email: initialData?.email || '',
-      nip: initialData?.nip || '',
-      name: initialData?.name || '',
-      phone: initialData?.phone || '',
-      address: initialData?.address || '',
-      roles: initialData?.roles?.[0]?.id || '',
-      perwadagId: initialData?.perwadagId || '',
-      inspektoratLevel: initialData?.inspektoratLevel || '',
-      isActive: initialData?.isActive !== undefined ? initialData.isActive : true,
+      role: initialData?.role || 'PERWADAG',
+      inspektorat: initialData?.inspektorat || '',
+      wilayah: initialData?.wilayah || '',
+      perwadag_id: initialData?.perwadag_id || '',
     }
   });
 
   useEffect(() => {
-    const roleId = form.watch('roles');
-    const selectedRole = ROLES.find(role => role.id === roleId);
-    const hasPerwadagRole = selectedRole?.name === 'perwadag';
+    const role = form.watch('role');
     
-    setShowPerwadagSelect(hasPerwadagRole);
-    setShowInspektoratSelect(hasPerwadagRole);
+    setShowPerwadagSelect(role === 'PERWADAG');
+    setShowInspektoratSelect(role === 'INSPEKTORAT');
     
-    if (!hasPerwadagRole) {
-      form.setValue('perwadagId', '');
-      form.setValue('inspektoratLevel', '');
+    if (role !== 'PERWADAG') {
+      form.setValue('perwadag_id', '');
     }
-  }, [form.watch('roles')]);
+    if (role !== 'INSPEKTORAT') {
+      form.setValue('inspektorat', '');
+    }
+  }, [form.watch('role')]);
 
 
   const handleSubmit = (data: UserFormData) => {
@@ -100,15 +93,15 @@ export const UserForm: React.FC<UserFormProps> = ({
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
 
         {/* Basic Information */}
-        <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
-            name="name"
+            name="nama"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Full Name</FormLabel>
+                <FormLabel>Nama Lengkap</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter full name" disabled={loading || disabled} {...field} />
+                  <Input placeholder="Masukkan nama lengkap" disabled={loading || disabled} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -120,37 +113,9 @@ export const UserForm: React.FC<UserFormProps> = ({
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email</FormLabel>
+                <FormLabel>Email (Opsional)</FormLabel>
                 <FormControl>
-                  <Input type="email" placeholder="Enter email address" disabled={loading || disabled} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="nip"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>NIP</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter 18-digit NIP" disabled={loading || disabled} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Phone</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter phone number" disabled={loading || disabled} {...field} />
+                  <Input type="email" placeholder="Masukkan alamat email" disabled={loading || disabled} {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -160,12 +125,12 @@ export const UserForm: React.FC<UserFormProps> = ({
 
         <FormField
           control={form.control}
-          name="address"
+          name="wilayah"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Address</FormLabel>
+              <FormLabel>Wilayah</FormLabel>
               <FormControl>
-                <Textarea placeholder="Enter address" disabled={loading || disabled} {...field} />
+                <Input placeholder="Masukkan wilayah" disabled={loading || disabled} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -175,22 +140,20 @@ export const UserForm: React.FC<UserFormProps> = ({
         {/* Role Selection */}
         <FormField
           control={form.control}
-          name="roles"
+          name="role"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Role</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading || disabled}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a role" />
+                    <SelectValue placeholder="Pilih role" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {ROLES.map((role) => (
-                    <SelectItem key={role.id} value={role.id}>
-                      {role.label}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="ADMIN">Admin</SelectItem>
+                  <SelectItem value="INSPEKTORAT">Inspektorat</SelectItem>
+                  <SelectItem value="PERWADAG">Perwadag</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -202,13 +165,13 @@ export const UserForm: React.FC<UserFormProps> = ({
         {showPerwadagSelect && (
           <FormField
             control={form.control}
-            name="perwadagId"
+            name="perwadag_id"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nama Perwadag</FormLabel>
+                <FormLabel>ID Perwadag</FormLabel>
                 <FormControl>
                   <Input 
-                    placeholder="Enter perwadag name" 
+                    placeholder="Masukkan ID perwadag" 
                     disabled={loading || disabled} 
                     {...field} 
                   />
@@ -219,55 +182,26 @@ export const UserForm: React.FC<UserFormProps> = ({
           />
         )}
 
-        {/* Inspektorat Level Selection */}
+        {/* Inspektorat Selection */}
         {showInspektoratSelect && (
           <FormField
             control={form.control}
-            name="inspektoratLevel"
+            name="inspektorat"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Inspektorat</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading || disabled}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select inspektorat" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="1">Inspektorat 1</SelectItem>
-                    <SelectItem value="2">Inspektorat 2</SelectItem>
-                    <SelectItem value="3">Inspektorat 3</SelectItem>
-                    <SelectItem value="4">Inspektorat 4</SelectItem>
-                  </SelectContent>
-                </Select>
+                <FormControl>
+                  <Input 
+                    placeholder="Masukkan nama inspektorat" 
+                    disabled={loading || disabled} 
+                    {...field} 
+                  />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
         )}
-
-        {/* Active Status */}
-        <FormField
-          control={form.control}
-          name="isActive"
-          render={({ field }) => (
-            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-              <div className="space-y-0.5">
-                <FormLabel className="text-base">Active Status</FormLabel>
-                <div className="text-sm text-muted-foreground">
-                  Enable or disable user access to the system
-                </div>
-              </div>
-              <FormControl>
-                <Switch
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  disabled={loading || disabled}
-                />
-              </FormControl>
-            </FormItem>
-          )}
-        />
 
         {/* Form Actions */}
         <div className="flex justify-end space-x-4 pt-4">
@@ -275,7 +209,7 @@ export const UserForm: React.FC<UserFormProps> = ({
             Cancel
           </Button>
           <Button type="submit" disabled={loading || disabled}>
-            {loading ? 'Saving...' : initialData ? 'Update User' : 'Create User'}
+            {loading ? 'Menyimpan...' : initialData ? 'Update User' : 'Buat User'}
           </Button>
         </div>
       </form>

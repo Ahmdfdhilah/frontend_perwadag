@@ -1,8 +1,8 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRole } from '@/hooks/useRole';
 import { useToast } from '@workspace/ui/components/sonner';
-import { User, USERS_DATA } from '@/mocks/users';
-import { ROLES } from '@/mocks/roles';
+import { User, UserFilterParams } from '@/services/users/types';
+import { userService } from '@/services/users';
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import {
@@ -37,7 +37,9 @@ import {
 const UsersPage: React.FC = () => {
   const { isAdmin } = useRole();
   const { toast } = useToast();
-  const [users, setUsers] = useState<User[]>(USERS_DATA);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [totalItems, setTotalItems] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
@@ -52,44 +54,37 @@ const UsersPage: React.FC = () => {
   // Calculate access control
   const hasAccess = isAdmin();
 
-  // Filter and search users
-  const filteredUsers = useMemo(() => {
-    let filtered = [...users];
+  // Fetch users function
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const params: UserFilterParams = {
+        page: currentPage,
+        size: itemsPerPage,
+        search: searchQuery || undefined,
+        role: selectedRole !== 'all' ? selectedRole : undefined,
+        is_active: selectedStatus !== 'all' ? selectedStatus === 'active' : undefined,
+      };
 
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(user =>
-        user.name.toLowerCase().includes(query) ||
-        user.email.toLowerCase().includes(query) ||
-        user.nip.includes(query) ||
-        user.phone.includes(query)
-      );
+      const response = await userService.getUsers(params);
+      setUsers(response.items);
+      setTotalItems(response.total);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    // Role filter
-    if (selectedRole !== 'all') {
-      filtered = filtered.filter(user =>
-        user.roles.some(role => role.id === selectedRole)
-      );
+  // Effect to fetch users when filters change
+  useEffect(() => {
+    if (hasAccess) {
+      fetchUsers();
     }
-
-    // Status filter
-    if (selectedStatus !== 'all') {
-      const isActive = selectedStatus === 'active';
-      filtered = filtered.filter(user => user.isActive === isActive);
-    }
-
-    // Sort by name
-    filtered.sort((a, b) => a.name.localeCompare(b.name));
-
-    return filtered;
-  }, [users, searchQuery, selectedRole, selectedStatus]);
+  }, [currentPage, itemsPerPage, searchQuery, selectedRole, selectedStatus, hasAccess]);
 
   // Pagination
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedUsers = filteredUsers.slice(startIndex, startIndex + itemsPerPage);
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const handleView = (user: User) => {
     setViewingUser(user);
@@ -105,15 +100,20 @@ const UsersPage: React.FC = () => {
     setUserToDelete(user);
   };
 
-  const confirmDeleteUser = () => {
+  const confirmDeleteUser = async () => {
     if (userToDelete) {
-      setUsers(prev => prev.filter(u => u.id !== userToDelete.id));
-      setUserToDelete(null);
-      toast({
-        title: 'User berhasil dihapus',
-        description: `User ${userToDelete.name} telah dihapus dari sistem.`,
-        variant: 'default'
-      });
+      try {
+        await userService.deleteUser(userToDelete.id);
+        setUserToDelete(null);
+        fetchUsers(); // Refresh the list
+        toast({
+          title: 'User berhasil dihapus',
+          description: `User ${userToDelete.nama} telah dihapus dari sistem.`,
+          variant: 'default'
+        });
+      } catch (error) {
+        console.error('Failed to delete user:', error);
+      }
     }
   };
 
@@ -122,26 +122,31 @@ const UsersPage: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSave = (userData: User) => {
-    if (editingUser) {
-      // Update existing user
-      setUsers(prev => prev.map(u => u.id === editingUser.id ? userData : u));
-      toast({
-        title: 'User berhasil diperbarui',
-        description: `Data user ${userData.name} telah diperbarui.`,
-        variant: 'default'
-      });
-    } else {
-      // Create new user
-      setUsers(prev => [...prev, userData]);
-      toast({
-        title: 'User berhasil dibuat',
-        description: `User ${userData.name} telah ditambahkan ke sistem.`,
-        variant: 'default'
-      });
+  const handleSave = async (userData: any) => {
+    try {
+      if (editingUser) {
+        // Update existing user
+        await userService.updateUser(editingUser.id, userData);
+        toast({
+          title: 'User berhasil diperbarui',
+          description: `Data user ${userData.nama} telah diperbarui.`,
+          variant: 'default'
+        });
+      } else {
+        // Create new user
+        await userService.createUser(userData);
+        toast({
+          title: 'User berhasil dibuat',
+          description: `User ${userData.nama} telah ditambahkan ke sistem.`,
+          variant: 'default'
+        });
+      }
+      setIsDialogOpen(false);
+      setEditingUser(null);
+      fetchUsers(); // Refresh the list
+    } catch (error) {
+      console.error('Failed to save user:', error);
     }
-    setIsDialogOpen(false);
-    setEditingUser(null);
   };
 
   const handleItemsPerPageChange = (value: string) => {
@@ -149,13 +154,20 @@ const UsersPage: React.FC = () => {
     setCurrentPage(1);
   };
 
+  // Role options
+  const roleOptions = [
+    { value: 'ADMIN', label: 'Admin' },
+    { value: 'INSPEKTORAT', label: 'Inspektorat' },
+    { value: 'PERWADAG', label: 'Perwadag' },
+  ];
+
   // Generate composite title
   const getCompositeTitle = () => {
     let title = "Daftar Pengguna";
     const filters = [];
     
     if (selectedRole !== 'all') {
-      const role = ROLES.find(r => r.id === selectedRole);
+      const role = roleOptions.find(r => r.value === selectedRole);
       if (role) filters.push(role.label);
     }
     
@@ -206,8 +218,8 @@ const UsersPage: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Role</SelectItem>
-              {ROLES.map(role => (
-                <SelectItem key={role.id} value={role.id}>
+              {roleOptions.map(role => (
+                <SelectItem key={role.value} value={role.value}>
                   {role.label}
                 </SelectItem>
               ))}
@@ -247,7 +259,8 @@ const UsersPage: React.FC = () => {
             {/* Desktop Table */}
             <div className="hidden md:block">
               <UserTable
-                users={paginatedUsers}
+                users={users}
+                loading={loading}
                 onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
@@ -257,7 +270,8 @@ const UsersPage: React.FC = () => {
             {/* Mobile Cards */}
             <div className="md:hidden">
               <UserCards
-                users={paginatedUsers}
+                users={users}
+                loading={loading}
                 onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
@@ -270,7 +284,7 @@ const UsersPage: React.FC = () => {
                 currentPage={currentPage}
                 totalPages={totalPages}
                 itemsPerPage={itemsPerPage}
-                totalItems={filteredUsers.length}
+                totalItems={totalItems}
                 onPageChange={setCurrentPage}
                 onItemsPerPageChange={handleItemsPerPageChange}
               />
@@ -301,7 +315,7 @@ const UsersPage: React.FC = () => {
             <AlertDialogTitle>Konfirmasi Hapus</AlertDialogTitle>
             <AlertDialogDescription>
               Tindakan ini tidak dapat dibatalkan. User{' '}
-              <span className="font-semibold">{userToDelete?.name}</span> akan dihapus
+              <span className="font-semibold">{userToDelete?.nama}</span> akan dihapus
               secara permanen dari sistem.
             </AlertDialogDescription>
           </AlertDialogHeader>

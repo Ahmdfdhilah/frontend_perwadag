@@ -21,15 +21,11 @@ export interface PaginationParams {
 }
 
 export interface PaginatedResponse<T> {
-  success: boolean;
-  message: string;
-  data: {
-    items: T[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
+  items: T[];
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
 }
 
 export interface ToastConfig {

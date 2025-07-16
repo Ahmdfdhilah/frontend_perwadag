@@ -1,6 +1,5 @@
 import React from 'react';
-import { User } from '@/mocks/users';
-import { PERWADAG_DATA } from '@/mocks/perwadag';
+import { User } from '@/services/users/types';
 import {
   Table,
   TableBody,
@@ -17,6 +16,7 @@ import { id } from 'date-fns/locale';
 
 interface UserTableProps {
   users: User[];
+  loading?: boolean;
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
   onView: (user: User) => void;
@@ -24,33 +24,29 @@ interface UserTableProps {
 
 export const UserTable: React.FC<UserTableProps> = ({
   users,
+  loading = false,
   onEdit,
   onDelete,
   onView
 }) => {
-  const getPerwadagName = (perwadagId?: string) => {
-    if (!perwadagId) return '-';
-    const perwadag = PERWADAG_DATA.find(p => p.id === perwadagId);
-    return perwadag?.name || '-';
-  };
-
   const getStatusBadge = (isActive: boolean) => {
     return (
       <Badge variant={isActive ? 'default' : 'destructive'}>
-        {isActive ? 'Active' : 'Inactive'}
+        {isActive ? 'Aktif' : 'Tidak Aktif'}
       </Badge>
     );
   };
 
-  const getRolesBadges = (roles: User['roles']) => {
+  const getRoleBadge = (role: string) => {
+    const roleLabels = {
+      'ADMIN': 'Admin',
+      'INSPEKTORAT': 'Inspektorat', 
+      'PERWADAG': 'Perwadag'
+    };
     return (
-      <div className="flex flex-wrap gap-1">
-        {roles.map((role) => (
-          <Badge key={role.id} variant="secondary" className="text-xs">
-            {role.label}
-          </Badge>
-        ))}
-      </div>
+      <Badge variant="secondary" className="text-xs">
+        {roleLabels[role as keyof typeof roleLabels] || role}
+      </Badge>
     );
   };
 
@@ -61,19 +57,25 @@ export const UserTable: React.FC<UserTableProps> = ({
         <TableHeader>
           <TableRow>
             <TableHead>User</TableHead>
-            <TableHead>Contact</TableHead>
-            <TableHead>Roles</TableHead>
-            <TableHead>Perwadag</TableHead>
+            <TableHead>Email</TableHead>
+            <TableHead>Role</TableHead>
+            <TableHead>Wilayah</TableHead>
+            <TableHead>Inspektorat/Perwadag</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Last Login</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {users.length === 0 ? (
+          {loading ? (
             <TableRow>
               <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
-                No users found
+                Loading users...
+              </TableCell>
+            </TableRow>
+          ) : users.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                Tidak ada user ditemukan
               </TableCell>
             </TableRow>
           ) : (
@@ -82,45 +84,32 @@ export const UserTable: React.FC<UserTableProps> = ({
                 <TableCell>
                   <div className="flex items-center space-x-3">
                     <Avatar className="w-8 h-8">
-                      {user.avatar ? (
-                        <AvatarImage src={user.avatar} alt={user.name} />
-                      ) : (
-                        <AvatarFallback className="text-xs">
-                          {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                        </AvatarFallback>
-                      )}
+                      <AvatarFallback className="text-xs">
+                        {user.nama.split(' ').map(n => n[0]).join('').toUpperCase()}
+                      </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="font-medium">{user.name}</p>
-                      <p className="text-sm text-muted-foreground">NIP: {user.nip}</p>
+                      <p className="font-medium">{user.nama}</p>
+                      <p className="text-sm text-muted-foreground">ID: {user.id}</p>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div>
-                    <p className="text-sm">{user.email}</p>
-                    <p className="text-sm text-muted-foreground">{user.phone}</p>
-                  </div>
+                  <span className="text-sm">{user.email || '-'}</span>
                 </TableCell>
                 <TableCell>
-                  {getRolesBadges(user.roles)}
+                  {getRoleBadge(user.role)}
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">{user.wilayah || '-'}</span>
                 </TableCell>
                 <TableCell>
                   <span className="text-sm">
-                    {getPerwadagName(user.perwadagId)}
+                    {user.inspektorat || user.perwadag_id || '-'}
                   </span>
                 </TableCell>
                 <TableCell>
-                  {getStatusBadge(user.isActive)}
-                </TableCell>
-                <TableCell>
-                  {user.lastLogin ? (
-                    <span className="text-sm text-muted-foreground">
-                      {format(user.lastLogin, 'dd MMM yyyy, HH:mm', { locale: id })}
-                    </span>
-                  ) : (
-                    <span className="text-sm text-muted-foreground">Never</span>
-                  )}
+                  {getStatusBadge(user.is_active)}
                 </TableCell>
                 <TableCell className="text-right">
                   <ActionDropdown

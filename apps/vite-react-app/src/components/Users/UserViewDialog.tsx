@@ -7,7 +7,7 @@ import {
 } from '@workspace/ui/components/dialog';
 import { Badge } from '@workspace/ui/components/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@workspace/ui/components/avatar';
-import { User } from '@/mocks/users';
+import { User } from '@/services/users/types';
 import { PERWADAG_DATA } from '@/mocks/perwadag';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -49,15 +49,11 @@ export const UserViewDialog: React.FC<UserViewDialogProps> = ({
     );
   };
 
-  const getRolesBadges = (roles: User['roles']) => {
+  const getRoleBadge = (role: User['role']) => {
     return (
-      <div className="flex flex-wrap gap-2">
-        {roles.map((role) => (
-          <Badge key={role.id} variant="secondary">
-            {role.label}
-          </Badge>
-        ))}
-      </div>
+      <Badge variant="secondary">
+        {role}
+      </Badge>
     );
   };
 
@@ -72,18 +68,14 @@ export const UserViewDialog: React.FC<UserViewDialogProps> = ({
           {/* User Header */}
           <div className="flex items-center space-x-4">
             <Avatar className="w-20 h-20">
-              {user.avatar ? (
-                <AvatarImage src={user.avatar} alt={user.name} />
-              ) : (
-                <AvatarFallback className="text-lg">
-                  {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                </AvatarFallback>
-              )}
+              <AvatarFallback className="text-lg">
+                {user.nama.split(' ').map(n => n[0]).join('').toUpperCase()}
+              </AvatarFallback>
             </Avatar>
             <div className="flex-1">
-              <h2 className="text-2xl font-semibold">{user.name}</h2>
+              <h2 className="text-2xl font-semibold">{user.nama}</h2>
               <div className="flex items-center gap-2 mt-2">
-                {getStatusBadge(user.isActive)}
+                {getStatusBadge(user.is_active)}
               </div>
             </div>
           </div>
@@ -101,34 +93,40 @@ export const UserViewDialog: React.FC<UserViewDialogProps> = ({
                 <div className="flex items-center space-x-3">
                   <CreditCard className="w-4 h-4 text-muted-foreground" />
                   <div>
-                    <p className="text-sm font-medium">NIP</p>
-                    <p className="text-sm text-muted-foreground">{user.nip}</p>
+                    <p className="text-sm font-medium">ID</p>
+                    <p className="text-sm text-muted-foreground">{user.id}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-3">
-                  <Mail className="w-4 h-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">Email</p>
-                    <p className="text-sm text-muted-foreground">{user.email}</p>
+                {user.email && (
+                  <div className="flex items-center space-x-3">
+                    <Mail className="w-4 h-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">Email</p>
+                      <p className="text-sm text-muted-foreground">{user.email}</p>
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div className="flex items-center space-x-3">
-                  <Phone className="w-4 h-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">Telepon</p>
-                    <p className="text-sm text-muted-foreground">{user.phone}</p>
+                {user.inspektorat && (
+                  <div className="flex items-center space-x-3">
+                    <Building className="w-4 h-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">Inspektorat</p>
+                      <p className="text-sm text-muted-foreground">{user.inspektorat}</p>
+                    </div>
                   </div>
-                </div>
+                )}
 
-                <div className="flex items-start space-x-3">
-                  <MapPin className="w-4 h-4 text-muted-foreground mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium">Alamat</p>
-                    <p className="text-sm text-muted-foreground">{user.address}</p>
+                {user.wilayah && (
+                  <div className="flex items-start space-x-3">
+                    <MapPin className="w-4 h-4 text-muted-foreground mt-0.5" />
+                    <div>
+                      <p className="text-sm font-medium">Wilayah</p>
+                      <p className="text-sm text-muted-foreground">{user.wilayah}</p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
 
@@ -142,36 +140,25 @@ export const UserViewDialog: React.FC<UserViewDialogProps> = ({
               <div className="space-y-3">
                 <div>
                   <p className="text-sm font-medium mb-1">Peran</p>
-                  {getRolesBadges(user.roles)}
+                  {getRoleBadge(user.role)}
                 </div>
 
-                <div className="flex items-center space-x-3">
-                  <Building className="w-4 h-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">Perwadag</p>
-                    <p className="text-sm text-muted-foreground">{getPerwadagName(user.perwadagId)}</p>
+                {user.perwadag_id && (
+                  <div className="flex items-center space-x-3">
+                    <Building className="w-4 h-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">Perwadag</p>
+                      <p className="text-sm text-muted-foreground">{getPerwadagName(user.perwadag_id)}</p>
+                    </div>
                   </div>
-                </div>
-
-                <div className="flex items-center space-x-3">
-                  <Calendar className="w-4 h-4 text-muted-foreground" />
-                  <div>
-                    <p className="text-sm font-medium">Login Terakhir</p>
-                    <p className="text-sm text-muted-foreground">
-                      {user.lastLogin ? 
-                        format(user.lastLogin, 'dd MMM yyyy, HH:mm', { locale: id }) : 
-                        'Belum pernah login'
-                      }
-                    </p>
-                  </div>
-                </div>
+                )}
 
                 <div className="flex items-center space-x-3">
                   <Calendar className="w-4 h-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm font-medium">Dibuat</p>
                     <p className="text-sm text-muted-foreground">
-                      {format(user.createdAt, 'dd MMM yyyy, HH:mm', { locale: id })}
+                      {format(new Date(user.created_at), 'dd MMM yyyy, HH:mm', { locale: id })}
                     </p>
                   </div>
                 </div>
@@ -181,7 +168,7 @@ export const UserViewDialog: React.FC<UserViewDialogProps> = ({
                   <div>
                     <p className="text-sm font-medium">Diperbarui</p>
                     <p className="text-sm text-muted-foreground">
-                      {format(user.updatedAt, 'dd MMM yyyy, HH:mm', { locale: id })}
+                      {format(new Date(user.updated_at), 'dd MMM yyyy, HH:mm', { locale: id })}
                     </p>
                   </div>
                 </div>
