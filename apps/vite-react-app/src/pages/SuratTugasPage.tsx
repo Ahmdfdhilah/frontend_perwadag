@@ -124,12 +124,12 @@ const SuratTugasPage: React.FC = () => {
   const fetchAvailablePerwadag = async () => {
     try {
       const params: PerwadagSearchParams = {};
-      
+
       // If current user is inspektorat, filter by their inspektorat
       if (isInspektorat() && user?.inspektorat) {
         params.inspektorat = user.inspektorat;
       }
-      
+
       const response = await userService.getPerwadagList(params);
       setAvailablePerwadag(response.items || []);
     } catch (error) {
@@ -236,13 +236,13 @@ const SuratTugasPage: React.FC = () => {
       fetchSuratTugasList(); // Refresh the list
     } catch (error) {
       console.error('Failed to save surat tugas:', error);
-      
+
       // Extract error message if available
       let errorMessage = 'Gagal menyimpan surat tugas. Pastikan semua field sudah diisi dengan benar.';
       if (error instanceof Error) {
         errorMessage = error.message || errorMessage;
       }
-      
+
       toast({
         title: 'Error',
         description: errorMessage,
@@ -295,21 +295,7 @@ const SuratTugasPage: React.FC = () => {
         activeFilters.push(`Perwadag ${selectedPerwadag.nama}`);
       }
     }
-
-    if (filters.evaluation_status !== 'all') {
-      const statusLabels = {
-        'DRAFT': 'Draft',
-        'ACTIVE': 'Aktif',
-        'COMPLETED': 'Selesai',
-        'CANCELLED': 'Dibatalkan'
-      };
-      activeFilters.push(statusLabels[filters.evaluation_status as keyof typeof statusLabels] || filters.evaluation_status);
-    }
-
-    if (activeFilters.length > 0) {
-      title += " - " + activeFilters.join(" - ");
-    }
-
+    
     return title;
   };
 

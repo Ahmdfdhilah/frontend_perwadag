@@ -1,6 +1,12 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
+import { useURLFilters } from '@/hooks/useURLFilters';
+import { useToast } from '@workspace/ui/components/sonner';
+import { PenilaianRisikoResponse, PenilaianRisikoFilterParams } from '@/services/penilaianRisiko/types';
+import { penilaianRisikoService } from '@/services/penilaianRisiko';
+import { userService } from '@/services/users';
+import { PerwadagSummary, PerwadagSearchParams } from '@/services/users/types';
 import Filtering from '@/components/common/Filtering';
 import SearchContainer from '@/components/common/SearchContainer';
 import Pagination from '@/components/common/Pagination';
@@ -12,119 +18,205 @@ import {
   SelectTrigger,
   SelectValue
 } from '@workspace/ui/components/select';
+import { Combobox } from '@workspace/ui/components/combobox';
 import { Label } from '@workspace/ui/components/label';
-import {
-  RISK_ASSESSMENTS,
-  YEARS,
-  INSPEKTORATS,
-  RiskAssessment
-} from '@/mocks/riskAssessment';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import RiskAssessmentTable from '@/components/RiskAssesment/RiskAssessmentTable';
 import RiskAssessmentCards from '@/components/RiskAssesment/RiskAssessmentCards';
 
+interface RiskAssessmentPageFilters {
+  search: string;
+  inspektorat: string;
+  user_perwadag_id: string;
+  tahun: string;
+  sort_by: string;
+  page: number;
+  size: number;
+  [key: string]: string | number;
+}
+
 const RiskAssessmentPage: React.FC = () => {
   const navigate = useNavigate();
-  const { currentRole } = useRole();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedYear, setSelectedYear] = useState<string>('all');
-  const [selectedInspektorat, setSelectedInspektorat] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<string>('score-desc');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
+  const { toast } = useToast();
 
-  // Calculate role values once to avoid any potential issues
-  const userIsAdmin = currentRole.id === 'admin';
-  const userIsInspektorat = currentRole.id === 'inspektorat';
-  const hasAccess = userIsAdmin || userIsInspektorat;
+  // URL Filters configuration
+  const { updateURL, getCurrentFilters } = useURLFilters<RiskAssessmentPageFilters>({
+    defaults: {
+      search: '',
+      inspektorat: 'all',
+      user_perwadag_id: 'all',
+      tahun: 'all',
+      sort_by: 'skor_tertinggi',
+      page: 1,
+      size: 10,
+    },
+    cleanDefaults: true,
+  });
 
-  // Filter and sort data - always run this hook regardless of access
-  const filteredData = useMemo(() => {
-    let filtered = [...RISK_ASSESSMENTS];
+  // Get current filters from URL
+  const filters = getCurrentFilters();
 
-    // Filter by search query
-    if (searchQuery) {
-      filtered = filtered.filter(item =>
-        item.perwadagName.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
+  const [riskAssessments, setRiskAssessments] = useState<PenilaianRisikoResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [totalItems, setTotalItems] = useState(0);
+  const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
+  const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
 
-    // Filter by year
-    if (selectedYear !== 'all') {
-      filtered = filtered.filter(item => item.year === parseInt(selectedYear));
-    }
+  // Calculate access control
+  const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
 
-    // Filter by inspektorat (only for admin)
-    if (userIsAdmin && selectedInspektorat !== 'all') {
-      filtered = filtered.filter(item => item.inspektorat === parseInt(selectedInspektorat));
-    }
+  // Fetch risk assessments function
+  const fetchRiskAssessments = async () => {
+    setLoading(true);
+    try {
+      const params: PenilaianRisikoFilterParams = {
+        page: filters.page,
+        size: filters.size,
+        search: filters.search || undefined,
+        inspektorat: filters.inspektorat !== 'all' ? filters.inspektorat : undefined,
+        user_perwadag_id: filters.user_perwadag_id !== 'all' ? filters.user_perwadag_id : undefined,
+        tahun: filters.tahun !== 'all' ? parseInt(filters.tahun) : undefined,
+        is_complete: filters.is_complete !== 'all' ? filters.is_complete === 'true' : undefined,
+        sort_by: filters.sort_by as "skor_tertinggi" | "skor_terendah" | "nama" | "created_at",
+      };
 
-    // For inspektorat role, only show data for their own inspektorat
-    if (userIsInspektorat) {
-      // In a real app, you would get the user's inspektorat from auth context
-      // For now, we'll show inspektorat 1 data as example
-      filtered = filtered.filter(item => item.inspektorat === 1);
-    }
-
-    // Sort data
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'score-desc':
-          return b.score - a.score;
-        case 'score-asc':
-          return a.score - b.score;
-        default:
-          return 0;
+      // Auto-apply role-based filtering
+      if (isInspektorat() && user?.inspektorat && !params.inspektorat) {
+        // If inspektorat user and no specific inspektorat filter, apply their inspektorat
+        params.inspektorat = user.inspektorat;
+      } else if (isPerwadag() && user?.id && !params.user_perwadag_id) {
+        // If perwadag user and no specific perwadag filter, apply their user ID
+        params.user_perwadag_id = user.id;
       }
-    });
 
-    return filtered;
-  }, [searchQuery, selectedYear, selectedInspektorat, sortBy, userIsAdmin, userIsInspektorat]);
+      const response = await penilaianRisikoService.getPenilaianRisiko(params);
+      setRiskAssessments(response.items);
+      setTotalItems(response.total);
+    } catch (error) {
+      console.error('Failed to fetch risk assessments:', error);
+      toast({
+        title: 'Error',
+        description: 'Gagal memuat data penilaian risiko. Silakan coba lagi.',
+        variant: 'destructive'
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch available perwadag
+  const fetchAvailablePerwadag = async () => {
+    try {
+      const params: PerwadagSearchParams = {};
+
+      // If current user is inspektorat, filter by their inspektorat
+      if (isInspektorat() && user?.inspektorat) {
+        params.inspektorat = user.inspektorat;
+      }
+
+      const response = await userService.getPerwadagList(params);
+      setAvailablePerwadag(response.items || []);
+    } catch (error) {
+      console.error('Failed to fetch perwadag list:', error);
+    }
+  };
+
+  // Effect to fetch data when filters change
+  useEffect(() => {
+    if (hasAccess) {
+      fetchRiskAssessments();
+      fetchAvailablePerwadag();
+    }
+  }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun, filters.is_complete, filters.sort_by, hasAccess]);
 
   // Pagination
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = filteredData.slice(startIndex, startIndex + itemsPerPage);
+  const totalPages = Math.ceil(totalItems / filters.size);
 
-  const handleView = (item: RiskAssessment) => {
+  const handleView = (item: PenilaianRisikoResponse) => {
     navigate(`/penilaian-resiko/${item.id}`);
   };
 
-  const handleEdit = (item: RiskAssessment) => {
+  const handleEdit = (item: PenilaianRisikoResponse) => {
     navigate(`/penilaian-resiko/${item.id}/edit`);
   };
 
-  const handleDelete = (item: RiskAssessment) => {
+  const handleDelete = (item: PenilaianRisikoResponse) => {
     console.log('Delete:', item);
     // Implement delete logic
   };
 
+  const handleInspektoratChange = (inspektorat: string) => {
+    updateURL({ inspektorat, page: 1 });
+  };
+
+  const handlePerwadagChange = (user_perwadag_id: string) => {
+    updateURL({ user_perwadag_id, page: 1 });
+  };
+
+  const handleTahunChange = (tahun: string) => {
+    updateURL({ tahun, page: 1 });
+  };
+
+  const handleIsCompleteChange = (is_complete: string) => {
+    updateURL({ is_complete, page: 1 });
+  };
+
+  const handleSortByChange = (sort_by: string) => {
+    updateURL({ sort_by, page: 1 });
+  };
+
+  const handleSearchChange = (search: string) => {
+    updateURL({ search, page: 1 });
+  };
+
+  const handlePageChange = (page: number) => {
+    updateURL({ page });
+  };
+
   const handleItemsPerPageChange = (value: string) => {
-    setItemsPerPage(parseInt(value));
-    setCurrentPage(1); // Reset to first page when changing items per page
+    updateURL({ size: parseInt(value), page: 1 });
   };
 
   // Generate composite title
   const getCompositeTitle = () => {
     let title = "Daftar Penilaian Risiko";
-    const filters = [];
-    
-    if (userIsInspektorat) {
-      filters.push("Inspektorat I");
-    } else if (userIsAdmin && selectedInspektorat !== 'all') {
-      filters.push(`Inspektorat ${selectedInspektorat}`);
+    const activeFilters = [];
+
+    if (filters.inspektorat !== 'all') {
+      activeFilters.push(`Inspektorat ${filters.inspektorat}`);
     }
-    
-    if (selectedYear !== 'all') {
-      filters.push(selectedYear);
+
+    if (filters.tahun !== 'all') {
+      activeFilters.push(`Tahun ${filters.tahun}`);
     }
-    
-    if (filters.length > 0) {
-      title += " - " + filters.join(" - ");
+
+    if (filters.user_perwadag_id !== 'all') {
+      const selectedPerwadag = availablePerwadag.find(p => p.id === filters.user_perwadag_id);
+      if (selectedPerwadag) {
+        activeFilters.push(`Perwadag ${selectedPerwadag.nama}`);
+      }
     }
-    
+
+    if (filters.is_complete !== 'all') {
+      activeFilters.push(filters.is_complete === 'true' ? 'Lengkap' : 'Belum Lengkap');
+    }
+
+    if (activeFilters.length > 0) {
+      title += " - " + activeFilters.join(" - ");
+    }
+
     return title;
+  };
+
+  const canEdit = () => {
+    if (isAdmin()) return true;
+    if (isInspektorat()) {
+      // Check if user can edit this assessment based on inspektorat
+      return true; // Implement proper logic based on user's inspektorat
+    }
+    return false;
   };
 
   // Check access after all hooks have been called
@@ -150,51 +242,94 @@ const RiskAssessmentPage: React.FC = () => {
 
       <Filtering>
         <div className="space-y-2">
-          <Label htmlFor="year-filter">Periode (Tahun)</Label>
-          <Select value={selectedYear} onValueChange={setSelectedYear}>
-            <SelectTrigger id="year-filter">
+          <Label htmlFor="tahun-filter">Periode (Tahun)</Label>
+          <Select value={filters.tahun} onValueChange={handleTahunChange}>
+            <SelectTrigger id="tahun-filter">
               <SelectValue placeholder="Pilih tahun" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Tahun</SelectItem>
-              {YEARS.map(year => (
-                <SelectItem key={year} value={year.toString()}>
-                  {year}
-                </SelectItem>
-              ))}
+              <SelectItem value="2024">2024</SelectItem>
+              <SelectItem value="2023">2023</SelectItem>
+              <SelectItem value="2022">2022</SelectItem>
+              <SelectItem value="2021">2021</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         {/* Only show inspektorat filter for admin */}
-        {userIsAdmin && (
+        {isAdmin() && (
           <div className="space-y-2">
             <Label htmlFor="inspektorat-filter">Inspektorat</Label>
-            <Select value={selectedInspektorat} onValueChange={setSelectedInspektorat}>
+            <Select value={filters.inspektorat} onValueChange={handleInspektoratChange}>
               <SelectTrigger id="inspektorat-filter">
                 <SelectValue placeholder="Pilih inspektorat" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Semua Inspektorat</SelectItem>
-                {INSPEKTORATS.map(inspektorat => (
-                  <SelectItem key={inspektorat.value} value={inspektorat.value.toString()}>
-                    {inspektorat.label}
-                  </SelectItem>
-                ))}
+                <SelectItem value="1">Inspektorat I</SelectItem>
+                <SelectItem value="2">Inspektorat II</SelectItem>
+                <SelectItem value="3">Inspektorat III</SelectItem>
               </SelectContent>
             </Select>
           </div>
         )}
 
+        {/* Show perwadag filter for admin and inspektorat */}
+        {(isAdmin() || isInspektorat()) && (
+          <div className="space-y-2">
+            <Label htmlFor="perwadag-filter">Perwadag</Label>
+            <Combobox
+              options={[
+                { value: 'all', label: 'Semua Perwadag' },
+                ...availablePerwadag
+                  .filter(perwadag =>
+                    perwadagSearchValue === '' ||
+                    perwadag.nama.toLowerCase().includes(perwadagSearchValue.toLowerCase()) ||
+                    perwadag.inspektorat?.toLowerCase().includes(perwadagSearchValue.toLowerCase())
+                  )
+                  .map(perwadag => ({
+                    value: perwadag.id,
+                    label: perwadag.nama,
+                    description: perwadag.inspektorat || ''
+                  }))
+              ]}
+              value={filters.user_perwadag_id}
+              onChange={(value) => handlePerwadagChange(value.toString())}
+              placeholder="Pilih perwadag"
+              searchPlaceholder="Cari perwadag..."
+              searchValue={perwadagSearchValue}
+              onSearchChange={setPerwadagSearchValue}
+              emptyMessage="Tidak ada perwadag yang ditemukan"
+            />
+          </div>
+        )}
+
+        <div className="space-y-2">
+          <Label htmlFor="completion-filter">Status Kelengkapan</Label>
+          <Select value={filters.is_complete} onValueChange={handleIsCompleteChange}>
+            <SelectTrigger id="completion-filter">
+              <SelectValue placeholder="Pilih status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Semua Status</SelectItem>
+              <SelectItem value="true">Lengkap</SelectItem>
+              <SelectItem value="false">Belum Lengkap</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="sort-filter">Urutkan</Label>
-          <Select value={sortBy} onValueChange={setSortBy}>
+          <Select value={filters.sort_by} onValueChange={handleSortByChange}>
             <SelectTrigger id="sort-filter">
               <SelectValue placeholder="Pilih urutan" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="score-desc">Skor Tertinggi</SelectItem>
-              <SelectItem value="score-asc">Skor Terendah</SelectItem>
+              <SelectItem value="skor_tertinggi">Skor Tertinggi</SelectItem>
+              <SelectItem value="skor_terendah">Skor Terendah</SelectItem>
+              <SelectItem value="nama">Nama Perwadag</SelectItem>
+              <SelectItem value="created_at">Tanggal Dibuat</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -209,39 +344,43 @@ const RiskAssessmentPage: React.FC = () => {
             />
 
             <SearchContainer
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
+              searchQuery={filters.search}
+              onSearchChange={handleSearchChange}
               placeholder="Cari nama perwadag..."
             />
 
             {/* Desktop Table */}
             <div className="hidden md:block">
               <RiskAssessmentTable
-                data={paginatedData}
+                data={riskAssessments}
+                loading={loading}
                 onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                canEdit={canEdit}
               />
             </div>
 
             {/* Mobile Cards */}
             <div className="md:hidden">
               <RiskAssessmentCards
-                data={paginatedData}
+                data={riskAssessments}
+                loading={loading}
                 onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                canEdit={canEdit}
               />
             </div>
 
             {/* Pagination */}
             {totalPages > 1 && (
               <Pagination
-                currentPage={currentPage}
+                currentPage={filters.page}
                 totalPages={totalPages}
-                itemsPerPage={itemsPerPage}
-                totalItems={filteredData.length}
-                onPageChange={setCurrentPage}
+                itemsPerPage={filters.size}
+                totalItems={totalItems}
+                onPageChange={handlePageChange}
                 onItemsPerPageChange={handleItemsPerPageChange}
               />
             )}

@@ -216,10 +216,6 @@ const EntryMeetingPage: React.FC = () => {
       }
     }
 
-    if (filters.is_completed !== 'all') {
-      activeFilters.push(filters.is_completed === 'true' ? 'Lengkap' : 'Belum Lengkap');
-    }
-
     if (activeFilters.length > 0) {
       title += " - " + activeFilters.join(" - ");
     }
