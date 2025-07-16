@@ -1,22 +1,45 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { LaporanHasilEvaluasi, getLaporanHasilEvaluasiStatus } from '@/mocks/laporanHasilEvaluasi';
+import { LaporanHasilResponse } from '@/services/laporanHasil/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface LaporanHasilEvaluasiCardsProps {
-  data: LaporanHasilEvaluasi[];
-  onView?: (item: LaporanHasilEvaluasi) => void;
-  onEdit?: (item: LaporanHasilEvaluasi) => void;
-  canEdit?: (item: LaporanHasilEvaluasi) => boolean;
+  data: LaporanHasilResponse[];
+  loading?: boolean;
+  onView?: (item: LaporanHasilResponse) => void;
+  onEdit?: (item: LaporanHasilResponse) => void;
+  canEdit?: (item: LaporanHasilResponse) => boolean;
 }
 
 const LaporanHasilEvaluasiCards: React.FC<LaporanHasilEvaluasiCardsProps> = ({
   data,
+  loading = false,
   onView,
   onEdit,
   canEdit,
 }) => {
+
+  const getStatusBadge = (laporan: LaporanHasilResponse) => {
+    const isCompleted = laporan.is_completed;
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+        isCompleted
+          ? 'bg-green-100 text-green-800' 
+          : 'bg-red-100 text-red-800'
+      }`}>
+        {isCompleted ? 'Lengkap' : 'Belum Lengkap'}
+      </span>
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-32 text-muted-foreground">
+        Loading laporan hasil evaluasi...
+      </div>
+    );
+  }
 
 
   if (data.length === 0) {
@@ -34,7 +57,7 @@ const LaporanHasilEvaluasiCards: React.FC<LaporanHasilEvaluasiCardsProps> = ({
           <CardHeader className="pb-3">
             <div className="flex justify-between items-start">
               <CardTitle className="text-lg font-semibold">
-                {item.perwadagName}
+                {item.nama_perwadag}
               </CardTitle>
               <ActionDropdown
                 onView={() => onView?.(item)}
@@ -53,21 +76,21 @@ const LaporanHasilEvaluasiCards: React.FC<LaporanHasilEvaluasiCardsProps> = ({
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
-                <span className="ml-2">{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</span>
+                <span className="ml-2">{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Nomor Laporan:</span>
-                <span className="ml-2">{item.nomorEvaluasi}</span>
+                <span className="ml-2">{item.nomor_laporan || '-'}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Tanggal Laporan:</span>
-                <span className="ml-2">{formatIndonesianDate(item.tanggal)}</span>
+                <span className="ml-2">{item.tanggal_laporan ? formatIndonesianDate(item.tanggal_laporan) : '-'}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Laporan Hasil Evaluasi:</span>
-                {item.uploadFile ? (
+                {item.has_file ? (
                   <a 
-                    href={item.uploadFileUrl || '#'} 
+                    href={item.file_urls?.view_url || '#'} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="ml-2 text-blue-600 hover:text-blue-800 underline"
@@ -80,12 +103,8 @@ const LaporanHasilEvaluasiCards: React.FC<LaporanHasilEvaluasiCardsProps> = ({
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Status:</span>
-                <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                  getLaporanHasilEvaluasiStatus(item) === 'Sudah Upload' 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {getLaporanHasilEvaluasiStatus(item)}
+                <span className="ml-2">
+                  {getStatusBadge(item)}
                 </span>
               </div>
             </div>

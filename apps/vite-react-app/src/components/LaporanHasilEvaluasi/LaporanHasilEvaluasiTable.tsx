@@ -8,22 +8,45 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { LaporanHasilEvaluasi, getLaporanHasilEvaluasiStatus } from '@/mocks/laporanHasilEvaluasi';
+import { LaporanHasilResponse } from '@/services/laporanHasil/types';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
 
 interface LaporanHasilEvaluasiTableProps {
-  data: LaporanHasilEvaluasi[];
-  onView?: (item: LaporanHasilEvaluasi) => void;
-  onEdit?: (item: LaporanHasilEvaluasi) => void;
-  canEdit?: (item: LaporanHasilEvaluasi) => boolean;
+  data: LaporanHasilResponse[];
+  loading?: boolean;
+  onView?: (item: LaporanHasilResponse) => void;
+  onEdit?: (item: LaporanHasilResponse) => void;
+  canEdit?: (item: LaporanHasilResponse) => boolean;
 }
 
 const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
   data,
+  loading = false,
   onView,
   onEdit,
   canEdit,
 }) => {
+
+  const getStatusBadge = (laporan: LaporanHasilResponse) => {
+    const isCompleted = laporan.is_completed;
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+        isCompleted
+          ? 'bg-green-100 text-green-800' 
+          : 'bg-red-100 text-red-800'
+      }`}>
+        {isCompleted ? 'Lengkap' : 'Belum Lengkap'}
+      </span>
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-32 text-muted-foreground">
+        Loading laporan hasil evaluasi...
+      </div>
+    );
+  }
 
 
   return (
@@ -45,21 +68,21 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
           {data.length === 0 ? (
             <TableRow>
               <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                Tidak ada data laporan hasil evaluasi
+                Tidak ada data laporan hasil evaluasi yang ditemukan.
               </TableCell>
             </TableRow>
           ) : (
             data.map((item, index) => (
               <TableRow key={item.id}>
                 <TableCell className="font-medium">{index + 1}</TableCell>
-                <TableCell>{item.perwadagName}</TableCell>
-                <TableCell>{formatIndonesianDateRange(item.tanggalMulaiEvaluasi, item.tanggalAkhirEvaluasi)}</TableCell>
-                <TableCell>{item.nomorEvaluasi}</TableCell>
-                <TableCell>{formatIndonesianDate(item.tanggal)}</TableCell>
+                <TableCell>{item.nama_perwadag}</TableCell>
+                <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
+                <TableCell>{item.nomor_laporan || '-'}</TableCell>
+                <TableCell>{item.tanggal_laporan ? formatIndonesianDate(item.tanggal_laporan) : '-'}</TableCell>
                 <TableCell>
-                  {item.uploadFile ? (
+                  {item.has_file ? (
                     <a
-                      href={item.uploadFileUrl || '#'}
+                      href={item.file_urls?.view_url || '#'}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-800 underline"
@@ -71,12 +94,7 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
                   )}
                 </TableCell>
                 <TableCell>
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${getLaporanHasilEvaluasiStatus(item) === 'Sudah Upload'
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-red-100 text-red-800'
-                    }`}>
-                    {getLaporanHasilEvaluasiStatus(item)}
-                  </span>
+                  {getStatusBadge(item)}
                 </TableCell>
                 <TableCell>
                   <ActionDropdown
