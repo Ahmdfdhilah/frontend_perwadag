@@ -346,7 +346,7 @@ const KonfirmasiMeetingPage: React.FC = () => {
             />
 
             {/* Desktop Table */}
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <KonfirmasiMeetingTable
                 data={meetings}
                 loading={loading}
@@ -357,7 +357,7 @@ const KonfirmasiMeetingPage: React.FC = () => {
             </div>
 
             {/* Mobile Cards */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <KonfirmasiMeetingCards
                 data={meetings}
                 loading={loading}

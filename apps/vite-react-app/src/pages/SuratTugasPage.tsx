@@ -423,7 +423,7 @@ const SuratTugasPage: React.FC = () => {
             />
 
             {/* Desktop Table */}
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <SuratTugasTable
                 data={suratTugasList}
                 loading={loading}
@@ -435,7 +435,7 @@ const SuratTugasPage: React.FC = () => {
             </div>
 
             {/* Mobile Cards */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <SuratTugasCards
                 data={suratTugasList}
                 loading={loading}

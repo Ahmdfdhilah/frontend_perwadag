@@ -91,13 +91,16 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <MobileHeader onOpenSidebar={() => setIsSidebarOpen(true)} />
 
         {/* Page Content */}
-        <main className="flex-1">
+        <main className="flex-1 min-h-0">
           <div className="py-3 lg:py-6 px-4 sm:px-6 lg:px-8">
             {children || <Outlet />}
           </div>
         </main>
 
-        <DashboardFooter />
+        {/* Fixed Footer */}
+        <div className="mt-auto">
+          <DashboardFooter />
+        </div>
       </div>
     </div>
   );

@@ -294,7 +294,7 @@ const UsersPage: React.FC = () => {
             />
 
             {/* Desktop Table */}
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <UserTable
                 users={users}
                 loading={loading}
@@ -305,7 +305,7 @@ const UsersPage: React.FC = () => {
             </div>
 
             {/* Mobile Cards */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <UserCards
                 users={users}
                 loading={loading}

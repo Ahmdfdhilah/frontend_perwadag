@@ -437,7 +437,7 @@ ${user?.nama || 'Sistem Audit'}
             />
 
             {/* Desktop Table */}
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <LaporanHasilEvaluasiTable
                 data={laporanHasil}
                 loading={loading}
@@ -449,7 +449,7 @@ ${user?.nama || 'Sistem Audit'}
             </div>
 
             {/* Mobile Cards */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <LaporanHasilEvaluasiCards
                 data={laporanHasil}
                 loading={loading}

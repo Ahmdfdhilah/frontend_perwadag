@@ -351,7 +351,7 @@ const MatriksPage: React.FC = () => {
             />
 
             {/* Desktop Table */}
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <MatriksTable
                 data={matriks}
                 loading={loading}
@@ -362,7 +362,7 @@ const MatriksPage: React.FC = () => {
             </div>
 
             {/* Mobile Cards */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <MatriksCards
                 data={matriks}
                 loading={loading}

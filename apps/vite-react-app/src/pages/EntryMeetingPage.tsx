@@ -343,7 +343,7 @@ const EntryMeetingPage: React.FC = () => {
             />
 
             {/* Desktop Table */}
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <EntryMeetingTable
                 data={meetings}
                 loading={loading}
@@ -354,7 +354,7 @@ const EntryMeetingPage: React.FC = () => {
             </div>
 
             {/* Mobile Cards */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <EntryMeetingCards
                 data={meetings}
                 loading={loading}

@@ -61,7 +61,7 @@ export function SidebarMenuItem({
           title={collapsed ? item.title : undefined}
         >
           <div className={cn('flex items-center', collapsed ? 'justify-center' : 'space-x-3')}>
-            <item.icon className="h-5 w-5 flex-shrink-0" />
+            <item.icon className={cn("flex-shrink-0", collapsed ? "h-4 w-4" : "h-5 w-5")} />
             {!collapsed && <span>{item.title}</span>}
           </div>
           {!collapsed && hasChildren && (
@@ -107,7 +107,7 @@ export function SidebarMenuItem({
         onClick={onLinkClick}
         title={collapsed ? item.title : undefined}
       >
-        <item.icon className="h-5 w-5 flex-shrink-0" />
+        <item.icon className={cn("flex-shrink-0", collapsed ? "h-4 w-4" : "h-5 w-5")} />
         {!collapsed && <span>{item.title}</span>}
       </Link>
     </div>

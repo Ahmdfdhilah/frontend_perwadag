@@ -91,21 +91,24 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
           <Button
             variant="ghost"
             className={cn(
-              "p-2 hover:bg-transparent",
-              collapsed ? "flex items-center justify-center" : "flex items-center space-x-2 w-full"
+              "hover:bg-transparent",
+              collapsed ? "p-1.5 flex items-center justify-center h-auto" : "p-2 flex items-center space-x-2 w-full"
             )}
             disabled={isLoggingOut}
           >
             <div className="relative">
-              <Avatar className="h-6 w-6 flex-shrink-0">
+              <Avatar className={cn("flex-shrink-0", collapsed ? "h-5 w-5" : "h-6 w-6")}>
                 {/* <AvatarImage src={fileUtils.getFullFileUrl(user?.avatar_file?.file_url || '')} alt={getUserDisplayName()} /> */}
-                <AvatarFallback className="text-xs">
+                <AvatarFallback className={cn(collapsed ? "text-[10px]" : "text-xs")}>
                   {getUserInitials()}
                 </AvatarFallback>
               </Avatar>
               {/* Active user indicator */}
               {user.is_active && (
-                <div className="absolute -top-1 -right-1 h-3 w-3 bg-green-500 rounded-full border border-background"></div>
+                <div className={cn(
+                  "absolute bg-green-500 rounded-full border border-background",
+                  collapsed ? "-top-0.5 -right-0.5 h-2 w-2" : "-top-1 -right-1 h-3 w-3"
+                )}></div>
               )}
             </div>
             {!collapsed && (
@@ -126,7 +129,7 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
           </Button>
         </DropdownMenuTrigger>
 
-        <DropdownMenuContent align={collapsed ? "center" : "end"} className="w-56">
+        <DropdownMenuContent align={collapsed ? "start" : "end"} className="w-56" side={collapsed ? "right" : "bottom"}>
           <DropdownMenuLabel>
             <div className="flex flex-col space-y-1">
               <span className="font-medium">{getUserDisplayName()}</span>

@@ -356,7 +356,7 @@ const RiskAssessmentPage: React.FC = () => {
             />
 
             {/* Desktop Table */}
-            <div className="hidden md:block">
+            <div className="hidden lg:block">
               <RiskAssessmentTable
                 data={riskAssessments}
                 loading={loading}
@@ -368,7 +368,7 @@ const RiskAssessmentPage: React.FC = () => {
             </div>
 
             {/* Mobile Cards */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <RiskAssessmentCards
                 data={riskAssessments}
                 loading={loading}
