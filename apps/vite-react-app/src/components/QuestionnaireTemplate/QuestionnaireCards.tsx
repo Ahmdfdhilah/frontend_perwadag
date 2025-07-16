@@ -1,25 +1,76 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { QuestionnaireTemplate, getQuestionnaireTemplateStatus } from '@/mocks/questionnaireTemplate';
+import { FormatKuisionerResponse } from '@/services/formatKuisioner/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
 
 interface QuestionnaireCardsProps {
-  data: QuestionnaireTemplate[];
-  onView?: (item: QuestionnaireTemplate) => void;
-  onEdit?: (item: QuestionnaireTemplate) => void;
-  onDelete?: (item: QuestionnaireTemplate) => void;
-  canEdit?: (item: QuestionnaireTemplate) => boolean;
-  canDelete?: (item: QuestionnaireTemplate) => boolean;
+  data: FormatKuisionerResponse[];
+  loading?: boolean;
+  onView?: (item: FormatKuisionerResponse) => void;
+  onEdit?: (item: FormatKuisionerResponse) => void;
+  onDelete?: (item: FormatKuisionerResponse) => void;
+  canEdit?: (item?: FormatKuisionerResponse) => boolean;
+  canDelete?: (item?: FormatKuisionerResponse) => boolean;
 }
 
 const QuestionnaireCards: React.FC<QuestionnaireCardsProps> = ({
   data,
+  loading = false,
   onView,
   onEdit,
   onDelete,
   canEdit,
   canDelete,
 }) => {
+  const getStatusBadge = (template: FormatKuisionerResponse) => {
+    const hasFile = template.has_file;
+    const isCurrentYear = template.is_current_year;
+    
+    if (hasFile && isCurrentYear) {
+      return (
+        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+          Tersedia
+        </span>
+      );
+    } else if (hasFile && !isCurrentYear) {
+      return (
+        <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+          Archived
+        </span>
+      );
+    } else {
+      return (
+        <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+          Belum Tersedia
+        </span>
+      );
+    }
+  };
+
+  const renderDocumentLink = (template: FormatKuisionerResponse) => {
+    if (template.has_file && template.file_urls?.view_url) {
+      return (
+        <a
+          href={template.file_urls.view_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:text-blue-800 underline"
+        >
+          Lihat Template
+        </a>
+      );
+    }
+    return <span className="text-muted-foreground">-</span>;
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-32 text-muted-foreground">
+        Loading template...
+      </div>
+    );
+  }
+
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-32 text-muted-foreground">
@@ -30,20 +81,20 @@ const QuestionnaireCards: React.FC<QuestionnaireCardsProps> = ({
 
   return (
     <div className="grid grid-cols-1 gap-4">
-      {data.map((item) => (
+      {data.map((item, index) => (
         <Card key={item.id} className="w-full">
           <CardHeader className="pb-3">
             <div className="flex justify-between items-start">
               <CardTitle className="text-lg font-semibold">
-                {item.nama}
+                {item.nama_template}
               </CardTitle>
               <ActionDropdown
                 onView={() => onView?.(item)}
-                onEdit={canEdit?.(item) ? () => onEdit?.(item) : undefined}
-                onDelete={canDelete?.(item) ? () => onDelete?.(item) : undefined}
+                onEdit={canEdit?.() ? () => onEdit?.(item) : undefined}
+                onDelete={canDelete?.() ? () => onDelete?.(item) : undefined}
                 showView={true}
-                showEdit={canEdit?.(item) && !!onEdit}
-                showDelete={canDelete?.(item) && !!onDelete}
+                showEdit={canEdit?.() && !!onEdit}
+                showDelete={canDelete?.() && !!onDelete}
               />
             </div>
           </CardHeader>
@@ -51,11 +102,11 @@ const QuestionnaireCards: React.FC<QuestionnaireCardsProps> = ({
             <div className="space-y-2 text-sm">
               <div>
                 <span className="font-medium text-muted-foreground">No:</span>
-                <span className="ml-2">{item.no}</span>
+                <span className="ml-2">{index + 1}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Deskripsi:</span>
-                <span className="ml-2">{item.deskripsi}</span>
+                <span className="ml-2">{item.deskripsi || '-'}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Tahun:</span>
@@ -63,28 +114,14 @@ const QuestionnaireCards: React.FC<QuestionnaireCardsProps> = ({
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Dokumen:</span>
-                {item.dokumen ? (
-                  <button
-                    onClick={() => {
-                      console.log('Lihat template:', item.dokumen);
-                      // Implement view/download logic here
-                    }}
-                    className="ml-2 text-blue-600 hover:text-blue-800 underline"
-                  >
-                    Lihat Template
-                  </button>
-                ) : (
-                  <span className="ml-2 text-muted-foreground">-</span>
-                )}
+                <span className="ml-2">
+                  {renderDocumentLink(item)}
+                </span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Status:</span>
-                <span className={`ml-2 px-2 py-1 rounded-full text-xs font-medium ${
-                  getQuestionnaireTemplateStatus(item) === 'Tersedia'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800'
-                }`}>
-                  {getQuestionnaireTemplateStatus(item)}
+                <span className="ml-2">
+                  {getStatusBadge(item)}
                 </span>
               </div>
             </div>

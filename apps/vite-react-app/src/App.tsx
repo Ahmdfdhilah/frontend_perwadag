@@ -27,7 +27,7 @@ import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
 import { EmailSentSuccessPage } from './pages/auth/EmailSentSuccessPage';
 import UsersPage from './pages/users/UsersPage';
 import ProfilePage from './pages/profile/ProfilePage';
-import { PublicRoute, AuthGuard, AdminGuard, AdminOrInspektoratGuard } from './components/Auth/AuthGuard';
+import { PublicRoute, AuthGuard } from './components/Auth/AuthGuard';
 import { RoleProtectedRoute } from './components/Auth/RoleProtectedRoute';
 import { RoleBasedHome } from './components/Auth/RoleBasedHome';
 

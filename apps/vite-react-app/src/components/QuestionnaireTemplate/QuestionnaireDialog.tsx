@@ -11,16 +11,23 @@ import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Textarea } from '@workspace/ui/components/textarea';
-import { QuestionnaireTemplate } from '@/mocks/questionnaireTemplate';
+import { FormatKuisionerResponse } from '@/services/formatKuisioner/types';
 import { Download } from 'lucide-react';
 import FileUpload from '@/components/common/FileUpload';
+
+interface QuestionnaireFormData {
+  nama_template: string;
+  deskripsi: string;
+  tahun: number;
+  file?: File;
+}
 
 interface QuestionnaireDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  item: QuestionnaireTemplate | null;
+  item: FormatKuisionerResponse | null;
   mode: 'view' | 'edit';
-  onSave: (data: Partial<QuestionnaireTemplate>) => void;
+  onSave: (data: QuestionnaireFormData) => void;
 }
 
 const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
@@ -31,9 +38,12 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
   onSave,
 }) => {
   const { isAdmin } = useRole();
-  const [formData, setFormData] = useState<Partial<QuestionnaireTemplate>>({});
-  const [dokumenFiles, setDokumenFiles] = useState<File[]>([]);
-  const [existingDokumen, setExistingDokumen] = useState<Array<{ name: string; url?: string }>>([]);
+  const [formData, setFormData] = useState<QuestionnaireFormData>({
+    nama_template: '',
+    deskripsi: '',
+    tahun: new Date().getFullYear(),
+  });
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
 
   const isCreating = !item;
   const isEditable = mode === 'edit' && isAdmin();
@@ -41,22 +51,18 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
   useEffect(() => {
     if (item && open) {
       setFormData({
-        ...item,
+        nama_template: item.nama_template,
+        deskripsi: item.deskripsi || '',
+        tahun: item.tahun,
       });
-
-      // Set existing files for display
-      setExistingDokumen(item.dokumen ? [{ name: item.dokumen, url: item.dokumen }] : []);
     } else {
       // Initialize empty form for new template
       setFormData({
-        no: 0,
-        nama: '',
+        nama_template: '',
         deskripsi: '',
         tahun: new Date().getFullYear(),
-        dokumen: '',
       });
-      setDokumenFiles([]);
-      setExistingDokumen([]);
+      setUploadFile(null);
     }
   }, [item, open]);
 
@@ -68,7 +74,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
     }
 
     // Validation for required fields
-    if (!formData.nama) {
+    if (!formData.nama_template) {
       alert('Nama template harus diisi');
       return;
     }
@@ -80,14 +86,10 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       alert('Tahun harus diisi');
       return;
     }
-    if (!formData.no || formData.no <= 0) {
-      alert('Nomor harus diisi dan lebih dari 0');
-      return;
-    }
 
     const dataToSave = {
       ...formData,
-      dokumenFiles,
+      file: uploadFile || undefined,
     };
     onSave(dataToSave);
   };
@@ -96,18 +98,16 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
     onOpenChange(false);
   };
 
-  const handleDokumenFilesChange = (files: File[]) => {
-    setDokumenFiles(files);
-  };
-
-  const handleExistingDokumenRemove = (index: number) => {
-    setExistingDokumen(prev => prev.filter((_, i) => i !== index));
+  const handleUploadFileChange = (files: File[]) => {
+    setUploadFile(files[0] || null);
   };
 
   const handleDownloadTemplate = () => {
-    if (formData.dokumen) {
-      console.log('Download template:', formData.dokumen);
-      // Implement download logic here
+    if (item?.file_urls?.download_url) {
+      const link = document.createElement('a');
+      link.href = item.file_urls.download_url;
+      link.download = item.file_metadata?.original_filename || `template_${item.nama_template}.pdf`;
+      link.click();
     }
   };
 
@@ -123,11 +123,11 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
         <div className="flex-1 overflow-y-auto py-4">
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="nama">Nama Template</Label>
+              <Label htmlFor="nama_template">Nama Template</Label>
               <Input
-                id="nama"
-                value={formData.nama || ''}
-                onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+                id="nama_template"
+                value={formData.nama_template || ''}
+                onChange={(e) => setFormData({ ...formData, nama_template: e.target.value })}
                 disabled={!isEditable}
                 className={!isEditable ? "bg-muted" : ""}
                 placeholder="Nama template kuesioner"
@@ -168,12 +168,15 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
               multiple={false}
               maxSize={10 * 1024 * 1024} // 10MB
               maxFiles={1}
-              files={dokumenFiles}
-              existingFiles={existingDokumen}
+              files={uploadFile ? [uploadFile] : []}
+              existingFiles={item?.has_file ? [{
+                name: item.file_metadata?.original_filename || item.nama_template,
+                url: item.file_urls?.view_url,
+                size: item.file_metadata?.size_mb ? Math.round(item.file_metadata.size_mb * 1024 * 1024) : undefined
+              }] : []}
               mode={isEditable ? 'edit' : 'view'}
               disabled={!isEditable}
-              onFilesChange={handleDokumenFilesChange}
-              onExistingFileRemove={handleExistingDokumenRemove}
+              onFilesChange={handleUploadFileChange}
               description="Format yang didukung: PDF, DOC, DOCX (Max 10MB)"
             />
           </div>
@@ -183,7 +186,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
           <Button variant="outline" onClick={handleCancel}>
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
-          {mode === 'view' && formData.dokumen && (
+          {mode === 'view' && item?.has_file && (
             <Button onClick={handleDownloadTemplate}>
               <Download className="w-4 h-4 mr-2" />
               Download Template
