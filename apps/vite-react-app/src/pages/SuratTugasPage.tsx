@@ -372,6 +372,7 @@ const SuratTugasPage: React.FC = () => {
                 <SelectItem value="1">Inspektorat I</SelectItem>
                 <SelectItem value="2">Inspektorat II</SelectItem>
                 <SelectItem value="3">Inspektorat III</SelectItem>
+                <SelectItem value="4">Inspektorat IV</SelectItem>
               </SelectContent>
             </Select>
           </div>
