@@ -299,7 +299,7 @@ const SuratPemberitahuanPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Surat Pemberitahuan"
-        description="Kelola data surat pemberitahuan audit"
+        description="Kelola data surat pemberitahuan evaluasi"
       />
 
       <Filtering>
@@ -374,7 +374,7 @@ const SuratPemberitahuanPage: React.FC = () => {
           <div className="space-y-4">
             <ListHeaderComposite
               title={getCompositeTitle()}
-              subtitle="Kelola data surat pemberitahuan audit berdasarkan filter yang dipilih"
+              subtitle="Kelola data surat pemberitahuan evaluasi berdasarkan filter yang dipilih"
             />
 
             <SearchContainer

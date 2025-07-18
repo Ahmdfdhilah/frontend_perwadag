@@ -295,7 +295,7 @@ const KonfirmasiMeetingPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Konfirmasi Meeting"
-        description="Kelola data konfirmasi meeting evaluasi audit"
+        description="Kelola data konfirmasi meeting evaluasi"
       />
 
       <Filtering>
@@ -370,7 +370,7 @@ const KonfirmasiMeetingPage: React.FC = () => {
           <div className="space-y-4">
             <ListHeaderComposite
               title={getCompositeTitle()}
-              subtitle="Kelola data konfirmasi meeting evaluasi audit berdasarkan filter yang dipilih"
+              subtitle="Kelola data konfirmasi meeting evaluasi berdasarkan filter yang dipilih"
             />
 
             {/* Desktop Table */}

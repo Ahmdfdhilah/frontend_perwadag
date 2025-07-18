@@ -256,7 +256,7 @@ const RiskAssessmentPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Penilaian Risiko"
-        description="Kelola data penilaian risiko audit"
+        description="Kelola data penilaian risiko evaluasi"
         actions={
           isAdmin() ? (
             <Button

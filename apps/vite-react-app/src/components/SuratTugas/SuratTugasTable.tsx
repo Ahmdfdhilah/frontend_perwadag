@@ -41,7 +41,7 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
             <TableHead>No</TableHead>
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Tanggal Pelaksanaan Evaluasi</TableHead>
-            <TableHead>No Surat</TableHead>
+            <TableHead>No. Surat Tugas</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
         </TableHeader>

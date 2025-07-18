@@ -69,6 +69,7 @@ const MatriksPage: React.FC = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MatriksResponse | null>(null);
+  const [dialogMode, setDialogMode] = useState<'edit' | 'view'>('edit');
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
   const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
@@ -168,6 +169,13 @@ const MatriksPage: React.FC = () => {
 
   const handleEdit = (item: MatriksResponse) => {
     setSelectedItem(item);
+    setDialogMode('edit');
+    setIsDialogOpen(true);
+  };
+
+  const handleView = (item: MatriksResponse) => {
+    setSelectedItem(item);
+    setDialogMode('view');
     setIsDialogOpen(true);
   };
 
@@ -176,7 +184,9 @@ const MatriksPage: React.FC = () => {
 
     try {
       const updateData = {
-        nomor_matriks: data.nomor_matriks || undefined,
+        temuan_rekomendasi: data.temuan_rekomendasi && data.temuan_rekomendasi.length > 0 ? {
+          items: data.temuan_rekomendasi
+        } : undefined,
       };
 
       await matriksService.updateMatriks(selectedItem.id, updateData);
@@ -219,6 +229,21 @@ const MatriksPage: React.FC = () => {
     if (isInspektorat()) {
       // Check if user can edit this matriks based on inspektorat
       return user?.inspektorat === item.inspektorat;
+    }
+    return false;
+  };
+
+  // Check if user can view this item 
+  const canView = (item: MatriksResponse) => {
+    // All roles can view
+    if (isAdmin()) return true;
+    if (isInspektorat()) {
+      // Check if user can view this matriks based on inspektorat
+      return user?.inspektorat === item.inspektorat;
+    }
+    if (isPerwadag()) {
+      // Check if user can view this matriks based on perwadag
+      return user?.id === item.surat_tugas_info?.id;
     }
     return false;
   };
@@ -293,7 +318,7 @@ const MatriksPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Matriks"
-        description={isPerwadag() ? "Lihat temuan dan rekomendasi audit" : "Kelola data matriks audit"}
+        description={isPerwadag() ? "Lihat temuan dan rekomendasi evaluasi" : "Kelola data matriks evaluasi"}
       />
 
       <Filtering>
@@ -368,7 +393,7 @@ const MatriksPage: React.FC = () => {
           <div className="space-y-4">
             <ListHeaderComposite
               title={getCompositeTitle()}
-              subtitle="Kelola data matriks audit berdasarkan filter yang dipilih"
+              subtitle="Kelola data matriks evaluasi berdasarkan filter yang dipilih"
             />
 
             <SearchContainer
@@ -383,7 +408,9 @@ const MatriksPage: React.FC = () => {
                 data={matriks}
                 loading={loading}
                 onEdit={handleEdit}
+                onView={handleView}
                 canEdit={canEdit}
+                canView={canView}
                 userRole={isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : 'perwadag'}
               />
             </div>
@@ -394,7 +421,9 @@ const MatriksPage: React.FC = () => {
                 data={matriks}
                 loading={loading}
                 onEdit={handleEdit}
+                onView={handleView}
                 canEdit={canEdit}
+                canView={canView}
                 userRole={isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : 'perwadag'}
               />
             </div>
@@ -414,16 +443,14 @@ const MatriksPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Edit Dialog - For Admin and Inspektorat */}
-      {(isAdmin() || isInspektorat()) && (
-        <MatriksDialog
-          open={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
-          item={selectedItem}
-          onSave={handleSave}
-          mode="edit"
-        />
-      )}
+      {/* Edit/View Dialog */}
+      <MatriksDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        item={selectedItem}
+        onSave={dialogMode === 'edit' ? handleSave : undefined}
+        mode={dialogMode}
+      />
     </div>
   );
 };

@@ -8,7 +8,10 @@ import {
 } from '@workspace/ui/components/dialog';
 import { Button } from '@workspace/ui/components/button';
 import { Label } from '@workspace/ui/components/label';
-import { MatriksResponse } from '@/services/matriks/types';
+import { Textarea } from '@workspace/ui/components/textarea';
+import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
+import { Trash2, Plus } from 'lucide-react';
+import { MatriksResponse, TemuanRekomendasi } from '@/services/matriks/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
@@ -18,7 +21,7 @@ interface MatriksDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   item: MatriksResponse | null;
-  mode: 'edit';
+  mode: 'edit' | 'view';
   onSave?: (data: any) => void;
 }
 
@@ -33,11 +36,14 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   const isEditable = mode === 'edit';
   const canEdit = canEditForm('matriks') && isEditable;
   const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [temuanRekomendasi, setTemuanRekomendasi] = useState<TemuanRekomendasi[]>([]);
 
   useEffect(() => {
     if (item && open) {
+      setTemuanRekomendasi(item.temuan_rekomendasi_summary?.data || []);
     } else {
       setUploadFile(null);
+      setTemuanRekomendasi([]);
     }
   }, [item, open]);
 
@@ -45,11 +51,29 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     setUploadFile(files[0] || null);
   };
 
+  const handleAddTemuanRekomendasi = () => {
+    if (temuanRekomendasi.length >= 20) return;
+    setTemuanRekomendasi([...temuanRekomendasi, { temuan: '', rekomendasi: '' }]);
+  };
+
+  const handleRemoveTemuanRekomendasi = (index: number) => {
+    setTemuanRekomendasi(temuanRekomendasi.filter((_, i) => i !== index));
+  };
+
+  const handleTemuanRekomendasiChange = (index: number, field: 'temuan' | 'rekomendasi', value: string) => {
+    const updated = [...temuanRekomendasi];
+    updated[index] = { ...updated[index], [field]: value };
+    setTemuanRekomendasi(updated);
+  };
 
   const handleSave = () => {
     if (!onSave) return;
 
+    // Send full JSON of temuan_rekomendasi, including existing IDs for updates
+    const filteredTemuanRekomendasi = temuanRekomendasi.filter(tr => tr.temuan.trim() && tr.rekomendasi.trim());
+    
     const dataToSave = {
+      temuan_rekomendasi: filteredTemuanRekomendasi,
       file: uploadFile,
     };
     onSave(dataToSave);
@@ -82,7 +106,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0 border-b pb-4">
           <DialogTitle>
-            Edit Matriks
+            {mode === 'view' ? 'Detail Matriks' : 'Edit Matriks'}
           </DialogTitle>
         </DialogHeader>
 
@@ -104,6 +128,89 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                 {item ? formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai) : '-'}
               </div>
             </div>
+
+
+            {/* Temuan Rekomendasi */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center justify-between">
+                  <span>Temuan dan Rekomendasi</span>
+                  {canEdit && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAddTemuanRekomendasi}
+                      disabled={temuanRekomendasi.length >= 20}
+                      className="ml-2"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Tambah
+                    </Button>
+                  )}
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {temuanRekomendasi.length === 0 ? (
+                    <p className="text-muted-foreground text-sm">Belum ada temuan dan rekomendasi</p>
+                  ) : (
+                    temuanRekomendasi.map((tr, index) => (
+                      <div key={index} className="border rounded-lg p-4 space-y-3">
+                        <div className="flex justify-between items-center">
+                          <span className="font-medium text-sm">#{index + 1}</span>
+                          {canEdit && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRemoveTemuanRekomendasi(index)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                        <div className="grid grid-cols-1 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor={`temuan-${index}`}>Temuan</Label>
+                            {canEdit ? (
+                              <Textarea
+                                id={`temuan-${index}`}
+                                value={tr.temuan}
+                                onChange={(e) => handleTemuanRekomendasiChange(index, 'temuan', e.target.value)}
+                                placeholder="Masukkan temuan..."
+                                rows={3}
+                              />
+                            ) : (
+                              <div className="p-3 bg-muted rounded-md text-sm">
+                                {tr.temuan || '-'}
+                              </div>
+                            )}
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor={`rekomendasi-${index}`}>Rekomendasi</Label>
+                            {canEdit ? (
+                              <Textarea
+                                id={`rekomendasi-${index}`}
+                                value={tr.rekomendasi}
+                                onChange={(e) => handleTemuanRekomendasiChange(index, 'rekomendasi', e.target.value)}
+                                placeholder="Masukkan rekomendasi..."
+                                rows={3}
+                              />
+                            ) : (
+                              <div className="p-3 bg-muted rounded-md text-sm">
+                                {tr.rekomendasi || '-'}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </CardContent>
+            </Card>
 
 
             {/* File Upload */}
@@ -145,9 +252,9 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
           <Button variant="outline" onClick={handleCancel}>
-            Batal
+            {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
-          {canEdit && onSave && (
+          {canEdit && onSave && mode === 'edit' && (
             <Button onClick={handleSave}>
               Simpan
             </Button>

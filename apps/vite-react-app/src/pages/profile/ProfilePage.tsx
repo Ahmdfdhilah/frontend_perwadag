@@ -8,7 +8,7 @@ import { Badge } from '@workspace/ui/components/badge';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import { PageHeader } from '@/components/common/PageHeader';
 import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
-import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
+// import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { UserUpdate } from '@/services/users/types';
@@ -21,7 +21,6 @@ import {
   CheckCircle,
   XCircle,
   IdCard,
-  Lock,
 } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
@@ -30,7 +29,7 @@ const ProfilePage: React.FC = () => {
   const isLoading = useAppSelector(selectAuthLoading);
   const { toast } = useToast();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  // const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
 
   if (!user) {
     return (
@@ -77,34 +76,20 @@ const ProfilePage: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return '-';
-    try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return '-';
-      return format(date, 'dd MMMM yyyy', { locale: id });
-    } catch {
-      return '-';
-    }
+    return format(new Date(dateString), 'dd MMMM yyyy', { locale: id });
   };
 
   const formatDateTime = (dateString: string) => {
-    if (!dateString) return '-';
-    try {
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) return '-';
-      return format(date, 'dd MMMM yyyy, HH:mm', { locale: id });
-    } catch {
-      return '-';
-    }
+    return format(new Date(dateString), 'dd MMMM yyyy, HH:mm', { locale: id });
   };
 
   const handleEditProfile = () => {
     setIsEditDialogOpen(true);
   };
 
-  const handleChangePassword = () => {
-    setIsPasswordDialogOpen(true);
-  };
+  // const handleChangePassword = () => {
+  //   setIsPasswordDialogOpen(true);
+  // };
 
   const handleProfileUpdate = async (data: UserUpdate) => {
     try {
@@ -124,10 +109,23 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  const handlePasswordChange = () => {
-    // This will be called when password change is successful
-    // No need to do anything special here since the dialog handles success
-  };
+  // const handlePasswordChange = async (data: UserChangePassword) => {
+  //   try {
+  //     await dispatch(changePasswordAsync(data)).unwrap();
+  //     toast({
+  //       title: 'Password berhasil diubah',
+  //       description: 'Password Anda telah berhasil diubah.',
+  //       variant: 'default'
+  //     });
+  //     setIsPasswordDialogOpen(false);
+  //   } catch (error) {
+  //     toast({
+  //       title: 'Gagal mengubah password',
+  //       description: 'Terjadi kesalahan saat mengubah password.',
+  //       variant: 'destructive'
+  //     });
+  //   }
+  // };
 
   return (
     <div className="space-y-6">
@@ -140,10 +138,10 @@ const ProfilePage: React.FC = () => {
               <Edit className="w-4 h-4 mr-2" />
               Edit Profil
             </Button>
-            <Button onClick={handleChangePassword}>
+            {/* <Button onClick={handleChangePassword}>
               <Lock className="w-4 h-4 mr-2" />
               Ganti Password
-            </Button>
+            </Button> */}
           </div>
         }
       />
@@ -183,8 +181,6 @@ const ProfilePage: React.FC = () => {
                 <Shield className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm">{getRoleDisplayName()}</span>
               </div>
-
-
               {user.inspektorat && (
                 <div className="flex items-center gap-2">
                   <Building className="w-4 h-4 text-muted-foreground" />
@@ -350,13 +346,12 @@ const ProfilePage: React.FC = () => {
         loading={isLoading}
       />
 
-      {/* Change Password Dialog */}
-      <ChangePasswordDialog
+      {/* <ChangePasswordDialog
         open={isPasswordDialogOpen}
         onOpenChange={setIsPasswordDialogOpen}
         onSave={handlePasswordChange}
         loading={isLoading}
-      />
+      /> */}
     </div>
   );
 };

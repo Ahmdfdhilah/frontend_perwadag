@@ -297,7 +297,7 @@ const EntryMeetingPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Entry Meeting"
-        description="Kelola data entry meeting audit"
+        description="Kelola data entry meeting evaluasi"
       />
 
       <Filtering>
@@ -372,7 +372,7 @@ const EntryMeetingPage: React.FC = () => {
           <div className="space-y-4">
             <ListHeaderComposite
               title={getCompositeTitle()}
-              subtitle="Kelola data entry meeting audit berdasarkan filter yang dipilih"
+              subtitle="Kelola data entry meeting evaluasi berdasarkan filter yang dipilih"
             />
 
             {/* Desktop Table */}

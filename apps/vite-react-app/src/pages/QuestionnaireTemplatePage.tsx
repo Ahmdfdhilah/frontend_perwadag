@@ -270,7 +270,7 @@ const QuestionnaireTemplatePage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Template Kuesioner"
-        description="Template kuesioner yang dapat digunakan untuk evaluasi audit"
+        description="Template kuesioner yang dapat digunakan untuk evaluasi"
         actions={
           <Button variant="default" onClick={isAdmin() ? handleAdd : undefined}>
             <Plus className='w-4'/>
@@ -316,7 +316,7 @@ const QuestionnaireTemplatePage: React.FC = () => {
           <div className="space-y-4">
             <ListHeaderComposite
               title={getCompositeTitle()}
-              subtitle="Template kuesioner yang dapat digunakan untuk evaluasi audit"
+              subtitle="Template kuesioner yang dapat digunakan untuk evaluasi"
             />
 
             <SearchContainer

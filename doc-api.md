@@ -17,6 +17,7 @@ All endpoints are prefixed with the base URL configured in your environment.
 | GET | `/password-reset-eligibility` | None | Dict | JWT | Check if user is eligible for password reset |
 | POST | `/request-password-reset` | `PasswordReset` | `MessageResponse` | None | Request password reset token |
 | POST | `/confirm-password-reset` | `PasswordResetConfirm` | `MessageResponse` | None | Confirm password reset with token |
+| POST | `/change-password` | `UserChangePassword` | `MessageResponse` | JWT | Change current user password |
 | GET | `/verify-token` | None | Dict | JWT | Verify if JWT token is valid |
 | GET | `/default-password-info` | None | Dict | JWT | Get default password policy info |
 
@@ -71,6 +72,14 @@ All endpoints are prefixed with the base URL configured in your environment.
 }
 ```
 
+#### **UserChangePassword**
+```json
+{
+  "current_password": "string (current password)",
+  "new_password": "string (minimum 6 chars, max 128 chars)"
+}
+```
+
 #### **Password Reset Eligibility Response**
 ```json
 {
@@ -111,6 +120,7 @@ All endpoints are prefixed with the base URL configured in your environment.
    - Check eligibility: GET `/auth/password-reset-eligibility`
    - Request reset: POST `/auth/request-password-reset`
    - Confirm reset: POST `/auth/confirm-password-reset`
+5. **Change Password**: POST `/auth/change-password` with current and new password
 
 ### Login Examples:
 ```json
@@ -810,7 +820,14 @@ All users are created with default password: `@Kemendag123`
 **MatriksUpdate**
 ```json
 {
-  // Minimal update fields - can be extended
+  "temuan_rekomendasi": {
+    "items": [
+      {
+        "temuan": "string (tidak boleh kosong)",
+        "rekomendasi": "string (tidak boleh kosong)"
+      }
+    ]
+  }
 }
 ```
 
@@ -821,6 +838,16 @@ All users are created with default password: `@Kemendag123`
   "surat_tugas_id": "string",
   "nomor_matriks": "string?",
   "file_dokumen": "string?",
+  "temuan_rekomendasi": {
+    "items": [
+      {
+        "temuan": "string",
+        "rekomendasi": "string"
+      }
+    ],
+    "total_items": "int",
+    "has_items": "bool"
+  },
   "file_urls": {
     "file_url": "string",
     "download_url": "string",
@@ -840,6 +867,7 @@ All users are created with default password: `@Kemendag123`
   "is_completed": "bool",
   "has_file": "bool",
   "has_nomor": "bool",
+  "has_temuan_rekomendasi": "bool",
   "completion_percentage": "int (0-100)",
   "surat_tugas_info": {
     "id": "string",

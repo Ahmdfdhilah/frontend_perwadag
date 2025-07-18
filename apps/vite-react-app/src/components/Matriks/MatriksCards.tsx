@@ -9,7 +9,9 @@ interface MatriksCardsProps {
   data: MatriksResponse[];
   loading?: boolean;
   onEdit?: (item: MatriksResponse) => void;
+  onView?: (item: MatriksResponse) => void;
   canEdit?: (item: MatriksResponse) => boolean;
+  canView?: (item: MatriksResponse) => boolean;
   userRole: 'admin' | 'inspektorat' | 'perwadag';
 }
 
@@ -17,7 +19,9 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
   data,
   loading = false,
   onEdit,
+  onView,
   canEdit,
+  canView,
   userRole,
 }) => {
 
@@ -68,11 +72,12 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
           <CardTitle className="text-lg font-semibold">
             {item.nama_perwadag}
           </CardTitle>
-          {canEdit?.(item) && (
+          {(canEdit?.(item) || canView?.(item)) && (
             <ActionDropdown
               onEdit={() => onEdit?.(item)}
-              showView={false}
-              showEdit={!!onEdit}
+              onView={() => onView?.(item)}
+              showView={!!onView && !!canView?.(item)}
+              showEdit={!!onEdit && !!canEdit?.(item)}
               showDelete={false}
             />
           )}
@@ -80,15 +85,9 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
       </CardHeader>
       <CardContent className="pt-0">
         <div className="space-y-3 text-sm">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <span className="font-medium text-muted-foreground">No:</span>
-              <span className="ml-2">{index + 1}</span>
-            </div>
-            <div>
-              <span className="font-medium text-muted-foreground">Nomor Matriks:</span>
-              <span className="ml-2">{item.nomor_matriks || '-'}</span>
-            </div>
+          <div>
+            <span className="font-medium text-muted-foreground">No:</span>
+            <span className="ml-2">{index + 1}</span>
           </div>
 
           <div>
@@ -126,6 +125,15 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
           <CardTitle className="text-lg font-semibold">
             Matriks #{index + 1}
           </CardTitle>
+          {(canEdit?.(item) || canView?.(item)) && (
+            <ActionDropdown
+              onEdit={() => onEdit?.(item)}
+              onView={() => onView?.(item)}
+              showView={!!onView && !!canView?.(item)}
+              showEdit={!!onEdit && !!canEdit?.(item)}
+              showDelete={false}
+            />
+          )}
         </div>
       </CardHeader>
       <CardContent className="pt-0">

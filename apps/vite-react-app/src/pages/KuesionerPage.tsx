@@ -304,7 +304,7 @@ const KuesionerPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Kuesioner"
-        description="Kelola data kuesioner audit"
+        description="Kelola data kuesioner evaluasi"
         actions={
           <Button 
             variant="outline" 
@@ -389,7 +389,7 @@ const KuesionerPage: React.FC = () => {
           <div className="space-y-4">
             <ListHeaderComposite
               title={getCompositeTitle()}
-              subtitle="Kelola data kuesioner audit berdasarkan filter yang dipilih"
+              subtitle="Kelola data kuesioner evaluasi berdasarkan filter yang dipilih"
             />
 
             {/* Desktop Table */}

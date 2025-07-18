@@ -401,7 +401,7 @@ const SuratTugasPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Surat Tugas"
-        description="Kelola data surat tugas audit"
+        description="Kelola data surat tugas evaluasi"
         actions={
           canCreateEdit && (
             <Button onClick={handleCreate}>
@@ -484,7 +484,7 @@ const SuratTugasPage: React.FC = () => {
           <div className="space-y-4">
             <ListHeaderComposite
               title={getCompositeTitle()}
-              subtitle="Kelola data surat tugas audit berdasarkan filter yang dipilih"
+              subtitle="Kelola data surat tugas evaluasi berdasarkan filter yang dipilih"
             />
 
             <SearchContainer

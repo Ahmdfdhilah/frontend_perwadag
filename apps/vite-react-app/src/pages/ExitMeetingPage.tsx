@@ -295,7 +295,7 @@ const ExitMeetingPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Exit Meeting"
-        description="Kelola data exit meeting audit"
+        description="Kelola data exit meeting evaluasi"
       />
 
       <Filtering>
@@ -370,9 +370,8 @@ const ExitMeetingPage: React.FC = () => {
           <div className="space-y-4">
             <ListHeaderComposite
               title={getCompositeTitle()}
-              subtitle="Kelola data exit meeting audit berdasarkan filter yang dipilih"
+              subtitle="Kelola data exit meeting evaluasi berdasarkan filter yang dipilih"
             />
-
 
             {/* Desktop Table */}
             <div className="hidden lg:block">
