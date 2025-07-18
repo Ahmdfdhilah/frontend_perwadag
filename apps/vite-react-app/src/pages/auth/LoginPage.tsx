@@ -32,11 +32,13 @@ export function LoginPage() {
   const { login, isAuthenticated, loading: authLoading, error, clearAuthError } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string>('');
+  const [successMessage, setSuccessMessage] = useState<string>('');
 
   const navigate = useNavigate();
   const location = useLocation();
 
   const from = location.state?.from || '/';
+  const message = location.state?.message || '';
 
   // Check if already logged in
   useEffect(() => {
@@ -52,6 +54,13 @@ export function LoginPage() {
     }
   }, [error]);
 
+  // Set success message if provided
+  useEffect(() => {
+    if (message) {
+      setSuccessMessage(message);
+    }
+  }, [message]);
+
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -61,13 +70,16 @@ export function LoginPage() {
     }
   });
 
-  // Clear errors when form values change
+  // Clear errors and success message when form values change
   useEffect(() => {
     if (loginError) {
       setLoginError('');
       clearAuthError();
     }
-  }, [form.watch(), clearAuthError]);
+    if (successMessage) {
+      setSuccessMessage('');
+    }
+  }, [form.watch(), clearAuthError, loginError, successMessage]);
 
   const onSubmit = async (data: LoginFormData) => {
     setLoginError('');
@@ -143,6 +155,15 @@ export function LoginPage() {
                       <Alert variant="destructive">
                         <AlertDescription>
                           {loginError}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
+                    {/* Success Alert */}
+                    {successMessage && (
+                      <Alert>
+                        <AlertDescription>
+                          {successMessage}
                         </AlertDescription>
                       </Alert>
                     )}
@@ -295,6 +316,15 @@ export function LoginPage() {
                     <Alert variant="destructive">
                       <AlertDescription>
                         {loginError}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {/* Success Alert */}
+                  {successMessage && (
+                    <Alert>
+                      <AlertDescription>
+                        {successMessage}
                       </AlertDescription>
                     </Alert>
                   )}

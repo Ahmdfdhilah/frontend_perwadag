@@ -1,5 +1,9 @@
 import { useNavigate, useLocation } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, Mail } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Mail, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/redux/store';
+import { requestPasswordResetAsync } from '@/redux/features/authSlice';
 
 import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@workspace/ui/components/card';
@@ -14,6 +18,10 @@ export function EmailSentSuccessPage() {
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch<AppDispatch>();
+  const [resending, setResending] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [success, setSuccess] = useState<string>('');
 
   const email = location.state?.email || '';
 
@@ -21,10 +29,24 @@ export function EmailSentSuccessPage() {
     navigate('/login');
   };
 
-  const handleResendEmail = () => {
-    navigate('/forgot-password', {
-      state: { email }
-    });
+  const handleResendEmail = async () => {
+    if (!email) {
+      navigate('/forgot-password');
+      return;
+    }
+
+    setResending(true);
+    setError('');
+    setSuccess('');
+
+    try {
+      await dispatch(requestPasswordResetAsync({ email })).unwrap();
+      setSuccess('Email telah dikirim ulang!');
+    } catch (error: any) {
+      setError(error || 'Terjadi kesalahan saat mengirim ulang email');
+    } finally {
+      setResending(false);
+    }
   };
 
   return (
@@ -81,6 +103,21 @@ export function EmailSentSuccessPage() {
                   </AlertDescription>
                 </Alert>
 
+                {/* Error Alert */}
+                {error && (
+                  <Alert variant="destructive">
+                    <AlertDescription>{error}</AlertDescription>
+                  </Alert>
+                )}
+
+                {/* Success Alert for Resend */}
+                {success && (
+                  <Alert>
+                    <CheckCircle className="h-4 w-4" />
+                    <AlertDescription>{success}</AlertDescription>
+                  </Alert>
+                )}
+
                 <div className="text-sm text-muted-foreground space-y-2">
                   <p>Silakan cek email Anda dan klik link yang diberikan untuk reset password.</p>
                   <p>Jika Anda tidak menerima email dalam beberapa menit, cek folder spam atau junk mail.</p>
@@ -102,8 +139,16 @@ export function EmailSentSuccessPage() {
                   variant="outline"
                   className="w-full"
                   onClick={handleResendEmail}
+                  disabled={resending}
                 >
-                  Kirim Ulang Email
+                  {resending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Mengirim...
+                    </>
+                  ) : (
+                    'Kirim Ulang Email'
+                  )}
                 </Button>
               </CardFooter>
             </Card>
@@ -151,6 +196,21 @@ export function EmailSentSuccessPage() {
                 </AlertDescription>
               </Alert>
 
+              {/* Error Alert */}
+              {error && (
+                <Alert variant="destructive">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              {/* Success Alert for Resend */}
+              {success && (
+                <Alert>
+                  <CheckCircle className="h-4 w-4" />
+                  <AlertDescription>{success}</AlertDescription>
+                </Alert>
+              )}
+
               <div className="text-sm text-muted-foreground space-y-2">
                 <p>Silakan cek email Anda dan klik link yang diberikan untuk reset password.</p>
                 <p>Jika Anda tidak menerima email dalam beberapa menit, cek folder spam atau junk mail.</p>
@@ -172,8 +232,16 @@ export function EmailSentSuccessPage() {
                 variant="outline"
                 className="w-full"
                 onClick={handleResendEmail}
+                disabled={resending}
               >
-                Kirim Ulang Email
+                {resending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Mengirim...
+                  </>
+                ) : (
+                  'Kirim Ulang Email'
+                )}
               </Button>
             </CardFooter>
           </Card>

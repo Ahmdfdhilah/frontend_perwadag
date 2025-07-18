@@ -25,6 +25,7 @@ import { LoginPage } from './pages/auth/LoginPage';
 import { DefaultLayout } from './components/layouts';
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
 import { EmailSentSuccessPage } from './pages/auth/EmailSentSuccessPage';
+import { ResetPasswordPage } from './pages/auth/ResetPasswordPage';
 import UsersPage from './pages/users/UsersPage';
 import ProfilePage from './pages/profile/ProfilePage';
 import { PublicRoute, AuthGuard } from './components/Auth/AuthGuard';
@@ -57,6 +58,11 @@ function App() {
                     <Route path='callback' element={
                       <PublicRoute>
                         <EmailSentSuccessPage />
+                      </PublicRoute>
+                    } />
+                    <Route path='reset-password' element={
+                      <PublicRoute>
+                        <ResetPasswordPage />
                       </PublicRoute>
                     } />
                   </Route>

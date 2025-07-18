@@ -6,6 +6,7 @@ import {
   LoginRequest, 
   PasswordResetRequest, 
   PasswordResetConfirmRequest,
+  ChangePasswordRequest,
   UserResponse 
 } from '@/services/auth/types';
 
@@ -130,9 +131,9 @@ export const confirmPasswordResetAsync = createAsyncThunk(
 
 export const changePasswordAsync = createAsyncThunk(
   'auth/changePassword',
-  async (passwordData: UserChangePassword, { rejectWithValue }) => {
+  async (passwordData: ChangePasswordRequest, { rejectWithValue }) => {
     try {
-      const response = await userService.changePassword(passwordData);
+      const response = await authService.changePassword(passwordData);
       return response.message;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Password change failed');

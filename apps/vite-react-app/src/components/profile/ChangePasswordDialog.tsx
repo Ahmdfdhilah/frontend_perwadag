@@ -3,6 +3,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useToast } from '@workspace/ui/components/sonner';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/redux/store';
+import { changePasswordAsync } from '@/redux/features/authSlice';
 import {
   Dialog,
   DialogContent,
@@ -25,11 +28,8 @@ const changePasswordSchema = z.object({
   current_password: z.string().min(1, 'Password saat ini wajib diisi'),
   new_password: z
     .string()
-    .min(8, 'Password baru minimal 8 karakter')
-    .regex(/[A-Z]/, 'Password harus mengandung minimal 1 huruf besar')
-    .regex(/[a-z]/, 'Password harus mengandung minimal 1 huruf kecil')
-    .regex(/[0-9]/, 'Password harus mengandung minimal 1 angka')
-    .regex(/[^A-Za-z0-9]/, 'Password harus mengandung minimal 1 karakter khusus'),
+    .min(6, 'Password baru minimal 6 karakter')
+    .max(128, 'Password baru maksimal 128 karakter'),
   confirm_password: z.string().min(1, 'Konfirmasi password wajib diisi'),
 }).refine((data) => data.new_password === data.confirm_password, {
   message: 'Konfirmasi password tidak cocok',
@@ -42,15 +42,19 @@ interface ChangePasswordDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: () => void;
+  loading?: boolean;
 }
 
 export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
   open,
   onOpenChange,
-  onSave
+  onSave,
+  loading: externalLoading
 }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const isLoading = loading || externalLoading;
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -68,11 +72,8 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
 
   const getPasswordStrength = (password: string) => {
     const requirements = [
-      { regex: /.{8,}/, label: 'Minimal 8 karakter' },
-      { regex: /[A-Z]/, label: 'Mengandung huruf besar' },
-      { regex: /[a-z]/, label: 'Mengandung huruf kecil' },
-      { regex: /[0-9]/, label: 'Mengandung angka' },
-      { regex: /[^A-Za-z0-9]/, label: 'Mengandung karakter khusus' },
+      { regex: /.{6,}/, label: 'Minimal 6 karakter' },
+      { regex: /^.{1,128}$/, label: 'Maksimal 128 karakter' },
     ];
 
     return requirements.map(req => ({
@@ -84,14 +85,10 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
   const handleSubmit = async (data: ChangePasswordData) => {
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // In real app, this would call the API to change password
-      console.log('Password change data:', {
+      await dispatch(changePasswordAsync({
         current_password: data.current_password,
         new_password: data.new_password
-      });
+      })).unwrap();
       
       onSave();
       toast({
@@ -101,12 +98,13 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
       });
       
       form.reset();
+      onOpenChange(false);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error changing password:', error);
       toast({
         title: 'Gagal mengubah password',
-        description: 'Terjadi kesalahan saat mengubah password',
+        description: error || 'Terjadi kesalahan saat mengubah password',
         variant: 'destructive'
       });
     } finally {
@@ -115,7 +113,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
   };
 
   const handleCancel = () => {
-    if (!loading) {
+    if (!isLoading) {
       form.reset();
       onOpenChange(false);
     }
@@ -147,7 +145,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
                       <Input
                         type={showCurrentPassword ? "text" : "password"}
                         placeholder="Masukkan password saat ini"
-                        disabled={loading}
+                        disabled={isLoading}
                         {...field}
                       />
                       <Button
@@ -156,7 +154,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
                         size="sm"
                         className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                         onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                        disabled={loading}
+                        disabled={isLoading}
                       >
                         {showCurrentPassword ? (
                           <EyeOff className="h-4 w-4" />
@@ -183,7 +181,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
                       <Input
                         type={showNewPassword ? "text" : "password"}
                         placeholder="Masukkan password baru"
-                        disabled={loading}
+                        disabled={isLoading}
                         {...field}
                       />
                       <Button
@@ -192,7 +190,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
                         size="sm"
                         className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                         onClick={() => setShowNewPassword(!showNewPassword)}
-                        disabled={loading}
+                        disabled={isLoading}
                       >
                         {showNewPassword ? (
                           <EyeOff className="h-4 w-4" />
@@ -238,7 +236,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
                       <Input
                         type={showConfirmPassword ? "text" : "password"}
                         placeholder="Konfirmasi password baru"
-                        disabled={loading}
+                        disabled={isLoading}
                         {...field}
                       />
                       <Button
@@ -247,7 +245,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
                         size="sm"
                         className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        disabled={loading}
+                        disabled={isLoading}
                       >
                         {showConfirmPassword ? (
                           <EyeOff className="h-4 w-4" />
@@ -266,7 +264,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
             <div className="bg-blue-50 p-3 rounded-lg">
               <p className="text-sm text-blue-800 font-medium mb-1">Tips Keamanan:</p>
               <ul className="text-xs text-blue-700 space-y-1">
-                <li>• Gunakan kombinasi huruf besar, kecil, angka, dan simbol</li>
+                <li>• Gunakan password yang sulit ditebak</li>
                 <li>• Jangan gunakan informasi pribadi yang mudah ditebak</li>
                 <li>• Ganti password secara berkala</li>
                 <li>• Jangan bagikan password kepada siapa pun</li>
@@ -275,11 +273,11 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
 
             {/* Form Actions */}
             <div className="flex justify-end space-x-4 pt-4">
-              <Button type="button" variant="outline" onClick={handleCancel} disabled={loading}>
+              <Button type="button" variant="outline" onClick={handleCancel} disabled={isLoading}>
                 Batal
               </Button>
-              <Button type="submit" disabled={loading}>
-                {loading ? 'Mengubah...' : 'Ubah Password'}
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? 'Mengubah...' : 'Ubah Password'}
               </Button>
             </div>
           </form>

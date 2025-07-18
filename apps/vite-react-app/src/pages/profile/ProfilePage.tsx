@@ -8,6 +8,7 @@ import { Badge } from '@workspace/ui/components/badge';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import { PageHeader } from '@/components/common/PageHeader';
 import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
+import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { UserUpdate } from '@/services/users/types';
@@ -20,6 +21,7 @@ import {
   CheckCircle,
   XCircle,
   IdCard,
+  Lock,
 } from 'lucide-react';
 
 const ProfilePage: React.FC = () => {
@@ -28,8 +30,7 @@ const ProfilePage: React.FC = () => {
   const isLoading = useAppSelector(selectAuthLoading);
   const { toast } = useToast();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  // Skip password dialog for now
-  // const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
+  const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
 
   if (!user) {
     return (
@@ -101,10 +102,9 @@ const ProfilePage: React.FC = () => {
     setIsEditDialogOpen(true);
   };
 
-  // Skip password change for now
-  // const handleChangePassword = () => {
-  //   setIsPasswordDialogOpen(true);
-  // };
+  const handleChangePassword = () => {
+    setIsPasswordDialogOpen(true);
+  };
 
   const handleProfileUpdate = async (data: UserUpdate) => {
     try {
@@ -124,6 +124,10 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const handlePasswordChange = () => {
+    // This will be called when password change is successful
+    // No need to do anything special here since the dialog handles success
+  };
 
   return (
     <div className="space-y-6">
@@ -136,11 +140,10 @@ const ProfilePage: React.FC = () => {
               <Edit className="w-4 h-4 mr-2" />
               Edit Profil
             </Button>
-            {/* Skip password change for now */}
-            {/* <Button onClick={handleChangePassword}>
+            <Button onClick={handleChangePassword}>
               <Lock className="w-4 h-4 mr-2" />
               Ganti Password
-            </Button> */}
+            </Button>
           </div>
         }
       />
@@ -347,7 +350,13 @@ const ProfilePage: React.FC = () => {
         loading={isLoading}
       />
 
-      {/* Skip ChangePasswordDialog for now */}
+      {/* Change Password Dialog */}
+      <ChangePasswordDialog
+        open={isPasswordDialogOpen}
+        onOpenChange={setIsPasswordDialogOpen}
+        onSave={handlePasswordChange}
+        loading={isLoading}
+      />
     </div>
   );
 };

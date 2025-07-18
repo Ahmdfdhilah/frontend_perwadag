@@ -4,6 +4,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { ArrowLeft, Loader2 } from 'lucide-react';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/redux/store';
+import { requestPasswordResetAsync } from '@/redux/features/authSlice';
 
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
@@ -26,6 +29,7 @@ export function ForgotPasswordPage() {
   const { isDarkMode } = useTheme();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
+  const dispatch = useDispatch<AppDispatch>();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -43,16 +47,20 @@ export function ForgotPasswordPage() {
     }
   }, [form.watch()]);
 
-  const onSubmit = (data: ForgotPasswordFormData) => {
+  const onSubmit = async (data: ForgotPasswordFormData) => {
     setLoading(true);
     setError('');
 
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await dispatch(requestPasswordResetAsync({ email: data.email })).unwrap();
       navigate('/callback', {
         state: { email: data.email }
       });
-    }, 1500);
+    } catch (error: any) {
+      setError(error || 'Terjadi kesalahan saat mengirim email reset password');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleBackToLogin = () => {

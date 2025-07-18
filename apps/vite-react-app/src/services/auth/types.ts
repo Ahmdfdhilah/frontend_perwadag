@@ -19,6 +19,11 @@ export interface PasswordResetConfirmRequest {
   new_password: string;
 }
 
+export interface ChangePasswordRequest {
+  current_password: string;
+  new_password: string;
+}
+
 // Auth Response Types
 export interface TokenResponse {
   access_token: string;

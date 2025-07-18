@@ -6,6 +6,7 @@ import {
   TokenResponse,
   PasswordResetRequest,
   PasswordResetConfirmRequest,
+  ChangePasswordRequest,
   PasswordResetEligibilityResponse,
   DefaultPasswordInfoResponse,
   TokenVerificationResponse,
@@ -56,6 +57,12 @@ class AuthService extends BaseService {
 
   async getDefaultPasswordInfo(): Promise<DefaultPasswordInfoResponse> {
     return this.get("/default-password-info");
+  }
+
+  async changePassword(
+    changePasswordData: ChangePasswordRequest
+  ): Promise<MessageResponse> {
+    return this.post("/change-password", changePasswordData);
   }
 }
 
