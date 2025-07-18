@@ -29,6 +29,7 @@ import { getDefaultYearOptions, findPeriodeByYear } from '@/utils/yearUtils';
 import { periodeEvaluasiService } from '@/services/periodeEvaluasi';
 import { PeriodeEvaluasi } from '@/services/periodeEvaluasi/types';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
+import { exportMatriksToExcel } from '@/utils/excelExportUtils';
 
 interface MatriksPageFilters {
   search: string;
@@ -180,151 +181,8 @@ const MatriksPage: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-  const handleExportExcel = (item: MatriksResponse) => {
-    try {
-      // Import ExcelJS library dynamically
-      import('exceljs').then((ExcelJS) => {
-        const temuanRekomendasi = item.temuan_rekomendasi_summary?.data || [];
-        const tanggalEvaluasi = formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai);
-        
-        // File name and title
-        const fileName = `Matriks_Temuan_Rekomendasi_${item.nama_perwadag.replace(/\s+/g, '_')}_${item.tahun_evaluasi}.xlsx`;
-        const title = `Matriks Temuan Rekomendasi ${item.nama_perwadag} ${tanggalEvaluasi}`;
-        
-        // Create new workbook
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('Matriks Temuan Rekomendasi');
-        
-        // Set column widths
-        worksheet.columns = [
-          { width: 5 },   // No column
-          { width: 50 },  // Temuan column
-          { width: 50 }   // Rekomendasi column
-        ];
-        
-        // Add title (merged cell)
-        worksheet.mergeCells('A1:C1');
-        const titleCell = worksheet.getCell('A1');
-        titleCell.value = title;
-        titleCell.font = { bold: true, size: 18, color: { argb: 'FF1565C0' } };
-        titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
-        titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE3F2FD' } };
-        titleCell.border = {
-          top: { style: 'thin' },
-          bottom: { style: 'thin' },
-          left: { style: 'thin' },
-          right: { style: 'thin' }
-        };
-        
-        // Set title row height
-        worksheet.getRow(1).height = 35;
-        
-        // Add empty row
-        worksheet.addRow([]);
-        
-        // Add header information with styling
-        const headerInfo = [
-          [`Nama Perwadag: ${item.nama_perwadag}`],
-          [`Inspektorat: ${item.inspektorat}`],
-          [`Tanggal Evaluasi: ${tanggalEvaluasi}`],
-          [`Tahun Evaluasi: ${item.tahun_evaluasi}`]
-        ];
-        
-        headerInfo.forEach((info, index) => {
-          const rowNum = index + 3; // Starting from row 3
-          worksheet.mergeCells(`A${rowNum}:B${rowNum}`);
-          const cell = worksheet.getCell(`A${rowNum}`);
-          cell.value = info[0];
-          cell.font = { bold: true, size: 12, color: { argb: 'FF424242' } };
-          cell.alignment = { horizontal: 'left', vertical: 'middle' };
-          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF5F5F5' } };
-          cell.border = {
-            top: { style: 'thin' },
-            bottom: { style: 'thin' },
-            left: { style: 'thin' },
-            right: { style: 'thin' }
-          };
-          worksheet.getRow(rowNum).height = 25;
-        });
-        
-        // Add empty row
-        worksheet.addRow([]);
-        
-        if (temuanRekomendasi.length > 0) {
-          // Add table headers
-          const headerRow = worksheet.addRow(['No', 'Temuan', 'Rekomendasi']);
-          headerRow.height = 30;
-          
-          // Style table headers
-          headerRow.eachCell((cell) => {
-            cell.font = { bold: true, size: 13, color: { argb: 'FFFFFFFF' } };
-            cell.alignment = { horizontal: 'center', vertical: 'middle' };
-            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1976D2' } };
-            cell.border = {
-              top: { style: 'thin' },
-              bottom: { style: 'thin' },
-              left: { style: 'thin' },
-              right: { style: 'thin' }
-            };
-          });
-          
-          // Add data rows
-          temuanRekomendasi.forEach((tr, index) => {
-            const dataRow = worksheet.addRow([index + 1, tr.temuan, tr.rekomendasi]);
-            
-            // Style data cells
-            dataRow.eachCell((cell, colNumber) => {
-              cell.font = { size: 11, color: { argb: 'FF212121' } };
-              cell.alignment = { 
-                horizontal: colNumber === 1 ? 'center' : 'left',
-                vertical: 'top',
-                wrapText: true
-              };
-              cell.border = {
-                top: { style: 'thin' },
-                bottom: { style: 'thin' },
-                left: { style: 'thin' },
-                right: { style: 'thin' }
-              };
-            });
-          });
-        } else {
-          const noDataRow = worksheet.addRow(['Tidak ada temuan dan rekomendasi']);
-          worksheet.mergeCells(`A${noDataRow.number}:C${noDataRow.number}`);
-          const cell = worksheet.getCell(`A${noDataRow.number}`);
-          cell.alignment = { horizontal: 'center', vertical: 'middle' };
-          cell.font = { italic: true, size: 11 };
-        }
-        
-        // Set workbook properties
-        workbook.creator = 'Sistem Evaluasi';
-        workbook.created = new Date();
-        workbook.modified = new Date();
-        
-        // Save file
-        workbook.xlsx.writeBuffer().then((buffer) => {
-          const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-          const link = document.createElement('a');
-          link.href = URL.createObjectURL(blob);
-          link.download = fileName;
-          link.click();
-          URL.revokeObjectURL(link.href);
-        });
-        
-        toast({
-          title: 'Export Berhasil',
-          description: `Data matriks ${item.nama_perwadag} berhasil diekspor ke Excel.`,
-          variant: 'default'
-        });
-      });
-    } catch (error) {
-      console.error('Failed to export Excel:', error);
-      toast({
-        title: 'Export Gagal',
-        description: 'Gagal mengekspor data ke Excel. Silakan coba lagi.',
-        variant: 'destructive'
-      });
-    }
+  const handleExportExcel = async (item: MatriksResponse) => {
+    await exportMatriksToExcel(item, formatIndonesianDateRange, toast);
   };
 
   const handleSave = async (data: any) => {
