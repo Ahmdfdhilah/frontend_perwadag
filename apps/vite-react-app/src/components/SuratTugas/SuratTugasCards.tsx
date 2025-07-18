@@ -56,8 +56,8 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
                 onEdit={canEdit(item) && onEdit && !isPerwadag ? () => onEdit(item) : undefined}
                 onDelete={canDelete(item) && onDelete && !isPerwadag ? () => onDelete(item) : undefined}
                 showView={true}
-                showEdit={!isPerwadag && !!onEdit}
-                showDelete={!isPerwadag && !!onDelete}
+                showEdit={!isPerwadag && !!onEdit && canEdit(item)}
+                showDelete={!isPerwadag && !!onDelete && canDelete(item)}
               />
             </div>
           </CardHeader>

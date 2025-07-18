@@ -28,8 +28,8 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
   onView,
   onEdit,
   onDelete,
-  canEdit = () => true,
-  canDelete = () => true,
+  canEdit = () => false,
+  canDelete = () => false,
   isPerwadag = false,
 }) => {
 
@@ -71,8 +71,8 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
                     onEdit={canEdit(item) && onEdit ? () => onEdit(item) : undefined}
                     onDelete={canDelete(item) && onDelete ? () => onDelete(item) : undefined}
                     showView={true}
-                    showEdit={!isPerwadag && !!onEdit}
-                    showDelete={!isPerwadag && !!onDelete}
+                    showEdit={!isPerwadag && !!onEdit && canEdit(item)}
+                    showDelete={!isPerwadag && !!onDelete && canDelete(item)}
                   />
                 </TableCell>
               </TableRow>

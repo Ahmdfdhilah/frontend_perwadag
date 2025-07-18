@@ -68,12 +68,14 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
           <CardTitle className="text-lg font-semibold">
             {item.nama_perwadag}
           </CardTitle>
-          <ActionDropdown
-            onEdit={canEdit?.(item) ? () => onEdit?.(item) : undefined}
-            showView={false}
-            showEdit={canEdit?.(item) && !!onEdit}
-            showDelete={false}
-          />
+          {canEdit?.(item) && (
+            <ActionDropdown
+              onEdit={() => onEdit?.(item)}
+              showView={false}
+              showEdit={!!onEdit}
+              showDelete={false}
+            />
+          )}
         </div>
       </CardHeader>
       <CardContent className="pt-0">

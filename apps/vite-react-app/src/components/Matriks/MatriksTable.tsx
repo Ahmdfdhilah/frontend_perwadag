@@ -59,16 +59,21 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
     );
   }
 
-  const renderAdminInspektoratColumns = () => (
-    <>
-      <TableHead>No</TableHead>
-      <TableHead>Nama Perwadag</TableHead>
-      <TableHead>Tanggal Evaluasi</TableHead>
-      <TableHead>Dokumen</TableHead>
-      <TableHead>Status</TableHead>
-      <TableHead className="w-[80px]">Aksi</TableHead>
-    </>
-  );
+  const renderAdminInspektoratColumns = () => {
+    // Check if any item can be edited
+    const hasEditableItems = data.some(item => canEdit?.(item));
+    
+    return (
+      <>
+        <TableHead>No</TableHead>
+        <TableHead>Nama Perwadag</TableHead>
+        <TableHead>Tanggal Evaluasi</TableHead>
+        <TableHead>Dokumen</TableHead>
+        <TableHead>Status</TableHead>
+        {hasEditableItems && <TableHead className="w-[80px]">Aksi</TableHead>}
+      </>
+    );
+  };
 
   const renderPerwadagColumns = () => (
     <>
@@ -79,25 +84,36 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
     </>
   );
 
-  const renderAdminInspektoratRow = (item: MatriksResponse, index: number) => (
-    <TableRow key={item.id}>
-      <TableCell className="font-medium">{index + 1}</TableCell>
-      <TableCell>{item.nama_perwadag}</TableCell>
-      <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
-      <TableCell>{renderDocumentLink(item)}</TableCell>
-      <TableCell>
-        {getStatusBadge(item)}
-      </TableCell>
-      <TableCell>
-        <ActionDropdown
-          onEdit={canEdit?.(item) ? () => onEdit?.(item) : undefined}
-          showView={false}
-          showEdit={canEdit?.(item) && !!onEdit}
-          showDelete={false}
-        />
-      </TableCell>
-    </TableRow>
-  );
+  const renderAdminInspektoratRow = (item: MatriksResponse, index: number) => {
+    // Check if any item can be edited to determine if we need the Actions column
+    const hasEditableItems = data.some(item => canEdit?.(item));
+    
+    return (
+      <TableRow key={item.id}>
+        <TableCell className="font-medium">{index + 1}</TableCell>
+        <TableCell>{item.nama_perwadag}</TableCell>
+        <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
+        <TableCell>{renderDocumentLink(item)}</TableCell>
+        <TableCell>
+          {getStatusBadge(item)}
+        </TableCell>
+        {hasEditableItems && (
+          <TableCell>
+            {canEdit?.(item) ? (
+              <ActionDropdown
+                onEdit={() => onEdit?.(item)}
+                showView={false}
+                showEdit={!!onEdit}
+                showDelete={false}
+              />
+            ) : (
+              <span className="text-muted-foreground text-sm">-</span>
+            )}
+          </TableCell>
+        )}
+      </TableRow>
+    );
+  };
 
   const renderPerwadagRow = (item: MatriksResponse, index: number) => (
     <TableRow key={item.id}>

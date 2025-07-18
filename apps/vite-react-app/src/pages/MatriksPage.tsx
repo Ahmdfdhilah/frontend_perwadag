@@ -87,8 +87,8 @@ const MatriksPage: React.FC = () => {
   // Fetch periode evaluasi data
   const fetchPeriodeEvaluasi = async () => {
     try {
-      const response = await periodeEvaluasiService.getPeriodeEvaluasi({ 
-        size: 100 
+      const response = await periodeEvaluasiService.getPeriodeEvaluasi({
+        size: 100
       });
       setPeriodeEvaluasi(response.items);
     } catch (error) {
@@ -208,13 +208,13 @@ const MatriksPage: React.FC = () => {
   // Check if user can edit this item based on role and permissions
   const canEdit = (item: MatriksResponse) => {
     if (!canEditForm('matriks')) return false;
-    
+
     // Check if the periode is locked or status is "tutup"
     const periode = findPeriodeByYear(periodeEvaluasi, item.tahun_evaluasi);
     if (periode?.is_locked || periode?.status === 'tutup') {
       return false;
     }
-    
+
     if (isAdmin()) return true;
     if (isInspektorat()) {
       // Check if user can edit this matriks based on inspektorat
