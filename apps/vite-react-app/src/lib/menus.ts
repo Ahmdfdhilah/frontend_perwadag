@@ -40,6 +40,14 @@ export const appMenuItems: SidebarItem[] = [
     icon: MailWarningIcon,
     allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
   },
+    // Kuesioner - All roles
+    {
+      title: 'Kuesioner',
+      href: '/kuesioner',
+      icon: ClipboardList,
+      allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
+    },
+  
   // Entry Meeting - All roles
   {
     title: 'Entry Meeting',
@@ -55,12 +63,11 @@ export const appMenuItems: SidebarItem[] = [
     icon: CheckSquare,
     allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
   },
-
-  // Kuesioner - All roles
+  // Matriks - All roles
   {
-    title: 'Kuesioner',
-    href: '/kuesioner',
-    icon: ClipboardList,
+    title: 'Matriks',
+    href: '/matriks',
+    icon: Grid2X2,
     allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
   },
 
@@ -72,13 +79,7 @@ export const appMenuItems: SidebarItem[] = [
     allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
   },
 
-  // Matriks - All roles
-  {
-    title: 'Matriks',
-    href: '/matriks',
-    icon: Grid2X2,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
-  },
+
 
   // Laporan Hasil - All roles
   {
@@ -93,7 +94,7 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Template Kuesioner',
     href: '/template-kuesioner',
     icon: ClipboardCopyIcon,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
+    allowedRoles: ['ADMIN'],
   },
 
   // User Management - ADMIN only
