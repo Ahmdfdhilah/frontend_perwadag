@@ -278,7 +278,7 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
             {/* Upload Bukti Hadir */}
             <FileUpload
               label="Upload Bukti Hadir"
-              accept="*/*"
+              accept="image/*,.jpg,.jpeg,.png,.gif,.webp"
               multiple={true}
               maxSize={10 * 1024 * 1024} // 10MB
               maxFiles={5}
@@ -289,7 +289,7 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
               onFilesChange={handleMeetingFilesChange}
               onExistingFileRemove={handleExistingFilesRemove}
               onFileDownload={handleFileDownload}
-              description="Upload bukti hadir meeting (Max 10MB per file)"
+              description="Upload bukti hadir meeting dalam format gambar (Max 10MB per file)"
             />
           </div>
         </div>

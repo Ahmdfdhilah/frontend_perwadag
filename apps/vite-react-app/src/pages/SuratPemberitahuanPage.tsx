@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRole } from '@/hooks/useRole';
+import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import Filtering from '@/components/common/Filtering';
@@ -38,6 +39,7 @@ interface SuratPemberitahuanPageFilters {
 
 const SuratPemberitahuanPage: React.FC = () => {
   const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
+  const { hasPageAccess, canEditForm, canCreateForm, canDeleteForm } = useFormPermissions();
   const { toast } = useToast();
 
   // URL Filters configuration
@@ -76,8 +78,8 @@ const SuratPemberitahuanPage: React.FC = () => {
     }
   };
 
-  // Calculate access control
-  const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
+  // Calculate access control using useFormPermissions
+  const hasAccess = hasPageAccess('surat_pemberitahuan');
 
   // Fetch surat pemberitahuan function
   const fetchSuratPemberitahuan = async () => {
@@ -189,8 +191,10 @@ const SuratPemberitahuanPage: React.FC = () => {
     }
   };
 
-  // Check if user can edit this item based on role
+  // Check if user can edit this item based on role and permissions
   const canEdit = (item: SuratPemberitahuanResponse) => {
+    if (!canEditForm('surat_pemberitahuan')) return false;
+    
     if (isAdmin()) return true;
     if (isInspektorat()) {
       // Check if user can edit this surat pemberitahuan based on inspektorat

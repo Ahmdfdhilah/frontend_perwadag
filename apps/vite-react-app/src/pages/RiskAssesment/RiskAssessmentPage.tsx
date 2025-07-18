@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
+import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import { PenilaianRisikoResponse, PenilaianRisikoFilterParams } from '@/services/penilaianRisiko/types';
@@ -43,6 +44,7 @@ interface RiskAssessmentPageFilters {
 const RiskAssessmentPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
+  const { hasPageAccess, canEditForm } = useFormPermissions();
   const { toast } = useToast();
 
   // URL Filters configuration
@@ -80,8 +82,8 @@ const RiskAssessmentPage: React.FC = () => {
     }
   };
 
-  // Calculate access control
-  const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
+  // Calculate access control based on permissions
+  const hasAccess = hasPageAccess('risk_assessment');
 
   // Fetch risk assessments function
   const fetchRiskAssessments = async () => {
@@ -221,12 +223,7 @@ const RiskAssessmentPage: React.FC = () => {
   };
 
   const canEdit = () => {
-    if (isAdmin()) return true;
-    if (isInspektorat()) {
-      // Check if user can edit this assessment based on inspektorat
-      return true; // Implement proper logic based on user's inspektorat
-    }
-    return false;
+    return canEditForm('risk_assessment');
   };
 
   // Check access after all hooks have been called

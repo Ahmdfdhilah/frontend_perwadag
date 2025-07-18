@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRole } from '@/hooks/useRole';
+import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import { MeetingResponse, MeetingFilterParams } from '@/services/meeting/types';
@@ -37,6 +38,7 @@ interface EntryMeetingPageFilters {
 
 const EntryMeetingPage: React.FC = () => {
   const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
+  const { hasPageAccess, canEditForm, canCreateForm, canDeleteForm } = useFormPermissions();
   const { toast } = useToast();
 
   // URL Filters configuration
@@ -67,8 +69,8 @@ const EntryMeetingPage: React.FC = () => {
     { value: 'all', label: 'Semua Tahun' }
   ]);
 
-  // Calculate access control
-  const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
+  // Calculate access control using useFormPermissions
+  const hasAccess = hasPageAccess('entry_meeting');
 
   // Fetch meetings function
   const fetchMeetings = async () => {
@@ -238,11 +240,17 @@ const EntryMeetingPage: React.FC = () => {
     return title;
   };
 
-  const canEdit = () => {
+  const canEdit = (item?: MeetingResponse) => {
+    if (!canEditForm('entry_meeting')) return false;
+    
     if (isAdmin()) return true;
     if (isInspektorat()) {
       // Check if user can edit this meeting based on inspektorat
-      return true; // Implement proper logic based on user's inspektorat
+      return item ? user?.inspektorat === item.inspektorat : true;
+    }
+    if (isPerwadag()) {
+      // Check if user can edit their own meeting
+      return item ? user?.id === item.surat_tugas_info?.nama_perwadag : true;
     }
     return false;
   };

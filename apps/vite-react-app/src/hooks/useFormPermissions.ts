@@ -28,63 +28,92 @@ export const useFormPermissions = () => {
   const getFormPermission = useCallback((formType: FormType): FormPermission => {
     const role = isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : 'perwadag';
     
-    // Base permissions for different roles
-    const basePermissions = {
-      admin: {
-        canView: true,
-        canEdit: true,
-        canCreate: true,
-        canDelete: true,
-        excludeReadonlyFields: true,
+    // Define permissions based on mapping requirements
+    const permissions: Record<FormType, Record<string, FormPermission>> = {
+      // Risk Assessment: Admin (R,U), Inspektorat (X), Perwadag (X)
+      risk_assessment: {
+        admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        inspektorat: { canView: false, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
+        perwadag: { canView: false, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
       },
-      inspektorat: {
-        canView: true,
-        canEdit: true,
-        canCreate: true,
-        canDelete: false,
-        excludeReadonlyFields: true,
+      
+      // Surat Tugas: Admin (CRUD), Inspektorat (CRUD), Perwadag (R)
+      surat_tugas: {
+        admin: { canView: true, canEdit: true, canCreate: true, canDelete: true, excludeReadonlyFields: true },
+        inspektorat: { canView: true, canEdit: true, canCreate: true, canDelete: true, excludeReadonlyFields: true },
+        perwadag: { canView: true, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
       },
-      perwadag: {
-        canView: true,
-        canEdit: false,
-        canCreate: false,
-        canDelete: false,
-        excludeReadonlyFields: false,
+      
+      // Surat Pemberitahuan: Admin (RU), Inspektorat (RU), Perwadag (R)
+      surat_pemberitahuan: {
+        admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        inspektorat: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        perwadag: { canView: true, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
+      },
+      
+      // Kuesioner: Admin (RU), Inspektorat (RU), Perwadag (RU)
+      kuesioner: {
+        admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        inspektorat: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        perwadag: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+      },
+      
+      // Entry Meeting: Admin (RU), Inspektorat (RU), Perwadag (RU)
+      entry_meeting: {
+        admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        inspektorat: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        perwadag: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+      },
+      
+      // Exit Meeting: Admin (RU), Inspektorat (RU), Perwadag (RU)
+      exit_meeting: {
+        admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        inspektorat: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        perwadag: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+      },
+      
+      // Konfirmasi Meeting: Admin (RU), Inspektorat (RU), Perwadag (RU)
+      konfirmasi_meeting: {
+        admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        inspektorat: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        perwadag: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+      },
+      
+      // Matriks: Admin (RU), Inspektorat (RU), Perwadag (R)
+      matriks: {
+        admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        inspektorat: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        perwadag: { canView: true, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
+      },
+      
+      // Laporan Hasil: Admin (RU), Inspektorat (X), Perwadag (X)
+      laporan_hasil_evaluasi: {
+        admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        inspektorat: { canView: false, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
+        perwadag: { canView: false, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
+      },
+      
+      // Default permissions for other forms
+      questionnaire_template: {
+        admin: { canView: true, canEdit: true, canCreate: true, canDelete: true, excludeReadonlyFields: true },
+        inspektorat: { canView: true, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
+        perwadag: { canView: true, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
+      },
+      
+      user_management: {
+        admin: { canView: true, canEdit: true, canCreate: true, canDelete: true, excludeReadonlyFields: true },
+        inspektorat: { canView: false, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
+        perwadag: { canView: false, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
       },
     };
 
-    // Override permissions based on form type and role
-    if (role === 'perwadag') {
-      const perwadagOverrides: Partial<Record<FormType, Partial<FormPermission>>> = {
-        // Meeting forms - view only
-        entry_meeting: { canView: true, canEdit: false },
-        exit_meeting: { canView: true, canEdit: false },
-        konfirmasi_meeting: { canView: true, canEdit: false },
-        
-        // Document forms - mostly view only
-        surat_tugas: { canView: true, canEdit: false },
-        surat_pemberitahuan: { canView: true, canEdit: false },
-        laporan_hasil_evaluasi: { canView: true, canEdit: false },
-        
-        // Kuesioner - can edit
-        kuesioner: { canView: true, canEdit: true, canCreate: true },
-        
-        // Matrix and risk assessment - view only
-        matriks: { canView: true, canEdit: false },
-        risk_assessment: { canView: true, canEdit: false },
-        
-        // Templates and user management - view only
-        questionnaire_template: { canView: true, canEdit: false },
-        user_management: { canView: false, canEdit: false },
-      };
-
-      return {
-        ...basePermissions[role],
-        ...perwadagOverrides[formType],
-      };
-    }
-
-    return basePermissions[role];
+    return permissions[formType]?.[role] || {
+      canView: false,
+      canEdit: false,
+      canCreate: false,
+      canDelete: false,
+      excludeReadonlyFields: false,
+    };
   }, [isAdmin, isInspektorat, isPerwadag]);
 
   const canViewForm = useCallback((formType: FormType): boolean => {
@@ -107,6 +136,10 @@ export const useFormPermissions = () => {
     return getFormPermission(formType).excludeReadonlyFields;
   }, [getFormPermission]);
 
+  const hasPageAccess = useCallback((formType: FormType): boolean => {
+    return getFormPermission(formType).canView;
+  }, [getFormPermission]);
+
   return {
     getFormPermission,
     canViewForm,
@@ -114,5 +147,6 @@ export const useFormPermissions = () => {
     canCreateForm,
     canDeleteForm,
     shouldExcludeReadonlyFields,
+    hasPageAccess,
   };
 };

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRole } from '@/hooks/useRole';
+import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import Filtering from '@/components/common/Filtering';
@@ -40,6 +41,7 @@ interface MatriksPageFilters {
 
 const MatriksPage: React.FC = () => {
   const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
+  const { hasPageAccess, canEditForm, canCreateForm, canDeleteForm } = useFormPermissions();
   const { toast } = useToast();
 
   // URL Filters configuration
@@ -79,8 +81,8 @@ const MatriksPage: React.FC = () => {
     }
   };
 
-  // Calculate access control
-  const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
+  // Calculate access control using useFormPermissions
+  const hasAccess = hasPageAccess('matriks');
 
   // Fetch matriks function
   const fetchMatriks = async () => {
@@ -187,8 +189,10 @@ const MatriksPage: React.FC = () => {
     }
   };
 
-  // Check if user can edit this item based on role
+  // Check if user can edit this item based on role and permissions
   const canEdit = (item: MatriksResponse) => {
+    if (!canEditForm('matriks')) return false;
+    
     if (isAdmin()) return true;
     if (isInspektorat()) {
       // Check if user can edit this matriks based on inspektorat

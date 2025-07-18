@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRole } from '@/hooks/useRole';
+import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import Filtering from '@/components/common/Filtering';
@@ -38,6 +39,7 @@ interface KuesionerPageFilters {
 
 const KuesionerPage: React.FC = () => {
   const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
+  const { hasPageAccess, canEditForm, canCreateForm, canDeleteForm } = useFormPermissions();
   const { toast } = useToast();
 
   // URL Filters configuration
@@ -77,8 +79,8 @@ const KuesionerPage: React.FC = () => {
     }
   };
 
-  // Calculate access control
-  const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
+  // Calculate access control using useFormPermissions
+  const hasAccess = hasPageAccess('kuesioner');
 
   // Fetch kuisioner function
   const fetchKuisioner = async () => {
@@ -245,6 +247,8 @@ const KuesionerPage: React.FC = () => {
   };
 
   const canEdit = (item: KuisionerResponse) => {
+    if (!canEditForm('kuesioner')) return false;
+    
     if (isAdmin()) return true;
     if (isInspektorat()) {
       // Check if user can edit this kuisioner based on inspektorat

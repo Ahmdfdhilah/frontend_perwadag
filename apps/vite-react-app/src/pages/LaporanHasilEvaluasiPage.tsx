@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRole } from '@/hooks/useRole';
+import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import Filtering from '@/components/common/Filtering';
@@ -42,6 +43,7 @@ interface LaporanHasilEvaluasiPageFilters {
 
 const LaporanHasilEvaluasiPage: React.FC = () => {
   const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
+  const { hasPageAccess, canEditForm, canCreateForm, canDeleteForm } = useFormPermissions();
   const { toast } = useToast();
 
   // URL Filters configuration
@@ -83,8 +85,8 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
     }
   };
 
-  // Calculate access control
-  const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
+  // Calculate access control using useFormPermissions
+  const hasAccess = hasPageAccess('laporan_hasil_evaluasi');
 
   // Fetch laporan hasil function
   const fetchLaporanHasil = async () => {
@@ -258,6 +260,8 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
   };
 
   const canEdit = (item: LaporanHasilResponse) => {
+    if (!canEditForm('laporan_hasil_evaluasi')) return false;
+    
     if (isAdmin()) return true;
     if (isInspektorat()) {
       // Check if user can edit this laporan based on inspektorat

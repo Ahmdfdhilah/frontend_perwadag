@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRole } from '@/hooks/useRole';
+import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import { SuratTugasResponse, SuratTugasFilterParams } from '@/services/suratTugas/types';
@@ -50,6 +51,7 @@ interface SuratTugasPageFilters {
 
 const SuratTugasPage: React.FC = () => {
   const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
+  const { hasPageAccess, canEditForm, canCreateForm, canDeleteForm } = useFormPermissions();
   const { toast } = useToast();
 
   // URL Filters configuration
@@ -89,9 +91,11 @@ const SuratTugasPage: React.FC = () => {
     }
   };
 
-  // Calculate access control
-  const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
-  const canCreateEdit = isAdmin() || isInspektorat();
+  // Calculate access control based on permissions
+  const hasAccess = hasPageAccess('surat_tugas');
+  const canCreateEdit = canCreateForm('surat_tugas') || canEditForm('surat_tugas');
+  const canEdit = canEditForm('surat_tugas');
+  const canDelete = canDeleteForm('surat_tugas');
 
   // Fetch surat tugas list function
   const fetchSuratTugasList = async () => {
@@ -429,8 +433,8 @@ const SuratTugasPage: React.FC = () => {
                 data={suratTugasList}
                 loading={loading}
                 onView={handleView}
-                onEdit={canCreateEdit ? handleEdit : undefined}
-                onDelete={canCreateEdit ? handleDelete : undefined}
+                onEdit={canEdit ? handleEdit : undefined}
+                onDelete={canDelete ? handleDelete : undefined}
                 isPerwadag={isPerwadag()}
               />
             </div>
@@ -441,8 +445,8 @@ const SuratTugasPage: React.FC = () => {
                 data={suratTugasList}
                 loading={loading}
                 onView={handleView}
-                onEdit={canCreateEdit ? handleEdit : undefined}
-                onDelete={canCreateEdit ? handleDelete : undefined}
+                onEdit={canEdit ? handleEdit : undefined}
+                onDelete={canDelete ? handleDelete : undefined}
                 isPerwadag={isPerwadag()}
               />
             </div>
