@@ -249,12 +249,16 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.accessToken = action.payload.access_token;
         state.tokenExpiry = action.payload.tokenExpiry;
+        // Keep user authenticated and preserve user data
+        state.isAuthenticated = true;
         state.error = null;
       })
       .addCase(refreshTokenAsync.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
+        // Clear all auth data when refresh fails
         state.isAuthenticated = false;
+        state.user = null;
         state.accessToken = null;
         state.refreshToken = null;
         state.tokenExpiry = null;
@@ -390,6 +394,7 @@ export const selectUser = (state: { auth: AuthState }) => state.auth.user;
 export const selectAuthLoading = (state: { auth: AuthState }) => state.auth.isLoading;
 export const selectAuthError = (state: { auth: AuthState }) => state.auth.error;
 export const selectAccessToken = (state: { auth: AuthState }) => state.auth.accessToken;
+export const selectRefreshToken = (state: { auth: AuthState }) => state.auth.refreshToken;
 export const selectTokenExpiry = (state: { auth: AuthState }) => state.auth.tokenExpiry;
 
 export default authSlice.reducer;

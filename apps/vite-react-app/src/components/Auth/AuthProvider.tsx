@@ -5,6 +5,7 @@ import {
   loginAsync,
   logoutAsync,
   verifyTokenAsync,
+  refreshTokenAsync,
   changePasswordAsync,
   getCurrentUserAsync,
   clearAuth,
@@ -14,6 +15,7 @@ import {
   selectAuthLoading,
   selectAuthError,
   selectAccessToken,
+  selectRefreshToken,
   selectTokenExpiry
 } from '@/redux/features/authSlice';
 import { useToast } from '@workspace/ui/components/sonner';
@@ -62,6 +64,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const loading = useAppSelector(selectAuthLoading);
   const error = useAppSelector(selectAuthError);
   const accessToken = useAppSelector(selectAccessToken);
+  const refreshToken = useAppSelector(selectRefreshToken);
   const tokenExpiry = useAppSelector(selectTokenExpiry);
 
   // Show error toast when error is set
@@ -102,7 +105,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       // Check if token is expired
       if (tokenExpiry && tokenExpiry < Date.now()) {
-        dispatch(clearAuth());
+        // Token is expired, try to refresh
+        if (refreshToken) {
+          try {
+            await dispatch(refreshTokenAsync(refreshToken)).unwrap();
+            // Don't fetch user data here - it's already persisted
+          } catch (refreshError) {
+            console.error('Token refresh failed:', refreshError);
+            dispatch(clearAuth());
+          }
+        } else {
+          dispatch(clearAuth());
+        }
         return;
       }
 
@@ -169,7 +183,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return () => clearTimeout(timer);
       }
     }
-  }, [accessToken, tokenExpiry, isAuthenticated, dispatch]);
+  }, [accessToken, refreshToken, tokenExpiry, isAuthenticated, dispatch]);
 
   // Periodic token validation (every 10 minutes)
   useEffect(() => {

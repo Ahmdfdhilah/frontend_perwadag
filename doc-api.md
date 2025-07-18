@@ -6,6 +6,143 @@ This document provides comprehensive mapping of all API endpoints in the Perwada
 ## Base URL
 All endpoints are prefixed with the base URL configured in your environment.
 
+## Authentication Endpoints
+**Base Path**: `/auth`
+
+| Method | Route | Request Schema | Response Schema | Auth Required | Description |
+|--------|-------|---------------|----------------|---------------|-------------|
+| POST | `/login` | `UserLogin` | `Token` | None | Login with nama (as username) and password |
+| POST | `/refresh` | `TokenRefresh` | `Token` | None | Refresh access token using refresh token |
+| POST | `/logout` | None | `MessageResponse` | JWT | Logout current user |
+| GET | `/password-reset-eligibility` | None | Dict | JWT | Check if user is eligible for password reset |
+| POST | `/request-password-reset` | `PasswordReset` | `MessageResponse` | None | Request password reset token |
+| POST | `/confirm-password-reset` | `PasswordResetConfirm` | `MessageResponse` | None | Confirm password reset with token |
+| GET | `/verify-token` | None | Dict | JWT | Verify if JWT token is valid |
+| GET | `/default-password-info` | None | Dict | JWT | Get default password policy info |
+
+### Key Features:
+- Simplified authentication using nama (full name) as username
+- JWT-based authentication with access and refresh tokens
+- Password reset functionality via email
+- Default password system: All users start with `@Kemendag123`
+- Token verification for frontend applications
+- Role-based password information access
+
+### Request/Response Schemas:
+
+#### **UserLogin**
+```json
+{
+  "username": "string (nama lengkap)",
+  "password": "string (minimum 1 char)"
+}
+```
+
+#### **Token**
+```json
+{
+  "access_token": "string",
+  "refresh_token": "string", 
+  "token_type": "bearer",
+  "expires_in": "int (seconds)",
+  "user": "UserResponse"
+}
+```
+
+#### **TokenRefresh**
+```json
+{
+  "refresh_token": "string"
+}
+```
+
+#### **PasswordReset**
+```json
+{
+  "email": "string (valid email, must be set in profile first)"
+}
+```
+
+#### **PasswordResetConfirm**
+```json
+{
+  "token": "string (reset token from email)",
+  "new_password": "string (minimum 6 chars, max 128 chars)"
+}
+```
+
+#### **Password Reset Eligibility Response**
+```json
+{
+  "eligible": "bool",
+  "has_email": "bool",
+  "email": "string or null",
+  "message": "string (explanation)"
+}
+```
+
+#### **Token Verification Response**
+```json
+{
+  "valid": "bool",
+  "user_id": "string",
+  "nama": "string",
+  "roles": ["string"],
+  "message": "string"
+}
+```
+
+#### **Default Password Info Response**
+```json
+{
+  "message": "string",
+  "description": "string",
+  "recommendation": "string",
+  "policy": "string",
+  "actual_password": "string (admin only)"
+}
+```
+
+### Authentication Flow:
+1. **Login**: POST `/auth/login` with `nama` and `password`
+2. **Token Usage**: Include `Authorization: Bearer <access_token>` in headers
+3. **Token Refresh**: POST `/auth/refresh` when access token expires
+4. **Password Reset**: 
+   - Check eligibility: GET `/auth/password-reset-eligibility`
+   - Request reset: POST `/auth/request-password-reset`
+   - Confirm reset: POST `/auth/confirm-password-reset`
+
+### Login Examples:
+```json
+{
+  "username": "Administrator Sistem",
+  "password": "@Kemendag123"
+}
+```
+
+```json
+{
+  "username": "ITPC Lagos – Nigeria", 
+  "password": "@Kemendag123"
+}
+```
+
+### Password Reset Process:
+1. User must first set email address via PUT `/users/me`
+2. Check eligibility via GET `/auth/password-reset-eligibility`
+3. Request reset token via POST `/auth/request-password-reset`
+4. Check email for reset link with token
+5. Confirm reset with token via POST `/auth/confirm-password-reset`
+
+### Security Notes:
+- All users start with default password `@Kemendag123`
+- Password reset requires email to be set in user profile first
+- Reset tokens expire after 1 hour
+- Case-sensitive nama matching for login
+- JWT tokens have configurable expiration times
+
+---
+
 ## 1. Users Endpoints
 **Base Path**: `/users`
 
@@ -28,13 +165,14 @@ All endpoints are prefixed with the base URL configured in your environment.
 | DELETE | `/{user_id}` | None | `MessageResponse` | Admin | Soft delete user |
 
 ### Key Features:
-- Role-based user management (ADMIN, INSPEKTORAT, PERWADAG)
-- Auto-generated usernames based on nama and tanggal_lahir
+- Simplified user management with role-based access (ADMIN, INSPEKTORAT, PERWADAG)
+- Auto-generated usernames based on nama only
 - Comprehensive filtering and search capabilities
 - Dedicated perwadag search endpoint with pagination
 - Profile self-management
 - Password management with default password system
 - User statistics and analytics
+- Removed unnecessary fields (tempat_lahir, tanggal_lahir, pangkat, age calculations)
 
 ### Request/Response Schemas:
 
@@ -42,14 +180,11 @@ All endpoints are prefixed with the base URL configured in your environment.
 ```json
 {
   "nama": "string (1-200 chars)",
-  "tempat_lahir": "string (1-100 chars)",
-  "tanggal_lahir": "date",
-  "pangkat": "string (1-100 chars)",
   "jabatan": "string (1-200 chars)",
   "email": "string? (valid email)",
   "is_active": "bool (default: true)",
   "role": "enum (ADMIN/INSPEKTORAT/PERWADAG)",
-  "inspektorat": "string? (required for PERWADAG and INSPEKTORAT roles)"
+  "inspektorat": "string? (required for PERWADAG roles)"
 }
 ```
 
@@ -57,9 +192,6 @@ All endpoints are prefixed with the base URL configured in your environment.
 ```json
 {
   "nama": "string? (1-200 chars)",
-  "tempat_lahir": "string? (1-100 chars)",
-  "tanggal_lahir": "date?",
-  "pangkat": "string? (1-100 chars)",
   "jabatan": "string? (1-200 chars)",
   "email": "string? (valid email)",
   "is_active": "bool?",
@@ -82,16 +214,12 @@ All endpoints are prefixed with the base URL configured in your environment.
   "id": "string",
   "nama": "string",
   "username": "string",
-  "tempat_lahir": "string",
-  "tanggal_lahir": "date",
-  "pangkat": "string",
   "jabatan": "string",
   "email": "string?",
   "is_active": "bool",
   "role": "enum",
   "inspektorat": "string?",
   "display_name": "string",
-  "age": "int",
   "has_email": "bool",
   "last_login": "datetime?",
   "role_display": "string",
@@ -117,7 +245,6 @@ All endpoints are prefixed with the base URL configured in your environment.
   "id": "string",
   "nama": "string",
   "username": "string",
-  "pangkat": "string",
   "jabatan": "string",
   "role": "enum",
   "role_display": "string",
@@ -131,7 +258,6 @@ All endpoints are prefixed with the base URL configured in your environment.
 ```json
 {
   "nama": "string",
-  "tanggal_lahir": "date",
   "role": "enum (ADMIN/INSPEKTORAT/PERWADAG)"
 }
 ```
@@ -170,16 +296,12 @@ All endpoints are prefixed with the base URL configured in your environment.
 #### **UserFilterParams** (Query Parameters)
 - **page**: Page number (default: 1)
 - **size**: Items per page (default: 20, max: 100)
-- **search**: Search in nama, username, tempat_lahir, pangkat, jabatan, email, inspektorat
+- **search**: Search in nama, username, jabatan, email, inspektorat
 - **role**: Filter by role (ADMIN/INSPEKTORAT/PERWADAG)
 - **inspektorat**: Filter by inspektorat
-- **pangkat**: Filter by pangkat
 - **jabatan**: Filter by jabatan
-- **tempat_lahir**: Filter by tempat_lahir
 - **has_email**: Filter by email status (true/false)
 - **is_active**: Filter by active status (true/false)
-- **min_age**: Minimum age filter (17-70)
-- **max_age**: Maximum age filter (17-70)
 
 #### **PerwadagSearchParams** (Query Parameters)
 - **search**: Search term for nama perwadag or inspektorat
@@ -197,7 +319,7 @@ All endpoints are prefixed with the base URL configured in your environment.
 - **Statistics**: Admin-only
 
 ### Username Generation Rules:
-- **Admin/Inspektorat**: `{nama_depan}{dd}{mm}{yyyy}` (e.g., "daffa01082003")
+- **Admin/Inspektorat**: Simplified format based on nama only
 - **Perwadag**: Extracted from organization name (e.g., "ITPC Lagos" → "itpc_lagos")
 
 ### Default Password:
