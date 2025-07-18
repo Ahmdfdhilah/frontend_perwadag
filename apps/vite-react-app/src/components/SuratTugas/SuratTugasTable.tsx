@@ -38,22 +38,19 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Tanggal Pelaksanaan Evaluasi</TableHead>
             <TableHead>No Surat</TableHead>
-            <TableHead>Pengendali Mutu</TableHead>
-            <TableHead>Pengendali Teknis</TableHead>
-            <TableHead>Ketua</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                 Loading surat tugas...
               </TableCell>
             </TableRow>
           ) : data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                 Tidak ada data surat tugas
               </TableCell>
             </TableRow>
@@ -64,9 +61,6 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
                 <TableCell>{item.nama_perwadag}</TableCell>
                 <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
                 <TableCell>{item.no_surat}</TableCell>
-                <TableCell>{item.nama_pengedali_mutu}</TableCell>
-                <TableCell>{item.nama_pengendali_teknis}</TableCell>
-                <TableCell>{item.nama_ketua_tim}</TableCell>
                 <TableCell>
                   <ActionDropdown
                     onView={() => onView?.(item)}

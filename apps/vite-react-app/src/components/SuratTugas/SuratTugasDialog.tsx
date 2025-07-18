@@ -47,9 +47,6 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
     user_perwadag_id: '',
     tanggal_evaluasi_mulai: undefined as Date | undefined,
     tanggal_evaluasi_selesai: undefined as Date | undefined,
-    nama_pengedali_mutu: '',
-    nama_pengendali_teknis: '',
-    nama_ketua_tim: '',
   });
 
   const [isStartCalendarOpen, setIsStartCalendarOpen] = useState(false);
@@ -65,9 +62,6 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
         user_perwadag_id: editingItem.user_perwadag_id,
         tanggal_evaluasi_mulai: new Date(editingItem.tanggal_evaluasi_mulai),
         tanggal_evaluasi_selesai: editingItem.tanggal_evaluasi_selesai ? new Date(editingItem.tanggal_evaluasi_selesai) : undefined,
-        nama_pengedali_mutu: editingItem.nama_pengedali_mutu,
-        nama_pengendali_teknis: editingItem.nama_pengendali_teknis,
-        nama_ketua_tim: editingItem.nama_ketua_tim,
       });
       
       // Set existing files for display
@@ -86,9 +80,6 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
         user_perwadag_id: '',
         tanggal_evaluasi_mulai: undefined,
         tanggal_evaluasi_selesai: undefined,
-        nama_pengedali_mutu: '',
-        nama_pengendali_teknis: '',
-        nama_ketua_tim: '',
       });
       setUploadFiles([]);
       setExistingFiles([]);
@@ -99,8 +90,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
 
   const handleSave = () => {
     // Validate all required fields
-    if (!formData.no_surat || !formData.user_perwadag_id || !formData.tanggal_evaluasi_mulai ||
-        !formData.nama_pengedali_mutu || !formData.nama_pengendali_teknis || !formData.nama_ketua_tim) {
+    if (!formData.no_surat || !formData.user_perwadag_id || !formData.tanggal_evaluasi_mulai) {
       return;
     }
 
@@ -109,9 +99,6 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       tanggal_evaluasi_mulai: formData.tanggal_evaluasi_mulai.toISOString().split('T')[0],
       tanggal_evaluasi_selesai: formData.tanggal_evaluasi_selesai?.toISOString().split('T')[0],
       no_surat: formData.no_surat,
-      nama_pengedali_mutu: formData.nama_pengedali_mutu,
-      nama_pengendali_teknis: formData.nama_pengendali_teknis,
-      nama_ketua_tim: formData.nama_ketua_tim,
       file: uploadFiles.length > 0 ? uploadFiles[0] : null, // Send null instead of undefined
     };
 
@@ -131,8 +118,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   };
 
 
-  const isFormValid = formData.no_surat && formData.user_perwadag_id && formData.tanggal_evaluasi_mulai &&
-    formData.nama_pengedali_mutu && formData.nama_pengendali_teknis && formData.nama_ketua_tim;
+  const isFormValid = formData.no_surat && formData.user_perwadag_id && formData.tanggal_evaluasi_mulai;
   const isEditable = mode !== 'view';
   const canEdit = canEditForm('surat_tugas') && isEditable;
 
@@ -162,26 +148,35 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
 
             <div className="space-y-2">
               <Label htmlFor="perwadag">Perwadag *</Label>
-              <Combobox
-                options={availablePerwadag
-                  .filter(perwadag => 
-                    perwadagSearchValue === '' || 
-                    perwadag.nama.toLowerCase().includes(perwadagSearchValue.toLowerCase()) ||
-                    perwadag.inspektorat?.toLowerCase().includes(perwadagSearchValue.toLowerCase())
-                  )
-                  .map(perwadag => ({
-                    value: perwadag.id,
-                    label: perwadag.nama,
-                    description: perwadag.inspektorat || ''
-                  }))}
-                value={formData.user_perwadag_id}
-                onChange={(value) => setFormData(prev => ({ ...prev, user_perwadag_id: value.toString() }))}
-                placeholder="Pilih perwadag"
-                searchPlaceholder="Cari perwadag..."
-                searchValue={perwadagSearchValue}
-                onSearchChange={setPerwadagSearchValue}
-                emptyMessage="Tidak ada perwadag yang ditemukan"
-              />
+              {mode === 'edit' || !canEdit ? (
+                <Input
+                  id="perwadag"
+                  value={editingItem ? editingItem.nama_perwadag : ''}
+                  disabled={true}
+                  className="bg-muted"
+                />
+              ) : (
+                <Combobox
+                  options={availablePerwadag
+                    .filter(perwadag => 
+                      perwadagSearchValue === '' || 
+                      perwadag.nama.toLowerCase().includes(perwadagSearchValue.toLowerCase()) ||
+                      perwadag.inspektorat?.toLowerCase().includes(perwadagSearchValue.toLowerCase())
+                    )
+                    .map(perwadag => ({
+                      value: perwadag.id,
+                      label: perwadag.nama,
+                      description: perwadag.inspektorat || ''
+                    }))}
+                  value={formData.user_perwadag_id}
+                  onChange={(value) => setFormData(prev => ({ ...prev, user_perwadag_id: value.toString() }))}
+                  placeholder="Pilih perwadag"
+                  searchPlaceholder="Cari perwadag..."
+                  searchValue={perwadagSearchValue}
+                  onSearchChange={setPerwadagSearchValue}
+                  emptyMessage="Tidak ada perwadag yang ditemukan"
+                />
+              )}
             </div>
 
             <div className="grid grid-cols-1 gap-4">
@@ -250,39 +245,6 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                   </PopoverContent>
                 </Popover>
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="nama_pengedali_mutu">Nama Pengendali Mutu *</Label>
-              <Input
-                id="nama_pengedali_mutu"
-                value={formData.nama_pengedali_mutu}
-                onChange={(e) => setFormData(prev => ({ ...prev, nama_pengedali_mutu: e.target.value }))}
-                placeholder="Contoh: Dr. Ahmad Sutanto"
-                disabled={!canEdit}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="nama_pengendali_teknis">Nama Pengendali Teknis *</Label>
-              <Input
-                id="nama_pengendali_teknis"
-                value={formData.nama_pengendali_teknis}
-                onChange={(e) => setFormData(prev => ({ ...prev, nama_pengendali_teknis: e.target.value }))}
-                placeholder="Contoh: Ir. Budi Setiawan"
-                disabled={!canEdit}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="nama_ketua_tim">Nama Ketua Tim *</Label>
-              <Input
-                id="nama_ketua_tim"
-                value={formData.nama_ketua_tim}
-                onChange={(e) => setFormData(prev => ({ ...prev, nama_ketua_tim: e.target.value }))}
-                placeholder="Contoh: Drs. Chandra Kusuma"
-                disabled={!canEdit}
-              />
             </div>
 
             <div className="space-y-2">

@@ -210,9 +210,6 @@ const SuratTugasPage: React.FC = () => {
           tanggal_evaluasi_mulai: data.tanggal_evaluasi_mulai,
           tanggal_evaluasi_selesai: data.tanggal_evaluasi_selesai,
           no_surat: data.no_surat,
-          nama_pengedali_mutu: data.nama_pengedali_mutu,
-          nama_pengendali_teknis: data.nama_pengendali_teknis,
-          nama_ketua_tim: data.nama_ketua_tim,
         };
 
         await suratTugasService.updateSuratTugas(selectedItem.id, updateData);
@@ -234,9 +231,6 @@ const SuratTugasPage: React.FC = () => {
           tanggal_evaluasi_mulai: data.tanggal_evaluasi_mulai,
           tanggal_evaluasi_selesai: data.tanggal_evaluasi_selesai,
           no_surat: data.no_surat,
-          nama_pengedali_mutu: data.nama_pengedali_mutu,
-          nama_pengendali_teknis: data.nama_pengendali_teknis,
-          nama_ketua_tim: data.nama_ketua_tim,
           file: data.file, // Include file in create request
         };
 

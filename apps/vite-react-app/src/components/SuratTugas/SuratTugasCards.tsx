@@ -74,21 +74,6 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
                 <span className="font-medium text-muted-foreground">No Surat:</span>
                 <span className="ml-2">{item.no_surat}</span>
               </div>
-              
-              <div>
-                <span className="font-medium text-muted-foreground">Pengendali Mutu:</span>
-                <span className="ml-2">{item.nama_pengedali_mutu}</span>
-              </div>
-              
-              <div>
-                <span className="font-medium text-muted-foreground">Pengendali Teknis:</span>
-                <span className="ml-2">{item.nama_pengendali_teknis}</span>
-              </div>
-              
-              <div>
-                <span className="font-medium text-muted-foreground">Ketua Tim:</span>
-                <span className="ml-2">{item.nama_ketua_tim}</span>
-              </div>
             </div>
           </CardContent>
         </Card>

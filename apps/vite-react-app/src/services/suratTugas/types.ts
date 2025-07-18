@@ -9,9 +9,6 @@ export interface SuratTugas {
   tanggal_evaluasi_mulai: string;
   tanggal_evaluasi_selesai: string;
   no_surat: string;
-  nama_pengedali_mutu: string;
-  nama_pengendali_teknis: string;
-  nama_ketua_tim: string;
   file_surat_tugas?: string;
   tahun_evaluasi?: number;
   durasi_evaluasi?: number;
@@ -46,18 +43,12 @@ export interface SuratTugasCreate {
   tanggal_evaluasi_mulai: string;
   tanggal_evaluasi_selesai: string;
   no_surat: string;
-  nama_pengedali_mutu: string;
-  nama_pengendali_teknis: string;
-  nama_ketua_tim: string;
 }
 
 export interface SuratTugasUpdate {
   tanggal_evaluasi_mulai?: string;
   tanggal_evaluasi_selesai?: string;
   no_surat?: string;
-  nama_pengedali_mutu?: string;
-  nama_pengendali_teknis?: string;
-  nama_ketua_tim?: string;
 }
 
 // Response Types
@@ -69,9 +60,6 @@ export interface SuratTugasResponse {
   tanggal_evaluasi_mulai: string;
   tanggal_evaluasi_selesai: string;
   no_surat: string;
-  nama_pengedali_mutu: string;
-  nama_pengendali_teknis: string;
-  nama_ketua_tim: string;
   file_surat_tugas?: string;
   tahun_evaluasi?: number;
   durasi_evaluasi?: number;

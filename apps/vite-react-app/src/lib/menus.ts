@@ -24,7 +24,7 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Penilaian Risiko',
     href: '/penilaian-resiko',
     icon: AlertTriangle,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT'],
+    allowedRoles: ['ADMIN'],
   },
   // Surat Tugas - All roles
   {
@@ -85,7 +85,7 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Laporan Hasil',
     href: '/laporan-hasil',
     icon: FileInput,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
+    allowedRoles: ['ADMIN'],
   },
 
   // Template Kuesioner - All roles

@@ -30,9 +30,6 @@ class SuratTugasService extends BaseService {
       formData.append("tanggal_evaluasi_mulai", data.tanggal_evaluasi_mulai);
       formData.append("tanggal_evaluasi_selesai", data.tanggal_evaluasi_selesai);
       formData.append("no_surat", data.no_surat);
-      formData.append("nama_pengedali_mutu", data.nama_pengedali_mutu);
-      formData.append("nama_pengendali_teknis", data.nama_pengendali_teknis);
-      formData.append("nama_ketua_tim", data.nama_ketua_tim);
       
       // Add the file
       formData.append("file", data.file);
