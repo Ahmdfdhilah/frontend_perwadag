@@ -12,7 +12,6 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { 
   Mail, 
-  MapPin, 
   Calendar, 
   CreditCard,
   Building,
@@ -74,7 +73,7 @@ export const UserViewDialog: React.FC<UserViewDialogProps> = ({
           </div>
 
           {/* User Information */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1  gap-4 sm:gap-6">
             {/* Basic Info */}
             <div className="space-y-3 sm:space-y-4">
               <h3 className="font-semibold text-base sm:text-lg flex items-center gap-2">
@@ -109,31 +108,6 @@ export const UserViewDialog: React.FC<UserViewDialogProps> = ({
                   </div>
                 )}
 
-                <div className="flex items-start space-x-3">
-                  <MapPin className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs sm:text-sm font-medium">Tempat Lahir</p>
-                    <p className="text-xs sm:text-sm text-muted-foreground break-words">{user.tempat_lahir}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3">
-                  <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs sm:text-sm font-medium">Tanggal Lahir</p>
-                    <p className="text-xs sm:text-sm text-muted-foreground">
-                      {format(new Date(user.tanggal_lahir), 'dd MMM yyyy', { locale: id })} ({user.age} tahun)
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-3">
-                  <Shield className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs sm:text-sm font-medium">Pangkat</p>
-                    <p className="text-xs sm:text-sm text-muted-foreground break-words">{user.pangkat}</p>
-                  </div>
-                </div>
 
                 <div className="flex items-center space-x-3">
                   <Building className="w-4 h-4 text-muted-foreground flex-shrink-0" />

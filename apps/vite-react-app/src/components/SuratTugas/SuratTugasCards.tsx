@@ -45,8 +45,8 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
   return (
     <div className="grid grid-cols-1 gap-4">
       {data.map((item, index) => (
-        <Card key={item.id} className="w-full">
-          <CardHeader className="pb-3">
+        <Card key={item.id} className="w-full gap-0">
+          <CardHeader>
             <div className="flex justify-between items-start">
               <CardTitle className="text-lg font-semibold">
                 {item.nama_perwadag}
@@ -63,7 +63,7 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
           </CardHeader>
           <CardContent className="pt-0">
             <div className="space-y-3 text-sm">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div>
                   <span className="font-medium text-muted-foreground">No:</span>
                   <span className="ml-2">{index + 1}</span>

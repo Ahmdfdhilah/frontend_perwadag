@@ -25,9 +25,6 @@ import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 
 const editProfileSchema = z.object({
   nama: z.string().min(1, 'Nama wajib diisi').min(2, 'Nama minimal 2 karakter'),
-  tempat_lahir: z.string().min(1, 'Tempat lahir wajib diisi'),
-  tanggal_lahir: z.string().min(1, 'Tanggal lahir wajib diisi'),
-  pangkat: z.string().min(1, 'Pangkat wajib diisi'),
   jabatan: z.string().min(1, 'Jabatan wajib diisi'),
   email: z.string().email('Format email tidak valid').optional().or(z.literal('')),
 });
@@ -53,9 +50,6 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
     resolver: zodResolver(editProfileSchema),
     defaultValues: {
       nama: user.nama,
-      tempat_lahir: user.tempat_lahir,
-      tanggal_lahir: user.tanggal_lahir,
-      pangkat: user.pangkat,
       jabatan: user.jabatan,
       email: user.email || '',
     },
@@ -65,9 +59,6 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
     if (open && user) {
       form.reset({
         nama: user.nama,
-        tempat_lahir: user.tempat_lahir,
-        tanggal_lahir: user.tanggal_lahir,
-        pangkat: user.pangkat,
         jabatan: user.jabatan,
         email: user.email || '',
       });
@@ -77,9 +68,6 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
   const onSubmit = (data: EditProfileData) => {
     const updateData: UserUpdate = {
       nama: data.nama,
-      tempat_lahir: data.tempat_lahir,
-      tanggal_lahir: data.tanggal_lahir,
-      pangkat: data.pangkat,
       jabatan: data.jabatan,
       email: data.email || undefined,
     };
@@ -133,59 +121,6 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="tempat_lahir"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tempat Lahir</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Masukkan tempat lahir"
-                          disabled={loading}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="tanggal_lahir"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tanggal Lahir</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="date"
-                          disabled={loading}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="pangkat"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Pangkat</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Masukkan pangkat"
-                          disabled={loading}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
 
                 <FormField
                   control={form.control}
@@ -250,12 +185,6 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
                   </div>
                 )}
 
-                <div className="space-y-2">
-                  <Label>Umur</Label>
-                  <div className="p-3 bg-muted rounded-md text-sm">
-                    {user.age} tahun
-                  </div>
-                </div>
               </div>
             </form>
           </Form>

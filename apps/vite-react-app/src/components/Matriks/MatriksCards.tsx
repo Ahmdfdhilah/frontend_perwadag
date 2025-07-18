@@ -62,7 +62,7 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
   }
 
   const renderAdminInspektoratCard = (item: MatriksResponse, index: number) => (
-    <Card key={item.id} className="w-full">
+    <Card key={item.id} className="w-full gap-0">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg font-semibold">
@@ -120,7 +120,7 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
   );
 
   const renderPerwadagCard = (item: MatriksResponse, index: number) => (
-    <Card key={item.id} className="w-full">
+    <Card key={item.id} className="w-full gap-0">
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg font-semibold">

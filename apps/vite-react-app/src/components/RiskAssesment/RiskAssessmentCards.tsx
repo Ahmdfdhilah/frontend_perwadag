@@ -34,7 +34,7 @@ const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
               </div>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="grid grid-cols-1 gap-4 text-sm">
                 <div>
                   <Skeleton className="h-4 w-12" />
                   <Skeleton className="h-4 w-8 mt-1" />
@@ -74,8 +74,8 @@ const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
   return (
     <div className="grid grid-cols-1 gap-4">
       {data.map((item, index) => (
-        <Card key={item.id} className="w-full">
-          <CardHeader className="pb-3">
+        <Card key={item.id} className="w-full gap-0">
+          <CardHeader>
             <div className="flex justify-between items-start">
               <CardTitle className="text-lg font-semibold">
                 {item.nama_perwadag}
@@ -88,7 +88,7 @@ const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
             </div>
           </CardHeader>
           <CardContent className="pt-0">
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="flex flex-col gap-3 text-sm">
               <div>
                 <span className="font-medium text-muted-foreground">No:</span>
                 <span className="ml-2">{index + 1}</span>
@@ -105,7 +105,7 @@ const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
                 <span className="font-medium text-muted-foreground">Skor:</span>
                 <span className="ml-2">{item.skor_rata_rata ? Number(item.skor_rata_rata).toFixed(1) : '-'}</span>
               </div>
-              <div className="col-span-2">
+              <div>
                 <span className="font-medium text-muted-foreground">Profil Risiko:</span>
                 <Badge 
                   className="ml-2"

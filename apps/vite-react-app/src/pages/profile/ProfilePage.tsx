@@ -19,7 +19,6 @@ import {
   Edit,
   CheckCircle,
   XCircle,
-  Award,
   IdCard,
 } from 'lucide-react';
 
@@ -182,10 +181,6 @@ const ProfilePage: React.FC = () => {
                 <span className="text-sm">{getRoleDisplayName()}</span>
               </div>
 
-              <div className="flex items-center gap-2">
-                <Award className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm">{user.pangkat}</span>
-              </div>
 
               {user.inspektorat && (
                 <div className="flex items-center gap-2">
@@ -224,22 +219,6 @@ const ProfilePage: React.FC = () => {
                   <div>
                     <label className="text-sm font-medium">Email</label>
                     <p className="text-sm text-muted-foreground">{user.email || 'Tidak ada email'}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Tempat Lahir</label>
-                    <p className="text-sm text-muted-foreground">{user.tempat_lahir}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Tanggal Lahir</label>
-                    <p className="text-sm text-muted-foreground">{formatDate(user.tanggal_lahir)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Umur</label>
-                    <p className="text-sm text-muted-foreground">{user.age} tahun</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Pangkat</label>
-                    <p className="text-sm text-muted-foreground">{user.pangkat}</p>
                   </div>
                   <div>
                     <label className="text-sm font-medium">Jabatan</label>

@@ -9,8 +9,6 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { 
   Mail, 
- 
-  MapPin, 
   Calendar, 
   CreditCard,
   Building
@@ -65,7 +63,7 @@ export const UserCards: React.FC<UserCardsProps> = ({
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 gap-4">
       {users.map((user) => (
         <Card key={user.id} className="hover:shadow-md transition-shadow">
           <CardContent className="p-4">
@@ -97,10 +95,9 @@ export const UserCards: React.FC<UserCardsProps> = ({
               <span>@{user.username}</span>
             </div>
 
-            {/* Pangkat & Jabatan */}
+            {/* Jabatan */}
             <div className="mb-2">
-              <p className="text-sm font-medium">{user.pangkat}</p>
-              <p className="text-sm text-muted-foreground">{user.jabatan}</p>
+              <p className="text-sm font-medium">{user.jabatan}</p>
             </div>
 
             {/* Email */}
@@ -111,13 +108,6 @@ export const UserCards: React.FC<UserCardsProps> = ({
               </div>
             )}
 
-            {/* Tempat Lahir */}
-            {user.tempat_lahir && (
-              <div className="flex items-start space-x-2 text-sm text-muted-foreground mb-2">
-                <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span className="line-clamp-2">{user.tempat_lahir}</span>
-              </div>
-            )}
 
             {/* Inspektorat */}
             {user.inspektorat && (

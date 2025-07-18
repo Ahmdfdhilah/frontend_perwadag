@@ -25,9 +25,6 @@ import {
 
 const userSchema = z.object({
   nama: z.string().min(1, 'Nama is required').min(2, 'Nama must be at least 2 characters').max(200),
-  tempat_lahir: z.string().min(1, 'Tempat lahir is required').max(100),
-  tanggal_lahir: z.string().min(1, 'Tanggal lahir is required'),
-  pangkat: z.string().min(1, 'Pangkat is required').max(100),
   jabatan: z.string().min(1, 'Jabatan is required').max(200),
   email: z.string().email('Please enter a valid email address').optional().or(z.literal('')),
   is_active: z.boolean().optional(),
@@ -63,9 +60,6 @@ export const UserForm: React.FC<UserFormProps> = ({
     resolver: zodResolver(userSchema),
     defaultValues: {
       nama: initialData?.nama || '',
-      tempat_lahir: initialData?.tempat_lahir || '',
-      tanggal_lahir: initialData?.tanggal_lahir || '',
-      pangkat: initialData?.pangkat || '',
       jabatan: initialData?.jabatan || '',
       email: initialData?.email || '',
       is_active: initialData?.is_active ?? true,
@@ -109,47 +103,6 @@ export const UserForm: React.FC<UserFormProps> = ({
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="tempat_lahir"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tempat Lahir</FormLabel>
-                <FormControl>
-                  <Input placeholder="Masukkan tempat lahir" disabled={loading || disabled} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="tanggal_lahir"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tanggal Lahir</FormLabel>
-                <FormControl>
-                  <Input type="date" disabled={loading || disabled} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="pangkat"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Pangkat</FormLabel>
-                <FormControl>
-                  <Input placeholder="Masukkan pangkat" disabled={loading || disabled} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
           <FormField
             control={form.control}

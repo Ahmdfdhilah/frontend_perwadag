@@ -7,16 +7,12 @@ export interface User {
   id: string;
   nama: string;
   username: string;
-  tempat_lahir: string;
-  tanggal_lahir: string; // date
-  pangkat: string;
   jabatan: string;
   email?: string;
   is_active: boolean;
   role: "ADMIN" | "INSPEKTORAT" | "PERWADAG";
   inspektorat?: string;
   display_name: string;
-  age: number;
   has_email: boolean;
   last_login?: string; // datetime
   role_display: string;
@@ -28,7 +24,6 @@ export interface UserSummary {
   id: string;
   nama: string;
   username: string;
-  pangkat: string;
   jabatan: string;
   role: "ADMIN" | "INSPEKTORAT" | "PERWADAG";
   role_display: string;
@@ -40,7 +35,6 @@ export interface UserSummary {
 export interface PerwadagSummary {
   id: string;
   nama: string;
-  pangkat: string;
   jabatan: string;
   inspektorat?: string;
   is_active: boolean;
@@ -49,9 +43,6 @@ export interface PerwadagSummary {
 // Request Types
 export interface UserCreate {
   nama: string; // 1-200 chars
-  tempat_lahir: string; // 1-100 chars
-  tanggal_lahir: string; // date
-  pangkat: string; // 1-100 chars
   jabatan: string; // 1-200 chars
   email?: string; // valid email
   is_active?: boolean; // default: true
@@ -61,9 +52,6 @@ export interface UserCreate {
 
 export interface UserUpdate {
   nama?: string; // 1-200 chars
-  tempat_lahir?: string; // 1-100 chars
-  tanggal_lahir?: string; // date
-  pangkat?: string; // 1-100 chars
   jabatan?: string; // 1-200 chars
   email?: string; // valid email
   is_active?: boolean;
@@ -78,7 +66,6 @@ export interface UserChangePassword {
 
 export interface UsernameGenerationPreview {
   nama: string;
-  tanggal_lahir: string; // date
   role: "ADMIN" | "INSPEKTORAT" | "PERWADAG";
 }
 
@@ -108,22 +95,18 @@ export interface UserStatistics {
 export interface UserFilterParams {
   page?: number; // default: 1
   size?: number; // default: 20, max: 100
-  search?: string; // Search in nama, username, tempat_lahir, pangkat, jabatan, email, inspektorat
+  search?: string; // Search in nama, username, jabatan, email, inspektorat
   role?: "ADMIN" | "INSPEKTORAT" | "PERWADAG";
   inspektorat?: string;
-  pangkat?: string;
   jabatan?: string;
-  tempat_lahir?: string;
   has_email?: boolean;
   is_active?: boolean;
-  min_age?: number; // 17-70
-  max_age?: number; // 17-70
 }
 
 export interface PerwadagSearchParams {
   page?: number; // default: 1
   size?: number; // default: 20, max: 100
-  search?: string; // Search in nama, pangkat, jabatan, inspektorat
+  search?: string; // Search in nama, jabatan, inspektorat
   inspektorat?: string;
   is_active?: boolean;
 }

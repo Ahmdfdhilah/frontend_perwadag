@@ -16,10 +16,6 @@ import {
 } from '@workspace/ui/components/select';
 import { Separator } from '@workspace/ui/components/separator';
 import { ArrowLeft, Save, Calculator, Loader2 } from 'lucide-react';
-import {
-  AUDIT_CHOICES,
-  TRADE_AGREEMENT_CHOICES,
-} from '@/mocks';
 import { formatNumber, handleNumberInput, parseFormattedNumber } from '@/utils/numberUtils';
 import {
   calculateTrendChoice,
@@ -35,6 +31,7 @@ import {
 import { penilaianRisikoService } from '@/services/penilaianRisiko';
 import { PenilaianRisiko, KriteriaData } from '@/services/penilaianRisiko/types';
 import { useToast } from '@workspace/ui/components/sonner';
+import { AUDIT_CHOICES, TRADE_AGREEMENT_CHOICES } from '@/lib/constants';
 
 const RiskAssessmentInputPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

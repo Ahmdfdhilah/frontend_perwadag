@@ -54,7 +54,7 @@ const KuesionerCards: React.FC<KuesionerCardsProps> = ({
   return (
     <div className="grid grid-cols-1 gap-4">
       {data.map((item, index) => (
-        <Card key={item.id} className="w-full">
+        <Card key={item.id} className="w-full gap-0">
           <CardHeader className="pb-3">
             <div className="flex justify-between items-start">
               <CardTitle className="text-lg font-semibold">

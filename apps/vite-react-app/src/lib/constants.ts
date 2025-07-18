@@ -3,7 +3,7 @@
 // User Role Constants
 export const USER_ROLES = {
   ADMIN: 'ADMIN',
-  INSPEKTORAT: 'INSPEKTORAT', 
+  INSPEKTORAT: 'INSPEKTORAT',
   PERWADAG: 'PERWADAG'
 } as const;
 
@@ -52,3 +52,19 @@ export const PAGINATION_DEFAULTS = {
   SIZE: 20,
   MAX_SIZE: 100
 } as const;
+
+export const AUDIT_CHOICES = [
+  { value: '1-tahun', label: '1 Tahun', score: 5 },
+  { value: '2-tahun', label: '2 Tahun', score: 4 },
+  { value: '3-tahun', label: '3 Tahun', score: 3 },
+  { value: '4-tahun', label: '4 Tahun', score: 2 },
+  { value: 'belum-pernah', label: 'Belum pernah diaudit', score: 1 }
+];
+
+export const TRADE_AGREEMENT_CHOICES = [
+  { value: 'sudah-implementasi', label: 'Sudah diimplementasikan', score: 5 },
+  { value: 'sudah-sepakat-belum-ratifikasi', label: 'Sudah disepakati namun belum diratifikasi', score: 4 },
+  { value: 'masih-proses', label: 'Masih berproses/ on going', score: 3 },
+  { value: 'sedang-diusulkan', label: 'Sedang diusulkan/ Being Proposed', score: 2 },
+  { value: 'tidak-ada', label: 'Tidak ada perjanjian internasional', score: 1 }
+];
