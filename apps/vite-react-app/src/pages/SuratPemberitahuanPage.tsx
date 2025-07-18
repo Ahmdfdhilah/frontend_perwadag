@@ -39,7 +39,7 @@ interface SuratPemberitahuanPageFilters {
 
 const SuratPemberitahuanPage: React.FC = () => {
   const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
-  const { hasPageAccess, canEditForm, canCreateForm, canDeleteForm } = useFormPermissions();
+  const { hasPageAccess, canEditForm } = useFormPermissions();
   const { toast } = useToast();
 
   // URL Filters configuration

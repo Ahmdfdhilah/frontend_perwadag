@@ -39,7 +39,7 @@ interface KuesionerPageFilters {
 
 const KuesionerPage: React.FC = () => {
   const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
-  const { hasPageAccess, canEditForm, canCreateForm, canDeleteForm } = useFormPermissions();
+  const { hasPageAccess, canEditForm} = useFormPermissions();
   const { toast } = useToast();
 
   // URL Filters configuration
@@ -255,8 +255,7 @@ const KuesionerPage: React.FC = () => {
       return user?.inspektorat === item.inspektorat;
     }
     if (isPerwadag()) {
-      // Check if user can edit their own kuisioner
-      return user?.id === item.surat_tugas_info?.nama_perwadag;
+      return true;
     }
     return false;
   };

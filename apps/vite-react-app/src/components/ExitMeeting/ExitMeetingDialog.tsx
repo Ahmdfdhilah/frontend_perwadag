@@ -21,6 +21,7 @@ import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
 import { MeetingResponse } from '@/services/meeting/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
+import { useRole } from '@/hooks/useRole';
 import { formatIndonesianDate, formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 import { meetingService } from '@/services/meeting';
@@ -41,6 +42,7 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   onSave,
 }) => {
   const { canEditForm } = useFormPermissions();
+  const { isAdmin, isInspektorat } = useRole();
   const [formData, setFormData] = useState<any>({});
   const [selectedExitDate, setSelectedExitDate] = useState<Date>();
   const [isExitDatePickerOpen, setIsExitDatePickerOpen] = useState(false);
@@ -75,12 +77,17 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   }, [item, open]);
 
   const handleSave = () => {
-    const dataToSave = {
-      tanggal_meeting: selectedExitDate ? selectedExitDate.toISOString().split('T')[0] : formData.tanggal_meeting,
-      link_zoom: formData.link_zoom,
-      link_daftar_hadir: formData.link_daftar_hadir,
+    const dataToSave: any = {
       files: meetingFiles,
     };
+    
+    // Only include fields that the user can edit
+    if (canEditAllFields) {
+      dataToSave.tanggal_meeting = selectedExitDate ? selectedExitDate.toISOString().split('T')[0] : formData.tanggal_meeting;
+      dataToSave.link_zoom = formData.link_zoom;
+      dataToSave.link_daftar_hadir = formData.link_daftar_hadir;
+    }
+    
     onSave(dataToSave);
   };
 
@@ -123,6 +130,8 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
 
   const isEditable = mode === 'edit';
   const canEdit = canEditForm('exit_meeting') && isEditable;
+  const canEditAllFields = canEdit && (isAdmin() || isInspektorat());
+  const canEditBuktiHadir = canEdit; // All roles can edit bukti hadir
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -154,7 +163,7 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
               </div>
               <div className="space-y-2">
                 <Label>Tanggal Exit Meeting</Label>
-                {canEdit ? (
+                {canEditAllFields ? (
                   <Popover open={isExitDatePickerOpen} onOpenChange={setIsExitDatePickerOpen}>
                     <PopoverTrigger asChild>
                       <Button
@@ -196,7 +205,7 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
             {/* Link Zoom - Editable */}
             <div className="space-y-2">
               <Label htmlFor="link_zoom">Link Zoom</Label>
-              {canEdit ? (
+              {canEditAllFields ? (
                 <div className="flex gap-2">
                   <Input
                     id="link_zoom"
@@ -237,7 +246,7 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
             {/* Link Daftar Hadir */}
             <div className="space-y-2">
               <Label htmlFor="link_daftar_hadir">Link Daftar Hadir (Google Form)</Label>
-              {canEdit ? (
+              {canEditAllFields ? (
                 <div className="flex gap-2">
                   <Input
                     id="link_daftar_hadir"
@@ -284,8 +293,8 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
               maxFiles={5}
               files={meetingFiles}
               existingFiles={existingFiles}
-              mode={canEdit ? 'edit' : 'view'}
-              disabled={!canEdit}
+              mode={canEditBuktiHadir ? 'edit' : 'view'}
+              disabled={!canEditBuktiHadir}
               onFilesChange={handleMeetingFilesChange}
               onExistingFileRemove={handleExistingFilesRemove}
               onFileDownload={handleFileDownload}
@@ -298,7 +307,7 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
           <Button variant="outline" onClick={handleCancel}>
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
-          {canEdit && (
+          {(canEditAllFields || canEditBuktiHadir) && (
             <Button onClick={handleSave}>
               Simpan
             </Button>

@@ -22,6 +22,7 @@ import { cn } from '@workspace/ui/lib/utils';
 import { MeetingResponse } from '@/services/meeting/types';
 import { PerwadagSummary } from '@/services/users/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
+import { useRole } from '@/hooks/useRole';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 import { meetingService } from '@/services/meeting';
@@ -43,6 +44,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
   onSave,
 }) => {
   const { canEditForm } = useFormPermissions();
+  const { isAdmin, isInspektorat, isPerwadag } = useRole();
   const [formData, setFormData] = useState<any>({});
   const [selectedKonfirmasiDate, setSelectedKonfirmasiDate] = useState<Date>();
   const [isKonfirmasiDatePickerOpen, setIsKonfirmasiDatePickerOpen] = useState(false);
@@ -77,12 +79,17 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
   }, [item, open]);
 
   const handleSave = () => {
-    const dataToSave = {
-      tanggal_meeting: selectedKonfirmasiDate ? selectedKonfirmasiDate.toISOString().split('T')[0] : formData.tanggal_meeting,
-      link_zoom: formData.link_zoom,
-      link_daftar_hadir: formData.link_daftar_hadir,
+    const dataToSave: any = {
       files: meetingFiles,
     };
+    
+    // Only include fields that the user can edit
+    if (canEditAllFields) {
+      dataToSave.tanggal_meeting = selectedKonfirmasiDate ? selectedKonfirmasiDate.toISOString().split('T')[0] : formData.tanggal_meeting;
+      dataToSave.link_zoom = formData.link_zoom;
+      dataToSave.link_daftar_hadir = formData.link_daftar_hadir;
+    }
+    
     onSave(dataToSave);
   };
 
@@ -126,6 +133,8 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
 
   const isEditable = mode === 'edit';
   const canEdit = canEditForm('konfirmasi_meeting') && isEditable;
+  const canEditAllFields = canEdit && (isAdmin() || isInspektorat());
+  const canEditBuktiHadir = canEdit; // All roles can edit bukti hadir
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -158,7 +167,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
 
             <div className="space-y-2">
               <Label>Tanggal Konfirmasi Meeting</Label>
-              {canEdit ? (
+              {canEditAllFields ? (
                 <Popover open={isKonfirmasiDatePickerOpen} onOpenChange={setIsKonfirmasiDatePickerOpen}>
                   <PopoverTrigger asChild>
                     <Button
@@ -199,7 +208,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
             {/* Link Zoom - Editable */}
             <div className="space-y-2">
               <Label htmlFor="link_zoom">Link Zoom</Label>
-              {canEdit ? (
+              {canEditAllFields ? (
                 <div className="flex gap-2">
                   <Input
                     id="link_zoom"
@@ -240,7 +249,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
             {/* Link Daftar Hadir */}
             <div className="space-y-2">
               <Label htmlFor="link_daftar_hadir">Link Daftar Hadir (Google Form)</Label>
-              {canEdit ? (
+              {canEditAllFields ? (
                 <div className="flex gap-2">
                   <Input
                     id="link_daftar_hadir"
@@ -287,8 +296,8 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
               maxFiles={5}
               files={meetingFiles}
               existingFiles={existingFiles}
-              mode={canEdit ? 'edit' : 'view'}
-              disabled={!canEdit}
+              mode={canEditBuktiHadir ? 'edit' : 'view'}
+              disabled={!canEditBuktiHadir}
               onFilesChange={handleMeetingFilesChange}
               onExistingFileRemove={handleExistingFilesRemove}
               onFileDownload={handleFileDownload}
@@ -301,7 +310,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
           <Button variant="outline" onClick={handleCancel}>
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
-          {canEdit && (
+          {(canEditAllFields || canEditBuktiHadir) && (
             <Button onClick={handleSave}>
               Simpan
             </Button>
