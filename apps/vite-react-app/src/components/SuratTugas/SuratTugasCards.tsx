@@ -10,6 +10,8 @@ interface SuratTugasCardsProps {
   onView?: (item: SuratTugasResponse) => void;
   onEdit?: (item: SuratTugasResponse) => void;
   onDelete?: (item: SuratTugasResponse) => void;
+  canEdit?: (item: SuratTugasResponse) => boolean;
+  canDelete?: (item: SuratTugasResponse) => boolean;
   isPerwadag?: boolean;
 }
 
@@ -19,6 +21,8 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
   onView,
   onEdit,
   onDelete,
+  canEdit = () => true,
+  canDelete = () => true,
   isPerwadag = false,
 }) => {
 
@@ -49,8 +53,8 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
               </CardTitle>
               <ActionDropdown
                 onView={() => onView?.(item)}
-                onEdit={onEdit && !isPerwadag ? () => onEdit(item) : undefined}
-                onDelete={onDelete && !isPerwadag ? () => onDelete(item) : undefined}
+                onEdit={canEdit(item) && onEdit && !isPerwadag ? () => onEdit(item) : undefined}
+                onDelete={canDelete(item) && onDelete && !isPerwadag ? () => onDelete(item) : undefined}
                 showView={true}
                 showEdit={!isPerwadag && !!onEdit}
                 showDelete={!isPerwadag && !!onDelete}

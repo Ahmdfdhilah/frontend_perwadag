@@ -24,7 +24,9 @@ import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import KuesionerTable from '@/components/Kuesioner/KuesionerTable';
 import KuesionerCards from '@/components/Kuesioner/KuesionerCards';
 import KuesionerDialog from '@/components/Kuesioner/KuesionerDialog';
-import { getDefaultYearOptions } from '@/utils/yearUtils';
+import { getDefaultYearOptions, findPeriodeByYear } from '@/utils/yearUtils';
+import { periodeEvaluasiService } from '@/services/periodeEvaluasi';
+import { PeriodeEvaluasi } from '@/services/periodeEvaluasi/types';
 
 interface KuesionerPageFilters {
   search: string;
@@ -68,6 +70,7 @@ const KuesionerPage: React.FC = () => {
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
   const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
+  const [periodeEvaluasi, setPeriodeEvaluasi] = useState<PeriodeEvaluasi[]>([]);
 
   // Fetch year options function
   const fetchYearOptions = async () => {
@@ -76,6 +79,18 @@ const KuesionerPage: React.FC = () => {
       setYearOptions(options);
     } catch (error) {
       console.error('Failed to fetch year options:', error);
+    }
+  };
+
+  // Fetch periode evaluasi data
+  const fetchPeriodeEvaluasi = async () => {
+    try {
+      const response = await periodeEvaluasiService.getPeriodeEvaluasi({ 
+        size: 100 
+      });
+      setPeriodeEvaluasi(response.items);
+    } catch (error) {
+      console.error('Failed to fetch periode evaluasi:', error);
     }
   };
 
@@ -141,6 +156,7 @@ const KuesionerPage: React.FC = () => {
       fetchKuisioner();
       fetchAvailablePerwadag();
       fetchYearOptions();
+      fetchPeriodeEvaluasi();
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, filters.has_file, hasAccess]);
 
@@ -248,6 +264,12 @@ const KuesionerPage: React.FC = () => {
 
   const canEdit = (item: KuisionerResponse) => {
     if (!canEditForm('kuesioner')) return false;
+    
+    // Check if the periode is locked or status is "tutup"
+    const periode = findPeriodeByYear(periodeEvaluasi, item.tahun_evaluasi);
+    if (periode?.is_locked || periode?.status === 'tutup') {
+      return false;
+    }
     
     if (isAdmin()) return true;
     if (isInspektorat()) {

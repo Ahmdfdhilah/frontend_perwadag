@@ -25,7 +25,9 @@ import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import LaporanHasilEvaluasiTable from '@/components/LaporanHasilEvaluasi/LaporanHasilEvaluasiTable';
 import LaporanHasilEvaluasiCards from '@/components/LaporanHasilEvaluasi/LaporanHasilEvaluasiCards';
 import LaporanHasilEvaluasiDialog from '@/components/LaporanHasilEvaluasi/LaporanHasilEvaluasiDialog';
-import { getDefaultYearOptions } from '@/utils/yearUtils';
+import { getDefaultYearOptions, findPeriodeByYear } from '@/utils/yearUtils';
+import { periodeEvaluasiService } from '@/services/periodeEvaluasi';
+import { PeriodeEvaluasi } from '@/services/periodeEvaluasi/types';
 import { API_BASE_URL } from '@/config/api';
 
 interface LaporanHasilEvaluasiPageFilters {
@@ -74,6 +76,7 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
   const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
+  const [periodeEvaluasi, setPeriodeEvaluasi] = useState<PeriodeEvaluasi[]>([]);
 
   // Fetch year options function
   const fetchYearOptions = async () => {
@@ -82,6 +85,18 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
       setYearOptions(options);
     } catch (error) {
       console.error('Failed to fetch year options:', error);
+    }
+  };
+
+  // Fetch periode evaluasi data
+  const fetchPeriodeEvaluasi = async () => {
+    try {
+      const response = await periodeEvaluasiService.getPeriodeEvaluasi({ 
+        size: 100 
+      });
+      setPeriodeEvaluasi(response.items);
+    } catch (error) {
+      console.error('Failed to fetch periode evaluasi:', error);
     }
   };
 
@@ -149,6 +164,7 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
       fetchLaporanHasil();
       fetchAvailablePerwadag();
       fetchYearOptions();
+      fetchPeriodeEvaluasi();
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, filters.has_file, filters.has_nomor, filters.is_completed, hasAccess]);
 
@@ -261,6 +277,12 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
 
   const canEdit = (item: LaporanHasilResponse) => {
     if (!canEditForm('laporan_hasil_evaluasi')) return false;
+    
+    // Check if the periode is locked or status is "tutup"
+    const periode = findPeriodeByYear(periodeEvaluasi, item.tahun_evaluasi);
+    if (periode?.is_locked || periode?.status === 'tutup') {
+      return false;
+    }
     
     if (isAdmin()) return true;
     if (isInspektorat()) {

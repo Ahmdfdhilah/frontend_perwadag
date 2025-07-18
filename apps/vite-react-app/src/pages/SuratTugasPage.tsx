@@ -37,7 +37,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@workspace/ui/components/alert-dialog';
-import { getDefaultYearOptions } from '@/utils/yearUtils';
+import { getDefaultYearOptions, findPeriodeByYear } from '@/utils/yearUtils';
+import { periodeEvaluasiService } from '@/services/periodeEvaluasi';
+import { PeriodeEvaluasi } from '@/services/periodeEvaluasi/types';
 
 interface SuratTugasPageFilters {
   search: string;
@@ -80,6 +82,7 @@ const SuratTugasPage: React.FC = () => {
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
   const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
+  const [periodeEvaluasi, setPeriodeEvaluasi] = useState<PeriodeEvaluasi[]>([]);
 
   // Fetch year options function
   const fetchYearOptions = async () => {
@@ -91,11 +94,49 @@ const SuratTugasPage: React.FC = () => {
     }
   };
 
+  // Fetch periode evaluasi data
+  const fetchPeriodeEvaluasi = async () => {
+    try {
+      const response = await periodeEvaluasiService.getPeriodeEvaluasi({ 
+        size: 100 
+      });
+      setPeriodeEvaluasi(response.items);
+    } catch (error) {
+      console.error('Failed to fetch periode evaluasi:', error);
+    }
+  };
+
   // Calculate access control based on permissions
   const hasAccess = hasPageAccess('surat_tugas');
   const canCreateEdit = canCreateForm('surat_tugas') || canEditForm('surat_tugas');
   const canEdit = canEditForm('surat_tugas');
   const canDelete = canDeleteForm('surat_tugas');
+
+  // Check if individual item can be edited based on periode status
+  const canEditItem = (item: SuratTugasResponse) => {
+    if (!canEdit) return false;
+    
+    // Check if the periode is locked or status is "tutup"
+    const periode = findPeriodeByYear(periodeEvaluasi, item.tahun_evaluasi);
+    if (periode?.is_locked || periode?.status === 'tutup') {
+      return false;
+    }
+    
+    return true;
+  };
+
+  // Check if individual item can be deleted based on periode status
+  const canDeleteItem = (item: SuratTugasResponse) => {
+    if (!canDelete) return false;
+    
+    // Check if the periode is locked or status is "tutup"
+    const periode = findPeriodeByYear(periodeEvaluasi, item.tahun_evaluasi);
+    if (periode?.is_locked || periode?.status === 'tutup') {
+      return false;
+    }
+    
+    return true;
+  };
 
   // Fetch surat tugas list function
   const fetchSuratTugasList = async () => {
@@ -157,6 +198,7 @@ const SuratTugasPage: React.FC = () => {
       fetchSuratTugasList();
       fetchAvailablePerwadag();
       fetchYearOptions();
+      fetchPeriodeEvaluasi();
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.evaluation_status, filters.is_evaluation_active, filters.tahun_evaluasi, hasAccess]);
 
@@ -427,8 +469,10 @@ const SuratTugasPage: React.FC = () => {
                 data={suratTugasList}
                 loading={loading}
                 onView={handleView}
-                onEdit={canEdit ? handleEdit : undefined}
-                onDelete={canDelete ? handleDelete : undefined}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                canEdit={canEditItem}
+                canDelete={canDeleteItem}
                 isPerwadag={isPerwadag()}
               />
             </div>
@@ -439,8 +483,10 @@ const SuratTugasPage: React.FC = () => {
                 data={suratTugasList}
                 loading={loading}
                 onView={handleView}
-                onEdit={canEdit ? handleEdit : undefined}
-                onDelete={canDelete ? handleDelete : undefined}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                canEdit={canEditItem}
+                canDelete={canDeleteItem}
                 isPerwadag={isPerwadag()}
               />
             </div>

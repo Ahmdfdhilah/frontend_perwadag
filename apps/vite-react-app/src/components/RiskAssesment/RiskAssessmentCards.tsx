@@ -11,7 +11,7 @@ interface RiskAssessmentCardsProps {
   onView?: (item: PenilaianRisikoResponse) => void;
   onEdit?: (item: PenilaianRisikoResponse) => void;
   onDelete?: (item: PenilaianRisikoResponse) => void;
-  canEdit?: () => boolean;
+  canEdit?: (item: PenilaianRisikoResponse) => boolean;
 }
 
 const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
@@ -82,8 +82,8 @@ const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
               </CardTitle>
               <ActionDropdown
                 onView={() => onView?.(item)}
-                onEdit={canEdit() ? () => onEdit?.(item) : undefined}
-                onDelete={canEdit() ? () => onDelete?.(item) : undefined}
+                onEdit={canEdit(item) ? () => onEdit?.(item) : undefined}
+                onDelete={canEdit(item) ? () => onDelete?.(item) : undefined}
               />
             </div>
           </CardHeader>

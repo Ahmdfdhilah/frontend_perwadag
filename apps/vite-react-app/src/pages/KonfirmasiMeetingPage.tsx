@@ -7,7 +7,9 @@ import { MeetingResponse, MeetingFilterParams } from '@/services/meeting/types';
 import { meetingService } from '@/services/meeting';
 import { userService } from '@/services/users';
 import { PerwadagSummary, PerwadagSearchParams } from '@/services/users/types';
-import { getDefaultYearOptions } from '@/utils/yearUtils';
+import { getDefaultYearOptions, findPeriodeByYear } from '@/utils/yearUtils';
+import { periodeEvaluasiService } from '@/services/periodeEvaluasi';
+import { PeriodeEvaluasi } from '@/services/periodeEvaluasi/types';
 import Filtering from '@/components/common/Filtering';
 import Pagination from '@/components/common/Pagination';
 import { Card, CardContent } from '@workspace/ui/components/card';
@@ -65,9 +67,8 @@ const KonfirmasiMeetingPage: React.FC = () => {
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
-
-  // Get year options from utility
   const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
+  const [periodeEvaluasi, setPeriodeEvaluasi] = useState<PeriodeEvaluasi[]>([]);
 
   // Fetch year options function
   const fetchYearOptions = async () => {
@@ -76,6 +77,18 @@ const KonfirmasiMeetingPage: React.FC = () => {
       setYearOptions(options);
     } catch (error) {
       console.error('Failed to fetch year options:', error);
+    }
+  };
+
+  // Fetch periode evaluasi data
+  const fetchPeriodeEvaluasi = async () => {
+    try {
+      const response = await periodeEvaluasiService.getPeriodeEvaluasi({ 
+        size: 100 
+      });
+      setPeriodeEvaluasi(response.items);
+    } catch (error) {
+      console.error('Failed to fetch periode evaluasi:', error);
     }
   };
 
@@ -143,6 +156,7 @@ const KonfirmasiMeetingPage: React.FC = () => {
       fetchMeetings();
       fetchAvailablePerwadag();
       fetchYearOptions();
+      fetchPeriodeEvaluasi();
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, filters.has_files, filters.has_date, filters.has_links, filters.is_completed, hasAccess]);
 
@@ -242,6 +256,14 @@ const KonfirmasiMeetingPage: React.FC = () => {
 
   const canEdit = (item?: MeetingResponse) => {
     if (!canEditForm('konfirmasi_meeting')) return false;
+    
+    // Check if the periode is locked or status is "tutup"
+    if (item) {
+      const periode = findPeriodeByYear(periodeEvaluasi, item.tahun_evaluasi);
+      if (periode?.is_locked || periode?.status === 'tutup') {
+        return false;
+      }
+    }
     
     if (isAdmin()) return true;
     if (isInspektorat()) {

@@ -25,7 +25,9 @@ import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import MatriksTable from '@/components/Matriks/MatriksTable';
 import MatriksCards from '@/components/Matriks/MatriksCards';
 import MatriksDialog from '@/components/Matriks/MatriksDialog';
-import { getDefaultYearOptions } from '@/utils/yearUtils';
+import { getDefaultYearOptions, findPeriodeByYear } from '@/utils/yearUtils';
+import { periodeEvaluasiService } from '@/services/periodeEvaluasi';
+import { PeriodeEvaluasi } from '@/services/periodeEvaluasi/types';
 
 interface MatriksPageFilters {
   search: string;
@@ -70,6 +72,7 @@ const MatriksPage: React.FC = () => {
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
   const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
+  const [periodeEvaluasi, setPeriodeEvaluasi] = useState<PeriodeEvaluasi[]>([]);
 
   // Fetch year options function
   const fetchYearOptions = async () => {
@@ -78,6 +81,18 @@ const MatriksPage: React.FC = () => {
       setYearOptions(options);
     } catch (error) {
       console.error('Failed to fetch year options:', error);
+    }
+  };
+
+  // Fetch periode evaluasi data
+  const fetchPeriodeEvaluasi = async () => {
+    try {
+      const response = await periodeEvaluasiService.getPeriodeEvaluasi({ 
+        size: 100 
+      });
+      setPeriodeEvaluasi(response.items);
+    } catch (error) {
+      console.error('Failed to fetch periode evaluasi:', error);
     }
   };
 
@@ -144,6 +159,7 @@ const MatriksPage: React.FC = () => {
       fetchMatriks();
       fetchAvailablePerwadag();
       fetchYearOptions();
+      fetchPeriodeEvaluasi();
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, filters.has_file, filters.is_completed, hasAccess]);
 
@@ -192,6 +208,12 @@ const MatriksPage: React.FC = () => {
   // Check if user can edit this item based on role and permissions
   const canEdit = (item: MatriksResponse) => {
     if (!canEditForm('matriks')) return false;
+    
+    // Check if the periode is locked or status is "tutup"
+    const periode = findPeriodeByYear(periodeEvaluasi, item.tahun_evaluasi);
+    if (periode?.is_locked || periode?.status === 'tutup') {
+      return false;
+    }
     
     if (isAdmin()) return true;
     if (isInspektorat()) {

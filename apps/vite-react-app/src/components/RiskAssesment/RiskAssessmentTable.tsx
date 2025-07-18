@@ -18,7 +18,7 @@ interface RiskAssessmentTableProps {
   onView?: (item: PenilaianRisikoResponse) => void;
   onEdit?: (item: PenilaianRisikoResponse) => void;
   onDelete?: (item: PenilaianRisikoResponse) => void;
-  canEdit?: () => boolean;
+  canEdit?: (item: PenilaianRisikoResponse) => boolean;
 }
 
 const RiskAssessmentTable: React.FC<RiskAssessmentTableProps> = ({
@@ -85,8 +85,8 @@ const RiskAssessmentTable: React.FC<RiskAssessmentTableProps> = ({
                 <TableCell className="text-right">
                   <ActionDropdown
                     onView={() => onView?.(item)}
-                    onEdit={canEdit() ? () => onEdit?.(item) : undefined}
-                    onDelete={canEdit() ? () => onDelete?.(item) : undefined}
+                    onEdit={canEdit(item) ? () => onEdit?.(item) : undefined}
+                    onDelete={canEdit(item) ? () => onDelete?.(item) : undefined}
                   />
                 </TableCell>
               </TableRow>

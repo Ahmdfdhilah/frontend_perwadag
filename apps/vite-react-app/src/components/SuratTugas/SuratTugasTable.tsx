@@ -17,6 +17,8 @@ interface SuratTugasTableProps {
   onView?: (item: SuratTugasResponse) => void;
   onEdit?: (item: SuratTugasResponse) => void;
   onDelete?: (item: SuratTugasResponse) => void;
+  canEdit?: (item: SuratTugasResponse) => boolean;
+  canDelete?: (item: SuratTugasResponse) => boolean;
   isPerwadag?: boolean;
 }
 
@@ -26,6 +28,8 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
   onView,
   onEdit,
   onDelete,
+  canEdit = () => true,
+  canDelete = () => true,
   isPerwadag = false,
 }) => {
 
@@ -64,8 +68,8 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
                 <TableCell>
                   <ActionDropdown
                     onView={() => onView?.(item)}
-                    onEdit={onEdit ? () => onEdit(item) : undefined}
-                    onDelete={onDelete ? () => onDelete(item) : undefined}
+                    onEdit={canEdit(item) && onEdit ? () => onEdit(item) : undefined}
+                    onDelete={canDelete(item) && onDelete ? () => onDelete(item) : undefined}
                     showView={true}
                     showEdit={!isPerwadag && !!onEdit}
                     showDelete={!isPerwadag && !!onDelete}

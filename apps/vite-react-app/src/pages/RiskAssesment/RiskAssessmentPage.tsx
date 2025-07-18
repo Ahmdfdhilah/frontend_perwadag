@@ -226,6 +226,18 @@ const RiskAssessmentPage: React.FC = () => {
     return canEditForm('risk_assessment');
   };
 
+  // Helper function to check if a record can be edited based on periode status
+  const canEditRecord = (item: PenilaianRisikoResponse) => {
+    if (!canEdit()) return false;
+    
+    // Check if the periode is locked or status is "tutup"
+    if (item.periode_info?.is_locked || item.periode_info?.status === 'tutup') {
+      return false;
+    }
+    
+    return true;
+  };
+
   // Check access after all hooks have been called
   if (!hasAccess) {
     return (
@@ -361,7 +373,7 @@ const RiskAssessmentPage: React.FC = () => {
                 onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
-                canEdit={canEdit}
+                canEdit={canEditRecord}
               />
             </div>
 
@@ -373,7 +385,7 @@ const RiskAssessmentPage: React.FC = () => {
                 onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
-                canEdit={canEdit}
+                canEdit={canEditRecord}
               />
             </div>
 
