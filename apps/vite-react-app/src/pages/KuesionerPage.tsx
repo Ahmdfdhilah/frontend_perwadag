@@ -24,9 +24,12 @@ import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import KuesionerTable from '@/components/Kuesioner/KuesionerTable';
 import KuesionerCards from '@/components/Kuesioner/KuesionerCards';
 import KuesionerDialog from '@/components/Kuesioner/KuesionerDialog';
+import TemplateKuisionerDialog from '@/components/Kuesioner/TemplateKuisionerDialog';
 import { getDefaultYearOptions, findPeriodeByYear } from '@/utils/yearUtils';
 import { periodeEvaluasiService } from '@/services/periodeEvaluasi';
 import { PeriodeEvaluasi } from '@/services/periodeEvaluasi/types';
+import { Button } from '@workspace/ui/components/button';
+import { FileText } from 'lucide-react';
 
 interface KuesionerPageFilters {
   search: string;
@@ -70,6 +73,7 @@ const KuesionerPage: React.FC = () => {
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
   const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
+  const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
   const [periodeEvaluasi, setPeriodeEvaluasi] = useState<PeriodeEvaluasi[]>([]);
 
   // Fetch year options function
@@ -301,6 +305,16 @@ const KuesionerPage: React.FC = () => {
       <PageHeader
         title="Kuesioner"
         description="Kelola data kuesioner audit"
+        actions={
+          <Button 
+            variant="outline" 
+            onClick={() => setTemplateDialogOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <FileText className="h-4 w-4" />
+            Lihat Template
+          </Button>
+        }
       />
 
       <Filtering>
@@ -422,6 +436,12 @@ const KuesionerPage: React.FC = () => {
         item={editingItem}
         mode={dialogMode}
         onSave={handleSave}
+      />
+
+      {/* Template Kuisioner Dialog */}
+      <TemplateKuisionerDialog
+        open={templateDialogOpen}
+        onOpenChange={setTemplateDialogOpen}
       />
     </div>
   );

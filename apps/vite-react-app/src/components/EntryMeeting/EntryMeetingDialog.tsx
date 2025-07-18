@@ -42,7 +42,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
   onSave,
 }) => {
   const { canEditForm } = useFormPermissions();
-  const { isAdmin, isInspektorat, isPerwadag } = useRole();
+  const { isAdmin, isInspektorat } = useRole();
   const [formData, setFormData] = useState<any>({});
   const [selectedEntryDate, setSelectedEntryDate] = useState<Date>();
   const [isEntryDatePickerOpen, setIsEntryDatePickerOpen] = useState(false);

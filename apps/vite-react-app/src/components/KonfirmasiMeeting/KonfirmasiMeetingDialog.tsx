@@ -44,7 +44,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
   onSave,
 }) => {
   const { canEditForm } = useFormPermissions();
-  const { isAdmin, isInspektorat, isPerwadag } = useRole();
+  const { isAdmin, isInspektorat } = useRole();
   const [formData, setFormData] = useState<any>({});
   const [selectedKonfirmasiDate, setSelectedKonfirmasiDate] = useState<Date>();
   const [isKonfirmasiDatePickerOpen, setIsKonfirmasiDatePickerOpen] = useState(false);

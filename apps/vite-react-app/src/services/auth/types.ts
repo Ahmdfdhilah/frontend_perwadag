@@ -33,41 +33,41 @@ export interface MessageResponse {
 // Login response includes user data and refresh token
 export interface LoginResponse extends TokenResponse {
   refresh_token: string;
-  user: {
-    id: string;
-    username: string;
-    nama: string;
-    email: string;
-    role: string;
-    is_active: boolean;
-    inspektorat?: string;
-    wilayah?: string;
-    perwadag_id?: string;
-    created_at: string;
-    updated_at?: string;
-    tempat_lahir?: string;
-    tanggal_lahir?: string;
-    pangkat?: string;
-    jabatan?: string;
-    display_name?: string;
-    age?: number;
-    has_email?: boolean;
-    last_login?: string;
-    role_display?: string;
-  };
+  user: UserResponse;
+}
+
+// User Response Type (simplified structure from backend)
+export interface UserResponse {
+  id: string;
+  nama: string;
+  username: string;
+  jabatan: string;
+  email?: string;
+  is_active: boolean;
+  role: "ADMIN" | "INSPEKTORAT" | "PERWADAG";
+  inspektorat?: string;
+  display_name: string;
+  has_email: boolean;
+  last_login?: string;
+  role_display: string;
+  created_at: string;
+  updated_at?: string;
 }
 
 // User password eligibility and info
 export interface PasswordResetEligibilityResponse {
-  can_reset: boolean;
+  eligible: boolean;
   has_email: boolean;
-  message?: string;
+  email?: string;
+  message: string;
 }
 
 export interface DefaultPasswordInfoResponse {
-  has_default_password: boolean;
-  default_password?: string;
-  message?: string;
+  message: string;
+  description: string;
+  recommendation: string;
+  policy: string;
+  actual_password?: string; // Only for admin users
 }
 
 // Token verification

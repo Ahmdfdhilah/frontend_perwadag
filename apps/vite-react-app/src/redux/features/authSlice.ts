@@ -1,17 +1,18 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { authService } from '@/services/auth';
 import { userService } from '@/services/users';
-import { User, UserChangePassword, UserUpdate } from '@/services/users/types';
+import { UserChangePassword, UserUpdate } from '@/services/users/types';
 import { 
   LoginRequest, 
   PasswordResetRequest, 
-  PasswordResetConfirmRequest 
+  PasswordResetConfirmRequest,
+  UserResponse 
 } from '@/services/auth/types';
 
 export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
-  user: User | null;
+  user: UserResponse | null;
   accessToken: string | null;
   refreshToken: string | null;
   error: string | null;
@@ -174,10 +175,10 @@ const authSlice = createSlice({
       state.tokenExpiry = null;
       state.error = null;
     },
-    setUser: (state, action: PayloadAction<User>) => {
+    setUser: (state, action: PayloadAction<UserResponse>) => {
       state.user = action.payload;
     },
-    updateUser: (state, action: PayloadAction<Partial<User>>) => {
+    updateUser: (state, action: PayloadAction<Partial<UserResponse>>) => {
       if (state.user) {
         state.user = { ...state.user, ...action.payload };
       }
@@ -197,22 +198,7 @@ const authSlice = createSlice({
         state.tokenExpiry = action.payload.tokenExpiry;
         
         if (action.payload.user) {
-          state.user = {
-            id: action.payload.user.id,
-            nama: action.payload.user.nama,
-            username: action.payload.user.username || '',
-            jabatan: action.payload.user.jabatan || '',
-            email: action.payload.user.email,
-            is_active: action.payload.user.is_active,
-            role: action.payload.user.role as "ADMIN" | "INSPEKTORAT" | "PERWADAG",
-            inspektorat: action.payload.user.inspektorat,
-            display_name: action.payload.user.display_name || action.payload.user.nama,
-            has_email: action.payload.user.has_email || false,
-            last_login: action.payload.user.last_login,
-            role_display: action.payload.user.role_display || action.payload.user.role,
-            created_at: action.payload.user.created_at,
-            updated_at: action.payload.user.updated_at,
-          };
+          state.user = action.payload.user;
         }
         state.error = null;
       })
@@ -321,22 +307,7 @@ const authSlice = createSlice({
       })
       .addCase(getCurrentUserAsync.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = {
-          id: action.payload.id,
-          nama: action.payload.nama,
-          username: action.payload.username,
-          jabatan: action.payload.jabatan,
-          email: action.payload.email,
-          is_active: action.payload.is_active,
-          role: action.payload.role as "ADMIN" | "INSPEKTORAT" | "PERWADAG",
-          inspektorat: action.payload.inspektorat,
-          display_name: action.payload.display_name,
-          has_email: action.payload.has_email,
-          last_login: action.payload.last_login,
-          role_display: action.payload.role_display,
-          created_at: action.payload.created_at,
-          updated_at: action.payload.updated_at,
-        };
+        state.user = action.payload;
         state.error = null;
       })
       .addCase(getCurrentUserAsync.rejected, (state, action) => {
@@ -349,22 +320,7 @@ const authSlice = createSlice({
       })
       .addCase(updateProfileAsync.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = {
-          id: action.payload.id,
-          nama: action.payload.nama,
-          username: action.payload.username,
-          jabatan: action.payload.jabatan,
-          email: action.payload.email,
-          is_active: action.payload.is_active,
-          role: action.payload.role as "ADMIN" | "INSPEKTORAT" | "PERWADAG",
-          inspektorat: action.payload.inspektorat,
-          display_name: action.payload.display_name,
-          has_email: action.payload.has_email,
-          last_login: action.payload.last_login,
-          role_display: action.payload.role_display,
-          created_at: action.payload.created_at,
-          updated_at: action.payload.updated_at,
-        };
+        state.user = action.payload;
         state.error = null;
       })
       .addCase(updateProfileAsync.rejected, (state, action) => {
