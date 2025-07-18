@@ -10,6 +10,7 @@ interface MatriksCardsProps {
   loading?: boolean;
   onEdit?: (item: MatriksResponse) => void;
   onView?: (item: MatriksResponse) => void;
+  onExport?: (item: MatriksResponse) => void;
   canEdit?: (item: MatriksResponse) => boolean;
   canView?: (item: MatriksResponse) => boolean;
   userRole: 'admin' | 'inspektorat' | 'perwadag';
@@ -20,6 +21,7 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
   loading = false,
   onEdit,
   onView,
+  onExport,
   canEdit,
   canView,
   userRole,
@@ -72,12 +74,14 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
           <CardTitle className="text-lg font-semibold">
             {item.nama_perwadag}
           </CardTitle>
-          {(canEdit?.(item) || canView?.(item)) && (
+          {(canEdit?.(item) || canView?.(item) || onExport) && (
             <ActionDropdown
               onEdit={() => onEdit?.(item)}
               onView={() => onView?.(item)}
+              onExport={() => onExport?.(item)}
               showView={!!onView && !!canView?.(item)}
               showEdit={!!onEdit && !!canEdit?.(item)}
+              showExport={!!onExport}
               showDelete={false}
             />
           )}
@@ -125,12 +129,14 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
           <CardTitle className="text-lg font-semibold">
             Matriks #{index + 1}
           </CardTitle>
-          {(canEdit?.(item) || canView?.(item)) && (
+          {(canEdit?.(item) || canView?.(item) || onExport) && (
             <ActionDropdown
               onEdit={() => onEdit?.(item)}
               onView={() => onView?.(item)}
+              onExport={() => onExport?.(item)}
               showView={!!onView && !!canView?.(item)}
               showEdit={!!onEdit && !!canEdit?.(item)}
+              showExport={!!onExport}
               showDelete={false}
             />
           )}

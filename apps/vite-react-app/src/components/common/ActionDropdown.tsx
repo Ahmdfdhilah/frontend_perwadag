@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit, Eye, Trash2, Mail } from 'lucide-react';
+import { Edit, Eye, Trash2, Mail, Download } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,10 +13,12 @@ interface ActionDropdownProps {
   onEdit?: () => void;
   onDelete?: () => void;
   onComposeEmail?: () => void;
+  onExport?: () => void;
   showView?: boolean;
   showEdit?: boolean;
   showDelete?: boolean;
   showComposeEmail?: boolean;
+  showExport?: boolean;
 }
 
 const ActionDropdown: React.FC<ActionDropdownProps> = ({
@@ -24,10 +26,12 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
   onEdit,
   onDelete,
   onComposeEmail,
+  onExport,
   showView = true,
   showEdit = true,
   showDelete = true,
   showComposeEmail = false,
+  showExport = false,
 }) => {
   return (
     <DropdownMenu>
@@ -53,6 +57,12 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
           <DropdownMenuItem onClick={onComposeEmail}>
             <Mail className="mr-2 h-4 w-4" />
             Kirim Email
+          </DropdownMenuItem>
+        )}
+        {showExport && (
+          <DropdownMenuItem onClick={onExport}>
+            <Download className="mr-2 h-4 w-4" />
+            Export Excel
           </DropdownMenuItem>
         )}
         {showDelete && (

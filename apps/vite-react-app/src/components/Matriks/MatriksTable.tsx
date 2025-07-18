@@ -17,6 +17,7 @@ interface MatriksTableProps {
   loading?: boolean;
   onEdit?: (item: MatriksResponse) => void;
   onView?: (item: MatriksResponse) => void;
+  onExport?: (item: MatriksResponse) => void;
   canEdit?: (item: MatriksResponse) => boolean;
   canView?: (item: MatriksResponse) => boolean;
   userRole: 'admin' | 'inspektorat' | 'perwadag';
@@ -27,6 +28,7 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
   loading = false,
   onEdit,
   onView,
+  onExport,
   canEdit,
   canView,
   userRole,
@@ -64,8 +66,8 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
   }
 
   const renderAdminInspektoratColumns = () => {
-    // Check if any item can be edited or viewed
-    const hasActionableItems = data.some(item => canEdit?.(item) || canView?.(item));
+    // Check if any item can be edited, viewed, or exported
+    const hasActionableItems = data.some(item => canEdit?.(item) || canView?.(item) || onExport);
     
     return (
       <>
@@ -80,8 +82,8 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
   };
 
   const renderPerwadagColumns = () => {
-    // Check if any item can be edited or viewed
-    const hasActionableItems = data.some(item => canEdit?.(item) || canView?.(item));
+    // Check if any item can be edited, viewed, or exported
+    const hasActionableItems = data.some(item => canEdit?.(item) || canView?.(item) || onExport);
     
     return (
       <>
@@ -95,8 +97,8 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
   };
 
   const renderAdminInspektoratRow = (item: MatriksResponse, index: number) => {
-    // Check if any item can be edited or viewed to determine if we need the Actions column
-    const hasActionableItems = data.some(item => canEdit?.(item) || canView?.(item));
+    // Check if any item can be edited, viewed, or exported to determine if we need the Actions column
+    const hasActionableItems = data.some(item => canEdit?.(item) || canView?.(item) || onExport);
     
     return (
       <TableRow key={item.id}>
@@ -109,12 +111,14 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
         </TableCell>
         {hasActionableItems && (
           <TableCell>
-            {(canEdit?.(item) || canView?.(item)) ? (
+            {(canEdit?.(item) || canView?.(item) || onExport) ? (
               <ActionDropdown
                 onEdit={() => onEdit?.(item)}
                 onView={() => onView?.(item)}
+                onExport={() => onExport?.(item)}
                 showView={!!onView && !!canView?.(item)}
                 showEdit={!!onEdit && !!canEdit?.(item)}
+                showExport={!!onExport}
                 showDelete={false}
               />
             ) : (
@@ -127,8 +131,8 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
   };
 
   const renderPerwadagRow = (item: MatriksResponse, index: number) => {
-    // Check if any item can be edited or viewed to determine if we need the Actions column
-    const hasActionableItems = data.some(item => canEdit?.(item) || canView?.(item));
+    // Check if any item can be edited, viewed, or exported to determine if we need the Actions column
+    const hasActionableItems = data.some(item => canEdit?.(item) || canView?.(item) || onExport);
     
     return (
       <TableRow key={item.id}>
@@ -140,12 +144,14 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
         </TableCell>
         {hasActionableItems && (
           <TableCell>
-            {(canEdit?.(item) || canView?.(item)) ? (
+            {(canEdit?.(item) || canView?.(item) || onExport) ? (
               <ActionDropdown
                 onEdit={() => onEdit?.(item)}
                 onView={() => onView?.(item)}
+                onExport={() => onExport?.(item)}
                 showView={!!onView && !!canView?.(item)}
                 showEdit={!!onEdit && !!canEdit?.(item)}
+                showExport={!!onExport}
                 showDelete={false}
               />
             ) : (
@@ -157,7 +163,7 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
     );
   };
 
-  const hasActionableItems = data.some(item => canEdit?.(item) || canView?.(item));
+  const hasActionableItems = data.some(item => canEdit?.(item) || canView?.(item) || onExport);
   const columnsCount = userRole === 'perwadag' 
     ? (hasActionableItems ? 5 : 4) 
     : (hasActionableItems ? 6 : 5);

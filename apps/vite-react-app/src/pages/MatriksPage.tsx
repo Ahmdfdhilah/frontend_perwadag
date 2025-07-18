@@ -28,6 +28,7 @@ import MatriksDialog from '@/components/Matriks/MatriksDialog';
 import { getDefaultYearOptions, findPeriodeByYear } from '@/utils/yearUtils';
 import { periodeEvaluasiService } from '@/services/periodeEvaluasi';
 import { PeriodeEvaluasi } from '@/services/periodeEvaluasi/types';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface MatriksPageFilters {
   search: string;
@@ -177,6 +178,168 @@ const MatriksPage: React.FC = () => {
     setSelectedItem(item);
     setDialogMode('view');
     setIsDialogOpen(true);
+  };
+
+  const handleExportExcel = (item: MatriksResponse) => {
+    try {
+      // Import XLSX library dynamically
+      import('xlsx').then((XLSX) => {
+        const temuanRekomendasi = item.temuan_rekomendasi_summary?.data || [];
+        const tanggalEvaluasi = formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai);
+        
+        // File name and title
+        const fileName = `Matriks_Temuan_Rekomendasi_${item.nama_perwadag.replace(/\s+/g, '_')}_${item.tahun_evaluasi}.xlsx`;
+        const title = `Matriks Temuan Rekomendasi ${item.nama_perwadag} ${tanggalEvaluasi}`;
+        
+        // Create new workbook
+        const wb = XLSX.utils.book_new();
+        
+        // Prepare data for Excel
+        const data = [];
+        
+        // Add title (merged cell)
+        data.push([title]);
+        data.push([]); // Empty row
+        
+        // Add header information (will be merged A:B for each row)
+        data.push([`Nama Perwadag: ${item.nama_perwadag}`]);
+        data.push([`Inspektorat: ${item.inspektorat}`]);
+        data.push([`Tanggal Evaluasi: ${tanggalEvaluasi}`]);
+        data.push([`Tahun Evaluasi: ${item.tahun_evaluasi}`]);
+        data.push([]); // Empty row
+        
+        if (temuanRekomendasi.length > 0) {
+          // Add table headers
+          data.push(['No', 'Temuan', 'Rekomendasi']);
+          
+          // Add temuan-rekomendasi data
+          temuanRekomendasi.forEach((tr, index) => {
+            data.push([index + 1, tr.temuan, tr.rekomendasi]);
+          });
+        } else {
+          data.push(['Tidak ada temuan dan rekomendasi']);
+        }
+        
+        // Create worksheet
+        const ws = XLSX.utils.aoa_to_sheet(data);
+        
+        // Set column widths
+        const colWidths = [
+          { wch: 5 },  // No column
+          { wch: 50 }, // Temuan column
+          { wch: 50 }  // Rekomendasi column
+        ];
+        ws['!cols'] = colWidths;
+        
+        // Apply styling and formatting
+        // Style title cell (A1)
+        if (ws['A1']) {
+          ws['A1'].s = {
+            font: { bold: true, sz: 18, color: { rgb: '1565C0' } },
+            alignment: { horizontal: 'center', vertical: 'center' },
+            fill: { fgColor: { rgb: 'E3F2FD' } }
+          };
+        }
+        
+        // Style header information (A3:A6 - merged cells)
+        for (let row = 2; row <= 5; row++) {
+          const cellA = `A${row + 1}`;
+          
+          if (ws[cellA]) {
+            ws[cellA].s = {
+              font: { bold: true, sz: 12, color: { rgb: '424242' } },
+              fill: { fgColor: { rgb: 'F5F5F5' } },
+              alignment: { horizontal: 'left', vertical: 'center' }
+            };
+          }
+        }
+        
+        // Style table headers (if exists)
+        if (temuanRekomendasi.length > 0) {
+          const headerRow = 8; // Row index for table headers
+          ['A', 'B', 'C'].forEach(col => {
+            const cell = `${col}${headerRow}`;
+            if (ws[cell]) {
+              ws[cell].s = {
+                font: { bold: true, sz: 13, color: { rgb: 'FFFFFF' } },
+                fill: { fgColor: { rgb: '1976D2' } },
+                alignment: { horizontal: 'center', vertical: 'center' },
+                border: {
+                  top: { style: 'thin' },
+                  bottom: { style: 'thin' },
+                  left: { style: 'thin' },
+                  right: { style: 'thin' }
+                }
+              };
+            }
+          });
+          
+          // Style data rows
+          for (let row = headerRow + 1; row <= headerRow + temuanRekomendasi.length; row++) {
+            ['A', 'B', 'C'].forEach(col => {
+              const cell = `${col}${row}`;
+              if (ws[cell]) {
+                ws[cell].s = {
+                  font: { sz: 11, color: { rgb: '212121' } },
+                  alignment: { 
+                    horizontal: col === 'A' ? 'center' : 'left',
+                    vertical: 'top',
+                    wrapText: true
+                  },
+                  border: {
+                    top: { style: 'thin' },
+                    bottom: { style: 'thin' },
+                    left: { style: 'thin' },
+                    right: { style: 'thin' }
+                  }
+                };
+              }
+            });
+          }
+        }
+        
+        // Merge cells
+        if (!ws['!merges']) ws['!merges'] = [];
+        // Merge title cell across columns
+        ws['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: 2 } });
+        
+        // Merge header information rows (A:B for each row)
+        ws['!merges'].push({ s: { r: 2, c: 0 }, e: { r: 2, c: 1 } }); // Nama Perwadag
+        ws['!merges'].push({ s: { r: 3, c: 0 }, e: { r: 3, c: 1 } }); // Inspektorat
+        ws['!merges'].push({ s: { r: 4, c: 0 }, e: { r: 4, c: 1 } }); // Tanggal Evaluasi
+        ws['!merges'].push({ s: { r: 5, c: 0 }, e: { r: 5, c: 1 } }); // Tahun Evaluasi
+        
+        // Set row heights
+        if (!ws['!rows']) ws['!rows'] = [];
+        ws['!rows'][0] = { hpx: 35 }; // Title row height (increased)
+        ws['!rows'][2] = { hpx: 25 }; // Header info rows
+        ws['!rows'][3] = { hpx: 25 };
+        ws['!rows'][4] = { hpx: 25 };
+        ws['!rows'][5] = { hpx: 25 };
+        if (temuanRekomendasi.length > 0) {
+          ws['!rows'][7] = { hpx: 30 }; // Table header row height
+        }
+        
+        // Add worksheet to workbook
+        XLSX.utils.book_append_sheet(wb, ws, 'Matriks Temuan Rekomendasi');
+        
+        // Save file
+        XLSX.writeFile(wb, fileName);
+        
+        toast({
+          title: 'Export Berhasil',
+          description: `Data matriks ${item.nama_perwadag} berhasil diekspor ke Excel.`,
+          variant: 'default'
+        });
+      });
+    } catch (error) {
+      console.error('Failed to export Excel:', error);
+      toast({
+        title: 'Export Gagal',
+        description: 'Gagal mengekspor data ke Excel. Silakan coba lagi.',
+        variant: 'destructive'
+      });
+    }
   };
 
   const handleSave = async (data: any) => {
@@ -409,6 +572,7 @@ const MatriksPage: React.FC = () => {
                 loading={loading}
                 onEdit={handleEdit}
                 onView={handleView}
+                onExport={handleExportExcel}
                 canEdit={canEdit}
                 canView={canView}
                 userRole={isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : 'perwadag'}
@@ -422,6 +586,7 @@ const MatriksPage: React.FC = () => {
                 loading={loading}
                 onEdit={handleEdit}
                 onView={handleView}
+                onExport={handleExportExcel}
                 canEdit={canEdit}
                 canView={canView}
                 userRole={isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : 'perwadag'}
