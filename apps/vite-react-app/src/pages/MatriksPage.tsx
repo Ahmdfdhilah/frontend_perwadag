@@ -182,8 +182,8 @@ const MatriksPage: React.FC = () => {
 
   const handleExportExcel = (item: MatriksResponse) => {
     try {
-      // Import XLSX library dynamically
-      import('xlsx').then((XLSX) => {
+      // Import ExcelJS library dynamically
+      import('exceljs').then((ExcelJS) => {
         const temuanRekomendasi = item.temuan_rekomendasi_summary?.data || [];
         const tanggalEvaluasi = formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai);
         
@@ -192,139 +192,124 @@ const MatriksPage: React.FC = () => {
         const title = `Matriks Temuan Rekomendasi ${item.nama_perwadag} ${tanggalEvaluasi}`;
         
         // Create new workbook
-        const wb = XLSX.utils.book_new();
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Matriks Temuan Rekomendasi');
         
-        // Prepare data for Excel
-        const data = [];
+        // Set column widths
+        worksheet.columns = [
+          { width: 5 },   // No column
+          { width: 50 },  // Temuan column
+          { width: 50 }   // Rekomendasi column
+        ];
         
         // Add title (merged cell)
-        data.push([title]);
-        data.push([]); // Empty row
+        worksheet.mergeCells('A1:C1');
+        const titleCell = worksheet.getCell('A1');
+        titleCell.value = title;
+        titleCell.font = { bold: true, size: 18, color: { argb: 'FF1565C0' } };
+        titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+        titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE3F2FD' } };
+        titleCell.border = {
+          top: { style: 'thin' },
+          bottom: { style: 'thin' },
+          left: { style: 'thin' },
+          right: { style: 'thin' }
+        };
         
-        // Add header information (will be merged A:B for each row)
-        data.push([`Nama Perwadag: ${item.nama_perwadag}`]);
-        data.push([`Inspektorat: ${item.inspektorat}`]);
-        data.push([`Tanggal Evaluasi: ${tanggalEvaluasi}`]);
-        data.push([`Tahun Evaluasi: ${item.tahun_evaluasi}`]);
-        data.push([]); // Empty row
+        // Set title row height
+        worksheet.getRow(1).height = 35;
+        
+        // Add empty row
+        worksheet.addRow([]);
+        
+        // Add header information with styling
+        const headerInfo = [
+          [`Nama Perwadag: ${item.nama_perwadag}`],
+          [`Inspektorat: ${item.inspektorat}`],
+          [`Tanggal Evaluasi: ${tanggalEvaluasi}`],
+          [`Tahun Evaluasi: ${item.tahun_evaluasi}`]
+        ];
+        
+        headerInfo.forEach((info, index) => {
+          const rowNum = index + 3; // Starting from row 3
+          worksheet.mergeCells(`A${rowNum}:B${rowNum}`);
+          const cell = worksheet.getCell(`A${rowNum}`);
+          cell.value = info[0];
+          cell.font = { bold: true, size: 12, color: { argb: 'FF424242' } };
+          cell.alignment = { horizontal: 'left', vertical: 'middle' };
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF5F5F5' } };
+          cell.border = {
+            top: { style: 'thin' },
+            bottom: { style: 'thin' },
+            left: { style: 'thin' },
+            right: { style: 'thin' }
+          };
+          worksheet.getRow(rowNum).height = 25;
+        });
+        
+        // Add empty row
+        worksheet.addRow([]);
         
         if (temuanRekomendasi.length > 0) {
           // Add table headers
-          data.push(['No', 'Temuan', 'Rekomendasi']);
+          const headerRow = worksheet.addRow(['No', 'Temuan', 'Rekomendasi']);
+          headerRow.height = 30;
           
-          // Add temuan-rekomendasi data
+          // Style table headers
+          headerRow.eachCell((cell) => {
+            cell.font = { bold: true, size: 13, color: { argb: 'FFFFFFFF' } };
+            cell.alignment = { horizontal: 'center', vertical: 'middle' };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1976D2' } };
+            cell.border = {
+              top: { style: 'thin' },
+              bottom: { style: 'thin' },
+              left: { style: 'thin' },
+              right: { style: 'thin' }
+            };
+          });
+          
+          // Add data rows
           temuanRekomendasi.forEach((tr, index) => {
-            data.push([index + 1, tr.temuan, tr.rekomendasi]);
+            const dataRow = worksheet.addRow([index + 1, tr.temuan, tr.rekomendasi]);
+            
+            // Style data cells
+            dataRow.eachCell((cell, colNumber) => {
+              cell.font = { size: 11, color: { argb: 'FF212121' } };
+              cell.alignment = { 
+                horizontal: colNumber === 1 ? 'center' : 'left',
+                vertical: 'top',
+                wrapText: true
+              };
+              cell.border = {
+                top: { style: 'thin' },
+                bottom: { style: 'thin' },
+                left: { style: 'thin' },
+                right: { style: 'thin' }
+              };
+            });
           });
         } else {
-          data.push(['Tidak ada temuan dan rekomendasi']);
+          const noDataRow = worksheet.addRow(['Tidak ada temuan dan rekomendasi']);
+          worksheet.mergeCells(`A${noDataRow.number}:C${noDataRow.number}`);
+          const cell = worksheet.getCell(`A${noDataRow.number}`);
+          cell.alignment = { horizontal: 'center', vertical: 'middle' };
+          cell.font = { italic: true, size: 11 };
         }
         
-        // Create worksheet
-        const ws = XLSX.utils.aoa_to_sheet(data);
-        
-        // Set column widths
-        const colWidths = [
-          { wch: 5 },  // No column
-          { wch: 50 }, // Temuan column
-          { wch: 50 }  // Rekomendasi column
-        ];
-        ws['!cols'] = colWidths;
-        
-        // Apply styling and formatting
-        // Style title cell (A1)
-        if (ws['A1']) {
-          ws['A1'].s = {
-            font: { bold: true, sz: 18, color: { rgb: '1565C0' } },
-            alignment: { horizontal: 'center', vertical: 'center' },
-            fill: { fgColor: { rgb: 'E3F2FD' } }
-          };
-        }
-        
-        // Style header information (A3:A6 - merged cells)
-        for (let row = 2; row <= 5; row++) {
-          const cellA = `A${row + 1}`;
-          
-          if (ws[cellA]) {
-            ws[cellA].s = {
-              font: { bold: true, sz: 12, color: { rgb: '424242' } },
-              fill: { fgColor: { rgb: 'F5F5F5' } },
-              alignment: { horizontal: 'left', vertical: 'center' }
-            };
-          }
-        }
-        
-        // Style table headers (if exists)
-        if (temuanRekomendasi.length > 0) {
-          const headerRow = 8; // Row index for table headers
-          ['A', 'B', 'C'].forEach(col => {
-            const cell = `${col}${headerRow}`;
-            if (ws[cell]) {
-              ws[cell].s = {
-                font: { bold: true, sz: 13, color: { rgb: 'FFFFFF' } },
-                fill: { fgColor: { rgb: '1976D2' } },
-                alignment: { horizontal: 'center', vertical: 'center' },
-                border: {
-                  top: { style: 'thin' },
-                  bottom: { style: 'thin' },
-                  left: { style: 'thin' },
-                  right: { style: 'thin' }
-                }
-              };
-            }
-          });
-          
-          // Style data rows
-          for (let row = headerRow + 1; row <= headerRow + temuanRekomendasi.length; row++) {
-            ['A', 'B', 'C'].forEach(col => {
-              const cell = `${col}${row}`;
-              if (ws[cell]) {
-                ws[cell].s = {
-                  font: { sz: 11, color: { rgb: '212121' } },
-                  alignment: { 
-                    horizontal: col === 'A' ? 'center' : 'left',
-                    vertical: 'top',
-                    wrapText: true
-                  },
-                  border: {
-                    top: { style: 'thin' },
-                    bottom: { style: 'thin' },
-                    left: { style: 'thin' },
-                    right: { style: 'thin' }
-                  }
-                };
-              }
-            });
-          }
-        }
-        
-        // Merge cells
-        if (!ws['!merges']) ws['!merges'] = [];
-        // Merge title cell across columns
-        ws['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: 2 } });
-        
-        // Merge header information rows (A:B for each row)
-        ws['!merges'].push({ s: { r: 2, c: 0 }, e: { r: 2, c: 1 } }); // Nama Perwadag
-        ws['!merges'].push({ s: { r: 3, c: 0 }, e: { r: 3, c: 1 } }); // Inspektorat
-        ws['!merges'].push({ s: { r: 4, c: 0 }, e: { r: 4, c: 1 } }); // Tanggal Evaluasi
-        ws['!merges'].push({ s: { r: 5, c: 0 }, e: { r: 5, c: 1 } }); // Tahun Evaluasi
-        
-        // Set row heights
-        if (!ws['!rows']) ws['!rows'] = [];
-        ws['!rows'][0] = { hpx: 35 }; // Title row height (increased)
-        ws['!rows'][2] = { hpx: 25 }; // Header info rows
-        ws['!rows'][3] = { hpx: 25 };
-        ws['!rows'][4] = { hpx: 25 };
-        ws['!rows'][5] = { hpx: 25 };
-        if (temuanRekomendasi.length > 0) {
-          ws['!rows'][7] = { hpx: 30 }; // Table header row height
-        }
-        
-        // Add worksheet to workbook
-        XLSX.utils.book_append_sheet(wb, ws, 'Matriks Temuan Rekomendasi');
+        // Set workbook properties
+        workbook.creator = 'Sistem Evaluasi';
+        workbook.created = new Date();
+        workbook.modified = new Date();
         
         // Save file
-        XLSX.writeFile(wb, fileName);
+        workbook.xlsx.writeBuffer().then((buffer) => {
+          const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = fileName;
+          link.click();
+          URL.revokeObjectURL(link.href);
+        });
         
         toast({
           title: 'Export Berhasil',
