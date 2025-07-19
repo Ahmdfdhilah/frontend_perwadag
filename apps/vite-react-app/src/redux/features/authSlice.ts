@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { authService } from '@/services/auth';
 import { userService } from '@/services/users';
-import { UserChangePassword, UserUpdate } from '@/services/users/types';
+import { UserUpdate } from '@/services/users/types';
 import { 
   LoginRequest, 
   PasswordResetRequest, 

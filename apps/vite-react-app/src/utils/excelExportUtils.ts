@@ -183,7 +183,7 @@ export const exportToExcel = async (config: ExcelExportConfig, toastFn: ToastFun
           headerRow.height = styles.tableHeader.height;
         }
         
-        headerRow.eachCell((cell) => {
+        headerRow.eachCell((cell: any) => {
           cell.font = styles.tableHeader?.font;
           cell.alignment = styles.tableHeader?.alignment;
           cell.fill = styles.tableHeader?.fill;
@@ -208,7 +208,7 @@ export const exportToExcel = async (config: ExcelExportConfig, toastFn: ToastFun
 
         // Style data cells
         if (styles.tableData) {
-          dataRow.eachCell((cell, colNumber) => {
+          dataRow.eachCell((cell: any, colNumber: any) => {
             cell.font = styles.tableData?.font;
             cell.alignment = {
               ...styles.tableData?.alignment,
