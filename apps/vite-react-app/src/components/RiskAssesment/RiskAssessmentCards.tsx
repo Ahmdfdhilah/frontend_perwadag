@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Skeleton } from '@workspace/ui/components/skeleton';
-import { Badge } from '@workspace/ui/components/badge';
 import { PenilaianRisikoResponse } from '@/services/penilaianRisiko/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
 
@@ -107,14 +106,15 @@ const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Status Penilaian Risiko:</span>
-                <Badge 
-                  className="ml-2"
-                  variant={
-                    item.total_nilai_risiko !== null  ? 'default' : 'secondary'
-                  }
-                >
-                  {item.total_nilai_risiko !== null ? 'Sudah Diisi' : 'Belum Diisi'}
-                </Badge>
+                <span className="ml-2">
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    item.total_nilai_risiko !== null
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {item.total_nilai_risiko !== null ? 'Sudah Diisi' : 'Belum Diisi'}
+                  </span>
+                </span>
               </div>
             </div>
           </CardContent>

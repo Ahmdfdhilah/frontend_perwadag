@@ -8,7 +8,6 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import { Skeleton } from '@workspace/ui/components/skeleton';
-import { Badge } from '@workspace/ui/components/badge';
 import { PenilaianRisikoResponse } from '@/services/penilaianRisiko/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
 
@@ -73,13 +72,13 @@ const RiskAssessmentTable: React.FC<RiskAssessmentTableProps> = ({
                   {item.total_nilai_risiko ? Number(item.total_nilai_risiko).toFixed(1) : '-'}
                 </TableCell>
                 <TableCell>
-                  <Badge 
-                    variant={
-                      item.total_nilai_risiko !== null  ? 'default' : 'secondary'
-                    }
-                  >
-                    {item.total_nilai_risiko !== null  ? 'Sudah Diisi' : 'Belum Diisi'}
-                  </Badge>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    item.total_nilai_risiko !== null
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {item.total_nilai_risiko !== null ? 'Sudah Diisi' : 'Belum Diisi'}
+                  </span>
                 </TableCell>
                 <TableCell className="text-right">
                   <ActionDropdown
