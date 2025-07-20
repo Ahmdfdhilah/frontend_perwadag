@@ -75,10 +75,10 @@ const RiskAssessmentTable: React.FC<RiskAssessmentTableProps> = ({
                 <TableCell>
                   <Badge 
                     variant={
-                      item.total_nilai_risiko !== null && item.total_nilai_risiko !== undefined ? 'default' : 'secondary'
+                      item.total_nilai_risiko !== null  ? 'default' : 'secondary'
                     }
                   >
-                    {item.total_nilai_risiko !== null && item.total_nilai_risiko !== undefined ? 'Sudah Diisi' : 'Belum Diisi'}
+                    {item.total_nilai_risiko !== null  ? 'Sudah Diisi' : 'Belum Diisi'}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">

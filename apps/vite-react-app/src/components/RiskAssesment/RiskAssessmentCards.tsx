@@ -110,10 +110,10 @@ const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
                 <Badge 
                   className="ml-2"
                   variant={
-                    item.total_nilai_risiko !== null && item.total_nilai_risiko !== undefined ? 'default' : 'secondary'
+                    item.total_nilai_risiko !== null  ? 'default' : 'secondary'
                   }
                 >
-                  {item.total_nilai_risiko !== null && item.total_nilai_risiko !== undefined ? 'Sudah Diisi' : 'Belum Diisi'}
+                  {item.total_nilai_risiko !== null ? 'Sudah Diisi' : 'Belum Diisi'}
                 </Badge>
               </div>
             </div>
