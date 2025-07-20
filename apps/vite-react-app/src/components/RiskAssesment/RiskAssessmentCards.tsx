@@ -103,18 +103,17 @@ const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Skor:</span>
-                <span className="ml-2">{item.skor_rata_rata ? Number(item.skor_rata_rata).toFixed(1) : '-'}</span>
+                <span className="ml-2">{item.total_nilai_risiko ? Number(item.total_nilai_risiko).toFixed(1) : '-'}</span>
               </div>
               <div>
-                <span className="font-medium text-muted-foreground">Profil Risiko:</span>
+                <span className="font-medium text-muted-foreground">Status Penilaian Risiko:</span>
                 <Badge 
                   className="ml-2"
                   variant={
-                    item.profil_risiko_auditan === 'Tinggi' ? 'destructive' :
-                    item.profil_risiko_auditan === 'Sedang' ? 'default' : 'secondary'
+                    item.total_nilai_risiko !== null || item.total_nilai_risiko !== undefined ? 'default' : 'secondary'
                   }
                 >
-                  {item.profil_risiko_auditan || 'Belum Dinilai'}
+                  {item.total_nilai_risiko !== null || item.total_nilai_risiko !== undefined ? 'Sudah Diisi' : 'Belum Diisi'}
                 </Badge>
               </div>
             </div>

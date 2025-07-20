@@ -39,7 +39,7 @@ const RiskAssessmentTable: React.FC<RiskAssessmentTableProps> = ({
             <TableHead>Inspektorat</TableHead>
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Skor</TableHead>
-            <TableHead>Profil Risiko Auditan</TableHead>
+            <TableHead>Status Penilaian Risiko</TableHead>
             <TableHead className="text-right">Aksi</TableHead>
           </TableRow>
         </TableHeader>
@@ -70,16 +70,15 @@ const RiskAssessmentTable: React.FC<RiskAssessmentTableProps> = ({
                 <TableCell>{item.inspektorat}</TableCell>
                 <TableCell>{item.nama_perwadag}</TableCell>
                 <TableCell>
-                  {item.skor_rata_rata ? Number(item.skor_rata_rata).toFixed(1) : '-'}
+                  {item.total_nilai_risiko ? Number(item.total_nilai_risiko).toFixed(1) : '-'}
                 </TableCell>
                 <TableCell>
                   <Badge 
                     variant={
-                      item.profil_risiko_auditan === 'Tinggi' ? 'destructive' :
-                      item.profil_risiko_auditan === 'Sedang' ? 'default' : 'secondary'
+                      item.total_nilai_risiko !== null || item.total_nilai_risiko !== undefined ? 'default' : 'secondary'
                     }
                   >
-                    {item.profil_risiko_auditan || 'Belum Dinilai'}
+                    {item.total_nilai_risiko !== null || item.total_nilai_risiko !== undefined ? 'Sudah Diisi' : 'Belum Diisi'}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">

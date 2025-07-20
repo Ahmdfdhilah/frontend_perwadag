@@ -54,11 +54,11 @@ export const PAGINATION_DEFAULTS = {
 } as const;
 
 export const AUDIT_CHOICES = [
-  { value: '1-tahun', label: '1 Tahun', score: 5 },
-  { value: '2-tahun', label: '2 Tahun', score: 4 },
+  { value: '1-tahun', label: '1 Tahun', score: 1 },
+  { value: '2-tahun', label: '2 Tahun', score: 2 },
   { value: '3-tahun', label: '3 Tahun', score: 3 },
-  { value: '4-tahun', label: '4 Tahun', score: 2 },
-  { value: 'belum-pernah', label: 'Belum pernah diaudit', score: 1 }
+  { value: '4-tahun', label: '4 Tahun', score: 4 },
+  { value: 'belum-pernah', label: 'Belum pernah diaudit', score: 5 }
 ];
 
 export const TRADE_AGREEMENT_CHOICES = [

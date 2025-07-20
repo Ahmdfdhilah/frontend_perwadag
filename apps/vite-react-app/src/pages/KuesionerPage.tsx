@@ -307,7 +307,7 @@ const KuesionerPage: React.FC = () => {
         description="Kelola data kuesioner evaluasi"
         actions={
           <Button 
-            variant="outline" 
+            variant="default" 
             onClick={() => setTemplateDialogOpen(true)}
             className="flex items-center gap-2"
           >
