@@ -9,6 +9,7 @@ import {
 } from '@workspace/ui/components/dialog';
 import { Button } from '@workspace/ui/components/button';
 import { Label } from '@workspace/ui/components/label';
+import { Input } from '@workspace/ui/components/input';
 import { Calendar } from '@workspace/ui/components/calendar';
 import {
   Popover,
@@ -50,6 +51,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
     if (item && open) {
       setFormData({
         tanggal_kuisioner: item.tanggal_kuisioner,
+        link_dokumen_data_dukung: item.link_dokumen_data_dukung || '',
       });
       setSelectedDate(item.tanggal_kuisioner ? new Date(item.tanggal_kuisioner) : undefined);
 
@@ -66,6 +68,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
     } else {
       setFormData({
         tanggal_kuisioner: '',
+        link_dokumen_data_dukung: '',
       });
       setSelectedDate(undefined);
       setUploadFiles([]);
@@ -76,6 +79,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   const handleSave = () => {
     const dataToSave = {
       tanggal_kuisioner: selectedDate ? selectedDate.toISOString().split('T')[0] : formData.tanggal_kuisioner,
+      link_dokumen_data_dukung: formData.link_dokumen_data_dukung,
       files: uploadFiles,
     };
     onSave(dataToSave);
@@ -179,6 +183,38 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
               ) : (
                 <div className="p-3 bg-muted rounded-md">
                   {item?.tanggal_kuisioner ? format(new Date(item.tanggal_kuisioner), "dd MMMM yyyy", { locale: id }) : '-'}
+                </div>
+              )}
+            </div>
+
+            {/* Link Dokumen Data Dukung */}
+            <div className="space-y-2">
+              <Label htmlFor="link_dokumen_data_dukung">Link Dokumen Data Dukung</Label>
+              {canEdit ? (
+                <Input
+                  id="link_dokumen_data_dukung"
+                  type="url"
+                  placeholder="https://drive.google.com/..."
+                  value={formData.link_dokumen_data_dukung || ''}
+                  onChange={(e) => setFormData(prev => ({ 
+                    ...prev, 
+                    link_dokumen_data_dukung: e.target.value 
+                  }))}
+                />
+              ) : (
+                <div className="p-3 bg-muted rounded-md">
+                  {item?.link_dokumen_data_dukung ? (
+                    <a
+                      href={item.link_dokumen_data_dukung}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 underline break-all"
+                    >
+                      {item.link_dokumen_data_dukung}
+                    </a>
+                  ) : (
+                    '-'
+                  )}
                 </div>
               )}
             </div>

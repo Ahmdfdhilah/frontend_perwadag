@@ -185,6 +185,7 @@ const KuesionerPage: React.FC = () => {
     try {
       const updateData = {
         tanggal_kuisioner: data.tanggal_kuisioner || undefined,
+        link_dokumen_data_dukung: data.link_dokumen_data_dukung || undefined,
       };
 
       await kuisionerService.updateKuisioner(editingItem.id, updateData);

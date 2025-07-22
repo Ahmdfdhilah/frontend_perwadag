@@ -59,6 +59,7 @@ export interface KuisionerCreate {
 
 export interface KuisionerUpdate {
   tanggal_kuisioner?: string;
+  link_dokumen_data_dukung?: string;
 }
 
 // Response Types
@@ -67,10 +68,12 @@ export interface KuisionerResponse {
   surat_tugas_id: string;
   tanggal_kuisioner?: string;
   file_dokumen?: string;
-  file_urls: FileUrls;
-  file_metadata: FileMetadata;
+  link_dokumen_data_dukung?: string;
+  file_urls?: FileUrls;
+  file_metadata?: FileMetadata;
   is_completed: boolean;
   has_file: boolean;
+  has_link_dokumen: boolean;
   completion_percentage: number;
   surat_tugas_info: SuratTugasInfo;
   nama_perwadag: string;

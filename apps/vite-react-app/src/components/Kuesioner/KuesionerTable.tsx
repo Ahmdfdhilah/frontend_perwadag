@@ -60,6 +60,7 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
             <TableHead>Tanggal Kuesioner</TableHead>
             <TableHead>Tanggal Evaluasi</TableHead>
             <TableHead>Dokumen</TableHead>
+            <TableHead>Link Data Dukung</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
@@ -67,7 +68,7 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                 Tidak ada data kuesioner yang ditemukan.
               </TableCell>
             </TableRow>
@@ -85,6 +86,20 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
                     fileName={item.file_metadata?.original_filename}
                     linkText="Lihat Dokumen"
                   />
+                </TableCell>
+                <TableCell>
+                  {item.link_dokumen_data_dukung ? (
+                    <a
+                      href={item.link_dokumen_data_dukung}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 underline"
+                    >
+                      Lihat Data Dukung
+                    </a>
+                  ) : (
+                    <span className="text-muted-foreground">-</span>
+                  )}
                 </TableCell>
                 <TableCell>
                   {getStatusBadge(item)}

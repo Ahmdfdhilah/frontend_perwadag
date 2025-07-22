@@ -95,6 +95,23 @@ const KuesionerCards: React.FC<KuesionerCardsProps> = ({
                 </span>
               </div>
               <div>
+                <span className="font-medium text-muted-foreground">Link Data Dukung:</span>
+                <span className="ml-2">
+                  {item.link_dokumen_data_dukung ? (
+                    <a
+                      href={item.link_dokumen_data_dukung}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 underline"
+                    >
+                      Lihat Data Dukung
+                    </a>
+                  ) : (
+                    <span className="text-muted-foreground">-</span>
+                  )}
+                </span>
+              </div>
+              <div>
                 <span className="font-medium text-muted-foreground">Status:</span>
                 <span className="ml-2">
                   {getStatusBadge(item)}
