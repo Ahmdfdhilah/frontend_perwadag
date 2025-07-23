@@ -296,6 +296,7 @@ export const exportMatriksToExcel = async (item: any, formatIndonesianDateRange:
 // New function for exporting all matriks data with merged cells and separate sheets per year
 export const exportAllMatriksToExcel = async (
   items: any[], 
+  formatIndonesianDateRange: (start: string, end: string) => string,
   toastFn: ToastFunction,
   selectedYear: string
 ): Promise<void> => {
@@ -330,8 +331,10 @@ export const exportAllMatriksToExcel = async (
       // Set column widths
       worksheet.columns = [
         { width: 5 },   // No
+        { width: 15 },  // Inspektorat
         { width: 30 },  // Nama Perwadag
         { width: 20 },  // No Surat Tugas
+        { width: 25 },  // Tanggal Evaluasi
         { width: 50 },  // Temuan
         { width: 50 }   // Rekomendasi
       ];
@@ -339,7 +342,7 @@ export const exportAllMatriksToExcel = async (
       let currentRow = 1;
 
       // Add title
-      const titleRange = `A${currentRow}:E${currentRow}`;
+      const titleRange = `A${currentRow}:G${currentRow}`;
       worksheet.mergeCells(titleRange);
       const titleCell = worksheet.getCell(`A${currentRow}`);
       titleCell.value = `Matriks Temuan Rekomendasi Tahun ${year}`;
@@ -350,7 +353,7 @@ export const exportAllMatriksToExcel = async (
       currentRow += 2;
 
       // Add table headers
-      const headerRow = worksheet.addRow(['No', 'Nama Perwadag', 'No Surat Tugas', 'Temuan', 'Rekomendasi']);
+      const headerRow = worksheet.addRow(['No', 'Inspektorat', 'Nama Perwadag', 'No Surat Tugas', 'Tanggal Evaluasi', 'Temuan', 'Rekomendasi']);
       headerRow.height = 30;
       
       headerRow.eachCell((cell: any) => {
@@ -367,56 +370,84 @@ export const exportAllMatriksToExcel = async (
 
       let rowIndex = 1;
       
-      // Process each item
-      for (const item of yearItems) {
-        const temuanRekomendasi = item.temuan_rekomendasi_summary?.data || [];
+      // Group items by inspektorat first
+      const itemsByInspektorat = yearItems.reduce((acc: any, item: any) => {
+        const inspektorat = item.inspektorat;
+        if (!acc[inspektorat]) {
+          acc[inspektorat] = [];
+        }
+        acc[inspektorat].push(item);
+        return acc;
+      }, {});
+
+      // Sort inspektorat keys (1, 2, 3, 4) - ensure numeric sorting
+      const sortedInspektorat = Object.keys(itemsByInspektorat).sort((a, b) => {
+        // Extract numeric value from inspektorat string, handle various formats
+        let numA, numB;
         
-        if (temuanRekomendasi.length === 0) {
-          // If no temuan/rekomendasi, add single row
-          const dataRow = worksheet.addRow([
-            rowIndex,
-            item.nama_perwadag,
-            item.surat_tugas_info?.no_surat || '-',
-            'Tidak ada temuan',
-            'Tidak ada rekomendasi'
-          ]);
-          
-          // Style the row
-          dataRow.eachCell((cell: any, colNumber: any) => {
-            cell.font = { size: 11, color: { argb: 'FF212121' } };
-            cell.alignment = { 
-              horizontal: colNumber === 1 ? 'center' : 'left', 
-              vertical: 'top', 
-              wrapText: true 
-            };
-            cell.border = {
-              top: { style: 'thin' },
-              bottom: { style: 'thin' },
-              left: { style: 'thin' },
-              right: { style: 'thin' }
-            };
-          });
-          
-          rowIndex++;
+        // If already contains "Inspektorat", extract the number
+        if (a.toString().toLowerCase().includes('inspektorat')) {
+          numA = parseInt(a.toString().match(/\d+/)?.[0] || '0');
         } else {
-          // Multiple temuan/rekomendasi - merge nama_perwadag and no_surat_tugas cells
-          const startRow = worksheet.lastRow ? worksheet.lastRow.number + 1 : currentRow + 1;
+          numA = parseInt(a) || 0;
+        }
+        
+        if (b.toString().toLowerCase().includes('inspektorat')) {
+          numB = parseInt(b.toString().match(/\d+/)?.[0] || '0');
+        } else {
+          numB = parseInt(b) || 0;
+        }
+        
+        return numA - numB;
+      });
+      
+      // Sort perwadag within each inspektorat alphabetically
+      sortedInspektorat.forEach(inspektorat => {
+        itemsByInspektorat[inspektorat].sort((a: any, b: any) => 
+          a.nama_perwadag.localeCompare(b.nama_perwadag, 'id', { sensitivity: 'base' })
+        );
+      });
+      
+      // Process each inspektorat
+      for (const inspektorat of sortedInspektorat) {
+        const inspektoratItems = itemsByInspektorat[inspektorat];
+        let inspektoratStartRow: number | null = null;
+        let inspektoratEndRow: number | null = null;
+        let totalRowsForInspektorat = 0;
+        
+        // Calculate total rows needed for this inspektorat
+        for (const item of inspektoratItems) {
+          const temuanRekomendasi = item.temuan_rekomendasi_summary?.data || [];
+          totalRowsForInspektorat += Math.max(1, temuanRekomendasi.length);
+        }
+        
+        // Process each item in this inspektorat
+        for (let itemIndex = 0; itemIndex < inspektoratItems.length; itemIndex++) {
+          const item = inspektoratItems[itemIndex];
+          const temuanRekomendasi = item.temuan_rekomendasi_summary?.data || [];
           
-          for (let i = 0; i < temuanRekomendasi.length; i++) {
-            const tr = temuanRekomendasi[i];
+          if (temuanRekomendasi.length === 0) {
+            // If no temuan/rekomendasi, add single row
             const dataRow = worksheet.addRow([
-              i === 0 ? rowIndex : '', // Only show number on first row
-              i === 0 ? item.nama_perwadag : '', // Only show nama_perwadag on first row
-              i === 0 ? (item.surat_tugas_info?.no_surat || '-') : '', // Only show no_surat on first row
-              tr.temuan || '',
-              tr.rekomendasi || ''
+              rowIndex,
+              itemIndex === 0 ? (item.inspektorat.toString().includes('Inspektorat') ? item.inspektorat : `Inspektorat ${item.inspektorat}`) : '', // Only show inspektorat on first item
+              item.nama_perwadag,
+              item.surat_tugas_info?.no_surat || '-',
+              formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai),
+              'Tidak ada temuan',
+              'Tidak ada rekomendasi'
             ]);
+            
+            if (inspektoratStartRow === null) {
+              inspektoratStartRow = dataRow.number;
+            }
+            inspektoratEndRow = dataRow.number;
             
             // Style the row
             dataRow.eachCell((cell: any, colNumber: any) => {
               cell.font = { size: 11, color: { argb: 'FF212121' } };
               cell.alignment = { 
-                horizontal: colNumber === 1 ? 'center' : 'left', 
+                horizontal: colNumber === 1 ? 'center' : 'left', // No column is column 1
                 vertical: 'top', 
                 wrapText: true 
               };
@@ -427,23 +458,70 @@ export const exportAllMatriksToExcel = async (
                 right: { style: 'thin' }
               };
             });
-          }
-          
-          const endRow = worksheet.lastRow ? worksheet.lastRow.number : startRow;
-          
-          // Merge cells for nama_perwadag and no_surat_tugas if multiple rows
-          if (temuanRekomendasi.length > 1) {
-            worksheet.mergeCells(`A${startRow}:A${endRow}`); // No column
-            worksheet.mergeCells(`B${startRow}:B${endRow}`); // Nama Perwadag column
-            worksheet.mergeCells(`C${startRow}:C${endRow}`); // No Surat Tugas column
             
-            // Center align merged cells
-            worksheet.getCell(`A${startRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
-            worksheet.getCell(`B${startRow}`).alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
-            worksheet.getCell(`C${startRow}`).alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+            rowIndex++;
+          } else {
+            // Multiple temuan/rekomendasi
+            const startRow = worksheet.lastRow ? worksheet.lastRow.number + 1 : currentRow + 1;
+            
+            for (let i = 0; i < temuanRekomendasi.length; i++) {
+              const tr = temuanRekomendasi[i];
+              const dataRow = worksheet.addRow([
+                i === 0 ? rowIndex : '', // Only show number on first row
+                (itemIndex === 0 && i === 0) ? (item.inspektorat.toString().includes('Inspektorat') ? item.inspektorat : `Inspektorat ${item.inspektorat}`) : '', // Only show inspektorat on first item's first row
+                i === 0 ? item.nama_perwadag : '', // Only show nama_perwadag on first row
+                i === 0 ? (item.surat_tugas_info?.no_surat || '-') : '', // Only show no_surat on first row
+                i === 0 ? formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai) : '', // Only show date on first row
+                tr.temuan || '',
+                tr.rekomendasi || ''
+              ]);
+              
+              if (inspektoratStartRow === null) {
+                inspektoratStartRow = dataRow.number;
+              }
+              inspektoratEndRow = dataRow.number;
+              
+              // Style the row
+              dataRow.eachCell((cell: any, colNumber: any) => {
+                cell.font = { size: 11, color: { argb: 'FF212121' } };
+                cell.alignment = { 
+                  horizontal: colNumber === 1 ? 'center' : 'left', // No column is column 1
+                  vertical: 'top', 
+                  wrapText: true 
+                };
+                cell.border = {
+                  top: { style: 'thin' },
+                  bottom: { style: 'thin' },
+                  left: { style: 'thin' },
+                  right: { style: 'thin' }
+                };
+              });
+            }
+            
+            const endRow = worksheet.lastRow ? worksheet.lastRow.number : startRow;
+            
+            // Merge cells for no, nama_perwadag, no_surat_tugas, and tanggal_evaluasi if multiple rows
+            if (temuanRekomendasi.length > 1) {
+              worksheet.mergeCells(`A${startRow}:A${endRow}`); // No column (column A)
+              worksheet.mergeCells(`C${startRow}:C${endRow}`); // Nama Perwadag column (column C)
+              worksheet.mergeCells(`D${startRow}:D${endRow}`); // No Surat Tugas column (column D)
+              worksheet.mergeCells(`E${startRow}:E${endRow}`); // Tanggal Evaluasi column (column E)
+              
+              // Center align merged cells
+              worksheet.getCell(`A${startRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+              worksheet.getCell(`C${startRow}`).alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+              worksheet.getCell(`D${startRow}`).alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+              worksheet.getCell(`E${startRow}`).alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+            }
+            
+            rowIndex++;
           }
-          
-          rowIndex++;
+        }
+        
+        // Merge inspektorat column for all rows of this inspektorat (column B)
+        if (inspektoratStartRow !== null && inspektoratEndRow !== null && inspektoratStartRow !== inspektoratEndRow) {
+          worksheet.mergeCells(`B${inspektoratStartRow}:B${inspektoratEndRow}`);
+          worksheet.getCell(`B${inspektoratStartRow}`).alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
         }
       }
     }

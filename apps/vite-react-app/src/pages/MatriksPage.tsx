@@ -28,6 +28,7 @@ import MatriksDialog from '@/components/Matriks/MatriksDialog';
 import { getDefaultYearOptions, findPeriodeByYear } from '@/utils/yearUtils';
 import { periodeEvaluasiService } from '@/services/periodeEvaluasi';
 import { PeriodeEvaluasi } from '@/services/periodeEvaluasi/types';
+import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import {  exportAllMatriksToExcel } from '@/utils/excelExportUtils';
 import { Download } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
@@ -193,8 +194,15 @@ const MatriksPage: React.FC = () => {
       };
 
       const response = await matriksService.getMatriksList(params);
+      let filteredItems = response.items;
+
+      // Apply frontend filtering for inspektorat
+      if (filters.inspektorat !== 'all') {
+        filteredItems = filteredItems.filter(item => item.inspektorat === filters.inspektorat);
+      }
+
       // Sort by tahun_evaluasi (evaluation year) in descending order
-      return response.items.sort((a, b) => b.tahun_evaluasi - a.tahun_evaluasi);
+      return filteredItems.sort((a, b) => b.tahun_evaluasi - a.tahun_evaluasi);
     } catch (error) {
       console.error('Failed to fetch all matriks for export:', error);
       return [];
@@ -222,7 +230,7 @@ const MatriksPage: React.FC = () => {
         return;
       }
 
-      await exportAllMatriksToExcel(allMatriks, toast, filters.tahun_evaluasi);
+      await exportAllMatriksToExcel(allMatriks, formatIndonesianDateRange, toast, filters.tahun_evaluasi);
     } catch (error) {
       console.error('Failed to export all matriks:', error);
       toast({
