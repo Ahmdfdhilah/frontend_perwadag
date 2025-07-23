@@ -17,30 +17,35 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
+      captionLayout="dropdown"
       className={cn("p-3", className)}
       classNames={{
         months: "flex flex-col relative",
-        month_caption: "flex justify-center h-7 mx-10 relative items-center",
+        month_caption: "flex justify-center py-2 relative items-center gap-2",
         weekdays: "flex flex-row",
         weekday: "text-muted-foreground w-8 font-normal text-[0.8rem]",
         month: "gap-y-4 overflow-x-hidden w-full",
-        caption: "flex justify-center pt-1 relative items-center",
-        caption_label: "text-sm font-medium truncate",
+        caption: "hidden",
+        caption_label: "hidden",
+        dropdown_root: "relative inline-flex items-center",
+        dropdown: "appearance-none bg-background border border-input rounded-md px-3 py-1 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer  bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUiIGhlaWdodD0iMTUiIHZpZXdCb3g9IjAgMCAxNSAxNSIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJtNC41IDYgMyAzIDMtM00iIHN0cm9rZT0iY3VycmVudENvbG9yIiBzdHJva2Utd2lkdGg9IjEiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjwvc3ZnPg==')] bg-no-repeat bg-right bg-[center_right_0.5rem]",
+        dropdown_month: "",
+        dropdown_year: "",
+        nav: "flex items-center justify-between w-full",
         button_next: cn(
           buttonVariants({
             variant: "outline",
             className:
-              "absolute right-0 h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+              "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
           }),
         ),
         button_previous: cn(
           buttonVariants({
             variant: "outline",
             className:
-              "absolute left-0 h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+              "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
           }),
         ),
-        nav: "flex items-start",
         month_grid: "mt-4",
         week: "flex w-full mt-2",
         day: "p-0 size-8 text-sm flex-1 flex items-center justify-center has-[button]:hover:!bg-accent rounded-md has-[button]:hover:aria-selected:!bg-primary has-[button]:hover:text-accent-foreground has-[button]:hover:aria-selected:text-primary-foreground",
@@ -69,7 +74,7 @@ function Calendar({
         }) => {
           const Icon =
             orientation === "left" ? ChevronLeftIcon : ChevronRightIcon;
-          return <Icon className="h-4 w-4" />;
+          return <Icon className="h-4 w-4 transition-colors" />;
         },
       }}
       {...props}
