@@ -18,11 +18,11 @@ export function SidebarHeader({ collapsed, onToggleCollapse }: SidebarHeaderProp
   
   return (
     <>
-      <div className={cn("flex h-16 items-center flex-shrink-0 border-b border-sidebar-border", collapsed ? "px-3 justify-center" : "px-6 justify-between")}>
-        <Link to="/admin" className={cn("flex items-center", collapsed ? "justify-center" : "space-x-2")}>
+      <div className={cn("flex h-14 lg:h-16 items-center flex-shrink-0 border-b border-sidebar-border", collapsed ? "px-2 lg:px-3 justify-center" : "px-4 lg:px-6 justify-between")}>
+        <Link to="/admin" className={cn("flex items-center min-w-0", collapsed ? "justify-center" : "space-x-2")}>
           <img 
             src={collapsed ? (isDarkMode ? logoMiniDarkMode : logoMiniLightMode) : (isDarkMode ? logoDarkMode : logoLightMode)} 
-            className={cn("transition-all duration-300", collapsed ? "w-8 h-8" : "w-35 h-auto")} 
+            className={cn("transition-all duration-300 object-contain", collapsed ? "w-7 h-7 lg:w-8 lg:h-8" : "w-32 lg:w-35 h-auto max-h-8")} 
             alt="logo okoce" 
           />
         </Link>
@@ -30,25 +30,25 @@ export function SidebarHeader({ collapsed, onToggleCollapse }: SidebarHeaderProp
           <Button
             variant="ghost"
             size="sm"
-            className="hidden md:flex h-8 w-8 p-0 flex-shrink-0"
+            className="hidden lg:flex h-7 w-7 lg:h-8 lg:w-8 p-0 flex-shrink-0"
             onClick={onToggleCollapse}
             title="Collapse sidebar"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-3 w-3 lg:h-4 lg:w-4" />
           </Button>
         )}
       </div>
 
       {collapsed && (
-        <div className="flex justify-center px-3 py-2 border-b border-sidebar-border flex-shrink-0">
+        <div className="flex justify-center px-2 lg:px-3 py-2 border-b border-sidebar-border flex-shrink-0">
           <Button
             variant="ghost"
             size="sm"
-            className="h-8 w-8 p-0"
+            className="h-7 w-7 lg:h-8 lg:w-8 p-0"
             onClick={onToggleCollapse}
             title="Expand sidebar"
           >
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="h-3 w-3 lg:h-4 lg:w-4" />
           </Button>
         </div>
       )}

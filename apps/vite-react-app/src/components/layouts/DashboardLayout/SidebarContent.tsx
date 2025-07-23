@@ -49,9 +49,9 @@ export function SidebarContent({
         onToggleCollapse={onToggleCollapse} 
       />
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden min-h-0">
         <ScrollArea className="h-full">
-          <div className={cn("p-4 pb-2", collapsed && "px-2")}>
+          <div className={cn("p-3 pb-2", collapsed && "px-2")}>
             <nav className="space-y-1">
               {menuItems.map((item) => (
                 <SidebarMenuItem 
