@@ -10,16 +10,9 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Label } from '@workspace/ui/components/label';
 import { Input } from '@workspace/ui/components/input';
-import { Calendar } from '@workspace/ui/components/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@workspace/ui/components/popover';
-import { CalendarIcon } from 'lucide-react';
+import DatePicker from '@/components/common/DatePicker';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { cn } from '@workspace/ui/lib/utils';
 import { KuisionerResponse } from '@/services/kuisioner/types';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
@@ -43,7 +36,6 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   const { canEditForm } = useFormPermissions();
   const [formData, setFormData] = useState<any>({});
   const [selectedDate, setSelectedDate] = useState<Date>();
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
 
@@ -150,36 +142,12 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
             <div className="space-y-2">
               <Label htmlFor="tanggal_kuisioner">Tanggal Kuesioner</Label>
               {canEdit ? (
-                <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !selectedDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? (
-                        format(selectedDate, "dd MMMM yyyy", { locale: id })
-                      ) : (
-                        <span>Pilih tanggal</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={(date) => {
-                        setSelectedDate(date);
-                        setIsDatePickerOpen(false);
-                      }}
-                      initialFocus
-                      locale={id}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DatePicker
+                  value={selectedDate}
+                  onChange={setSelectedDate}
+                  placeholder="Pilih tanggal kuesioner"
+                  disabled={!canEdit}
+                />
               ) : (
                 <div className="p-3 bg-muted rounded-md">
                   {item?.tanggal_kuisioner ? format(new Date(item.tanggal_kuisioner), "dd MMMM yyyy", { locale: id }) : '-'}
@@ -196,7 +164,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
                   type="url"
                   placeholder="https://drive.google.com/..."
                   value={formData.link_dokumen_data_dukung || ''}
-                  onChange={(e) => setFormData(prev => ({ 
+                  onChange={(e) => setFormData((prev: any) => ({ 
                     ...prev, 
                     link_dokumen_data_dukung: e.target.value 
                   }))}

@@ -9,16 +9,9 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
-import { Calendar } from '@workspace/ui/components/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@workspace/ui/components/popover';
-import { CalendarIcon } from 'lucide-react';
+import DatePicker from '@/components/common/DatePicker';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { cn } from '@workspace/ui/lib/utils';
 import { LaporanHasilResponse } from '@/services/laporanHasil/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
@@ -43,7 +36,6 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
   const { canEditForm } = useFormPermissions();
   const [formData, setFormData] = useState<any>({});
   const [selectedDate, setSelectedDate] = useState<Date>();
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
 
@@ -165,36 +157,12 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
             <div className="space-y-2">
               <Label htmlFor="tanggal_laporan">Tanggal Laporan</Label>
               {canEdit ? (
-                <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !selectedDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? (
-                        format(selectedDate, "dd MMMM yyyy", { locale: id })
-                      ) : (
-                        <span>Pilih tanggal</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={(date) => {
-                        setSelectedDate(date);
-                        setIsDatePickerOpen(false);
-                      }}
-                      initialFocus
-                      locale={id}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DatePicker
+                  value={selectedDate}
+                  onChange={setSelectedDate}
+                  placeholder="Pilih tanggal laporan"
+                  disabled={!canEdit}
+                />
               ) : (
                 <div className="p-3 bg-muted rounded-md">
                   {item?.tanggal_laporan ? format(new Date(item.tanggal_laporan), "dd MMMM yyyy", { locale: id }) : '-'}

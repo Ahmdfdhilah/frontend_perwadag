@@ -9,16 +9,8 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
-import { Calendar } from '@workspace/ui/components/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@workspace/ui/components/popover';
-import { CalendarIcon, ExternalLink } from 'lucide-react';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
-import { cn } from '@workspace/ui/lib/utils';
+import { ExternalLink } from 'lucide-react';
+import DatePicker from '@/components/common/DatePicker';
 import { MeetingResponse } from '@/services/meeting/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useRole } from '@/hooks/useRole';
@@ -45,7 +37,6 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   const { isAdmin, isInspektorat } = useRole();
   const [formData, setFormData] = useState<any>({});
   const [selectedExitDate, setSelectedExitDate] = useState<Date>();
-  const [isExitDatePickerOpen, setIsExitDatePickerOpen] = useState(false);
   const [meetingFiles, setMeetingFiles] = useState<File[]>([]);
   const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
 
@@ -164,36 +155,11 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
               <div className="space-y-2">
                 <Label>Tanggal Exit Meeting</Label>
                 {canEditAllFields ? (
-                  <Popover open={isExitDatePickerOpen} onOpenChange={setIsExitDatePickerOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !selectedExitDate && "text-muted-foreground"
-                        )}
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {selectedExitDate ? (
-                          format(selectedExitDate, "dd MMMM yyyy", { locale: id })
-                        ) : (
-                          <span>Pilih tanggal</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={selectedExitDate}
-                        onSelect={(date) => {
-                          setSelectedExitDate(date);
-                          setIsExitDatePickerOpen(false);
-                        }}
-                        initialFocus
-                        locale={id}
-                      />
-                    </PopoverContent>
-                  </Popover>
+                  <DatePicker
+                    value={selectedExitDate}
+                    onChange={setSelectedExitDate}
+                    placeholder="Pilih tanggal"
+                  />
                 ) : (
                   <div className="p-3 bg-muted rounded-md">
                     {item?.tanggal_meeting ? formatIndonesianDate(item.tanggal_meeting) : '-'}

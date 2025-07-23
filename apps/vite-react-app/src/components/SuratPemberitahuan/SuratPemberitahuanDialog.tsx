@@ -8,21 +8,14 @@ import {
 } from '@workspace/ui/components/dialog';
 import { Button } from '@workspace/ui/components/button';
 import { Label } from '@workspace/ui/components/label';
-import { Calendar } from '@workspace/ui/components/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@workspace/ui/components/popover';
-import { CalendarIcon } from 'lucide-react';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
+import DatePicker from '@/components/common/DatePicker';
 import { SuratPemberitahuanResponse } from '@/services/suratPemberitahuan/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
-import { cn } from '@workspace/ui/lib/utils';
 import FileUpload from '@/components/common/FileUpload';
 import { suratPemberitahuanService } from '@/services/suratPemberitahuan';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale/id';
 
 interface SuratPemberitahuanDialogProps {
   open: boolean;
@@ -42,7 +35,6 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
   const { canEditForm } = useFormPermissions();
   const [formData, setFormData] = useState<any>({});
   const [selectedDate, setSelectedDate] = useState<Date>();
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
 
@@ -146,36 +138,11 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
             <div className="space-y-2">
               <Label htmlFor="tanggal_surat_pemberitahuan">Tanggal Surat Pemberitahuan</Label>
               {canEdit ? (
-                <Popover open={isDatePickerOpen} onOpenChange={setIsDatePickerOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !selectedDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? (
-                        format(selectedDate, "dd MMMM yyyy", { locale: id })
-                      ) : (
-                        <span>Pilih tanggal</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={(date) => {
-                        setSelectedDate(date);
-                        setIsDatePickerOpen(false);
-                      }}
-                      initialFocus
-                      locale={id}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DatePicker
+                  value={selectedDate}
+                  onChange={setSelectedDate}
+                  placeholder="Pilih tanggal"
+                />
               ) : (
                 <div className="p-3 bg-muted rounded-md">
                   {item?.tanggal_surat_pemberitahuan ? format(new Date(item.tanggal_surat_pemberitahuan), "dd MMMM yyyy", { locale: id }) : '-'}

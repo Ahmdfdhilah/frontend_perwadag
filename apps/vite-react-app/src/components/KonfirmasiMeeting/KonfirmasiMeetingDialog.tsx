@@ -9,16 +9,8 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
-import { Calendar } from '@workspace/ui/components/calendar';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@workspace/ui/components/popover';
-import { CalendarIcon, ExternalLink } from 'lucide-react';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
-import { cn } from '@workspace/ui/lib/utils';
+import { ExternalLink } from 'lucide-react';
+import DatePicker from '@/components/common/DatePicker';
 import { MeetingResponse } from '@/services/meeting/types';
 import { PerwadagSummary } from '@/services/users/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
@@ -26,6 +18,8 @@ import { useRole } from '@/hooks/useRole';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 import { meetingService } from '@/services/meeting';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale/id';
 
 interface KonfirmasiMeetingDialogProps {
   open: boolean;
@@ -47,7 +41,6 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
   const { isAdmin, isInspektorat } = useRole();
   const [formData, setFormData] = useState<any>({});
   const [selectedKonfirmasiDate, setSelectedKonfirmasiDate] = useState<Date>();
-  const [isKonfirmasiDatePickerOpen, setIsKonfirmasiDatePickerOpen] = useState(false);
   const [meetingFiles, setMeetingFiles] = useState<File[]>([]);
   const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
 
@@ -168,36 +161,11 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
             <div className="space-y-2">
               <Label>Tanggal Konfirmasi Meeting</Label>
               {canEditAllFields ? (
-                <Popover open={isKonfirmasiDatePickerOpen} onOpenChange={setIsKonfirmasiDatePickerOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !selectedKonfirmasiDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedKonfirmasiDate ? (
-                        format(selectedKonfirmasiDate, "dd MMMM yyyy", { locale: id })
-                      ) : (
-                        <span>Pilih tanggal</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={selectedKonfirmasiDate}
-                      onSelect={(date) => {
-                        setSelectedKonfirmasiDate(date);
-                        setIsKonfirmasiDatePickerOpen(false);
-                      }}
-                      initialFocus
-                      locale={id}
-                    />
-                  </PopoverContent>
-                </Popover>
+                <DatePicker
+                  value={selectedKonfirmasiDate}
+                  onChange={setSelectedKonfirmasiDate}
+                  placeholder="Pilih tanggal"
+                />
               ) : (
                 <div className="p-3 bg-muted rounded-md">
                   {item?.tanggal_meeting ? format(new Date(item.tanggal_meeting), "dd MMMM yyyy", { locale: id }) : '-'}
