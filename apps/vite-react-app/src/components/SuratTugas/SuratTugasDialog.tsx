@@ -90,7 +90,13 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
 
   const handleSave = () => {
     // Validate all required fields
-    if (!formData.no_surat || !formData.user_perwadag_id || !formData.tanggal_evaluasi_mulai) {
+    if (!formData.no_surat || !formData.user_perwadag_id || !formData.tanggal_evaluasi_mulai || !formData.tanggal_evaluasi_selesai) {
+      return;
+    }
+
+    // For create mode, file upload is required
+    // For edit mode, file is only required if there's no existing file
+    if (mode === 'create' && uploadFiles.length === 0) {
       return;
     }
 
@@ -118,7 +124,11 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   };
 
 
-  const isFormValid = formData.no_surat && formData.user_perwadag_id && formData.tanggal_evaluasi_mulai;
+  const isFormValid = formData.no_surat && 
+    formData.user_perwadag_id && 
+    formData.tanggal_evaluasi_mulai && 
+    formData.tanggal_evaluasi_selesai &&
+    (mode !== 'create' || uploadFiles.length > 0);
   const isEditable = mode !== 'view';
   const canEdit = canEditForm('surat_tugas') && isEditable;
 
@@ -212,7 +222,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
               </div>
 
               <div className="space-y-2">
-                <Label>Tanggal Selesai Evaluasi</Label>
+                <Label>Tanggal Selesai Evaluasi *</Label>
                 <Popover open={isEndCalendarOpen} onOpenChange={setIsEndCalendarOpen}>
                   <PopoverTrigger asChild>
                     <Button
@@ -255,7 +265,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
             </div>
 
             <FileUpload
-              label="File Surat Tugas"
+              label="File Surat Tugas *"
               accept=".pdf,.doc,.docx"
               multiple={false}
               maxSize={10 * 1024 * 1024} // 10MB

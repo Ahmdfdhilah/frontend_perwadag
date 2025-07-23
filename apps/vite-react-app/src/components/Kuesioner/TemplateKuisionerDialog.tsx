@@ -73,7 +73,7 @@ const TemplateKuisionerDialog: React.FC<TemplateKuisionerDialogProps> = ({
     if (open) {
       fetchLatestTemplate();
     }
-  }, [open, fetchLatestTemplate]);
+  }, [open]);
 
   const handleViewTemplate = (template: FormatKuisioner) => {
     if (template.link_template) {
