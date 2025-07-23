@@ -292,3 +292,192 @@ export const exportMatriksToExcel = async (item: any, formatIndonesianDateRange:
 
   await exportToExcel(config, toastFn);
 };
+
+// New function for exporting all matriks data with merged cells and separate sheets per year
+export const exportAllMatriksToExcel = async (
+  items: any[], 
+  toastFn: ToastFunction,
+  selectedYear: string
+): Promise<void> => {
+  try {
+    const ExcelJS = await import('exceljs');
+    
+    // Create new workbook
+    const workbook = new ExcelJS.Workbook();
+    
+    // Group items by year
+    const itemsByYear = items.reduce((acc: any, item: any) => {
+      const year = item.tahun_evaluasi.toString();
+      if (!acc[year]) {
+        acc[year] = [];
+      }
+      acc[year].push(item);
+      return acc;
+    }, {});
+
+    // Sort years in descending order
+    const sortedYears = Object.keys(itemsByYear).sort((a, b) => parseInt(b) - parseInt(a));
+    
+    // If specific year is selected, only export that year
+    const yearsToExport = selectedYear !== 'all' ? [selectedYear] : sortedYears;
+
+    for (const year of yearsToExport) {
+      if (!itemsByYear[year]) continue;
+      
+      const yearItems = itemsByYear[year];
+      const worksheet = workbook.addWorksheet(`Matriks ${year}`);
+
+      // Set column widths
+      worksheet.columns = [
+        { width: 5 },   // No
+        { width: 30 },  // Nama Perwadag
+        { width: 20 },  // No Surat Tugas
+        { width: 50 },  // Temuan
+        { width: 50 }   // Rekomendasi
+      ];
+
+      let currentRow = 1;
+
+      // Add title
+      const titleRange = `A${currentRow}:E${currentRow}`;
+      worksheet.mergeCells(titleRange);
+      const titleCell = worksheet.getCell(`A${currentRow}`);
+      titleCell.value = `Matriks Temuan Rekomendasi Tahun ${year}`;
+      titleCell.font = { bold: true, size: 18, color: { argb: 'FF1565C0' } };
+      titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
+      titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE3F2FD' } };
+      worksheet.getRow(currentRow).height = 35;
+      currentRow += 2;
+
+      // Add table headers
+      const headerRow = worksheet.addRow(['No', 'Nama Perwadag', 'No Surat Tugas', 'Temuan', 'Rekomendasi']);
+      headerRow.height = 30;
+      
+      headerRow.eachCell((cell: any) => {
+        cell.font = { bold: true, size: 13, color: { argb: 'FFFFFFFF' } };
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1976D2' } };
+        cell.border = {
+          top: { style: 'thin' },
+          bottom: { style: 'thin' },
+          left: { style: 'thin' },
+          right: { style: 'thin' }
+        };
+      });
+
+      let rowIndex = 1;
+      
+      // Process each item
+      for (const item of yearItems) {
+        const temuanRekomendasi = item.temuan_rekomendasi_summary?.data || [];
+        
+        if (temuanRekomendasi.length === 0) {
+          // If no temuan/rekomendasi, add single row
+          const dataRow = worksheet.addRow([
+            rowIndex,
+            item.nama_perwadag,
+            item.surat_tugas_info?.no_surat || '-',
+            'Tidak ada temuan',
+            'Tidak ada rekomendasi'
+          ]);
+          
+          // Style the row
+          dataRow.eachCell((cell: any, colNumber: any) => {
+            cell.font = { size: 11, color: { argb: 'FF212121' } };
+            cell.alignment = { 
+              horizontal: colNumber === 1 ? 'center' : 'left', 
+              vertical: 'top', 
+              wrapText: true 
+            };
+            cell.border = {
+              top: { style: 'thin' },
+              bottom: { style: 'thin' },
+              left: { style: 'thin' },
+              right: { style: 'thin' }
+            };
+          });
+          
+          rowIndex++;
+        } else {
+          // Multiple temuan/rekomendasi - merge nama_perwadag and no_surat_tugas cells
+          const startRow = worksheet.lastRow ? worksheet.lastRow.number + 1 : currentRow + 1;
+          
+          for (let i = 0; i < temuanRekomendasi.length; i++) {
+            const tr = temuanRekomendasi[i];
+            const dataRow = worksheet.addRow([
+              i === 0 ? rowIndex : '', // Only show number on first row
+              i === 0 ? item.nama_perwadag : '', // Only show nama_perwadag on first row
+              i === 0 ? (item.surat_tugas_info?.no_surat || '-') : '', // Only show no_surat on first row
+              tr.temuan || '',
+              tr.rekomendasi || ''
+            ]);
+            
+            // Style the row
+            dataRow.eachCell((cell: any, colNumber: any) => {
+              cell.font = { size: 11, color: { argb: 'FF212121' } };
+              cell.alignment = { 
+                horizontal: colNumber === 1 ? 'center' : 'left', 
+                vertical: 'top', 
+                wrapText: true 
+              };
+              cell.border = {
+                top: { style: 'thin' },
+                bottom: { style: 'thin' },
+                left: { style: 'thin' },
+                right: { style: 'thin' }
+              };
+            });
+          }
+          
+          const endRow = worksheet.lastRow ? worksheet.lastRow.number : startRow;
+          
+          // Merge cells for nama_perwadag and no_surat_tugas if multiple rows
+          if (temuanRekomendasi.length > 1) {
+            worksheet.mergeCells(`A${startRow}:A${endRow}`); // No column
+            worksheet.mergeCells(`B${startRow}:B${endRow}`); // Nama Perwadag column
+            worksheet.mergeCells(`C${startRow}:C${endRow}`); // No Surat Tugas column
+            
+            // Center align merged cells
+            worksheet.getCell(`A${startRow}`).alignment = { horizontal: 'center', vertical: 'middle' };
+            worksheet.getCell(`B${startRow}`).alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+            worksheet.getCell(`C${startRow}`).alignment = { horizontal: 'left', vertical: 'middle', wrapText: true };
+          }
+          
+          rowIndex++;
+        }
+      }
+    }
+
+    // Set workbook properties
+    workbook.creator = 'Sistem Evaluasi';
+    workbook.created = new Date();
+    workbook.modified = new Date();
+
+    // Generate filename
+    const yearSuffix = selectedYear !== 'all' ? `_${selectedYear}` : '_Semua_Tahun';
+    const fileName = `Matriks_Temuan_Rekomendasi${yearSuffix}_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+    // Save file
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+    URL.revokeObjectURL(link.href);
+
+    toastFn({
+      title: 'Export Berhasil',
+      description: `Data matriks berhasil diekspor ke Excel dengan ${yearsToExport.length} sheet.`,
+      variant: 'default'
+    });
+
+  } catch (error) {
+    console.error('Failed to export all matriks Excel:', error);
+    toastFn({
+      title: 'Export Gagal',
+      description: 'Gagal mengekspor data matriks ke Excel. Silakan coba lagi.',
+      variant: 'destructive'
+    });
+  }
+};

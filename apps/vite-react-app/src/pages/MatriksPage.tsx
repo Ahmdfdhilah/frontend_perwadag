@@ -28,8 +28,9 @@ import MatriksDialog from '@/components/Matriks/MatriksDialog';
 import { getDefaultYearOptions, findPeriodeByYear } from '@/utils/yearUtils';
 import { periodeEvaluasiService } from '@/services/periodeEvaluasi';
 import { PeriodeEvaluasi } from '@/services/periodeEvaluasi/types';
-import { formatIndonesianDateRange } from '@/utils/timeFormat';
-import { exportMatriksToExcel } from '@/utils/excelExportUtils';
+import {  exportAllMatriksToExcel } from '@/utils/excelExportUtils';
+import { Download } from 'lucide-react';
+import { Button } from '@workspace/ui/components/button';
 
 interface MatriksPageFilters {
   search: string;
@@ -181,8 +182,55 @@ const MatriksPage: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-  const handleExportExcel = async (item: MatriksResponse) => {
-    await exportMatriksToExcel(item, formatIndonesianDateRange, toast);
+
+  // Function to fetch all matriks data for export (admin only)
+  const fetchAllMatriksForExport = async () => {
+    if (!isAdmin()) return [];
+    
+    try {
+      const params: MatriksFilterParams = {
+        tahun_evaluasi: filters.tahun_evaluasi !== 'all' ? parseInt(filters.tahun_evaluasi) : undefined,
+      };
+
+      const response = await matriksService.getMatriksList(params);
+      // Sort by tahun_evaluasi (evaluation year) in descending order
+      return response.items.sort((a, b) => b.tahun_evaluasi - a.tahun_evaluasi);
+    } catch (error) {
+      console.error('Failed to fetch all matriks for export:', error);
+      return [];
+    }
+  };
+
+  const handleExportAllExcel = async () => {
+    if (!isAdmin()) {
+      toast({
+        title: 'Akses Ditolak',
+        description: 'Hanya admin yang dapat mengunduh semua data matriks.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    try {
+      const allMatriks = await fetchAllMatriksForExport();
+      if (allMatriks.length === 0) {
+        toast({
+          title: 'Tidak Ada Data',
+          description: 'Tidak ada data matriks untuk diekspor.',
+          variant: 'destructive'
+        });
+        return;
+      }
+
+      await exportAllMatriksToExcel(allMatriks, toast, filters.tahun_evaluasi);
+    } catch (error) {
+      console.error('Failed to export all matriks:', error);
+      toast({
+        title: 'Export Gagal',
+        description: 'Gagal mengekspor data matriks. Silakan coba lagi.',
+        variant: 'destructive'
+      });
+    }
   };
 
   const handleSave = async (data: any) => {
@@ -325,6 +373,14 @@ const MatriksPage: React.FC = () => {
       <PageHeader
         title="Matriks"
         description={isPerwadag() ? "Lihat temuan dan rekomendasi evaluasi" : "Kelola data matriks evaluasi"}
+        actions={
+          isAdmin() && (
+            <Button onClick={handleExportAllExcel} className="flex items-center gap-2">
+              <Download className="h-4 w-4" />
+              Download Excel
+            </Button>
+          )
+        }
       />
 
       <Filtering>
@@ -415,7 +471,6 @@ const MatriksPage: React.FC = () => {
                 loading={loading}
                 onEdit={handleEdit}
                 onView={handleView}
-                onExport={handleExportExcel}
                 canEdit={canEdit}
                 canView={canView}
                 userRole={isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : 'perwadag'}
@@ -429,7 +484,6 @@ const MatriksPage: React.FC = () => {
                 loading={loading}
                 onEdit={handleEdit}
                 onView={handleView}
-                onExport={handleExportExcel}
                 canEdit={canEdit}
                 canView={canView}
                 userRole={isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : 'perwadag'}
