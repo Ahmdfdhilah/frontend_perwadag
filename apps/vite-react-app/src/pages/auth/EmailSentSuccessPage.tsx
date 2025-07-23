@@ -12,7 +12,8 @@ import { Alert, AlertDescription } from '@workspace/ui/components/alert';
 import { useTheme } from '@/hooks/useTheme';
 import logoLightMode from '@/assets/logoLightMode.png';
 import logoDarkMode from '@/assets/logoDarkMode.png';
-import loginIcon from '@/assets/loginIcon.png';
+import bgImage from '@/assets/bg.webp';
+import logoSielang from '@/assets/logo-sielang.png';
 
 export function EmailSentSuccessPage() {
   const { isDarkMode } = useTheme();
@@ -50,20 +51,35 @@ export function EmailSentSuccessPage() {
   };
 
   return (
-    <div className="max-h-screen relative overflow-hidden">
+    <div className="min-h-screen h-screen relative overflow-hidden">
       {/* Desktop Layout */}
-      <div className="hidden md:flex max-h-screen">
-        {/* Left Side - Banner Image */}
-        <div className="flex-[2] relative bg-gray-100 dark:bg-gray-900">
+      <div className="hidden lg:flex h-full">
+        {/* Left Side - Background Image (70%) */}
+        <div className="w-[70%] relative bg-gray-100 dark:bg-gray-900">
           <img 
-            src={loginIcon} 
-            alt="Login Banner" 
-            className="w-[80%] object-cover"
+            src={bgImage} 
+            alt="Background" 
+            className="w-full h-full object-cover"
+            style={{ height: '100dvh' }}
           />
+          {/* Overlay semi-transparan */}
+          <div className="absolute inset-0 bg-black/10" />
+          
+          {/* System Info Overlay - Top Left */}
+          <div className="absolute top-2 left-8 text-white flex items-center">
+            <img
+              src={logoSielang}
+              alt="SIELANGMERAH Logo"
+              className="w-40 h-40 object-contain"
+            />
+            <p className="font-bold opacity-90 max-w-sm">
+              Sistem Evaluasi Kinerja Perwakilan Perdagangan Metode Jarak Jauh
+            </p>
+          </div>
         </div>
 
-        {/* Right Side - Success Message */}
-        <div className="flex-1 flex items-center justify-center bg-background p-8">
+        {/* Right Side - Success Message (30%) */}
+        <div className="w-[30%] flex items-center justify-center bg-background p-8">
           <div className="w-full max-w-md space-y-6">
             
             {/* Logo and Header */}
@@ -157,7 +173,7 @@ export function EmailSentSuccessPage() {
       </div>
 
       {/* Mobile Layout */}
-      <div className="md:hidden min-h-screen flex items-center justify-center p-4 relative z-10">
+      <div className="lg:hidden min-h-screen flex items-center justify-center p-4 bg-background">
         <div className="w-full max-w-md space-y-6">
           {/* Logo and Header */}
           <div className="text-center space-y-4">
@@ -165,15 +181,15 @@ export function EmailSentSuccessPage() {
               <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="OKOCE HRIS" className="h-12 w-auto" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-white">Email Terkirim!</h1>
-              <p className="text-white/80">
+              <h1 className="text-2xl font-bold tracking-tight">Email Terkirim!</h1>
+              <p className="text-muted-foreground">
                 Link reset password telah dikirim ke email Anda
               </p>
             </div>
           </div>
 
           {/* Success Card */}
-          <Card className="bg-white/95 backdrop-blur-sm">
+          <Card>
             <CardHeader className="space-y-1">
               <div className="flex items-center justify-center mb-4">
                 <div className="rounded-full bg-green-100 p-3">

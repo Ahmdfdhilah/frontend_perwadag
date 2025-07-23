@@ -17,7 +17,8 @@ import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import logoLightMode from '@/assets/logoLightMode.png';
 import logoDarkMode from '@/assets/logoDarkMode.png';
-import loginIcon from '@/assets/loginIcon.png';
+import bgImage from '@/assets/bg.webp';
+import logoSielang from '@/assets/logo-sielang.png';
 
 const loginSchema = z.object({
   username: z.string().min(1, 'Username is required'),
@@ -90,11 +91,11 @@ export function LoginPage() {
         username: data.username,
         password: data.password
       });
-      
+
       if (data.rememberMe) {
         localStorage.setItem('rememberMe', 'true');
       }
-      
+
       // Navigation will be handled by useEffect when isAuthenticated becomes true
     } catch (error: any) {
       // Error is already handled by auth provider
@@ -109,22 +110,37 @@ export function LoginPage() {
   };
 
   return (
-    <div className="max-h-screen relative overflow-hidden">
+    <div className="min-h-screen h-screen relative overflow-hidden">
       {/* Desktop Layout */}
-      <div className="hidden md:flex max-h-screen">
-        {/* Left Side - Banner Image */}
-        <div className="flex-[2] relative bg-gray-100 dark:bg-gray-900">
-          <img 
-            src={loginIcon} 
-            alt="Login Banner" 
-            className="w-[80%] object-cover"
+      <div className="hidden lg:flex h-full">
+        {/* Left Side - Background Image (70%) */}
+        <div className="w-[70%] relative bg-gray-100 dark:bg-gray-900">
+          <img
+            src={bgImage}
+            alt="Background"
+            className="w-full h-full object-cover"
+            style={{ height: '100dvh' }}
           />
+          {/* Overlay semi-transparan */}
+          <div className="absolute inset-0 bg-black/10" />
+
+          {/* System Info Overlay - Top Left */}
+          <div className="absolute top-2 left-8 text-white flex items-center">
+            <img
+              src={logoSielang}
+              alt="SIELANGMERAH Logo"
+              className="w-40 h-40 object-contain"
+            />
+            <p className="font-bold opacity-90 max-w-sm">
+              Sistem Evaluasi Kinerja Perwakilan Perdagangan Metode Jarak Jauh
+            </p>
+          </div>
         </div>
 
-        {/* Right Side - Login Form */}
-        <div className="flex-1 flex items-center justify-center bg-background p-8">
+        {/* Right Side - Login Form (30%) */}
+        <div className="w-[30%] flex items-center justify-center bg-background p-8">
           <div className="w-full max-w-md space-y-6">
-            
+
             {/* Logo and Header */}
             <div className="text-center space-y-4">
               <div className="flex justify-center">
@@ -133,7 +149,7 @@ export function LoginPage() {
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">Selamat Datang</h1>
                 <p className="text-muted-foreground">
-                  Login dengan Username
+                  Masuk ke akun Anda
                 </p>
               </div>
             </div>
@@ -284,7 +300,7 @@ export function LoginPage() {
       </div>
 
       {/* Mobile Layout */}
-      <div className="md:hidden min-h-screen flex items-center justify-center p-4 relative z-10">
+      <div className="lg:hidden min-h-screen flex items-center justify-center p-4 bg-background">
         <div className="w-full max-w-md space-y-6">
           {/* Logo and Header */}
           <div className="text-center space-y-4">
@@ -292,15 +308,15 @@ export function LoginPage() {
               <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="" className="h-12 w-auto" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold tracking-tight text-white">Selamat Datang</h1>
-              <p className="text-white/80">
+              <h1 className="text-2xl font-bold tracking-tight">Selamat Datang</h1>
+              <p className="text-muted-foreground">
                 Login dengan Username
               </p>
             </div>
           </div>
 
           {/* Login Form */}
-          <Card className="bg-white/95 backdrop-blur-sm">
+          <Card>
             <CardHeader className="space-y-1">
               <CardTitle className="text-xl">Login</CardTitle>
               <CardDescription>
@@ -402,7 +418,7 @@ export function LoginPage() {
                           </FormControl>
                           <div className="space-y-1 leading-none">
                             <FormLabel className="text-sm font-normal">
-                              Ingat saya 
+                              Ingat saya
                             </FormLabel>
                           </div>
                         </FormItem>
