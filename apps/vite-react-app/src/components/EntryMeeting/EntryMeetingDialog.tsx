@@ -14,7 +14,7 @@ import DatePicker from '@/components/common/DatePicker';
 import { MeetingResponse } from '@/services/meeting/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useRole } from '@/hooks/useRole';
-import { formatIndonesianDate, formatIndonesianDateRange } from '@/utils/timeFormat';
+import { formatIndonesianDate, formatIndonesianDateRange, formatDateForAPI } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 import { meetingService } from '@/services/meeting';
 
@@ -70,7 +70,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
     
     // Only include fields that the user can edit
     if (canEditAllFields) {
-      dataToSave.tanggal_meeting = selectedEntryDate ? selectedEntryDate.toISOString().split('T')[0] : formData.tanggal_meeting;
+      dataToSave.tanggal_meeting = selectedEntryDate ? formatDateForAPI(selectedEntryDate) : formData.tanggal_meeting;
       dataToSave.link_zoom = formData.link_zoom;
       dataToSave.link_daftar_hadir = formData.link_daftar_hadir;
     }

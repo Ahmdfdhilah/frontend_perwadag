@@ -14,7 +14,7 @@ import DatePicker from '@/components/common/DatePicker';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { KuisionerResponse } from '@/services/kuisioner/types';
-import { formatIndonesianDateRange } from '@/utils/timeFormat';
+import { formatIndonesianDateRange, formatDateForAPI } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 import { kuisionerService } from '@/services/kuisioner';
 
@@ -70,7 +70,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
 
   const handleSave = () => {
     const dataToSave = {
-      tanggal_kuisioner: selectedDate ? selectedDate.toISOString().split('T')[0] : formData.tanggal_kuisioner,
+      tanggal_kuisioner: selectedDate ? formatDateForAPI(selectedDate) : formData.tanggal_kuisioner,
       link_dokumen_data_dukung: formData.link_dokumen_data_dukung,
       files: uploadFiles,
     };

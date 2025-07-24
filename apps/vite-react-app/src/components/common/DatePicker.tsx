@@ -80,6 +80,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
           disabled={getDisabledDates}
           initialFocus
           fixedWeeks
+          defaultMonth={value || new Date()}
         />
       </PopoverContent>
     </Popover>

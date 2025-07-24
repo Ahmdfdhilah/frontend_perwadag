@@ -15,7 +15,7 @@ import { MeetingResponse } from '@/services/meeting/types';
 import { PerwadagSummary } from '@/services/users/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useRole } from '@/hooks/useRole';
-import { formatIndonesianDateRange } from '@/utils/timeFormat';
+import { formatIndonesianDateRange, formatDateForAPI } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 import { meetingService } from '@/services/meeting';
 import { format } from 'date-fns';
@@ -78,7 +78,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
     
     // Only include fields that the user can edit
     if (canEditAllFields) {
-      dataToSave.tanggal_meeting = selectedKonfirmasiDate ? selectedKonfirmasiDate.toISOString().split('T')[0] : formData.tanggal_meeting;
+      dataToSave.tanggal_meeting = selectedKonfirmasiDate ? formatDateForAPI(selectedKonfirmasiDate) : formData.tanggal_meeting;
       dataToSave.link_zoom = formData.link_zoom;
       dataToSave.link_daftar_hadir = formData.link_daftar_hadir;
     }

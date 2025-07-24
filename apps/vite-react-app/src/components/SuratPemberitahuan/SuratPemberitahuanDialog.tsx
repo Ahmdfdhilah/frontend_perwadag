@@ -11,7 +11,7 @@ import { Label } from '@workspace/ui/components/label';
 import DatePicker from '@/components/common/DatePicker';
 import { SuratPemberitahuanResponse } from '@/services/suratPemberitahuan/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
-import { formatIndonesianDateRange } from '@/utils/timeFormat';
+import { formatIndonesianDateRange, formatDateForAPI } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 import { suratPemberitahuanService } from '@/services/suratPemberitahuan';
 import { format } from 'date-fns';
@@ -67,7 +67,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
 
   const handleSave = () => {
     const dataToSave = {
-      tanggal_surat_pemberitahuan: selectedDate ? selectedDate.toISOString().split('T')[0] : formData.tanggal_surat_pemberitahuan,
+      tanggal_surat_pemberitahuan: selectedDate ? formatDateForAPI(selectedDate) : formData.tanggal_surat_pemberitahuan,
       files: uploadFiles,
     };
     onSave?.(dataToSave);

@@ -15,6 +15,7 @@ import { SuratTugasResponse } from '@/services/suratTugas/types';
 import { PerwadagSummary } from '@/services/users/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import FileUpload from '@/components/common/FileUpload';
+import { formatDateForAPI } from '@/utils/timeFormat';
 
 interface SuratTugasDialogProps {
   open: boolean;
@@ -92,8 +93,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
 
     const saveData = {
       user_perwadag_id: formData.user_perwadag_id,
-      tanggal_evaluasi_mulai: formData.tanggal_evaluasi_mulai.toISOString().split('T')[0],
-      tanggal_evaluasi_selesai: formData.tanggal_evaluasi_selesai?.toISOString().split('T')[0],
+      tanggal_evaluasi_mulai: formatDateForAPI(formData.tanggal_evaluasi_mulai),
+      tanggal_evaluasi_selesai: formData.tanggal_evaluasi_selesai ? formatDateForAPI(formData.tanggal_evaluasi_selesai) : undefined,
       no_surat: formData.no_surat,
       file: uploadFiles.length > 0 ? uploadFiles[0] : null, // Send null instead of undefined
     };

@@ -95,3 +95,11 @@ export const formatIndonesianDateRange = (startDate: string, endDate: string): s
         return 'Rentang tanggal tidak valid';
     }
 };
+
+// Format date for API requests without timezone issues
+export const formatDateForAPI = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
