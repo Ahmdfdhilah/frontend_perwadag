@@ -40,14 +40,14 @@ export const appMenuItems: SidebarItem[] = [
     icon: MailWarningIcon,
     allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
   },
-    // Kuesioner - All roles
-    {
-      title: 'Kuesioner',
-      href: '/kuesioner',
-      icon: ClipboardList,
-      allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
-    },
-  
+  // Kuesioner - All roles
+  {
+    title: 'Kuesioner',
+    href: '/kuesioner',
+    icon: ClipboardList,
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
+  },
+
   // Entry Meeting - All roles
   {
     title: 'Entry Meeting',
@@ -94,6 +94,14 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Template Kuesioner',
     href: '/template-kuesioner',
     icon: ClipboardCopyIcon,
+    allowedRoles: ['ADMIN'],
+  },
+
+  // Email Templates - ADMIN only
+  {
+    title: 'Template Email',
+    href: '/email-templates',
+    icon: Mail,
     allowedRoles: ['ADMIN'],
   },
 

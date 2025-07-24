@@ -15,6 +15,7 @@ export { suratPemberitahuanService } from "./suratPemberitahuan";
 export { meetingService } from "./meeting";
 export { penilaianRisikoService } from "./penilaianRisiko";
 export { periodeEvaluasiService } from "./periodeEvaluasi";
+export { emailTemplateService } from "./emailTemplate";
 
 // Export types with explicit imports to avoid conflicts
 export type {
@@ -162,3 +163,14 @@ export type {
   PeriodeEvaluasiStatistics,
   PeriodeEvaluasiFilterParams,
 } from "./periodeEvaluasi";
+
+export type {
+  EmailTemplate,
+  EmailTemplateCreateRequest,
+  EmailTemplateUpdateRequest,
+  EmailTemplateResponse,
+  EmailTemplateListResponse,
+  EmailComposedResponse,
+  EmailVariablesResponse,
+  EmailVariableInfo,
+} from "./emailTemplate";

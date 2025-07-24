@@ -18,6 +18,7 @@ import { Combobox } from '@workspace/ui/components/combobox';
 import { Label } from '@workspace/ui/components/label';
 import { LaporanHasilResponse, LaporanHasilFilterParams } from '@/services/laporanHasil/types';
 import { laporanHasilService } from '@/services/laporanHasil';
+import { emailTemplateService } from '@/services/emailTemplate';
 import { userService } from '@/services/users';
 import { PerwadagSummary, PerwadagSearchParams } from '@/services/users/types';
 import { PageHeader } from '@/components/common/PageHeader';
@@ -28,7 +29,6 @@ import LaporanHasilEvaluasiDialog from '@/components/LaporanHasilEvaluasi/Lapora
 import { getDefaultYearOptions, findPeriodeByYear } from '@/utils/yearUtils';
 import { periodeEvaluasiService } from '@/services/periodeEvaluasi';
 import { PeriodeEvaluasi } from '@/services/periodeEvaluasi/types';
-import { API_BASE_URL } from '@/config/api';
 
 interface LaporanHasilEvaluasiPageFilters {
   search: string;
@@ -296,65 +296,39 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
     return false;
   };
 
-  // Function to compose email with attachment
-  const handleComposeEmail = (item: LaporanHasilResponse) => {
+  // Function to compose email using template API
+  const handleComposeEmail = async (item: LaporanHasilResponse) => {
     try {
-      // Prepare email content
-      const subject = encodeURIComponent(
-        `Laporan Hasil Evaluasi - ${item.nama_perwadag} (${item.tahun_evaluasi})`
-      );
+      // Use template API to compose email
+      const composedEmail = await emailTemplateService.composeEmailForLaporanHasil(item.id);
       
-      const body = encodeURIComponent(
-        `Kepada Yth. Tim Audit,
-
-Berikut kami lampirkan Laporan Hasil Evaluasi dengan detail sebagai berikut:
-
-📋 Detail Laporan:
-• Nama Perwadag: ${item.nama_perwadag}
-• Inspektorat: ${item.inspektorat}
-• Tahun Evaluasi: ${item.tahun_evaluasi}
-• Nomor Laporan: ${item.nomor_laporan || 'Belum ada nomor'}
-• Tanggal Laporan: ${item.tanggal_laporan ? new Date(item.tanggal_laporan).toLocaleDateString('id-ID') : 'Belum ditentukan'}
-
-📅 Periode Evaluasi:
-• Tanggal Mulai: ${new Date(item.tanggal_evaluasi_mulai).toLocaleDateString('id-ID')}
-• Tanggal Selesai: ${new Date(item.tanggal_evaluasi_selesai).toLocaleDateString('id-ID')}
-• Durasi: ${item.surat_tugas_info.durasi_evaluasi} hari
-
-📊 Status:
-• Status Evaluasi: ${item.evaluation_status}
-• Status Kelengkapan: ${item.is_completed ? 'Lengkap' : 'Belum Lengkap'}
-• Persentase Kelengkapan: ${item.completion_percentage}%
-
-${item.has_file ? `📎 File dokumen tersedia di: ${API_BASE_URL}${item.file_urls.file_url}` : '⚠️ File dokumen belum tersedia'}
-
-Mohon untuk ditindaklanjuti sesuai prosedur yang berlaku.
-
-Terima kasih atas perhatiannya.
-
-Hormat kami,
-${user?.nama || 'Sistem Audit'}
-        `
-      );
-
-      // Create Gmail compose URL
-      const gmailUrl = `https://mail.google.com/mail/u/0/?view=cm&su=${subject}&body=${body}`;
-      
-      // Open Gmail in new tab
-      window.open(gmailUrl, '_blank');
+      // Open Gmail with composed content
+      window.open(composedEmail.gmail_url, '_blank');
 
       // Show success toast
       toast({
         title: 'Email Client Dibuka',
-        description: `Email untuk laporan ${item.nama_perwadag} telah dibuka di Gmail. ${item.has_file ? 'Silakan lampirkan file dokumen secara manual.' : 'Perhatian: File dokumen belum tersedia.'}`,
+        description: `Email untuk laporan ${item.nama_perwadag} telah dibuka di Gmail menggunakan template aktif. ${item.has_file ? 'Silakan lampirkan file dokumen secara manual.' : 'Perhatian: File dokumen belum tersedia.'}`,
         variant: 'default'
       });
 
     } catch (error) {
       console.error('Failed to compose email:', error);
+      
+      // Handle specific error cases
+      let errorMessage = 'Gagal membuat email. Silakan coba lagi.';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('404')) {
+          errorMessage = 'Template email tidak ditemukan atau laporan tidak ditemukan.';
+        } else if (error.message.includes('Tidak ada template email yang aktif')) {
+          errorMessage = 'Tidak ada template email yang aktif. Silakan hubungi administrator.';
+        }
+      }
+      
       toast({
         title: 'Error',
-        description: 'Gagal membuka email client. Silakan coba lagi.',
+        description: errorMessage,
         variant: 'destructive'
       });
     }

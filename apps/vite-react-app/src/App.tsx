@@ -21,6 +21,7 @@ import KuesionerPage from './pages/KuesionerPage';
 import MatriksPage from './pages/MatriksPage';
 import QuestionnaireTemplatePage from './pages/QuestionnaireTemplatePage';
 import KonfirmasiMeetingPage from './pages/KonfirmasiMeetingPage';
+import EmailTemplatesPage from './pages/EmailTemplatesPage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { DefaultLayout } from './components/layouts';
 import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
@@ -144,6 +145,11 @@ function App() {
                     <Route path="users" element={
                       <RoleProtectedRoute allowedRoles={['ADMIN']}>
                         <UsersPage />
+                      </RoleProtectedRoute>
+                    } />
+                    <Route path="email-templates" element={
+                      <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                        <EmailTemplatesPage />
                       </RoleProtectedRoute>
                     } />
                     
