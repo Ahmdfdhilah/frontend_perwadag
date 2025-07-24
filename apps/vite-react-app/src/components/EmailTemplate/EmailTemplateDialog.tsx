@@ -17,11 +17,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@workspace/ui/componen
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Separator } from '@workspace/ui/components/separator';
 import { ScrollArea } from '@workspace/ui/components/scroll-area';
-import { 
-  EmailTemplate, 
-  EmailTemplateCreateRequest, 
+import {
+  EmailTemplate,
+  EmailTemplateCreateRequest,
   EmailTemplateUpdateRequest,
-  EMAIL_VARIABLES 
+  EMAIL_VARIABLES
 } from '@/services/emailTemplate/types';
 import { emailTemplateService } from '@/services/emailTemplate';
 import { Eye, Edit, Plus, Loader2 } from 'lucide-react';
@@ -116,7 +116,7 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
 
   const insertVariable = (variable: string, field: 'subject' | 'body') => {
     const variableText = `{{${variable}}}`;
-    
+
     if (field === 'subject') {
       setSubjectTemplate(prev => {
         const newValue = prev + (prev && !prev.endsWith(' ') && prev.length > 0 ? ' ' : '') + variableText;
@@ -136,78 +136,7 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
   };
 
 
-  const handleSubjectChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newValue = e.target.value;
-    setSubjectTemplate(newValue);
-  };
 
-  const handleBodyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const newValue = e.target.value;
-    setBodyTemplate(newValue);
-  };
-
-  // Render text with highlighted variables for preview
-  const renderHighlightedText = (text: string) => {
-    if (!text) return text;
-    
-    const variableRegex = /(\{\{[^}]+\}\})/g;
-    const parts = text.split(variableRegex);
-    
-    return (
-      <span>
-        {parts.map((part, index) => {
-          if (part.match(variableRegex)) {
-            return (
-              <span
-                key={index}
-                className="inline-block px-2 py-1 mx-1 rounded-md font-mono text-sm font-semibold"
-                style={{ 
-                  backgroundColor: '#3b82f6', 
-                  color: '#ffffff',
-                  border: '1px solid #1d4ed8',
-                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
-                }}
-              >
-                {part}
-              </span>
-            );
-          }
-          return <span key={index}>{part}</span>;
-        })}
-      </span>
-    );
-  };
-
-  // Render highlighted text overlay untuk textarea
-  const renderHighlightedTextOverlay = (text: string) => {
-    if (!text) return '';
-    
-    const variableRegex = /(\{\{[^}]+\}\})/g;
-    const parts = text.split(variableRegex);
-    
-    return (
-      <>
-        {parts.map((part, index) => {
-          if (part.match(variableRegex)) {
-            return (
-              <span
-                key={index}
-                style={{ 
-                  backgroundColor: 'rgba(59, 130, 246, 0.4)', 
-                  color: 'transparent',
-                  borderRadius: '3px',
-                  padding: '0 2px'
-                }}
-              >
-                {part}
-              </span>
-            );
-          }
-          return <span key={index} style={{ color: 'transparent' }}>{part}</span>;
-        })}
-      </>
-    );
-  };
 
   const getDialogTitle = () => {
     switch (mode) {
@@ -252,7 +181,7 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
               <TabsTrigger value="editor">Editor</TabsTrigger>
               <TabsTrigger value="preview">Preview</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="editor" className="flex-1 overflow-hidden">
               <ScrollArea className="h-[60vh] pr-4">
                 <div className="space-y-4">
@@ -271,36 +200,15 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
                   <div className="space-y-2">
                     <Label htmlFor="subject-template">Subject Template</Label>
                     <div className="space-y-2">
-                      <div className="relative">
-                        {/* Overlay untuk highlighting */}
-                        <div 
-                          className="absolute inset-0 font-mono text-sm pointer-events-none whitespace-pre-wrap break-words z-10 text-transparent overflow-hidden"
-                          style={{
-                            fontSize: '14px',
-                            lineHeight: '1.5rem',
-                            padding: '12px',
-                            border: '1px solid transparent',
-                            borderRadius: '6px'
-                          }}
-                        >
-                          {renderHighlightedTextOverlay(subjectTemplate)}
-                        </div>
-                        
-                        <Textarea
-                          id="subject-template"
-                          value={subjectTemplate}
-                          onChange={handleSubjectChange}
-                          placeholder="Masukkan subject email dengan variabel {{nama_variabel}}"
-                          disabled={isReadOnly}
-                          rows={3}
-                          className="w-full font-mono text-sm relative z-20 bg-transparent resize-none"
-                          style={{ 
-                            fontSize: '14px',
-                            lineHeight: '1.5rem',
-                            padding: '12px'
-                          }}
-                        />
-                      </div>
+                      <Textarea
+                        id="subject-template"
+                        value={subjectTemplate}
+                        onChange={(e) => setSubjectTemplate(e.target.value)}
+                        placeholder="Masukkan subject email dengan variabel {{nama_variabel}}"
+                        disabled={isReadOnly}
+                        rows={2}
+                        className="w-full font-mono text-sm"
+                      />
                       {!isReadOnly && (
                         <div className="flex flex-wrap gap-1">
                           {EMAIL_VARIABLES.slice(0, 5).map((variable) => (
@@ -322,36 +230,15 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
                   <div className="space-y-2">
                     <Label htmlFor="body-template">Body Template</Label>
                     <div className="space-y-2">
-                      <div className="relative">
-                        {/* Overlay untuk highlighting */}
-                        <div 
-                          className="absolute inset-0 font-mono text-sm pointer-events-none whitespace-pre-wrap break-words z-10 text-transparent overflow-hidden"
-                          style={{
-                            fontSize: '14px',
-                            lineHeight: '1.5rem',
-                            padding: '12px',
-                            border: '1px solid transparent',
-                            borderRadius: '6px'
-                          }}
-                        >
-                          {renderHighlightedTextOverlay(bodyTemplate)}
-                        </div>
-                        
-                        <Textarea
-                          id="body-template"
-                          value={bodyTemplate}
-                          onChange={handleBodyChange}
-                          placeholder="Masukkan body email dengan variabel {{nama_variabel}}"
-                          disabled={isReadOnly}
-                          rows={15}
-                          className="w-full font-mono text-sm relative z-20 bg-transparent resize-none"
-                          style={{ 
-                            fontSize: '14px',
-                            lineHeight: '1.5rem',
-                            padding: '12px'
-                          }}
-                        />
-                      </div>
+                      <Textarea
+                        id="body-template"
+                        value={bodyTemplate}
+                        onChange={(e) => setBodyTemplate(e.target.value)}
+                        placeholder="Masukkan body email dengan variabel {{nama_variabel}}"
+                        disabled={isReadOnly}
+                        rows={15}
+                        className="w-full font-mono text-sm"
+                      />
                       {!isReadOnly && (
                         <div className="flex flex-wrap gap-1">
                           {EMAIL_VARIABLES.map((variable) => (
@@ -372,7 +259,7 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
                 </div>
               </ScrollArea>
             </TabsContent>
-            
+
             <TabsContent value="preview" className="flex-1 overflow-hidden">
               <ScrollArea className="h-[60vh] pr-4">
                 <Card>
@@ -387,7 +274,7 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
                       <Label className="text-sm font-medium">Subject:</Label>
                       <div className="mt-1 p-3 bg-muted rounded border">
                         <div className="text-sm">
-                          {renderHighlightedText(getPreview().subject)}
+                          {getPreview().subject}
                         </div>
                       </div>
                     </div>
@@ -396,7 +283,7 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
                       <Label className="text-sm font-medium">Body:</Label>
                       <div className="mt-1 p-4 bg-muted rounded border">
                         <div className="text-sm whitespace-pre-wrap font-sans">
-                          {renderHighlightedText(getPreview().body)}
+                          {getPreview().body}
                         </div>
                       </div>
                     </div>
@@ -408,16 +295,6 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
         </div>
 
         <DialogFooter className="flex-shrink-0 flex justify-between items-center pt-4 border-t">
-          <div className="flex items-center text-sm text-muted-foreground">
-            {template && (
-              <span>
-                Dibuat: {new Date(template.created_at).toLocaleDateString('id-ID')}
-                {template.updated_at && (
-                  <> • Diperbarui: {new Date(template.updated_at).toLocaleDateString('id-ID')}</>
-                )}
-              </span>
-            )}
-          </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               {isReadOnly ? 'Tutup' : 'Batal'}

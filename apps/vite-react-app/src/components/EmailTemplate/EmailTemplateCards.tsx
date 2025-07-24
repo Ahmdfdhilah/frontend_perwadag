@@ -12,7 +12,6 @@ import {
 } from '@workspace/ui/components/dropdown-menu';
 import { EmailTemplate } from '@/services/emailTemplate/types';
 import { 
-  MoreHorizontal, 
   Eye, 
   Edit, 
   Power, 
@@ -148,7 +147,7 @@ export const EmailTemplateCards: React.FC<EmailTemplateCardsProps> = ({
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="h-8 w-8 p-0">
                       <span className="sr-only">Buka menu</span>
-                      <MoreHorizontal className="h-4 w-4" />
+                      <Edit className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">

@@ -130,10 +130,10 @@ class EmailTemplateService extends BaseService {
       tanggal_selesai: "25/01/2025",
       durasi_evaluasi: "10",
       evaluation_status: "active",
-      status_kelengkapan: "✅ Lengkap",
+      status_kelengkapan: "Lengkap",
       persentase: "100",
-      file_status: "✅ File dokumen tersedia",
-      file_url: "🔗 Link Download: http://example.com/file.pdf",
+      file_status: "File dokumen tersedia",
+      file_url: "http://localhost:8000/static/uploads/example-file.pdf",
       user_nama: "Administrator"
     };
 
