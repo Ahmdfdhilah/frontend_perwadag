@@ -118,15 +118,95 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
     const variableText = `{{${variable}}}`;
     
     if (field === 'subject') {
-      setSubjectTemplate(prev => prev + variableText);
+      setSubjectTemplate(prev => {
+        const newValue = prev + (prev && !prev.endsWith(' ') && prev.length > 0 ? ' ' : '') + variableText;
+        return newValue;
+      });
     } else {
-      setBodyTemplate(prev => prev + variableText);
+      setBodyTemplate(prev => {
+        const newValue = prev + (prev && !prev.endsWith(' ') && prev.length > 0 ? ' ' : '') + variableText;
+        return newValue;
+      });
     }
   };
 
 
   const getPreview = () => {
     return emailTemplateService.previewTemplate(subjectTemplate, bodyTemplate);
+  };
+
+
+  const handleSubjectChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    setSubjectTemplate(newValue);
+  };
+
+  const handleBodyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newValue = e.target.value;
+    setBodyTemplate(newValue);
+  };
+
+  // Render text with highlighted variables for preview
+  const renderHighlightedText = (text: string) => {
+    if (!text) return text;
+    
+    const variableRegex = /(\{\{[^}]+\}\})/g;
+    const parts = text.split(variableRegex);
+    
+    return (
+      <span>
+        {parts.map((part, index) => {
+          if (part.match(variableRegex)) {
+            return (
+              <span
+                key={index}
+                className="inline-block px-2 py-1 mx-1 rounded-md font-mono text-sm font-semibold"
+                style={{ 
+                  backgroundColor: '#3b82f6', 
+                  color: '#ffffff',
+                  border: '1px solid #1d4ed8',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                }}
+              >
+                {part}
+              </span>
+            );
+          }
+          return <span key={index}>{part}</span>;
+        })}
+      </span>
+    );
+  };
+
+  // Render highlighted text overlay untuk textarea
+  const renderHighlightedTextOverlay = (text: string) => {
+    if (!text) return '';
+    
+    const variableRegex = /(\{\{[^}]+\}\})/g;
+    const parts = text.split(variableRegex);
+    
+    return (
+      <>
+        {parts.map((part, index) => {
+          if (part.match(variableRegex)) {
+            return (
+              <span
+                key={index}
+                style={{ 
+                  backgroundColor: 'rgba(59, 130, 246, 0.4)', 
+                  color: 'transparent',
+                  borderRadius: '3px',
+                  padding: '0 2px'
+                }}
+              >
+                {part}
+              </span>
+            );
+          }
+          return <span key={index} style={{ color: 'transparent' }}>{part}</span>;
+        })}
+      </>
+    );
   };
 
   const getDialogTitle = () => {
@@ -191,15 +271,36 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
                   <div className="space-y-2">
                     <Label htmlFor="subject-template">Subject Template</Label>
                     <div className="space-y-2">
-                      <Textarea
-                        id="subject-template"
-                        value={subjectTemplate}
-                        onChange={(e) => setSubjectTemplate(e.target.value)}
-                        placeholder="Masukkan subject email dengan variabel {{nama_variabel}}"
-                        disabled={isReadOnly}
-                        rows={3}
-                        className="w-full"
-                      />
+                      <div className="relative">
+                        {/* Overlay untuk highlighting */}
+                        <div 
+                          className="absolute inset-0 font-mono text-sm pointer-events-none whitespace-pre-wrap break-words z-10 text-transparent overflow-hidden"
+                          style={{
+                            fontSize: '14px',
+                            lineHeight: '1.5rem',
+                            padding: '12px',
+                            border: '1px solid transparent',
+                            borderRadius: '6px'
+                          }}
+                        >
+                          {renderHighlightedTextOverlay(subjectTemplate)}
+                        </div>
+                        
+                        <Textarea
+                          id="subject-template"
+                          value={subjectTemplate}
+                          onChange={handleSubjectChange}
+                          placeholder="Masukkan subject email dengan variabel {{nama_variabel}}"
+                          disabled={isReadOnly}
+                          rows={3}
+                          className="w-full font-mono text-sm relative z-20 bg-transparent resize-none"
+                          style={{ 
+                            fontSize: '14px',
+                            lineHeight: '1.5rem',
+                            padding: '12px'
+                          }}
+                        />
+                      </div>
                       {!isReadOnly && (
                         <div className="flex flex-wrap gap-1">
                           {EMAIL_VARIABLES.slice(0, 5).map((variable) => (
@@ -221,15 +322,36 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
                   <div className="space-y-2">
                     <Label htmlFor="body-template">Body Template</Label>
                     <div className="space-y-2">
-                      <Textarea
-                        id="body-template"
-                        value={bodyTemplate}
-                        onChange={(e) => setBodyTemplate(e.target.value)}
-                        placeholder="Masukkan body email dengan variabel {{nama_variabel}}"
-                        disabled={isReadOnly}
-                        rows={20}
-                        className="w-full font-mono text-sm"
-                      />
+                      <div className="relative">
+                        {/* Overlay untuk highlighting */}
+                        <div 
+                          className="absolute inset-0 font-mono text-sm pointer-events-none whitespace-pre-wrap break-words z-10 text-transparent overflow-hidden"
+                          style={{
+                            fontSize: '14px',
+                            lineHeight: '1.5rem',
+                            padding: '12px',
+                            border: '1px solid transparent',
+                            borderRadius: '6px'
+                          }}
+                        >
+                          {renderHighlightedTextOverlay(bodyTemplate)}
+                        </div>
+                        
+                        <Textarea
+                          id="body-template"
+                          value={bodyTemplate}
+                          onChange={handleBodyChange}
+                          placeholder="Masukkan body email dengan variabel {{nama_variabel}}"
+                          disabled={isReadOnly}
+                          rows={15}
+                          className="w-full font-mono text-sm relative z-20 bg-transparent resize-none"
+                          style={{ 
+                            fontSize: '14px',
+                            lineHeight: '1.5rem',
+                            padding: '12px'
+                          }}
+                        />
+                      </div>
                       {!isReadOnly && (
                         <div className="flex flex-wrap gap-1">
                           {EMAIL_VARIABLES.map((variable) => (
@@ -264,16 +386,18 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
                     <div>
                       <Label className="text-sm font-medium">Subject:</Label>
                       <div className="mt-1 p-3 bg-muted rounded border">
-                        <p className="text-sm">{getPreview().subject}</p>
+                        <div className="text-sm">
+                          {renderHighlightedText(getPreview().subject)}
+                        </div>
                       </div>
                     </div>
                     <Separator />
                     <div>
                       <Label className="text-sm font-medium">Body:</Label>
                       <div className="mt-1 p-4 bg-muted rounded border">
-                        <pre className="text-sm whitespace-pre-wrap font-sans">
-                          {getPreview().body}
-                        </pre>
+                        <div className="text-sm whitespace-pre-wrap font-sans">
+                          {renderHighlightedText(getPreview().body)}
+                        </div>
                       </div>
                     </div>
                   </CardContent>
