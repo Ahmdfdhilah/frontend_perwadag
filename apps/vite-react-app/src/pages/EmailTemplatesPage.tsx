@@ -91,11 +91,6 @@ const EmailTemplatesPage: React.FC = () => {
       setTotalItems(response.total);
     } catch (error) {
       console.error('Failed to fetch templates:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal memuat template email. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     } finally {
       setLoading(false);
     }
@@ -144,11 +139,6 @@ const EmailTemplatesPage: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to activate template:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal mengaktifkan template. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     } finally {
       setActivatingTemplate(null);
     }
@@ -179,11 +169,6 @@ const EmailTemplatesPage: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to delete template:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal menghapus template. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     } finally {
       setTemplateToDelete(null);
     }

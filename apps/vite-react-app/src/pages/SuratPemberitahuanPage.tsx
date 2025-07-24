@@ -121,11 +121,6 @@ const SuratPemberitahuanPage: React.FC = () => {
       setTotalItems(response.total);
     } catch (error) {
       console.error('Failed to fetch surat pemberitahuan:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal memuat data surat pemberitahuan. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     } finally {
       setLoading(false);
     }

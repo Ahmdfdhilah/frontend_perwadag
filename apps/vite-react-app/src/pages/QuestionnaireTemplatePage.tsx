@@ -91,11 +91,6 @@ const QuestionnaireTemplatePage: React.FC = () => {
       setTotalItems(response.total);
     } catch (error) {
       console.error('Failed to fetch templates:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal memuat data template kuesioner. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     } finally {
       setLoading(false);
     }
@@ -145,11 +140,6 @@ const QuestionnaireTemplatePage: React.FC = () => {
         });
       } catch (error) {
         console.error('Failed to delete template:', error);
-        toast({
-          title: 'Error',
-          description: 'Gagal menghapus template. Silakan coba lagi.',
-          variant: 'destructive'
-        });
       }
     }
   };
@@ -195,11 +185,6 @@ const QuestionnaireTemplatePage: React.FC = () => {
       fetchTemplates(); // Refresh the list
     } catch (error) {
       console.error('Failed to save template:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal menyimpan template. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     }
   };
 

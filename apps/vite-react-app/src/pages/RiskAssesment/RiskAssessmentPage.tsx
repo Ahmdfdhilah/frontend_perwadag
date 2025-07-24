@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useURLFilters } from '@/hooks/useURLFilters';
-import { useToast } from '@workspace/ui/components/sonner';
 import { PenilaianRisikoResponse, PenilaianRisikoFilterParams } from '@/services/penilaianRisiko/types';
 import { penilaianRisikoService } from '@/services/penilaianRisiko';
 import { userService } from '@/services/users';
@@ -45,7 +44,6 @@ const RiskAssessmentPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
   const { hasPageAccess, canEditForm } = useFormPermissions();
-  const { toast } = useToast();
 
   // URL Filters configuration
   const { updateURL, getCurrentFilters } = useURLFilters<RiskAssessmentPageFilters>({
@@ -113,11 +111,6 @@ const RiskAssessmentPage: React.FC = () => {
       setTotalItems(response.total);
     } catch (error) {
       console.error('Failed to fetch risk assessments:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal memuat data penilaian risiko. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     } finally {
       setLoading(false);
     }

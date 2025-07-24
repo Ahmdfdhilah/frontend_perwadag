@@ -53,7 +53,7 @@ export const UserForm: React.FC<UserFormProps> = ({
   disabled = false,
 }) => {
   const [showInspektoratSelect, setShowInspektoratSelect] = useState(
-    initialData?.role === USER_ROLES.INSPEKTORAT || USER_ROLES.PERWADAG || false
+    initialData?.role === USER_ROLES.INSPEKTORAT || initialData?.role === USER_ROLES.PERWADAG || false
   );
 
   const form = useForm<UserFormData>({
@@ -71,9 +71,9 @@ export const UserForm: React.FC<UserFormProps> = ({
   useEffect(() => {
     const role = form.watch('role');
 
-    setShowInspektoratSelect(role === USER_ROLES.INSPEKTORAT || USER_ROLES.PERWADAG);
+    setShowInspektoratSelect(role === USER_ROLES.INSPEKTORAT || role === USER_ROLES.PERWADAG);
 
-    if (role !== USER_ROLES.INSPEKTORAT) {
+    if (role === USER_ROLES.ADMIN) {
       form.setValue('inspektorat', '');
     }
   }, [form.watch('role')]);

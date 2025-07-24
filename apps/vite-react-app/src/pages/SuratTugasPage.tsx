@@ -195,11 +195,6 @@ const SuratTugasPage: React.FC = () => {
       setTotalItems(response.total);
     } catch (error) {
       console.error('Failed to fetch surat tugas:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal memuat data surat tugas. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     } finally {
       setLoading(false);
     }
@@ -320,18 +315,6 @@ const SuratTugasPage: React.FC = () => {
       fetchSuratTugasList(); // Refresh the list
     } catch (error) {
       console.error('Failed to save surat tugas:', error);
-
-      // Extract error message if available
-      let errorMessage = 'Gagal menyimpan surat tugas. Pastikan semua field sudah diisi dengan benar.';
-      if (error instanceof Error) {
-        errorMessage = error.message || errorMessage;
-      }
-
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive'
-      });
     }
   };
 

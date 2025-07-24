@@ -131,11 +131,6 @@ const MatriksPage: React.FC = () => {
       setTotalItems(response.total);
     } catch (error) {
       console.error('Failed to fetch matriks:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal memuat data matriks. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     } finally {
       setLoading(false);
     }
@@ -233,11 +228,6 @@ const MatriksPage: React.FC = () => {
       await exportAllMatriksToExcel(allMatriks, formatIndonesianDateRange, toast, filters.tahun_evaluasi);
     } catch (error) {
       console.error('Failed to export all matriks:', error);
-      toast({
-        title: 'Export Gagal',
-        description: 'Gagal mengekspor data matriks. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     }
   };
 
@@ -269,11 +259,6 @@ const MatriksPage: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to save matriks:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal menyimpan data matriks. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     }
   };
 

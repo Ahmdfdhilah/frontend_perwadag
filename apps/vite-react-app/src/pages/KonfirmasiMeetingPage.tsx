@@ -123,11 +123,6 @@ const KonfirmasiMeetingPage: React.FC = () => {
       setTotalItems(response.total);
     } catch (error) {
       console.error('Failed to fetch meetings:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal memuat data konfirmasi meeting. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     } finally {
       setLoading(false);
     }

@@ -101,11 +101,7 @@ const ProfilePage: React.FC = () => {
       });
       setIsEditDialogOpen(false);
     } catch (error) {
-      toast({
-        title: 'Gagal memperbarui profil',
-        description: 'Terjadi kesalahan saat memperbarui profil.',
-        variant: 'destructive'
-      });
+      console.error('Failed to update profile:', error);
     }
   };
 

@@ -104,11 +104,6 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
       onSave();
     } catch (error) {
       console.error('Failed to save template:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal menyimpan template. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     } finally {
       setLoading(false);
     }

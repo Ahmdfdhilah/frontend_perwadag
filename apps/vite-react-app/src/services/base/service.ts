@@ -1,5 +1,6 @@
 import api from "@/utils/api";
 import { AxiosResponse } from "axios";
+import { toast } from "@workspace/ui/components/sonner";
 
 export abstract class BaseService {
   protected baseEndpoint: string;
@@ -15,7 +16,13 @@ export abstract class BaseService {
       const response = await requestFn();
       return response.data;
     } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || error.message || "An error occurred";
+      const errorMessage = error.response?.data?.detail || error.message || "Terjadi kesalahan";
+      
+      // Show error toast to user
+      toast.error("Error", {
+        description: errorMessage,
+      });
+      
       throw new Error(errorMessage);
     }
   }

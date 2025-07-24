@@ -27,6 +27,32 @@ const Toaster = ({ ...props }: ToasterProps) => {
 
 export { Toaster }
 
+// Direct toast function for use outside React components
+export const toast = {
+  success: (title: string, options?: { description?: string }) => {
+    return sonnerToast.success(title, {
+      description: options?.description,
+      ...defaultToastOptions,
+      position: defaultToastOptions.position as "bottom-right",
+    })
+  },
+  error: (title: string, options?: { description?: string }) => {
+    return sonnerToast.error(title, {
+      description: options?.description,
+      ...defaultToastOptions,
+      position: defaultToastOptions.position as "bottom-right",
+    })
+  },
+  info: (title: string, options?: { description?: string }) => {
+    return sonnerToast.info(title, {
+      description: options?.description,
+      ...defaultToastOptions,
+      position: defaultToastOptions.position as "bottom-right",
+    })
+  },
+  dismiss: sonnerToast.dismiss
+}
+
 const defaultToastOptions = {
   duration: 5000,
   position: "bottom-right",

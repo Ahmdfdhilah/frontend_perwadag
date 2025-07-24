@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useToast } from '@workspace/ui/components/sonner';
 import {
   Dialog,
   DialogContent,
@@ -28,7 +27,6 @@ export const UserDialog: React.FC<UserDialogProps> = ({
   const { canEditForm } = useFormPermissions();
   const isEditable = mode !== 'view';
   const canEdit = canEditForm('user_management') && isEditable;
-  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (data: any) => {
@@ -50,11 +48,6 @@ export const UserDialog: React.FC<UserDialogProps> = ({
 
     } catch (error) {
       console.error('Error saving user:', error);
-      toast({
-        title: 'Terjadi kesalahan',
-        description: 'Gagal menyimpan data user. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     } finally {
       setLoading(false);
     }

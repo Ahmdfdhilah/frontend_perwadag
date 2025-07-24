@@ -73,11 +73,6 @@ const PeriodeManagementDialog: React.FC<PeriodeManagementDialogProps> = ({
       setPeriodeList(response.items);
     } catch (error) {
       console.error('Failed to fetch periode list:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal memuat data periode evaluasi.',
-        variant: 'destructive',
-      });
     }
   };
 
@@ -145,11 +140,7 @@ const PeriodeManagementDialog: React.FC<PeriodeManagementDialogProps> = ({
       resetForm();
       onRefresh?.();
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Gagal membuat periode evaluasi.',
-        variant: 'destructive',
-      });
+      console.error('Failed to create periode:', error);
     } finally {
       setIsLoading(false);
     }
@@ -176,11 +167,7 @@ const PeriodeManagementDialog: React.FC<PeriodeManagementDialogProps> = ({
       await fetchPeriodeList();
       onRefresh?.();
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Gagal memperbarui periode evaluasi.',
-        variant: 'destructive',
-      });
+      console.error('Failed to update periode:', error);
     } finally {
       setIsLoading(false);
     }
@@ -205,11 +192,7 @@ const PeriodeManagementDialog: React.FC<PeriodeManagementDialogProps> = ({
       resetForm();
       onRefresh?.();
     } catch (error: any) {
-      toast({
-        title: 'Error',
-        description: error.message || 'Gagal menghapus periode evaluasi.',
-        variant: 'destructive',
-      });
+      console.error('Failed to delete periode:', error);
     } finally {
       setIsLoading(false);
     }

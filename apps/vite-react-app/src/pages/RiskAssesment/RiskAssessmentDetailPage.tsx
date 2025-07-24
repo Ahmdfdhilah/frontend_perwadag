@@ -10,14 +10,12 @@ import { Separator } from '@workspace/ui/components/separator';
 import { ArrowLeft, Edit, FileText, Loader2 } from 'lucide-react';
 import { penilaianRisikoService } from '@/services/penilaianRisiko';
 import { PenilaianRisiko } from '@/services/penilaianRisiko/types';
-import { useToast } from '@workspace/ui/components/sonner';
 
 const RiskAssessmentDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { currentRole } = useRole();
   const { canEditForm } = useFormPermissions();
-  const { toast } = useToast();
   const [penilaianData, setPenilaianData] = useState<PenilaianRisiko | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -40,11 +38,6 @@ const RiskAssessmentDetailPage: React.FC = () => {
         setPenilaianData(response);
       } catch (error) {
         console.error('Error loading penilaian data:', error);
-        toast({
-          title: 'Error',
-          description: 'Gagal memuat data penilaian risiko',
-          variant: 'destructive'
-        });
         navigate('/penilaian-resiko');
       } finally {
         setIsLoading(false);

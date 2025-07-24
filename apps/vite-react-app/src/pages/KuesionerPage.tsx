@@ -127,11 +127,6 @@ const KuesionerPage: React.FC = () => {
       setTotalItems(response.total);
     } catch (error) {
       console.error('Failed to fetch kuisioner:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal memuat data kuisioner. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     } finally {
       setLoading(false);
     }

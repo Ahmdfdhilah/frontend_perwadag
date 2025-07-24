@@ -102,11 +102,6 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
       
     } catch (error: any) {
       console.error('Error changing password:', error);
-      toast({
-        title: 'Gagal mengubah password',
-        description: error || 'Terjadi kesalahan saat mengubah password',
-        variant: 'destructive'
-      });
     } finally {
       setLoading(false);
     }

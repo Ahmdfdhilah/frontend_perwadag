@@ -81,11 +81,6 @@ const RiskAssessmentInputPage: React.FC = () => {
         });
       } catch (error) {
         console.error('Error loading data:', error);
-        toast({
-          title: 'Error',
-          description: 'Gagal memuat data penilaian risiko',
-          variant: 'destructive'
-        });
         navigate('/penilaian-resiko');
       } finally {
         setIsLoading(false);
@@ -395,11 +390,6 @@ const RiskAssessmentInputPage: React.FC = () => {
       });
     } catch (error) {
       console.error('Error saving assessment:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal menyimpan data penilaian risiko',
-        variant: 'destructive'
-      });
     } finally {
       setIsSaving(false);
     }

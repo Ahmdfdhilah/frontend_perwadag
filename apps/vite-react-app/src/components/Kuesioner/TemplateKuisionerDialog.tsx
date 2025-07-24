@@ -57,11 +57,6 @@ const TemplateKuisionerDialog: React.FC<TemplateKuisionerDialogProps> = ({
       
     } catch (error) {
       console.error('Error fetching latest template:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal memuat template kuisioner. Silakan coba lagi.',
-        variant: 'destructive'
-      });
       setLatestTemplate(null);
     } finally {
       setLoading(false);

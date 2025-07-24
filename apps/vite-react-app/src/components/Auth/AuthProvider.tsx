@@ -18,7 +18,6 @@ import {
   selectRefreshToken,
   selectTokenExpiry
 } from '@/redux/features/authSlice';
-import { useToast } from '@workspace/ui/components/sonner';
 import type { User } from '@/services/users/types';
 
 interface LoginData {
@@ -58,7 +57,6 @@ interface AuthProviderProps {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const dispatch = useAppDispatch();
-  const { toast } = useToast();
   const isAuthenticated = useAppSelector(selectIsAuthenticated);
   const user = useAppSelector(selectUser);
   const loading = useAppSelector(selectAuthLoading);
@@ -67,16 +65,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const refreshToken = useAppSelector(selectRefreshToken);
   const tokenExpiry = useAppSelector(selectTokenExpiry);
 
-  // Show error toast when error is set
-  useEffect(() => {
-    if (error) {
-      toast({
-        title: "Error",
-        description: error,
-        variant: "destructive"
-      });
-    }
-  }, [error, toast]);
+  // Note: Error toast handling removed to avoid duplication with BaseService
+  // BaseService automatically shows toast errors for all auth API calls
 
   const login = async (loginData: LoginData): Promise<void> => {
     try {

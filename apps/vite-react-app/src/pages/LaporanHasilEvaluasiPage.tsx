@@ -131,11 +131,6 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
       setTotalItems(response.total);
     } catch (error) {
       console.error('Failed to fetch laporan hasil:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal memuat data laporan hasil evaluasi. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     } finally {
       setLoading(false);
     }
@@ -210,11 +205,6 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to save laporan hasil:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal menyimpan data laporan hasil evaluasi. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     }
   };
 
