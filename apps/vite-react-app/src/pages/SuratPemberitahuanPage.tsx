@@ -84,8 +84,8 @@ const SuratPemberitahuanPage: React.FC = () => {
   // Fetch periode evaluasi data
   const fetchPeriodeEvaluasi = async () => {
     try {
-      const response = await periodeEvaluasiService.getPeriodeEvaluasi({ 
-        size: 100 
+      const response = await periodeEvaluasiService.getPeriodeEvaluasi({
+        size: 100
       });
       setPeriodeEvaluasi(response.items);
     } catch (error) {
@@ -194,24 +194,19 @@ const SuratPemberitahuanPage: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to save surat pemberitahuan:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal menyimpan data surat pemberitahuan. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     }
   };
 
   // Check if user can edit this item based on role and permissions
   const canEdit = (item: SuratPemberitahuanResponse) => {
     if (!canEditForm('surat_pemberitahuan')) return false;
-    
+
     // Check if the periode is locked or status is "tutup"
     const periode = findPeriodeByYear(periodeEvaluasi, item.tahun_evaluasi);
     if (periode?.is_locked || periode?.status === 'tutup') {
       return false;
     }
-    
+
     if (isAdmin()) return true;
     if (isInspektorat()) {
       // Check if user can edit this surat pemberitahuan based on inspektorat

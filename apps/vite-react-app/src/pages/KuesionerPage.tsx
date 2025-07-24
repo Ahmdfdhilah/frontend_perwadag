@@ -44,7 +44,7 @@ interface KuesionerPageFilters {
 
 const KuesionerPage: React.FC = () => {
   const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
-  const { hasPageAccess, canEditForm} = useFormPermissions();
+  const { hasPageAccess, canEditForm } = useFormPermissions();
   const { toast } = useToast();
 
   // URL Filters configuration
@@ -89,8 +89,8 @@ const KuesionerPage: React.FC = () => {
   // Fetch periode evaluasi data
   const fetchPeriodeEvaluasi = async () => {
     try {
-      const response = await periodeEvaluasiService.getPeriodeEvaluasi({ 
-        size: 100 
+      const response = await periodeEvaluasiService.getPeriodeEvaluasi({
+        size: 100
       });
       setPeriodeEvaluasi(response.items);
     } catch (error) {
@@ -201,11 +201,6 @@ const KuesionerPage: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to save kuisioner:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal menyimpan data kuisioner. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     }
   };
 
@@ -264,13 +259,13 @@ const KuesionerPage: React.FC = () => {
 
   const canEdit = (item: KuisionerResponse) => {
     if (!canEditForm('kuesioner')) return false;
-    
+
     // Check if the periode is locked or status is "tutup"
     const periode = findPeriodeByYear(periodeEvaluasi, item.tahun_evaluasi);
     if (periode?.is_locked || periode?.status === 'tutup') {
       return false;
     }
-    
+
     if (isAdmin()) return true;
     if (isInspektorat()) {
       // Check if user can edit this kuisioner based on inspektorat
@@ -302,8 +297,8 @@ const KuesionerPage: React.FC = () => {
         title="Kuesioner"
         description="Kelola data kuesioner evaluasi"
         actions={
-          <Button 
-            variant="default" 
+          <Button
+            variant="default"
             onClick={() => setTemplateDialogOpen(true)}
             className="flex items-center gap-2"
           >
