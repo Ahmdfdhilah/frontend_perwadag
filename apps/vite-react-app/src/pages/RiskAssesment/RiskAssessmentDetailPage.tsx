@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
+import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Button } from '@workspace/ui/components/button';
@@ -15,6 +16,7 @@ const RiskAssessmentDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { currentRole } = useRole();
+  const { canEditForm } = useFormPermissions();
   const { toast } = useToast();
   const [penilaianData, setPenilaianData] = useState<PenilaianRisiko | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -54,6 +56,19 @@ const RiskAssessmentDetailPage: React.FC = () => {
 
   const handleEdit = () => {
     navigate(`/penilaian-resiko/${id}/edit`);
+  };
+
+  // Helper function to check if a record can be edited based on periode status
+  const canEditRecord = () => {
+    if (!penilaianData) return false;
+    if (!canEditForm('risk_assessment')) return false;
+    
+    // Check if the periode is locked or status is "tutup"
+    if (penilaianData.periode_info?.is_locked || penilaianData.periode_info?.status === 'tutup') {
+      return false;
+    }
+    
+    return true;
   };
 
   // Check access after all hooks have been called
@@ -108,13 +123,15 @@ const RiskAssessmentDetailPage: React.FC = () => {
               <ArrowLeft className="mr-2 h-4 w-4" />
               Kembali ke Daftar
             </Button>
-            <Button
-              onClick={handleEdit}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              <Edit className="mr-2 h-4 w-4" />
-              Edit Assessment
-            </Button>
+            {canEditRecord() && (
+              <Button
+                onClick={handleEdit}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Edit className="mr-2 h-4 w-4" />
+                Edit Assessment
+              </Button>
+            )}
           </div>
         }
       />

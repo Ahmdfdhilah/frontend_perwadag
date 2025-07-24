@@ -41,31 +41,31 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {showView && (
+        {showView && onView && (
           <DropdownMenuItem onClick={onView}>
             <Eye className="mr-2 h-4 w-4" />
             Lihat
           </DropdownMenuItem>
         )}
-        {showEdit && (
+        {showEdit && onEdit && (
           <DropdownMenuItem onClick={onEdit}>
             <Edit className="mr-2 h-4 w-4" />
             Edit
           </DropdownMenuItem>
         )}
-        {showComposeEmail && (
+        {showComposeEmail && onComposeEmail && (
           <DropdownMenuItem onClick={onComposeEmail}>
             <Mail className="mr-2 h-4 w-4" />
             Kirim Email
           </DropdownMenuItem>
         )}
-        {showExport && (
+        {showExport && onExport && (
           <DropdownMenuItem onClick={onExport}>
             <Download className="mr-2 h-4 w-4" />
             Export Excel
           </DropdownMenuItem>
         )}
-        {showDelete && (
+        {showDelete && onDelete && (
           <DropdownMenuItem onClick={onDelete} className="text-red-600">
             <Trash2 className="mr-2 h-4 w-4" />
             Hapus
