@@ -1,5 +1,5 @@
 // src/App.jsx
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { TooltipProvider } from '@workspace/ui/components/tooltip';
 // Import your layouts/components
@@ -74,7 +74,9 @@ function App() {
                     </AuthGuard>
                   }>
                               
-                    {/* Dashboard - All authenticated users */}
+                    {/* Redirect root to dashboard */}
+                    <Route index element={<Navigate to="/dashboard" replace />} />
+                    
                     <Route path="dashboard" element={
                       <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT', 'PERWADAG']}>
                         <DashboardPage />

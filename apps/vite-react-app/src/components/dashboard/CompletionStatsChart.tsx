@@ -35,6 +35,34 @@ interface CompletionStatsChartProps {
 const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({ 
   completionStats 
 }) => {
+  // Check if all stats are zero (no data)
+  const hasNoData = Object.values(completionStats).every(stat => stat.total === 0);
+  
+  // Early return for debugging
+  if (hasNoData) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <BarChart3 className="h-5 w-5" />
+            <span>Status Penyelesaian Tahapan</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <BarChart3 className="h-16 w-16 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold text-muted-foreground mb-2">
+              Belum Ada Data
+            </h3>
+            <p className="text-sm text-muted-foreground max-w-md">
+              Belum ada surat tugas yang dibuat. Silakan buat surat tugas terlebih dahulu untuk melihat statistik penyelesaian.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   const getStepIcon = (stepKey: string) => {
     const iconMap: Record<string, React.ReactNode> = {
       surat_pemberitahuan: <FileText className="h-4 w-4" />,
@@ -90,10 +118,6 @@ const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({
     }
   ];
 
-  const sortedStats = Object.entries(completionStats).sort(
-    ([, a], [, b]) => b.percentage - a.percentage
-  );
-
   return (
     <Card>
       <CardHeader>
@@ -105,7 +129,9 @@ const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({
       <CardContent>
         {/* Grid of Donut Charts */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {sortedStats.map(([stepKey, stats]) => {
+          {Object.entries(completionStats)
+            .sort(([, a], [, b]) => b.percentage - a.percentage)
+            .map(([stepKey, stats]) => {
             const pieData = preparePieData(stats);
             const totalTasks = React.useMemo(() => {
               return stats.total;
