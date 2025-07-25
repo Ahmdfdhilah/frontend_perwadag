@@ -32,8 +32,6 @@ import ProfilePage from './pages/Profile/ProfilePage';
 import DashboardPage from './pages/Dashboard/DashboardPage';
 import { PublicRoute, AuthGuard } from './components/Auth/AuthGuard';
 import { RoleProtectedRoute } from './components/Auth/RoleProtectedRoute';
-import { RoleBasedHome } from './components/Auth/RoleBasedHome';
-
 
 function App() {
   return (
@@ -75,9 +73,7 @@ function App() {
                       <DashboardLayout />
                     </AuthGuard>
                   }>
-                    {/* Home route - redirects based on role */}
-                    <Route index element={<RoleBasedHome />} />
-                    
+                              
                     {/* Dashboard - All authenticated users */}
                     <Route path="dashboard" element={
                       <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT', 'PERWADAG']}>

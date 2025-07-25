@@ -55,7 +55,7 @@ export function RoleProtectedRoute({
 // Guard for routes that require user to have ANY role assigned
 export function RequireRoles({ 
   children, 
-  redirectTo = '/',
+  redirectTo = '/dashboard',
   fallback 
 }: { 
   children: ReactNode; 
