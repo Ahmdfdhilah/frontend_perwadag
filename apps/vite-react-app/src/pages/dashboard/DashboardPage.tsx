@@ -4,10 +4,12 @@ import { Helmet } from "react-helmet-async";
 import { PageHeader } from "../../components/common/PageHeader";
 import DashboardCards from "../../components/Dashboard/DashboardCards";
 import CompletionStatsChart from "../../components/Dashboard/CompletionStatsChart";
+import LogActivitySection from "../../components/Dashboard/LogActivitySection";
 import SuratTugasTable from "../../components/SuratTugas/SuratTugasTable";
 import SuratTugasCards from "../../components/SuratTugas/SuratTugasCards";
 import { suratTugasService } from "../../services/suratTugas/service";
 import { SuratTugasDashboardSummary } from "../../services/suratTugas/types";
+import { useRole } from "@/hooks/useRole";
 import {
   RefreshCw,
   AlertCircle,
@@ -29,6 +31,7 @@ import { getDefaultYearOptions, getCurrentYear } from "@/utils/yearUtils";
 
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
+  const { isAdmin } = useRole();
   const [dashboardData, setDashboardData] = useState<SuratTugasDashboardSummary | null>(null);
   const [selectedYear, setSelectedYear] = useState<number>(getCurrentYear());
   const [isLoading, setIsLoading] = useState(true);
@@ -257,6 +260,11 @@ const DashboardPage: React.FC = () => {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Log Activity Section - Only for Admin */}
+      {isAdmin() && (
+        <LogActivitySection />
       )}
     </div>
   );
