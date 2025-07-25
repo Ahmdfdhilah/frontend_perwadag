@@ -100,18 +100,6 @@ export interface CompletionStat {
   remaining: number;     // total - completed
 }
 
-export interface RecentItem {
-  id: string;
-  no_surat: string;
-  nama_perwadag: string;
-  inspektorat: string;
-  tanggal_evaluasi_mulai: string;    // YYYY-MM-DD
-  tanggal_evaluasi_selesai: string;  // YYYY-MM-DD
-  tahun_evaluasi: number;
-  progress_percentage: number;       // 0-100
-  is_evaluation_active: boolean;
-  evaluation_status: string;         // "active" | "completed" | "upcoming"
-}
 
 export interface SuratTugasDashboardSummary {
   user_info: {
@@ -136,7 +124,7 @@ export interface SuratTugasDashboardSummary {
       laporan_hasil: CompletionStat;
       kuisioner: CompletionStat;
     };
-    recent_surat_tugas: RecentItem[];   // Last 5 items
+    recent_surat_tugas: SuratTugasResponse[];   // Last 5 items
     summary_by_relationship: {
       most_completed: string | null;    // e.g. "matriks"
       least_completed: string | null;   // e.g. "kuisioner"

@@ -29,6 +29,7 @@ import { EmailSentSuccessPage } from './pages/auth/EmailSentSuccessPage';
 import { ResetPasswordPage } from './pages/auth/ResetPasswordPage';
 import UsersPage from './pages/users/UsersPage';
 import ProfilePage from './pages/profile/ProfilePage';
+import DashboardPage from './pages/dashboard/DashboardPage';
 import { PublicRoute, AuthGuard } from './components/Auth/AuthGuard';
 import { RoleProtectedRoute } from './components/Auth/RoleProtectedRoute';
 import { RoleBasedHome } from './components/Auth/RoleBasedHome';
@@ -76,6 +77,13 @@ function App() {
                   }>
                     {/* Home route - redirects based on role */}
                     <Route index element={<RoleBasedHome />} />
+                    
+                    {/* Dashboard - All authenticated users */}
+                    <Route path="dashboard" element={
+                      <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT', 'PERWADAG']}>
+                        <DashboardPage />
+                      </RoleProtectedRoute>
+                    } />
                     
                     {/* Risk Assessment - ADMIN and INSPEKTORAT only */}
                     <Route path="penilaian-resiko" element={

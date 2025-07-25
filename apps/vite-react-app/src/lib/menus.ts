@@ -1,4 +1,4 @@
-import { AlertTriangle, FileInput, Grid2X2, Mail, MailWarningIcon, PhoneIncoming, PhoneOutgoing, Users, ClipboardList, ClipboardCopyIcon, CheckSquare } from "lucide-react";
+import { AlertTriangle, FileInput, Grid2X2, Mail, MailWarningIcon, PhoneIncoming, PhoneOutgoing, Users, ClipboardList, ClipboardCopyIcon, CheckSquare, BarChart3 } from "lucide-react";
 
 // Role definitions - UPPERCASE to match backend
 export type UserRole =
@@ -18,6 +18,13 @@ export interface SidebarItem {
 
 
 export const appMenuItems: SidebarItem[] = [
+  // Dashboard - All roles
+  {
+    title: 'Dashboard',
+    href: '/dashboard',
+    icon: BarChart3,
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
+  },
 
   // Risk Assessment - Only ADMIN and INSPEKTORAT
   {
