@@ -10,6 +10,7 @@ import SuratTugasCards from "../../components/SuratTugas/SuratTugasCards";
 import { suratTugasService } from "../../services/suratTugas/service";
 import { SuratTugasDashboardSummary } from "../../services/suratTugas/types";
 import { useRole } from "@/hooks/useRole";
+import { useURLFilters } from "@/hooks/useURLFilters";
 import {
   RefreshCw,
   AlertCircle,
@@ -17,7 +18,6 @@ import {
 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
-import { toast } from "@workspace/ui/components/sonner";
 import Filtering from "@/components/common/Filtering";
 import {
   Select,
@@ -29,11 +29,29 @@ import {
 import { Label } from "@workspace/ui/components/label";
 import { getDefaultYearOptions, getCurrentYear } from "@/utils/yearUtils";
 
+interface DashboardPageFilters {
+  tahun_evaluasi: string;
+  search: string;
+  [key: string]: string | number;
+}
+
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAdmin } = useRole();
+
+  // URL Filters configuration
+  const { updateURL, getCurrentFilters } = useURLFilters<DashboardPageFilters>({
+    defaults: {
+      tahun_evaluasi: getCurrentYear().toString(),
+      search: '',
+    },
+    cleanDefaults: true,
+  });
+
+  // Get current filters from URL
+  const filters = getCurrentFilters();
+
   const [dashboardData, setDashboardData] = useState<SuratTugasDashboardSummary | null>(null);
-  const [selectedYear, setSelectedYear] = useState<number>(getCurrentYear());
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([]);
@@ -57,10 +75,7 @@ const DashboardPage: React.FC = () => {
       setDashboardData(data);
     } catch (error: any) {
       console.error("Error fetching dashboard data:", error);
-      toast.error(
-        error?.response?.data?.message ||
-        "Gagal memuat data dashboard"
-      );
+
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -68,17 +83,23 @@ const DashboardPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchDashboardData(selectedYear);
+    const year = parseInt(filters.tahun_evaluasi);
+    fetchDashboardData(year);
     fetchYearOptions();
-  }, [selectedYear]);
+  }, [filters.tahun_evaluasi]);
 
   const handleYearChange = (value: string) => {
-    setSelectedYear(parseInt(value));
+    updateURL({ tahun_evaluasi: value });
+  };
+
+  const handleSearchChange = (search: string) => {
+    updateURL({ search });
   };
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await fetchDashboardData(selectedYear);
+    const year = parseInt(filters.tahun_evaluasi);
+    await fetchDashboardData(year);
   };
 
   const handleViewAllSuratTugas = () => {
@@ -196,7 +217,7 @@ const DashboardPage: React.FC = () => {
         <div className="space-y-2">
           <Label htmlFor="year-filter">Periode (Tahun)</Label>
           <Select
-            value={selectedYear ? selectedYear.toString() : getCurrentYear().toString()}
+            value={filters.tahun_evaluasi}
             onValueChange={handleYearChange}
             disabled={isLoading}
           >
@@ -264,7 +285,10 @@ const DashboardPage: React.FC = () => {
 
       {/* Log Activity Section - Only for Admin */}
       {isAdmin() && (
-        <LogActivitySection />
+        <LogActivitySection 
+          searchQuery={filters.search}
+          onSearchChange={handleSearchChange}
+        />
       )}
     </div>
   );

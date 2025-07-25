@@ -12,11 +12,19 @@ import { cn } from '@workspace/ui/lib/utils';
 
 interface LogActivitySectionProps {
   className?: string;
+  searchQuery?: string;
+  onSearchChange?: (search: string) => void;
 }
 
-const LogActivitySection: React.FC<LogActivitySectionProps> = ({ className }) => {
+const LogActivitySection: React.FC<LogActivitySectionProps> = ({ 
+  className, 
+  searchQuery: externalSearchQuery, 
+  onSearchChange 
+}) => {
   const [logActivities, setLogActivities] = useState<LogActivityResponse[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [internalSearchQuery, setInternalSearchQuery] = useState('');
+  
+  const searchQuery = externalSearchQuery !== undefined ? externalSearchQuery : internalSearchQuery;
   const [isLoading, setIsLoading] = useState(true);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -123,7 +131,7 @@ const LogActivitySection: React.FC<LogActivitySectionProps> = ({ className }) =>
         <div className="pt-2">
           <SearchContainer
             searchQuery={searchQuery}
-            onSearchChange={setSearchQuery}
+            onSearchChange={onSearchChange || setInternalSearchQuery}
             placeholder="Cari aktivitas, user, atau URL..."
             className="max-w-md"
           />
