@@ -29,16 +29,18 @@ import { getDefaultYearOptions, getCurrentYear } from "@/utils/yearUtils";
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const [dashboardData, setDashboardData] = useState<SuratTugasDashboardSummary | null>(null);
-  const [selectedYear, setSelectedYear] = useState<number | null>(getCurrentYear());
+  const [selectedYear, setSelectedYear] = useState<number>(getCurrentYear());
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
+  const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([]);
 
   // Fetch year options function
   const fetchYearOptions = async () => {
     try {
       const options = await getDefaultYearOptions();
-      setYearOptions(options);
+      // Filter out 'all' option to only show specific years
+      const filteredOptions = options.filter(option => option.value !== 'all');
+      setYearOptions(filteredOptions);
     } catch (error) {
       console.error('Failed to fetch year options:', error);
     }
@@ -67,11 +69,7 @@ const DashboardPage: React.FC = () => {
   }, [selectedYear]);
 
   const handleYearChange = (value: string) => {
-    if (value === 'all') {
-      setSelectedYear(null);
-    } else {
-      setSelectedYear(parseInt(value));
-    }
+    setSelectedYear(parseInt(value));
   };
 
   const handleRefresh = async () => {
@@ -181,7 +179,6 @@ const DashboardPage: React.FC = () => {
           <Button
             onClick={handleRefresh}
             disabled={isRefreshing}
-            variant="outline"
             size="sm"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -195,7 +192,7 @@ const DashboardPage: React.FC = () => {
         <div className="space-y-2">
           <Label htmlFor="year-filter">Periode (Tahun)</Label>
           <Select 
-            value={selectedYear ? selectedYear.toString() : 'all'} 
+            value={selectedYear ? selectedYear.toString() : getCurrentYear().toString()} 
             onValueChange={handleYearChange}
             disabled={isLoading}
           >
