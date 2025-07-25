@@ -8,12 +8,13 @@ import SuratTugasTable from "../../components/SuratTugas/SuratTugasTable";
 import SuratTugasCards from "../../components/SuratTugas/SuratTugasCards";
 import { suratTugasService } from "../../services/suratTugas/service";
 import { SuratTugasDashboardSummary } from "../../services/suratTugas/types";
-import { 
-  RefreshCw, 
-  AlertCircle
+import {
+  RefreshCw,
+  AlertCircle,
+  FileText
 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
-import { Card, CardContent } from "@workspace/ui/components/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { toast } from "@workspace/ui/components/sonner";
 import Filtering from "@/components/common/Filtering";
 import {
@@ -54,7 +55,7 @@ const DashboardPage: React.FC = () => {
     } catch (error: any) {
       console.error("Error fetching dashboard data:", error);
       toast.error(
-        error?.response?.data?.message || 
+        error?.response?.data?.message ||
         "Gagal memuat data dashboard"
       );
     } finally {
@@ -113,7 +114,7 @@ const DashboardPage: React.FC = () => {
         <Helmet>
           <title>Dashboard - Loading...</title>
         </Helmet>
-        
+
         <PageHeader
           title="Dashboard"
           description="Memuat data dashboard..."
@@ -142,7 +143,7 @@ const DashboardPage: React.FC = () => {
         <Helmet>
           <title>Dashboard - Error</title>
         </Helmet>
-        
+
         <PageHeader
           title="Dashboard"
           description="Gagal memuat data"
@@ -191,8 +192,8 @@ const DashboardPage: React.FC = () => {
       <Filtering>
         <div className="space-y-2">
           <Label htmlFor="year-filter">Periode (Tahun)</Label>
-          <Select 
-            value={selectedYear ? selectedYear.toString() : getCurrentYear().toString()} 
+          <Select
+            value={selectedYear ? selectedYear.toString() : getCurrentYear().toString()}
             onValueChange={handleYearChange}
             disabled={isLoading}
           >
@@ -214,35 +215,48 @@ const DashboardPage: React.FC = () => {
       <DashboardCards dashboardData={dashboardData} />
 
       {/* Charts and Tables Grid */}
-      <CompletionStatsChart 
-          completionStats={dashboardData.summary.completion_stats} 
-        />
+      <CompletionStatsChart
+        completionStats={dashboardData.summary.completion_stats}
+      />
 
       {/* Recent Surat Tugas */}
       {dashboardData.summary.recent_surat_tugas.length > 0 && (
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium">Surat Tugas Terbaru</h3>
-          
-          {/* Desktop Table */}
-          <div className="hidden lg:block">
-            <SuratTugasTable
-              data={dashboardData.summary.recent_surat_tugas}
-              loading={isLoading}
-              isDashboard={true}
-              onViewAll={handleViewAllSuratTugas}
-            />
-          </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <FileText className="h-5 w-5" />
+                <span>Surat Tugas Terbaru</span>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleViewAllSuratTugas}
+              >
+                Lihat Semua
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {/* Desktop Table */}
+            <div className="hidden lg:block">
+              <SuratTugasTable
+                data={dashboardData.summary.recent_surat_tugas}
+                loading={isLoading}
+                isDashboard={true}
+              />
+            </div>
 
-          {/* Mobile Cards */}
-          <div className="lg:hidden">
-            <SuratTugasCards
-              data={dashboardData.summary.recent_surat_tugas}
-              loading={isLoading}
-              isDashboard={true}
-              onViewAll={handleViewAllSuratTugas}
-            />
-          </div>
-        </div>
+            {/* Mobile Cards */}
+            <div className="lg:hidden">
+              <SuratTugasCards
+                data={dashboardData.summary.recent_surat_tugas}
+                loading={isLoading}
+                isDashboard={true}
+              />
+            </div>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

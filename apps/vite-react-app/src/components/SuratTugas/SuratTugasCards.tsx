@@ -4,7 +4,6 @@ import { SuratTugasResponse } from '@/services/suratTugas/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import FileViewLink from '@/components/common/FileViewLink';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
-import { Button } from '@workspace/ui/components/button';
 
 interface SuratTugasCardsProps {
   data: SuratTugasResponse[];
@@ -16,7 +15,6 @@ interface SuratTugasCardsProps {
   canDelete?: (item: SuratTugasResponse) => boolean;
   isPerwadag?: boolean;
   isDashboard?: boolean;
-  onViewAll?: () => void;
 }
 
 const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
@@ -29,7 +27,6 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
   canDelete = () => true,
   isPerwadag = false,
   isDashboard = false,
-  onViewAll,
 }) => {
 
   if (loading) {
@@ -107,14 +104,6 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
           </Card>
         ))}
       </div>
-
-      {isDashboard && data.length > 0 && onViewAll && (
-        <div className="flex justify-center">
-          <Button variant="outline" onClick={onViewAll}>
-            Lihat Semua Surat Tugas
-          </Button>
-        </div>
-      )}
     </div>
   );
 };

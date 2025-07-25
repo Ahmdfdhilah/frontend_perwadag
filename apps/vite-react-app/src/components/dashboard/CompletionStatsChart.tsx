@@ -1,10 +1,8 @@
+"use client"
+
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
-import { Progress } from "@workspace/ui/components/progress";
-import { Badge } from "@workspace/ui/components/badge";
 import { 
-  CheckCircle, 
-  Clock, 
   FileText,
   Users,
   MessageSquare,
@@ -13,6 +11,13 @@ import {
   BookOpen,
   HelpCircle
 } from "lucide-react";
+import { Label, Pie, PieChart } from "recharts";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@workspace/ui/components/chart";
 import { CompletionStat } from "../../services/suratTugas/types";
 
 interface CompletionStatsChartProps {
@@ -56,11 +61,34 @@ const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({
     return nameMap[stepKey] || stepKey.replace('_', ' ');
   };
 
-  const getProgressBadgeVariant = (percentage: number) => {
-    if (percentage >= 80) return "default";
-    if (percentage >= 50) return "secondary";
-    return "destructive";
-  };
+  // Chart config for completion status
+  const chartConfig = {
+    count: {
+      label: "Jumlah",
+    },
+    completed: {
+      label: "Selesai",
+      color: "#10b981", // green-500
+    },
+    remaining: {
+      label: "Tersisa",
+      color: "#e5e7eb", // gray-200
+    },
+  } satisfies ChartConfig;
+
+  // Prepare data for each donut chart
+  const preparePieData = (stats: CompletionStat) => [
+    {
+      status: "completed",
+      count: stats.completed,
+      fill: "#10b981" // green-500 for completed
+    },
+    {
+      status: "remaining",
+      count: stats.remaining,
+      fill: "#e5e7eb" // gray-200 for remaining
+    }
+  ];
 
   const sortedStats = Object.entries(completionStats).sort(
     ([, a], [, b]) => b.percentage - a.percentage
@@ -75,68 +103,99 @@ const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {sortedStats.map(([stepKey, stats]) => (
-            <div key={stepKey} className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  {getStepIcon(stepKey)}
-                  <span className="text-sm font-medium">
-                    {getStepName(stepKey)}
-                  </span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Badge 
-                    variant={getProgressBadgeVariant(stats.percentage)}
-                    className="text-xs"
+        {/* Grid of Donut Charts */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {sortedStats.map(([stepKey, stats]) => {
+            const pieData = preparePieData(stats);
+            const totalTasks = React.useMemo(() => {
+              return stats.total;
+            }, [stats]);
+            
+            return (
+              <Card key={stepKey} className="flex flex-col">
+                <CardHeader className="items-center pb-0">
+                  <div className="flex items-center space-x-2">
+                    {getStepIcon(stepKey)}
+                    <CardTitle className="text-sm font-medium">
+                      {getStepName(stepKey)}
+                    </CardTitle>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1 pb-0">
+                  <ChartContainer
+                    config={chartConfig}
+                    className="mx-auto aspect-square max-h-[200px]"
                   >
-                    {stats.percentage}%
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">
-                    {stats.completed}/{stats.total}
-                  </span>
-                </div>
-              </div>
-              
-              <div className="space-y-1">
-                <Progress value={stats.percentage} className="h-2" />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span className="flex items-center space-x-1">
-                    <CheckCircle className="h-3 w-3 text-green-500" />
-                    <span>Selesai: {stats.completed}</span>
-                  </span>
-                  {stats.remaining > 0 && (
-                    <span className="flex items-center space-x-1">
-                      <Clock className="h-3 w-3 text-yellow-500" />
-                      <span>Tersisa: {stats.remaining}</span>
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
+                    <PieChart>
+                      <ChartTooltip
+                        cursor={false}
+                        content={<ChartTooltipContent hideLabel />}
+                      />
+                      <Pie
+                        data={pieData}
+                        dataKey="count"
+                        nameKey="status"
+                        innerRadius={50}
+                        strokeWidth={5}
+                      >
+                        <Label
+                          content={({ viewBox }) => {
+                            if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                              return (
+                                <text
+                                  x={viewBox.cx}
+                                  y={viewBox.cy}
+                                  textAnchor="middle"
+                                  dominantBaseline="middle"
+                                >
+                                  <tspan
+                                    x={viewBox.cx}
+                                    y={viewBox.cy}
+                                    className="fill-foreground text-2xl font-bold"
+                                  >
+                                    {stats.completed}
+                                  </tspan>
+                                  <tspan
+                                    x={viewBox.cx}
+                                    y={(viewBox.cy || 0) + 20}
+                                    className="fill-muted-foreground text-sm"
+                                  >
+                                    dari {totalTasks}
+                                  </tspan>
+                                </text>
+                              )
+                            }
+                          }}
+                        />
+                      </Pie>
+                    </PieChart>
+                  </ChartContainer>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
 
         {/* Summary Section */}
-        <div className="mt-6 pt-4 border-t">
+        <div className="mt-8 pt-6 border-t">
           <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="text-lg font-bold text-green-600">
+            <div className="space-y-1">
+              <div className="text-2xl font-bold text-green-600">
                 {Object.values(completionStats).reduce((sum, stat) => sum + stat.completed, 0)}
               </div>
-              <div className="text-xs text-muted-foreground">Total Selesai</div>
+              <div className="text-sm text-muted-foreground">Total Selesai</div>
             </div>
-            <div>
-              <div className="text-lg font-bold text-yellow-600">
+            <div className="space-y-1">
+              <div className="text-2xl font-bold text-yellow-600">
                 {Object.values(completionStats).reduce((sum, stat) => sum + stat.remaining, 0)}
               </div>
-              <div className="text-xs text-muted-foreground">Total Tersisa</div>
+              <div className="text-sm text-muted-foreground">Total Tersisa</div>
             </div>
-            <div>
-              <div className="text-lg font-bold text-blue-600">
+            <div className="space-y-1">
+              <div className="text-2xl font-bold text-blue-600">
                 {Object.values(completionStats).reduce((sum, stat) => sum + stat.total, 0)}
               </div>
-              <div className="text-xs text-muted-foreground">Total Keseluruhan</div>
+              <div className="text-sm text-muted-foreground">Total Keseluruhan</div>
             </div>
           </div>
         </div>
