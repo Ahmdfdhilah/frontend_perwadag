@@ -99,8 +99,17 @@ class SuratTugasService extends BaseService {
   }
 
   // Get dashboard summary
-  async getDashboardSummary(): Promise<SuratTugasDashboardSummary> {
-    return this.get("/dashboard/summary");
+  async getDashboardSummary(year?: number): Promise<SuratTugasDashboardSummary> {
+    const queryParams = new URLSearchParams();
+    if (year) {
+      queryParams.append("year", year.toString());
+    }
+    
+    const endpoint = queryParams.toString() 
+      ? `/dashboard/summary?${queryParams.toString()}` 
+      : "/dashboard/summary";
+    
+    return this.get(endpoint);
   }
 }
 

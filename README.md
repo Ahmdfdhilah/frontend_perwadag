@@ -1,36 +1,36 @@
-# 🚀 Frontend Monorepo
+# 🏛️ Perwadag Frontend - Sistem Evaluasi Pemerintahan
 
-A modern, scalable web frontend built with React, TypeScript, and Turborepo monorepo architecture. This project provides a robust foundation for building high-performance web applications with shared UI components and configurations.
+Aplikasi web frontend modern untuk **Sistem Evaluasi Perdagangan (Perwadag)** yang dibangun dengan React, TypeScript, dan arsitektur monorepo Turborepo. Sistem ini menyediakan platform komprehensif untuk mengelola proses evaluasi pemerintahan dengan fitur manajemen surat tugas, meeting, kuisioner, dan pelaporan.
 
-## 🏗️ Architecture
+## 🏗️ Arsitektur Sistem
 
-This project uses a monorepo structure powered by Turborepo, enabling efficient code sharing and coordinated development across multiple applications.
+Proyek ini menggunakan struktur monorepo yang diperkuat oleh Turborepo, memungkinkan berbagi kode yang efisien dan pengembangan terkoordinasi di seluruh aplikasi evaluasi pemerintahan.
 
-### 📱 Applications
-- **SAMPLE** - React application demonstrating the monorepo capabilities
+### 📱 Aplikasi
+- **vite-react-app** - Aplikasi utama sistem evaluasi Perwadag dengan dashboard, manajemen user, dan workflow evaluasi
 
 ### 📦 Shared Packages
-- **@workspace/ui** - Reusable UI components built with Tailwind CSS and Radix UI
-- **@workspace/eslint** - Centralized ESLint configuration for consistent code quality
-- **@workspace/prettier** - Shared code formatting rules
-- **@workspace/tailwind** - Common Tailwind CSS configuration and design tokens
-- **@workspace/typescript** - Unified TypeScript configuration
+- **@workspace/ui** - Komponen UI yang dapat digunakan ulang dengan Tailwind CSS dan Radix UI
+- **@workspace/eslint** - Konfigurasi ESLint terpusat untuk kualitas kode yang konsisten
+- **@workspace/prettier** - Aturan formatting kode bersama
+- **@workspace/tailwind** - Konfigurasi Tailwind CSS dan design tokens umum
+- **@workspace/typescript** - Konfigurasi TypeScript terpadu
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-Ensure you have the following installed on your system:
+Pastikan Anda memiliki yang berikut terinstal di sistem:
 
 - **Node.js** >= 20.0.0
 - **pnpm** >= 9.15.4
 
 ### Installation
 
-1. **Clone the repository:**
+1. **Clone repository:**
 ```bash
-git clone https://github.com/Ahmdfdhilah/turborepo_boilerplate
-cd turborepo_boilerplate
+git clone [repository-url]
+cd perwadag/frontend
 ```
 
 2. **Install dependencies:**
@@ -40,131 +40,213 @@ pnpm install
 
 ### Development
 
-**Start all applications in development mode:**
+**Start aplikasi dalam mode development:**
 
-For Linux/macOS:
 ```bash
-pnpm run dev:apps:linux
+pnpm dev
 ```
 
-For Windows:
+**Start aplikasi tertentu:**
 ```bash
-pnpm run dev:apps:windows
-```
-
-**Start individual applications:**
-```bash
-# Company Profile app example
-pnpm --filter company-profile dev
-
-# Or any other specific app
-pnpm --filter <app-name> dev
+# Aplikasi Perwadag utama
+pnpm --filter vite-react-app dev
 ```
 
 ## 📜 Available Scripts
 
 | Command | Description |
 |---------|-------------|
-| `pnpm dev` | Start all applications in development mode |
-| `pnpm build` | Build all applications for production |
-| `pnpm lint` | Run ESLint across all packages |
-| `pnpm format` | Format code with Prettier |
-| `pnpm check-types` | Run TypeScript type checking |
-| `pnpm clean` | Clean build artifacts and dependencies |
+| `pnpm dev` | Start aplikasi dalam mode development |
+| `pnpm build` | Build aplikasi untuk production |
+| `pnpm lint` | Jalankan ESLint di semua packages |
+| `pnpm format` | Format kode dengan Prettier |
+| `pnpm check-types` | Jalankan TypeScript type checking |
+| `pnpm clean` | Bersihkan build artifacts dan dependencies |
 
 ## 🛠️ Tech Stack
 
 ### Core Framework
-- **React 19** - Latest React with concurrent features
-- **TypeScript** - Type-safe JavaScript development
-- **Vite** - Lightning-fast build tool and dev server
+- **React 19** - React terbaru dengan fitur concurrent
+- **TypeScript** - Pengembangan JavaScript yang type-safe
+- **Vite** - Build tool dan dev server yang sangat cepat
 
 ### State Management
-- **Redux Toolkit** - Modern Redux with less boilerplate
-- **Redux Persist** - Automatic state persistence
+- **Redux Toolkit** - Redux modern dengan boilerplate minimal
+- **Redux Persist** - Persistensi state otomatis
 
 ### Styling & UI
-- **Tailwind CSS 4** - Utility-first CSS framework
-- **Radix UI** - Unstyled, accessible UI primitives
-- **Framer Motion** - Production-ready motion library
+- **Tailwind CSS 4** - Framework CSS utility-first
+- **Radix UI** - UI primitives yang accessible dan unstyled
+- **Framer Motion** - Library motion siap produksi
 
 ### Forms & Validation
-- **React Hook Form** - Performant forms with minimal re-renders
-- **Zod** - TypeScript-first schema validation
+- **React Hook Form** - Forms performa tinggi dengan minimal re-renders
+- **Zod** - Validasi schema TypeScript-first
 
 ### Rich Text Editing
-- **TipTap** - Headless rich text editor
-- **React Quill** - Alternative WYSIWYG editor
+- **TipTap** - Rich text editor headless untuk dokumen evaluasi
+- **React Quill** - WYSIWYG editor alternatif
 
 ### Data Visualization
-- **Recharts** - Composable charting library built on React components
+- **Recharts** - Library charting untuk dashboard dan laporan
 
 ### HTTP & API
-- **Axios** - Promise-based HTTP client with interceptors
+- **Axios** - HTTP client berbasis Promise dengan interceptors
 
 ### Internationalization
-- **i18next** - Internationalization framework
-- **react-i18next** - React integration for i18next
+- **i18next** - Framework internasionalisasi
+- **react-i18next** - Integrasi React untuk i18next
 
 ### Development Tools
-- **Turborepo** - High-performance build system for monorepos
-- **ESLint** - Pluggable JavaScript linter
-- **Prettier** - Opinionated code formatter
+- **Turborepo** - Build system performa tinggi untuk monorepos
+- **ESLint** - JavaScript linter yang pluggable
+- **Prettier** - Code formatter yang opinionated
 
-## 📁 Project Structure
+## 📁 Struktur Proyek
 
 ```
-turborepo_boilerplate/
-├── apps/                          # Applications
-│   └── sample/                    # Sample application
+frontend/
+├── apps/                          # Aplikasi
+│   └── vite-react-app/           # Aplikasi utama Perwadag
+│       ├── src/
+│       │   ├── components/       # Komponen React
+│       │   │   ├── Auth/         # Komponen autentikasi
+│       │   │   ├── Users/        # Manajemen user
+│       │   │   ├── SuratTugas/   # Surat tugas evaluasi
+│       │   │   ├── Meeting/      # Entry/Exit meeting
+│       │   │   ├── Kuisioner/    # Kuisioner evaluasi
+│       │   │   ├── Matriks/      # Matriks evaluasi
+│       │   │   └── common/       # Komponen umum
+│       │   ├── pages/            # Halaman aplikasi
+│       │   ├── services/         # API services layer
+│       │   ├── redux/            # State management
+│       │   ├── hooks/            # Custom React hooks
+│       │   └── utils/            # Utility functions
+│       └── package.json
 ├── packages/                      # Shared packages
-│   ├── ui/                        # Shared UI components
+│   ├── ui/                       # Shared UI components
 │   │   ├── src/
-│   │   │   ├── components/        # Reusable components
-│   │   │   ├── hooks/             # Custom React hooks
-│   │   │   └── utils/             # Utility functions
+│   │   │   ├── components/       # Komponen yang dapat digunakan ulang
+│   │   │   ├── hooks/            # Custom React hooks
+│   │   │   └── utils/            # Utility functions
 │   │   └── package.json
-│   ├── eslint/                    # ESLint configuration
-│   ├── prettier/                  # Prettier configuration
-│   ├── tailwind/                  # Tailwind CSS configuration
-│   └── typescript/                # TypeScript configuration
-├── turbo.json                     # Turborepo configuration
-├── package.json                   # Root package.json
-├── pnpm-workspace.yaml           # PNPM workspace configuration
-└── README.md                      # This file
+│   ├── eslint/                   # Konfigurasi ESLint
+│   ├── prettier/                 # Konfigurasi Prettier
+│   ├── tailwind/                 # Konfigurasi Tailwind CSS
+│   └── typescript/               # Konfigurasi TypeScript
+├── turbo.json                    # Konfigurasi Turborepo
+├── package.json                  # Root package.json
+├── pnpm-workspace.yaml          # Konfigurasi PNPM workspace
+└── README.md                     # File ini
 ```
 
-## 🌟 Features
+## 🌟 Fitur Sistem Perwadag
 
-- **⚡ Fast Development** - Hot reload with Vite and optimized builds with Turborepo
-- **🎨 Design System** - Consistent UI with shared components and design tokens
-- **📱 Responsive** - Mobile-first design with Tailwind CSS
-- **♿ Accessible** - Built with accessibility in mind using Radix UI primitives
-- **🔧 Type Safe** - Full TypeScript support across all packages
-- **🎯 Modern Tooling** - Latest versions of React, TypeScript, and build tools
-- **🔄 Code Sharing** - Efficient code reuse across applications
-- **📊 Performance** - Optimized builds and lazy loading
+### 🔐 Autentikasi & Otorisasi
+- **Login dengan Nama Lengkap** - Sistem login menggunakan nama lengkap sebagai username
+- **Role-based Access Control** - Tiga level akses: Admin, Inspektorat, Perwadag
+- **JWT Authentication** - Token-based authentication dengan refresh token
+- **Password Reset** - Fitur reset password via email
+
+### 👥 Manajemen User
+- **Multi-role User Management** - Kelola user dengan role berbeda
+- **Profile Management** - User dapat mengelola profil sendiri
+- **User Statistics** - Dashboard statistik user untuk admin
+
+### 📋 Workflow Evaluasi
+- **Surat Tugas** - Pembuatan dan pengelolaan surat tugas evaluasi
+- **Surat Pemberitahuan** - Notifikasi evaluasi ke perwadag
+- **Entry Meeting** - Manajemen meeting pembukaan evaluasi
+- **Konfirmasi Meeting** - Konfirmasi jadwal dan agenda meeting
+- **Exit Meeting** - Meeting penutupan evaluasi
+- **Matriks Evaluasi** - Input dan kelola matriks penilaian
+- **Kuisioner** - Template dan pengisian kuisioner evaluasi
+- **Laporan Hasil** - Generate dan kelola laporan hasil evaluasi
+
+### 📊 Dashboard & Reporting
+- **Dashboard Overview** - Ringkasan status evaluasi dan progress
+- **Progress Tracking** - Pelacakan kemajuan setiap tahap evaluasi
+- **Data Visualization** - Charts dan grafik untuk analisis data
+- **Export Functionality** - Export data ke Excel dan PDF
+
+### 📁 File Management
+- **Document Upload** - Upload dokumen pendukung evaluasi
+- **File Preview** - Preview file dalam aplikasi
+- **Download Center** - Pusat download dokumen dan template
+
+### 🔍 Search & Filter
+- **Advanced Search** - Pencarian lanjutan di semua modul
+- **URL-based Filters** - Filter yang tersimpan di URL untuk bookmarking
+- **Real-time Filtering** - Filter real-time dengan debouncing
+
+## 🎯 Pola Pengembangan
+
+### Services Layer
+- **API Integration** - Layer service terstruktur untuk komunikasi dengan backend
+- **Error Handling** - Penanganan error terpusat dengan toast notifications
+- **Request/Response Types** - Type safety penuh untuk semua API calls
+
+### Component Architecture
+- **Reusable Components** - Komponen yang dapat digunakan ulang di seluruh aplikasi
+- **Compound Components** - Pola compound untuk komponen kompleks
+- **Custom Hooks** - Hooks kustom untuk logic yang dapat digunakan ulang
+
+### State Management
+- **Redux Toolkit** - State management modern dengan RTK
+- **Persistent State** - State yang persisten untuk user preferences
+- **Optimistic Updates** - Update optimistik untuk UX yang lebih baik
+
+## 🔧 Konfigurasi Environment
+
+Buat file `.env.local` di `apps/vite-react-app/`:
+
+```env
+VITE_API_BASE_URL=http://localhost:8000/api/v1
+VITE_APP_NAME=Sistem Evaluasi Perwadag
+VITE_APP_VERSION=1.0.0
+```
+
+## 🚀 Deployment
+
+### Build untuk Production
+
+```bash
+pnpm build
+```
+
+### Preview Production Build
+
+```bash
+pnpm preview
+```
+
+## 📖 Dokumentasi Tambahan
+
+- [Guide Logic Pages](./guide-logic-pages.md) - Panduan implementasi halaman
+- [Form Data Mapping](./form-data-mapping.md) - Mapping data forms
+- [Data Structure Mapping](./data-structure-mapping.md) - Struktur data
+- [File Upload Components](./file-upload-components-list.md) - Komponen upload file
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+1. Fork repository
+2. Buat feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit perubahan (`git commit -m 'Add some amazing feature'`)
+4. Push ke branch (`git push origin feature/amazing-feature`)
+5. Buka Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+Proyek ini dilisensikan di bawah MIT License - lihat file [LICENSE](LICENSE) untuk detail.
 
 ## 🆘 Support
 
-If you encounter any issues or have questions, please:
+Jika Anda mengalami masalah atau memiliki pertanyaan:
 
-1. Check the [documentation](#)
-2. Search existing [issues](../../issues)
-3. Create a new [issue](../../issues/new) if needed
+1. Periksa [dokumentasi](#)
+2. Cari [issues](../../issues) yang sudah ada
+3. Buat [issue baru](../../issues/new) jika diperlukan
 
 ---
 
-Built with ❤️ using modern web technologies
+Dibangun dengan ❤️ untuk Sistem Evaluasi Pemerintahan Indonesia

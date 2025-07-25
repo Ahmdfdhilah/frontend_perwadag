@@ -92,13 +92,63 @@ export interface SuratTugasCreateResponse {
 
 export interface SuratTugasListResponse extends PaginatedResponse<SuratTugasResponse> { }
 
+// Dashboard Summary Types
+export interface CompletionStat {
+  completed: number;      // How many completed
+  total: number;         // Total records
+  percentage: number;    // 0-100
+  remaining: number;     // total - completed
+}
+
+export interface RecentItem {
+  id: string;
+  no_surat: string;
+  nama_perwadag: string;
+  inspektorat: string;
+  tanggal_evaluasi_mulai: string;    // YYYY-MM-DD
+  tanggal_evaluasi_selesai: string;  // YYYY-MM-DD
+  tahun_evaluasi: number;
+  progress_percentage: number;       // 0-100
+  is_evaluation_active: boolean;
+  evaluation_status: string;         // "active" | "completed" | "upcoming"
+}
+
 export interface SuratTugasDashboardSummary {
-  total_surat_tugas: number;
-  active_evaluations: number;
-  completed_evaluations: number;
-  by_status: Record<string, number>;
-  by_inspektorat: Record<string, number>;
-  recent_activities: any[];
+  user_info: {
+    nama: string;
+    role: "ADMIN" | "INSPEKTORAT" | "PERWADAG";
+    inspektorat: string | null;
+  };
+  year_filter: number | null;
+  summary: {
+    statistics: {
+      total_surat_tugas: number;        // Total filtered by year
+      average_progress: number;         // 0-100 percentage
+      year_filter_applied: boolean;
+      filtered_year: number | null;
+    };
+    completion_stats: {
+      surat_pemberitahuan: CompletionStat;
+      entry_meeting: CompletionStat;
+      konfirmasi_meeting: CompletionStat;
+      exit_meeting: CompletionStat;
+      matriks: CompletionStat;
+      laporan_hasil: CompletionStat;
+      kuisioner: CompletionStat;
+    };
+    recent_surat_tugas: RecentItem[];   // Last 5 items
+    summary_by_relationship: {
+      most_completed: string | null;    // e.g. "matriks"
+      least_completed: string | null;   // e.g. "kuisioner"
+      total_relationships: number;      // Always 7
+      fully_completed_relationships: number;
+    };
+  };
+  quick_actions: {
+    can_create_surat_tugas: boolean;
+    can_manage_templates: boolean;
+    total_evaluasi: number;
+  };
 }
 
 export interface PerwadagListResponse {
