@@ -14,6 +14,7 @@ import { Textarea } from '@workspace/ui/components/textarea';
 import { FormatKuisionerResponse } from '@/services/formatKuisioner/types';
 import { Download } from 'lucide-react';
 import FileUpload from '@/components/common/FileUpload';
+import { formatKuisionerService } from '@/services/formatKuisioner';
 
 interface QuestionnaireFormData {
   nama_template: string;
@@ -44,6 +45,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
     tahun: new Date().getFullYear(),
   });
   const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [fileToDelete, setFileToDelete] = useState<string | null>(null);
 
   const isCreating = !item;
   const isEditable = mode === 'edit' && isAdmin();
@@ -63,13 +65,23 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
         tahun: new Date().getFullYear(),
       });
       setUploadFile(null);
+      setFileToDelete(null);
     }
   }, [item, open]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Skip validation if form is invalid
     if (!isFormValid) {
       return;
+    }
+
+    // First, delete file that was marked for deletion
+    if (item?.id && fileToDelete) {
+      try {
+        await formatKuisionerService.deleteFile(item.id, fileToDelete);
+      } catch (error) {
+        console.error('Error deleting file:', error);
+      }
     }
 
     const dataToSave = {
@@ -89,12 +101,47 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
     setUploadFile(files[0] || null);
   };
 
-  const handleDownloadTemplate = () => {
-    if (item?.file_urls?.download_url) {
+  const handleDownloadTemplate = async () => {
+    if (!item?.id) return;
+    
+    try {
+      const blob = await formatKuisionerService.downloadTemplate(item.id);
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = item.file_urls.download_url;
+      link.href = url;
       link.download = item.file_metadata?.original_filename || `template_${item.nama_template}.pdf`;
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
+
+  const handleExistingFileRemove = () => {
+    if (!item?.file_metadata) return;
+    
+    // Mark file for deletion (will be executed on save)
+    const filename = item.file_metadata.original_filename || item.file_metadata.filename;
+    setFileToDelete(filename);
+  };
+
+  const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
+    if (!item?.id) return;
+    
+    try {
+      const blob = await formatKuisionerService.downloadTemplate(item.id);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
     }
   };
 
@@ -156,20 +203,23 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
 
             <FileUpload
               label="Upload Dokumen Template"
-              accept=".pdf,.doc,.docx"
+              accept=".pdf,.doc,.docx,.xls,.xlsx"
               multiple={false}
               maxSize={10 * 1024 * 1024} // 10MB
               maxFiles={1}
               files={uploadFile ? [uploadFile] : []}
-              existingFiles={item?.has_file ? [{
-                name: item.file_metadata?.original_filename || item.nama_template,
+              existingFiles={item?.has_file && !fileToDelete ? [{
+                name: item.file_metadata?.original_filename || item.file_metadata?.filename || item.nama_template,
                 url: item.file_urls?.file_url,
-                size: item.file_metadata?.size_mb ? Math.round(item.file_metadata.size_mb * 1024 * 1024) : undefined
+                viewUrl: item.file_urls?.view_url,
+                size: item.file_metadata?.size
               }] : []}
               mode={isEditable ? 'edit' : 'view'}
               disabled={!isEditable}
               onFilesChange={handleUploadFileChange}
-              description="Format yang didukung: PDF, DOC, DOCX (Max 10MB)"
+              onExistingFileRemove={handleExistingFileRemove}
+              onFileDownload={handleFileDownload}
+              description="Format yang didukung: PDF, DOC, DOCX, XLS, XLSX (Max 10MB)"
             />
           </div>
         </div>

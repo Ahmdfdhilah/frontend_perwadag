@@ -98,6 +98,14 @@ class FormatKuisionerService extends BaseService {
     return this.get(`/download/${formatKuisionerId}`);
   }
 
+  // Delete file
+  async deleteFile(
+    formatKuisionerId: string,
+    filename: string
+  ): Promise<MessageResponse> {
+    return this.delete(`/${formatKuisionerId}/files/${filename}`);
+  }
+
   // Get admin statistics
   async getAdminStatistics(): Promise<FormatKuisionerStatisticsResponse> {
     return this.get("/admin/statistics");
