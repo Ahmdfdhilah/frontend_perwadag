@@ -5,6 +5,7 @@ import { Label } from '@workspace/ui/components/label';
 import { Upload, Download, File, X, Eye } from 'lucide-react';
 import { cn } from '@workspace/ui/lib/utils';
 import { API_BASE_URL } from '@/config/api';
+import { useToast } from '@workspace/ui/components/sonner';
 
 export interface FileUploadProps {
   id?: string;
@@ -28,6 +29,7 @@ export interface FileUploadProps {
   showPreview?: boolean;
   allowRemove?: boolean;
   className?: string;
+  internalErrorHandling?: boolean; // New prop to enable internal error handling
   onFilesChange?: (files: File[]) => void;
   onFileRemove?: (index: number) => void;
   onExistingFileRemove?: (index: number) => void;
@@ -53,6 +55,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   showPreview = true,
   allowRemove = true,
   className,
+  internalErrorHandling = true,
   onFilesChange,
   onFileRemove,
   onExistingFileRemove,
@@ -63,6 +66,19 @@ const FileUpload: React.FC<FileUploadProps> = ({
   const [isDragOver, setIsDragOver] = useState(false);
   const [currentFiles, setCurrentFiles] = useState<File[]>(files);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  const handleError = (error: string, isInfo = false) => {
+    if (internalErrorHandling) {
+      toast({
+        title: isInfo ? 'Informasi File' : 'Error File',
+        description: error,
+        variant: isInfo ? 'default' : 'destructive'
+      });
+    } else {
+      onError?.(error);
+    }
+  };
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
@@ -74,7 +90,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
   const validateFile = (file: File): string | null => {
     if (file.size > maxSize) {
-      return `File ${file.name} is too large. Maximum size is ${formatFileSize(maxSize)}.`;
+      return `File ${file.name} terlalu besar. Ukuran maksimal ${formatFileSize(maxSize)}.`;
     }
 
     if (accept !== '*/*') {
@@ -90,7 +106,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
       });
 
       if (!isValidType) {
-        return `File ${file.name} has an unsupported format. Accepted formats: ${accept}`;
+        return `File ${file.name} memiliki format yang tidak didukung. Format yang diterima: ${accept}`;
       }
     }
 
@@ -104,13 +120,24 @@ const FileUpload: React.FC<FileUploadProps> = ({
     const validFiles: File[] = [];
     const errors: string[] = [];
 
-    // Check total file limit
-    if (currentFiles.length + newFiles.length > maxFiles) {
-      errors.push(`Maximum ${maxFiles} files allowed. Current: ${currentFiles.length}, Adding: ${newFiles.length}`);
+    // Check if current files alone exceed limit
+    if (currentFiles.length + existingFiles.length >= maxFiles) {
+      errors.push(`Maksimal ${maxFiles} file sudah tercapai. Silakan hapus beberapa file sebelum menambahkan yang baru.`);
+      handleError(errors.join('\n'));
+      return;
+    }
+
+    // Calculate remaining slots and limit files to process
+    const remainingSlots = maxFiles - currentFiles.length - existingFiles.length;
+    const filesToProcess = newFiles.slice(0, remainingSlots);
+    
+    // Show info if some files were skipped due to limit
+    if (newFiles.length > remainingSlots) {
+      errors.push(`Hanya ${remainingSlots} file lagi yang dapat ditambahkan. Mengambil ${remainingSlots} file pertama dari ${newFiles.length} file yang dipilih.`);
     }
 
     // Validate each file
-    newFiles.forEach(file => {
+    filesToProcess.forEach(file => {
       const error = validateFile(file);
       if (error) {
         errors.push(error);
@@ -119,15 +146,29 @@ const FileUpload: React.FC<FileUploadProps> = ({
       }
     });
 
-    if (errors.length > 0) {
-      onError?.(errors.join('\n'));
+    // Only stop if no valid files and there are errors (not including the "taking first X files" message)
+    const criticalErrors = errors.filter(error => !error.includes('Taking first'));
+    if (criticalErrors.length > 0 && validFiles.length === 0) {
+      handleError(criticalErrors.join('\n'));
       return;
     }
 
     const updatedFiles = multiple ? [...currentFiles, ...validFiles] : validFiles;
     setCurrentFiles(updatedFiles);
     onFilesChange?.(updatedFiles);
-  }, [currentFiles, maxFiles, maxSize, accept, multiple, onFilesChange, onError]);
+
+    // Show info/warning messages
+    if (errors.length > 0) {
+      const hasInfoMessages = errors.some(error => error.includes('Mengambil'));
+      const hasErrorMessages = errors.some(error => !error.includes('Mengambil'));
+      
+      if (hasInfoMessages && !hasErrorMessages) {
+        handleError(errors.join('\n'), true); // Info message
+      } else {
+        handleError(errors.join('\n'), false); // Error message
+      }
+    }
+  }, [currentFiles, existingFiles, maxFiles, maxSize, accept, multiple, onFilesChange, onError]);
 
   const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     handleFileSelection(event.target.files);
@@ -138,7 +179,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
   const handleDragOver = (event: React.DragEvent) => {
     event.preventDefault();
-    if (!disabled && dragAndDrop) {
+    if (!disabled && dragAndDrop && (currentFiles.length + existingFiles.length < maxFiles)) {
       setIsDragOver(true);
     }
   };
@@ -206,7 +247,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   };
 
   const triggerFileInput = () => {
-    if (!disabled && fileInputRef.current) {
+    if (!disabled && fileInputRef.current && (currentFiles.length + existingFiles.length < maxFiles)) {
       fileInputRef.current.click();
     }
   };
@@ -323,7 +364,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
               {fileName}
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              {fileSize} • Existing file
+              {fileSize} • File yang ada
             </p>
           </div>
         </div>
@@ -376,7 +417,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
           </Label>
         )}
         <div className="text-sm text-gray-500 dark:text-gray-400">
-          No files uploaded
+          Tidak ada file yang diupload
         </div>
       </div>
     );
@@ -405,7 +446,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
             isDragOver
               ? "border-blue-400 bg-blue-50 dark:bg-blue-900/20"
               : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500",
-            disabled && "cursor-not-allowed opacity-50"
+            (disabled || (currentFiles.length + existingFiles.length >= maxFiles)) && "cursor-not-allowed opacity-50"
           )}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -414,24 +455,28 @@ const FileUpload: React.FC<FileUploadProps> = ({
         >
           <Upload className="w-6 h-6 sm:w-8 sm:h-8 mx-auto mb-2 sm:mb-4 text-gray-400" />
           <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1 sm:mb-2 px-2">
-            {dragAndDrop
-              ? "Drag & drop files here, or click to select"
-              : "Click to select files"}
+            {(currentFiles.length + existingFiles.length >= maxFiles) ? (
+              `Maksimal ${maxFiles} file tercapai`
+            ) : dragAndDrop ? (
+              "Seret & lepas file di sini, atau klik untuk memilih"
+            ) : (
+              "Klik untuk memilih file"
+            )}
           </p>
           <p className="text-xs text-gray-500 dark:text-gray-400 break-words px-2">
             {accept !== '*/*' && (
               <span className="block sm:inline">
-                Accepted formats: {accept}
+                Format yang diterima: {accept}
               </span>
             )}
             {maxSize && (
               <span className="block sm:inline">
-                {accept !== '*/*' && ' • '}Max size: {formatFileSize(maxSize)}
+                {accept !== '*/*' && ' • '}Ukuran maks: {formatFileSize(maxSize)}
               </span>
             )}
             {multiple && (
               <span className="block sm:inline">
-                {(accept !== '*/*' || maxSize) && ' • '}Max files: {maxFiles}
+                {(accept !== '*/*' || maxSize) && ' • '}File: {currentFiles.length + existingFiles.length}/{maxFiles}
               </span>
             )}
           </p>
@@ -448,6 +493,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
         onChange={handleFileInputChange}
         disabled={disabled}
         className="hidden"
+        {...(maxSize && { 'data-max-size': maxSize })}
       />
 
       {/* File Lists */}
@@ -467,11 +513,14 @@ const FileUpload: React.FC<FileUploadProps> = ({
           type="button"
           variant="outline"
           onClick={triggerFileInput}
-          disabled={disabled}
+          disabled={disabled || (currentFiles.length + existingFiles.length >= maxFiles)}
           className="w-full"
         >
           <Upload className="w-4 h-4 mr-2" />
-          {multiple ? 'Select Files' : 'Select File'}
+          {(currentFiles.length + existingFiles.length >= maxFiles) 
+            ? `Maksimal ${maxFiles} file tercapai`
+            : multiple ? 'Pilih File' : 'Pilih File'
+          }
         </Button>
       )}
     </div>
