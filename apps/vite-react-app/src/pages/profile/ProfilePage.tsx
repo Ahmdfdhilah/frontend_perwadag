@@ -8,7 +8,6 @@ import { Badge } from '@workspace/ui/components/badge';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import { PageHeader } from '@/components/common/PageHeader';
 import { EditProfileDialog } from '@/components/Profile/EditProfileDialog';
-// import { ChangePasswordDialog } from '@/components/profile/ChangePasswordDialog';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { UserUpdate } from '@/services/users/types';
