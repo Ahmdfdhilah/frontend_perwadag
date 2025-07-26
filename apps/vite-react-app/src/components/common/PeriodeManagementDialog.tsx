@@ -326,8 +326,12 @@ const PeriodeManagementDialog: React.FC<PeriodeManagementDialogProps> = ({
                 <Button
                   variant="outline"
                   onClick={() => {
-                    resetForm();
-                    setMode('view');
+                    if (mode === 'view') {
+                      onOpenChange(false);
+                    } else {
+                      resetForm();
+                      setMode('view');
+                    }
                   }}
                 >
                   {mode === 'view' ? 'Tutup' : 'Batal'}

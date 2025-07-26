@@ -23,15 +23,13 @@ import {
 } from '@workspace/ui/components/form';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 
-const editProfileSchema = z.object({
-  nama: z.string().min(1, 'Nama wajib diisi').min(2, 'Nama minimal 2 karakter'),
-  jabatan: z.string().min(1, 'Jabatan wajib diisi'),
+const editEmailSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Format email tidak valid'),
 });
 
-type EditProfileData = z.infer<typeof editProfileSchema>;
+type EditEmailData = z.infer<typeof editEmailSchema>;
 
-interface EditProfileDialogProps {
+interface EditEmailDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   user: User;
@@ -39,18 +37,16 @@ interface EditProfileDialogProps {
   loading?: boolean;
 }
 
-export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
+export const EditEmailDialog: React.FC<EditEmailDialogProps> = ({
   open,
   onOpenChange,
   user,
   onSave,
   loading = false
 }) => {
-  const form = useForm<EditProfileData>({
-    resolver: zodResolver(editProfileSchema),
+  const form = useForm<EditEmailData>({
+    resolver: zodResolver(editEmailSchema),
     defaultValues: {
-      nama: user.nama,
-      jabatan: user.jabatan,
       email: user.email || '',
     },
   });
@@ -58,17 +54,13 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
   useEffect(() => {
     if (open && user) {
       form.reset({
-        nama: user.nama,
-        jabatan: user.jabatan,
         email: user.email || '',
       });
     }
   }, [open, user, form]);
 
-  const onSubmit = (data: EditProfileData) => {
+  const onSubmit = (data: EditEmailData) => {
     const updateData: UserUpdate = {
-      nama: data.nama,
-      jabatan: data.jabatan,
       email: data.email !== undefined ? data.email : undefined,
     };
     onSave(updateData);
@@ -86,7 +78,7 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0 border-b pb-4">
-          <DialogTitle>Edit Profil</DialogTitle>
+          <DialogTitle>Edit Email</DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto py-4">
@@ -103,43 +95,6 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
 
               {/* Form Fields */}
               <div className="flex flex-col gap-6">
-                <FormField
-                  control={form.control}
-                  name="nama"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nama Lengkap</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Masukkan nama lengkap"
-                          disabled={loading}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-
-                <FormField
-                  control={form.control}
-                  name="jabatan"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Jabatan</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Masukkan jabatan"
-                          disabled={loading}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
                 <FormField
                   control={form.control}
                   name="email"
@@ -162,6 +117,20 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
 
               {/* Read-only fields */}
               <div className="flex flex-col gap-6">
+                <div className="space-y-2">
+                  <Label>Nama Lengkap</Label>
+                  <div className="p-3 bg-muted rounded-md text-sm">
+                    {user.nama}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Jabatan</Label>
+                  <div className="p-3 bg-muted rounded-md text-sm">
+                    {user.jabatan}
+                  </div>
+                </div>
+
                 <div className="space-y-2">
                   <Label>Username</Label>
                   <div className="p-3 bg-muted rounded-md text-sm">
@@ -203,7 +172,7 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
             onClick={form.handleSubmit(onSubmit)}
             disabled={loading}
           >
-            {loading ? 'Menyimpan...' : 'Simpan Perubahan'}
+            {loading ? 'Menyimpan...' : 'Simpan Email'}
           </Button>
         </DialogFooter>
       </DialogContent>

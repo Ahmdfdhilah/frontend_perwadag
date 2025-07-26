@@ -144,7 +144,7 @@ const RiskAssessmentInputPage: React.FC = () => {
 
     // Calculate trend if capaian1 is greater than 0 (to avoid division by zero)
     if (capaian1 > 0) {
-      const percentage = ((capaian2 - capaian1) / capaian1) * 100;
+      const percentage = parseFloat((((capaian2 - capaian1) / capaian1) * 100).toFixed(2));
       const { pilihan, nilai } = calculateTrendChoice(percentage);
       
       setPenilaianData(prev => ({
@@ -219,7 +219,7 @@ const RiskAssessmentInputPage: React.FC = () => {
     }
 
     if (pagu > 0) {
-      const percentage = (realisasi / pagu) * 100;
+      const percentage = parseFloat(((realisasi / pagu) * 100).toFixed(2));
       const { pilihan, nilai } = calculateBudgetChoice(percentage);
       
       setPenilaianData(prev => ({
@@ -372,7 +372,7 @@ const RiskAssessmentInputPage: React.FC = () => {
     }
 
     if (totalIk > 0) {
-      const percentage = (ikTidakTercapai / totalIk) * 100;
+      const percentage = parseFloat(((ikTidakTercapai / totalIk) * 100).toFixed(2));
       const { pilihan, nilai } = calculateIKChoice(percentage);
       
       setPenilaianData(prev => ({
@@ -433,7 +433,7 @@ const RiskAssessmentInputPage: React.FC = () => {
     let isZeroDivision = false;
 
     if (nilaiPotensi > 0) {
-      percentage = (nilaiRealisasi / nilaiPotensi) * 100;
+      percentage = parseFloat(((nilaiRealisasi / nilaiPotensi) * 100).toFixed(2));
     } else if (nilaiRealisasi === 0 && nilaiPotensi === 0) {
       isZeroDivision = true;
     }
@@ -596,7 +596,7 @@ const RiskAssessmentInputPage: React.FC = () => {
                   step="0.01"
                   value={penilaianData.kriteria_data.tren_capaian.capaian_tahun_1 ?? ''}
                   onChange={(e) => {
-                    const value = e.target.value === '' ? null : parseFloat(e.target.value) || null;
+                    const value = e.target.value === '' ? null : parseFloat(parseFloat(e.target.value).toFixed(2)) || null;
                     handleInputChange('tren_capaian', 'capaian_tahun_1', value);
                   }}
                   placeholder="Contoh: 85.5"
@@ -609,7 +609,7 @@ const RiskAssessmentInputPage: React.FC = () => {
                   step="0.01"
                   value={penilaianData.kriteria_data.tren_capaian.capaian_tahun_2 ?? ''}
                   onChange={(e) => {
-                    const value = e.target.value === '' ? null : parseFloat(e.target.value) || null;
+                    const value = e.target.value === '' ? null : parseFloat(parseFloat(e.target.value).toFixed(2)) || null;
                     handleInputChange('tren_capaian', 'capaian_tahun_2', value);
                   }}
                   placeholder="Contoh: 90.2"
@@ -621,7 +621,7 @@ const RiskAssessmentInputPage: React.FC = () => {
               <Input
                 type="number"
                 step="0.01"
-                value={penilaianData.kriteria_data.tren_capaian.tren ?? ''}
+                value={penilaianData.kriteria_data.tren_capaian.tren !== null && penilaianData.kriteria_data.tren_capaian.tren !== undefined ? parseFloat(penilaianData.kriteria_data.tren_capaian.tren.toString()).toFixed(2) : ''}
                 disabled
                 className="bg-muted"
               />
@@ -676,7 +676,7 @@ const RiskAssessmentInputPage: React.FC = () => {
               <Input
                 type="number"
                 step="0.1"
-                value={penilaianData.kriteria_data.realisasi_anggaran.persentase ?? ''}
+                value={penilaianData.kriteria_data.realisasi_anggaran.persentase !== null && penilaianData.kriteria_data.realisasi_anggaran.persentase !== undefined ? parseFloat(penilaianData.kriteria_data.realisasi_anggaran.persentase.toString()).toFixed(2) : ''}
                 disabled
                 className="bg-muted"
               />
@@ -715,7 +715,7 @@ const RiskAssessmentInputPage: React.FC = () => {
                 step="0.01"
                 value={penilaianData.kriteria_data.tren_ekspor.deskripsi ?? ''}
                 onChange={(e) => {
-                  const value = e.target.value === '' ? null : parseFloat(e.target.value) || null;
+                  const value = e.target.value === '' ? null : parseFloat(parseFloat(e.target.value).toFixed(2)) || null;
                   handleInputChange('tren_ekspor', 'deskripsi', value);
                 }}
                 placeholder="Contoh: 4.71"
@@ -831,7 +831,7 @@ const RiskAssessmentInputPage: React.FC = () => {
                 type="number"
                 value={penilaianData.kriteria_data.peringkat_ekspor.deskripsi ?? ''}
                 onChange={(e) => {
-                  const value = e.target.value === '' ? null : parseFloat(e.target.value) || null;
+                  const value = e.target.value === '' ? null : parseFloat(parseFloat(e.target.value).toFixed(2)) || null;
                   handleInputChange('peringkat_ekspor', 'deskripsi', value);
                 }}
                 placeholder="Contoh: 27"
@@ -889,7 +889,7 @@ const RiskAssessmentInputPage: React.FC = () => {
               <Input
                 type="number"
                 step="0.1"
-                value={penilaianData.kriteria_data.persentase_ik.persentase ?? ''}
+                value={penilaianData.kriteria_data.persentase_ik.persentase !== null && penilaianData.kriteria_data.persentase_ik.persentase !== undefined ? parseFloat(penilaianData.kriteria_data.persentase_ik.persentase.toString()).toFixed(2) : ''}
                 disabled
                 className="bg-muted"
               />
@@ -946,7 +946,7 @@ const RiskAssessmentInputPage: React.FC = () => {
               <Input
                 type="number"
                 step="0.1"
-                value={penilaianData.kriteria_data.realisasi_tei.deskripsi ?? ''}
+                value={penilaianData.kriteria_data.realisasi_tei.deskripsi !== null && penilaianData.kriteria_data.realisasi_tei.deskripsi !== undefined ? parseFloat(penilaianData.kriteria_data.realisasi_tei.deskripsi.toString()).toFixed(2) : ''}
                 disabled
                 className="bg-muted"
               />
@@ -994,7 +994,7 @@ const RiskAssessmentInputPage: React.FC = () => {
               <Input
                 type="number"
                 step="0.01"
-                value={penilaianData.total_nilai_risiko ? Number(penilaianData.total_nilai_risiko).toFixed(2) : ''}
+                value={penilaianData.total_nilai_risiko !== null && penilaianData.total_nilai_risiko !== undefined ? Number(penilaianData.total_nilai_risiko).toFixed(2) : ''}
                 disabled
                 className="w-32 bg-muted font-bold text-center"
               />

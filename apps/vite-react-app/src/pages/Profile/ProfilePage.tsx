@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/componen
 import { Badge } from '@workspace/ui/components/badge';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import { PageHeader } from '@/components/common/PageHeader';
-import { EditProfileDialog } from '@/components/Profile/EditProfileDialog';
 import { ChangePasswordDialog } from '@/components/Profile/ChangePasswordDialog';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -17,12 +16,12 @@ import {
   Building,
   Shield,
   User as UserIcon,
-  Edit,
   CheckCircle,
   XCircle,
   IdCard,
   Lock,
 } from 'lucide-react';
+import { EditEmailDialog } from '@/components/Profile/EditEmailDialog';
 
 const ProfilePage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -84,7 +83,7 @@ const ProfilePage: React.FC = () => {
     return format(new Date(dateString), 'dd MMMM yyyy, HH:mm', { locale: id });
   };
 
-  const handleEditProfile = () => {
+  const handleEditEmail = () => {
     setIsEditDialogOpen(true);
   };
 
@@ -92,17 +91,17 @@ const ProfilePage: React.FC = () => {
     setIsPasswordDialogOpen(true);
   };
 
-  const handleProfileUpdate = async (data: UserUpdate) => {
+  const handleEmailUpdate = async (data: UserUpdate) => {
     try {
       await dispatch(updateProfileAsync(data)).unwrap();
       toast({
-        title: 'Profil berhasil diperbarui',
-        description: 'Data profil Anda telah diperbarui.',
+        title: 'Email berhasil diperbarui',
+        description: 'Email Anda telah diperbarui.',
         variant: 'default'
       });
       setIsEditDialogOpen(false);
     } catch (error) {
-      console.error('Failed to update profile:', error);
+      console.error('Failed to update email:', error);
     }
   };
 
@@ -115,9 +114,9 @@ const ProfilePage: React.FC = () => {
         actions={
           <div className="flex gap-2">
             {user.has_email && (
-              <Button variant="outline" onClick={handleEditProfile}>
-                <Edit className="w-4 h-4 mr-2" />
-                Edit Profil
+              <Button variant="outline" onClick={handleEditEmail}>
+                <Mail className="w-4 h-4 mr-2" />
+                Edit Email
               </Button>
             )}
             <Button onClick={handleChangePassword}>
@@ -321,11 +320,11 @@ const ProfilePage: React.FC = () => {
 
       {/* Dialogs */}
       {user.has_email && (
-        <EditProfileDialog
+        <EditEmailDialog
           open={isEditDialogOpen}
           onOpenChange={setIsEditDialogOpen}
           user={user}
-          onSave={handleProfileUpdate}
+          onSave={handleEmailUpdate}
           loading={isLoading}
         />
       )}

@@ -19,7 +19,7 @@ export function SidebarHeader({ collapsed, onToggleCollapse }: SidebarHeaderProp
   return (
     <>
       <div className={cn("flex h-14 lg:h-16 items-center flex-shrink-0 border-b border-sidebar-border", collapsed ? "px-2 lg:px-3 justify-center" : "px-4 lg:px-6 justify-between")}>
-        <Link to="/admin" className={cn("flex items-center min-w-0", collapsed ? "justify-center" : "space-x-2")}>
+        <Link to="/" className={cn("flex items-center min-w-0", collapsed ? "justify-center" : "space-x-2")}>
           <img 
             src={collapsed ? (isDarkMode ? logoMiniDarkMode : logoMiniLightMode) : (isDarkMode ? logoDarkMode : logoLightMode)} 
             className={cn("transition-all duration-300 object-contain", collapsed ? "w-7 h-7 lg:w-8 lg:h-8" : "w-32 lg:w-35 h-auto")} 
