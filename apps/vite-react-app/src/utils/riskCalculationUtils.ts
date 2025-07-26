@@ -36,7 +36,7 @@ export const calculateAuditValue = (pilihan: string): number => {
     "4 Tahun": 4,
     "Belum pernah diaudit": 5
   };
-  return mapping[pilihan] || 0;
+  return mapping[pilihan] ?? 0;
 };
 
 // 5. Perjanjian Perdagangan
@@ -48,7 +48,7 @@ export const calculateTradeAgreementValue = (pilihan: string): number => {
     "Sudah disepakati namun belum diratifikasi": 4,
     "Sudah diimplementasikan": 5
   };
-  return mapping[pilihan] || 0;
+  return mapping[pilihan] ?? 0;
 };
 
 // 6. Peringkat Ekspor

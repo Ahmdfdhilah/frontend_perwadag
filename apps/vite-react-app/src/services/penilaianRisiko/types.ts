@@ -8,18 +8,18 @@ export interface TrenCapaianData {
   capaian_tahun_1?: number;
   tahun_pembanding_2: number;
   capaian_tahun_2?: number;
-  tren?: number;
-  pilihan?: string;
-  nilai?: number;
+  tren?: number | null;
+  pilihan?: string | null;
+  nilai?: number | null;
 }
 
 export interface RealisasiAnggaranData {
   tahun_pembanding: number;
   realisasi?: number;
   pagu?: number;
-  persentase?: number;
-  pilihan?: string;
-  nilai?: number;
+  persentase?: number | null;
+  pilihan?: string | null;
+  nilai?: number | null;
 }
 
 export interface TrenEksporData {
@@ -54,18 +54,18 @@ export interface PersentaseIkData {
   tahun_pembanding: number;
   ik_tidak_tercapai?: number;
   total_ik?: number;
-  persentase?: number;
-  pilihan?: string;
-  nilai?: number;
+  persentase?: number | null;
+  pilihan?: string | null;
+  nilai?: number | null;
 }
 
 export interface RealisasiTeiData {
   tahun_pembanding: number;
   nilai_realisasi?: number;
   nilai_potensi?: number;
-  deskripsi?: number;
-  pilihan?: string;
-  nilai?: number;
+  deskripsi?: number | null;
+  pilihan?: string | null;
+  nilai?: number | null;
 }
 
 export interface KriteriaData {
