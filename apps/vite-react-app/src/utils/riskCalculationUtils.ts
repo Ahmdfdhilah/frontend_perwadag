@@ -80,14 +80,26 @@ export const calculateTEIChoice = (percentage: number, isZeroDivision: boolean):
 
 // 9. Total Risk Calculation
 export const calculateTotalRisk = (
-  nilai1: number, // tren_capaian
-  nilai2: number, // realisasi_anggaran  
-  nilai3: number, // tren_ekspor
-  nilai4: number, // audit_itjen
-  nilai5: number, // perjanjian_perdagangan
-  nilai6: number, // peringkat_ekspor
-  nilai7: number, // persentase_ik
-  nilai8: number  // realisasi_tei
-): number => {
+  nilai1: number | null | undefined, // tren_capaian
+  nilai2: number | null | undefined, // realisasi_anggaran  
+  nilai3: number | null | undefined, // tren_ekspor
+  nilai4: number | null | undefined, // audit_itjen
+  nilai5: number | null | undefined, // perjanjian_perdagangan
+  nilai6: number | null | undefined, // peringkat_ekspor
+  nilai7: number | null | undefined, // persentase_ik
+  nilai8: number | null | undefined  // realisasi_tei
+): number | undefined => {
+  // Check if any value is null or undefined
+  if (nilai1 === null || nilai1 === undefined ||
+      nilai2 === null || nilai2 === undefined ||
+      nilai3 === null || nilai3 === undefined ||
+      nilai4 === null || nilai4 === undefined ||
+      nilai5 === null || nilai5 === undefined ||
+      nilai6 === null || nilai6 === undefined ||
+      nilai7 === null || nilai7 === undefined ||
+      nilai8 === null || nilai8 === undefined) {
+    return undefined;
+  }
+  
   return ((nilai1 * 15) + (nilai2 * 10) + (nilai3 * 15) + (nilai4 * 25) + (nilai5 * 5) + (nilai6 * 10) + (nilai7 * 10) + (nilai8 * 10)) / 5;
 };

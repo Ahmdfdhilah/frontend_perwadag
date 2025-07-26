@@ -460,14 +460,14 @@ const RiskAssessmentInputPage: React.FC = () => {
 
     const kriteria = penilaianData.kriteria_data;
     const totalRisk = calculateTotalRisk(
-      kriteria.tren_capaian.nilai ?? 0,
-      kriteria.realisasi_anggaran.nilai ?? 0,
-      kriteria.tren_ekspor.nilai ?? 0,
-      kriteria.audit_itjen.nilai ?? 0,
-      kriteria.perjanjian_perdagangan.nilai ?? 0,
-      kriteria.peringkat_ekspor.nilai ?? 0,
-      kriteria.persentase_ik.nilai ?? 0,
-      kriteria.realisasi_tei.nilai ?? 0
+      kriteria.tren_capaian.nilai,
+      kriteria.realisasi_anggaran.nilai,
+      kriteria.tren_ekspor.nilai,
+      kriteria.audit_itjen.nilai,
+      kriteria.perjanjian_perdagangan.nilai,
+      kriteria.peringkat_ekspor.nilai,
+      kriteria.persentase_ik.nilai,
+      kriteria.realisasi_tei.nilai
     );
 
     setPenilaianData(prev => ({
@@ -490,6 +490,45 @@ const RiskAssessmentInputPage: React.FC = () => {
     // Force re-calculation by updating a state that triggers all useEffects
     // This will recalculate all values based on current inputs
     if (!penilaianData) return;
+    
+    const kriteria = penilaianData.kriteria_data;
+    
+    // Check if any required data is missing
+    const missingData = [];
+    
+    if (kriteria.tren_capaian.nilai === null || kriteria.tren_capaian.nilai === undefined) {
+      missingData.push('Tren Capaian');
+    }
+    if (kriteria.realisasi_anggaran.nilai === null || kriteria.realisasi_anggaran.nilai === undefined) {
+      missingData.push('Realisasi Anggaran');
+    }
+    if (kriteria.tren_ekspor.nilai === null || kriteria.tren_ekspor.nilai === undefined) {
+      missingData.push('Tren Ekspor');
+    }
+    if (kriteria.audit_itjen.nilai === null || kriteria.audit_itjen.nilai === undefined) {
+      missingData.push('Audit Itjen');
+    }
+    if (kriteria.perjanjian_perdagangan.nilai === null || kriteria.perjanjian_perdagangan.nilai === undefined) {
+      missingData.push('Perjanjian Perdagangan');
+    }
+    if (kriteria.peringkat_ekspor.nilai === null || kriteria.peringkat_ekspor.nilai === undefined) {
+      missingData.push('Peringkat Ekspor');
+    }
+    if (kriteria.persentase_ik.nilai === null || kriteria.persentase_ik.nilai === undefined) {
+      missingData.push('Persentase IK');
+    }
+    if (kriteria.realisasi_tei.nilai === null || kriteria.realisasi_tei.nilai === undefined) {
+      missingData.push('Realisasi TEI');
+    }
+    
+    if (missingData.length > 0) {
+      toast({
+        title: 'Data Belum Lengkap',
+        description: `Mohon lengkapi data berikut: ${missingData.join(', ')}`,
+        variant: 'destructive'
+      });
+      return;
+    }
     
     toast({
       title: 'Berhasil',
@@ -997,6 +1036,7 @@ const RiskAssessmentInputPage: React.FC = () => {
                 value={penilaianData.total_nilai_risiko !== null && penilaianData.total_nilai_risiko !== undefined ? Number(penilaianData.total_nilai_risiko).toFixed(2) : ''}
                 disabled
                 className="w-32 bg-muted font-bold text-center"
+                placeholder="-"
               />
             </div>
           </div>
