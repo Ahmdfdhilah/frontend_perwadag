@@ -15,7 +15,9 @@ import { MatriksResponse, TemuanRekomendasi } from '@/services/matriks/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
+import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { matriksService } from '@/services/matriks';
+import { useToast } from '@workspace/ui/components/sonner';
 
 interface MatriksDialogProps {
   open: boolean;
@@ -33,19 +35,33 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   onSave,
 }) => {
   const { canEditForm } = useFormPermissions();
+  const { toast } = useToast();
   const isEditable = mode === 'edit';
   const canEdit = canEditForm('matriks') && isEditable;
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [temuanRekomendasi, setTemuanRekomendasi] = useState<TemuanRekomendasi[]>([]);
-  const [fileToDelete, setFileToDelete] = useState<string | null>(null);
+  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string; filename?: string }>>([]);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [fileToDelete, setFileToDelete] = useState<{ name: string; filename: string } | null>(null);
+  const [deletingFile, setDeletingFile] = useState(false);
 
   useEffect(() => {
     if (item && open) {
       setTemuanRekomendasi(item.temuan_rekomendasi_summary?.data || []);
+      
+      // Set existing files for display
+      setExistingFiles(item.has_file ? [{
+        name: item.file_metadata?.original_filename || item.file_metadata?.filename || 'Matriks',
+        url: item.file_urls?.download_url,
+        viewUrl: item.file_urls?.file_url,
+        filename: item.file_metadata?.original_filename || item.file_metadata?.filename
+      }] : []);
     } else {
       setUploadFile(null);
       setTemuanRekomendasi([]);
+      setExistingFiles([]);
       setFileToDelete(null);
+      setDeleteConfirmOpen(false);
     }
   }, [item, open]);
 
@@ -70,15 +86,6 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
 
   const handleSave = async () => {
     if (!onSave) return;
-
-    // First, delete file that was marked for deletion
-    if (item?.id && fileToDelete) {
-      try {
-        await matriksService.deleteFile(item.id, fileToDelete);
-      } catch (error) {
-        console.error('Error deleting file:', error);
-      }
-    }
 
     // Send full JSON of temuan_rekomendasi, including existing IDs for updates
     // Allow empty strings to be sent for clearing data
@@ -118,11 +125,43 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   };
 
   const handleExistingFileRemove = () => {
-    if (!item?.file_metadata) return;
+    if (!existingFiles[0] || !existingFiles[0].filename) return;
     
-    // Mark file for deletion (will be executed on save)
-    const filename = item.file_metadata.original_filename || item.file_metadata.filename;
-    setFileToDelete(filename);
+    const fileToRemove = existingFiles[0];
+    setFileToDelete({
+      name: fileToRemove.name,
+      filename: fileToRemove.filename!
+    });
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!fileToDelete || !item?.id) return;
+    
+    setDeletingFile(true);
+    try {
+      await matriksService.deleteFile(item.id, fileToDelete.filename);
+      
+      // Remove from UI
+      setExistingFiles([]);
+      
+      toast({
+        title: 'File berhasil dihapus',
+        description: `File ${fileToDelete.name} telah dihapus.`,
+        variant: 'default'
+      });
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      toast({
+        title: 'Gagal menghapus file',
+        description: `Terjadi kesalahan saat menghapus file ${fileToDelete.name}.`,
+        variant: 'destructive'
+      });
+    } finally {
+      setDeletingFile(false);
+      setFileToDelete(null);
+      setDeleteConfirmOpen(false);
+    }
   };
 
   return (
@@ -245,12 +284,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                 multiple={false}
                 maxSize={10 * 1024 * 1024} // 10MB
                 files={uploadFile ? [uploadFile] : []}
-                existingFiles={item?.has_file && !fileToDelete ? [{
-                  name: item.file_metadata?.original_filename || item.file_metadata?.filename || 'Matriks',
-                  url: item.file_urls?.download_url,
-                  viewUrl: item.file_urls?.file_url,
-                  size: item.file_metadata?.size
-                }] : []}
+                existingFiles={existingFiles}
                 mode="edit"
                 onFilesChange={handleUploadFileChange}
                 onExistingFileRemove={handleExistingFileRemove}
@@ -287,6 +321,15 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
           )}
         </DialogFooter>
       </DialogContent>
+
+      {/* File Delete Confirmation Dialog */}
+      <FileDeleteConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        fileName={fileToDelete?.name || ''}
+        onConfirm={handleConfirmDelete}
+        loading={deletingFile}
+      />
     </Dialog>
   );
 };

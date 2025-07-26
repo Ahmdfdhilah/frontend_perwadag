@@ -15,8 +15,10 @@ import { SuratTugasResponse } from '@/services/suratTugas/types';
 import { PerwadagSummary } from '@/services/users/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import FileUpload from '@/components/common/FileUpload';
+import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { formatDateForAPI } from '@/utils/timeFormat';
 import { suratTugasService } from '@/services/suratTugas';
+import { useToast } from '@workspace/ui/components/sonner';
 
 interface SuratTugasDialogProps {
   open: boolean;
@@ -36,6 +38,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   availablePerwadag,
 }) => {
   const { canEditForm } = useFormPermissions();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     no_surat: '',
     user_perwadag_id: '',
@@ -44,8 +47,10 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   });
 
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
-  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string; size?: number }>>([]);
-  const [fileToDelete, setFileToDelete] = useState<string | null>(null);
+  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string; size?: number; filename?: string }>>([]);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [fileToDelete, setFileToDelete] = useState<{ name: string; filename: string } | null>(null);
+  const [deletingFile, setDeletingFile] = useState(false);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
 
   useEffect(() => {
@@ -63,7 +68,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
           name: editingItem.file_metadata.original_filename || editingItem.file_metadata.filename || 'Surat Tugas',
           url: editingItem.file_urls?.download_url,
           viewUrl: editingItem.file_urls?.file_url,
-          size: editingItem.file_metadata.size
+          size: editingItem.file_metadata.size,
+          filename: editingItem.file_metadata.original_filename || editingItem.file_metadata.filename
         }]);
       } else {
         setExistingFiles([]);
@@ -71,6 +77,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       
       // Reset file to delete when opening dialog
       setFileToDelete(null);
+      setDeleteConfirmOpen(false);
     } else {
       setFormData({
         no_surat: '',
@@ -81,6 +88,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       setUploadFiles([]);
       setExistingFiles([]);
       setFileToDelete(null);
+      setDeleteConfirmOpen(false);
     }
     // Reset search when dialog opens/closes
     setPerwadagSearchValue('');
@@ -98,14 +106,6 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       return;
     }
 
-    // First, delete file that was marked for deletion (only in edit mode)
-    if (mode === 'edit' && editingItem?.id && fileToDelete) {
-      try {
-        await suratTugasService.deleteFile(editingItem.id, fileToDelete);
-      } catch (error) {
-        console.error('Error deleting file:', error);
-      }
-    }
 
     const saveData = {
       user_perwadag_id: formData.user_perwadag_id,
@@ -127,14 +127,43 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   };
 
   const handleExistingFileRemove = (index: number) => {
-    if (!editingItem?.file_metadata) return;
-
-    // Mark file for deletion (will be executed on save)
-    const filename = editingItem.file_metadata.original_filename || editingItem.file_metadata.filename;
-    setFileToDelete(filename);
+    if (!existingFiles[index] || !existingFiles[index].filename) return;
     
-    // Remove from UI immediately
-    setExistingFiles(prev => prev.filter((_, i) => i !== index));
+    const fileToRemove = existingFiles[index];
+    setFileToDelete({
+      name: fileToRemove.name,
+      filename: fileToRemove.filename!
+    });
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!fileToDelete || !editingItem?.id) return;
+    
+    setDeletingFile(true);
+    try {
+      await suratTugasService.deleteFile(editingItem.id, fileToDelete.filename);
+      
+      // Remove from UI
+      setExistingFiles([]);
+      
+      toast({
+        title: 'File berhasil dihapus',
+        description: `File ${fileToDelete.name} telah dihapus.`,
+        variant: 'default'
+      });
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      toast({
+        title: 'Gagal menghapus file',
+        description: `Terjadi kesalahan saat menghapus file ${fileToDelete.name}.`,
+        variant: 'destructive'
+      });
+    } finally {
+      setDeletingFile(false);
+      setFileToDelete(null);
+      setDeleteConfirmOpen(false);
+    }
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
@@ -261,7 +290,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
               maxSize={10 * 1024 * 1024} // 10MB
               maxFiles={1}
               files={uploadFiles}
-              existingFiles={fileToDelete ? [] : existingFiles}
+              existingFiles={existingFiles}
               mode={canEdit ? 'edit' : 'view'}
               disabled={!canEdit}
               onFilesChange={handleUploadFilesChange}
@@ -283,6 +312,15 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
           )}
         </DialogFooter>
       </DialogContent>
+
+      {/* File Delete Confirmation Dialog */}
+      <FileDeleteConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        fileName={fileToDelete?.name || ''}
+        onConfirm={handleConfirmDelete}
+        loading={deletingFile}
+      />
     </Dialog>
   );
 };

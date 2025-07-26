@@ -16,7 +16,9 @@ import { LaporanHasilResponse } from '@/services/laporanHasil/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDateRange, formatDateForAPI } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
+import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { laporanHasilService } from '@/services/laporanHasil';
+import { useToast } from '@workspace/ui/components/sonner';
 
 interface LaporanHasilEvaluasiDialogProps {
   open: boolean;
@@ -34,11 +36,14 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
   onSave,
 }) => {
   const { canEditForm } = useFormPermissions();
+  const { toast } = useToast();
   const [formData, setFormData] = useState<any>({});
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
-  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string; size?: number }>>([]);
-  const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
+  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string; size?: number; filename?: string }>>([]);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [fileToDelete, setFileToDelete] = useState<{ name: string; filename: string } | null>(null);
+  const [deletingFile, setDeletingFile] = useState(false);
 
   useEffect(() => {
     if (item && open) {
@@ -54,7 +59,8 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
           name: item.file_metadata.original_filename || item.file_metadata.filename || 'Laporan Hasil Evaluasi',
           url: item.file_urls?.download_url,
           viewUrl: item.file_urls?.file_url,
-          size: item.file_metadata.size
+          size: item.file_metadata.size,
+          filename: item.file_metadata.original_filename || item.file_metadata.filename
         }]);
       } else {
         setExistingFiles([]);
@@ -67,22 +73,12 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
       setSelectedDate(undefined);
       setUploadFiles([]);
       setExistingFiles([]);
-      setFilesToDelete([]);
+      setFileToDelete(null);
+      setDeleteConfirmOpen(false);
     }
   }, [item, open]);
 
   const handleSave = async () => {
-    // First, delete files that were marked for deletion
-    if (item?.id && filesToDelete.length > 0) {
-      for (const filename of filesToDelete) {
-        try {
-          await laporanHasilService.deleteFile(item.id, filename);
-        } catch (error) {
-          console.error('Error deleting file:', error);
-        }
-      }
-    }
-
     const dataToSave = {
       nomor_laporan: formData.nomor_laporan || '',
       tanggal_laporan: selectedDate ? formatDateForAPI(selectedDate) : formData.tanggal_laporan,
@@ -100,14 +96,43 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
   };
 
   const handleExistingFilesRemove = (index: number) => {
-    if (!item?.file_metadata) return;
-
-    // Mark file for deletion (will be executed on save)
-    const filename = item.file_metadata.original_filename || item.file_metadata.filename;
-    setFilesToDelete(prev => [...prev, filename]);
+    if (!existingFiles[index] || !existingFiles[index].filename) return;
     
-    // Remove from UI immediately
-    setExistingFiles(prev => prev.filter((_, i) => i !== index));
+    const fileToRemove = existingFiles[index];
+    setFileToDelete({
+      name: fileToRemove.name,
+      filename: fileToRemove.filename!
+    });
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!fileToDelete || !item?.id) return;
+    
+    setDeletingFile(true);
+    try {
+      await laporanHasilService.deleteFile(item.id, fileToDelete.filename);
+      
+      // Remove from UI
+      setExistingFiles([]);
+      
+      toast({
+        title: 'File berhasil dihapus',
+        description: `File ${fileToDelete.name} telah dihapus.`,
+        variant: 'default'
+      });
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      toast({
+        title: 'Gagal menghapus file',
+        description: `Terjadi kesalahan saat menghapus file ${fileToDelete.name}.`,
+        variant: 'destructive'
+      });
+    } finally {
+      setDeletingFile(false);
+      setFileToDelete(null);
+      setDeleteConfirmOpen(false);
+    }
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
@@ -221,6 +246,15 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
           )}
         </DialogFooter>
       </DialogContent>
+
+      {/* File Delete Confirmation Dialog */}
+      <FileDeleteConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        fileName={fileToDelete?.name || ''}
+        onConfirm={handleConfirmDelete}
+        loading={deletingFile}
+      />
     </Dialog>
   );
 };

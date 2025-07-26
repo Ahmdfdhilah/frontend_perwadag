@@ -14,7 +14,9 @@ import { Textarea } from '@workspace/ui/components/textarea';
 import { FormatKuisionerResponse } from '@/services/formatKuisioner/types';
 import { Download } from 'lucide-react';
 import FileUpload from '@/components/common/FileUpload';
+import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { formatKuisionerService } from '@/services/formatKuisioner';
+import { useToast } from '@workspace/ui/components/sonner';
 
 interface QuestionnaireFormData {
   nama_template: string;
@@ -39,13 +41,17 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
   onSave,
 }) => {
   const { isAdmin } = useRole();
+  const { toast } = useToast();
   const [formData, setFormData] = useState<QuestionnaireFormData>({
     nama_template: '',
     deskripsi: '',
     tahun: new Date().getFullYear(),
   });
   const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const [fileToDelete, setFileToDelete] = useState<string | null>(null);
+  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string; filename: string }>>([]);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [fileToDelete, setFileToDelete] = useState<{ name: string; filename: string } | null>(null);
+  const [deletingFile, setDeletingFile] = useState(false);
 
   const isCreating = !item;
   const isEditable = mode === 'edit' && isAdmin();
@@ -57,6 +63,14 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
         deskripsi: item.deskripsi || '',
         tahun: item.tahun,
       });
+      
+      // Set existing files for display
+      setExistingFiles(item.has_file ? [{
+        name: item.file_metadata?.original_filename || item.file_metadata?.filename || item.nama_template,
+        url: item.file_urls?.file_url,
+        viewUrl: item.file_urls?.view_url,
+        filename: item.file_metadata?.original_filename || item.file_metadata?.filename
+      }] : []);
     } else {
       // Initialize empty form for new template
       setFormData({
@@ -65,7 +79,9 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
         tahun: new Date().getFullYear(),
       });
       setUploadFile(null);
+      setExistingFiles([]);
       setFileToDelete(null);
+      setDeleteConfirmOpen(false);
     }
   }, [item, open]);
 
@@ -73,15 +89,6 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
     // Skip validation if form is invalid
     if (!isFormValid) {
       return;
-    }
-
-    // First, delete file that was marked for deletion
-    if (item?.id && fileToDelete) {
-      try {
-        await formatKuisionerService.deleteFile(item.id, fileToDelete);
-      } catch (error) {
-        console.error('Error deleting file:', error);
-      }
     }
 
     const dataToSave = {
@@ -120,11 +127,43 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
   };
 
   const handleExistingFileRemove = () => {
-    if (!item?.file_metadata) return;
+    if (!existingFiles[0] || !existingFiles[0].filename) return;
     
-    // Mark file for deletion (will be executed on save)
-    const filename = item.file_metadata.original_filename || item.file_metadata.filename;
-    setFileToDelete(filename);
+    const fileToRemove = existingFiles[0];
+    setFileToDelete({
+      name: fileToRemove.name,
+      filename: fileToRemove.filename
+    });
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!fileToDelete || !item?.id) return;
+    
+    setDeletingFile(true);
+    try {
+      await formatKuisionerService.deleteFile(item.id, fileToDelete.filename);
+      
+      // Remove from UI
+      setExistingFiles([]);
+      
+      toast({
+        title: 'File berhasil dihapus',
+        description: `File ${fileToDelete.name} telah dihapus.`,
+        variant: 'default'
+      });
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      toast({
+        title: 'Gagal menghapus file',
+        description: `Terjadi kesalahan saat menghapus file ${fileToDelete.name}.`,
+        variant: 'destructive'
+      });
+    } finally {
+      setDeletingFile(false);
+      setFileToDelete(null);
+      setDeleteConfirmOpen(false);
+    }
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
@@ -208,12 +247,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
               maxSize={10 * 1024 * 1024} // 10MB
               maxFiles={1}
               files={uploadFile ? [uploadFile] : []}
-              existingFiles={item?.has_file && !fileToDelete ? [{
-                name: item.file_metadata?.original_filename || item.file_metadata?.filename || item.nama_template,
-                url: item.file_urls?.file_url,
-                viewUrl: item.file_urls?.view_url,
-                size: item.file_metadata?.size
-              }] : []}
+              existingFiles={existingFiles}
               mode={isEditable ? 'edit' : 'view'}
               disabled={!isEditable}
               onFilesChange={handleUploadFileChange}
@@ -241,6 +275,15 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
           )}
         </DialogFooter>
       </DialogContent>
+
+      {/* File Delete Confirmation Dialog */}
+      <FileDeleteConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        fileName={fileToDelete?.name || ''}
+        onConfirm={handleConfirmDelete}
+        loading={deletingFile}
+      />
     </Dialog>
   );
 };
