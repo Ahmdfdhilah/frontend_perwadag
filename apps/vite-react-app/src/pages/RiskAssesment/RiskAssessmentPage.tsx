@@ -27,6 +27,7 @@ import RiskAssessmentTable from '@/components/RiskAssesment/RiskAssessmentTable'
 import RiskAssessmentCards from '@/components/RiskAssesment/RiskAssessmentCards';
 import { Settings } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
+import { useToast } from '@workspace/ui/components/sonner';
 import { getDefaultYearOptions } from '@/utils/yearUtils';
 
 interface RiskAssessmentPageFilters {
@@ -44,6 +45,7 @@ const RiskAssessmentPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
   const { hasPageAccess, canEditForm } = useFormPermissions();
+  const { toast } = useToast();
 
   // URL Filters configuration
   const { updateURL, getCurrentFilters } = useURLFilters<RiskAssessmentPageFilters>({
@@ -153,9 +155,71 @@ const RiskAssessmentPage: React.FC = () => {
     navigate(`/penilaian-resiko/${item.id}/edit`);
   };
 
-  const handleDelete = (item: PenilaianRisikoResponse) => {
-    console.log('Delete:', item);
-    // Implement delete logic
+  const handleDelete = async (item: PenilaianRisikoResponse) => {
+    try {
+      // Create null kriteria_data to "delete" only user inputable data
+      const nullKriteriaData = {
+        tren_capaian: {
+          tahun_pembanding_1: item.kriteria_data.tren_capaian.tahun_pembanding_1,
+          tahun_pembanding_2: item.kriteria_data.tren_capaian.tahun_pembanding_2,
+          capaian_tahun_1: null,
+          capaian_tahun_2: null,
+        },
+        realisasi_anggaran: {
+          tahun_pembanding: item.kriteria_data.realisasi_anggaran.tahun_pembanding,
+          realisasi: null,
+          pagu: null,
+        },
+        tren_ekspor: {
+          tahun_pembanding: item.kriteria_data.tren_ekspor.tahun_pembanding,
+          deskripsi: null,
+        },
+        audit_itjen: {
+          tahun_pembanding: item.kriteria_data.audit_itjen.tahun_pembanding,
+          pilihan: null,
+        },
+        perjanjian_perdagangan: {
+          tahun_pembanding: item.kriteria_data.perjanjian_perdagangan.tahun_pembanding,
+          pilihan: null,
+        },
+        peringkat_ekspor: {
+          tahun_pembanding: item.kriteria_data.peringkat_ekspor.tahun_pembanding,
+          deskripsi: null,
+        },
+        persentase_ik: {
+          tahun_pembanding: item.kriteria_data.persentase_ik.tahun_pembanding,
+          ik_tidak_tercapai: null,
+          total_ik: null,
+        },
+        realisasi_tei: {
+          tahun_pembanding: item.kriteria_data.realisasi_tei.tahun_pembanding,
+          nilai_realisasi: null,
+          nilai_potensi: null,
+        },
+      };
+
+      await penilaianRisikoService.updatePenilaianRisiko(item.id, {
+        kriteria_data: nullKriteriaData,
+        catatan: null,
+        auto_calculate: true,
+      });
+
+      toast({
+        title: 'Berhasil',
+        description: `Data penilaian risiko ${item.nama_perwadag} berhasil dihapus.`,
+        variant: 'default',
+      });
+
+      // Refresh the data
+      fetchRiskAssessments();
+    } catch (error) {
+      console.error('Failed to delete risk assessment:', error);
+      toast({
+        title: 'Error',
+        description: 'Gagal menghapus data penilaian risiko.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleInspektoratChange = (inspektorat: string) => {

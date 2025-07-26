@@ -106,7 +106,7 @@ const RiskAssessmentDetailPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title={`Detail Penilaian Risiko - ${penilaianData.nama_perwadag}`}
-        description={`Tahun ${penilaianData.tahun} | Total Risiko: ${penilaianData.total_nilai_risiko ? Number(penilaianData.total_nilai_risiko).toFixed(2) : '-'}`}
+        description={`Tahun ${penilaianData.tahun} | Total Risiko: ${penilaianData.total_nilai_risiko !== null && penilaianData.total_nilai_risiko !== undefined ? Number(penilaianData.total_nilai_risiko).toFixed(2) : '-'}`}
         actions={
           <div className="flex gap-2">
             <Button
@@ -141,16 +141,16 @@ const RiskAssessmentDetailPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Capaian {penilaianData.kriteria_data.tren_capaian.tahun_pembanding_1} (%)</Label>
-              <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.tren_capaian.capaian_tahun_1 || '-'}%</div>
+              <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.tren_capaian.capaian_tahun_1 !== null && penilaianData.kriteria_data.tren_capaian.capaian_tahun_1 !== undefined ? Number(penilaianData.kriteria_data.tren_capaian.capaian_tahun_1).toFixed(2) : '-'}%</div>
             </div>
             <div>
               <Label className="text-sm font-medium text-muted-foreground">Capaian {penilaianData.kriteria_data.tren_capaian.tahun_pembanding_2} (%)</Label>
-              <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.tren_capaian.capaian_tahun_2 || '-'}%</div>
+              <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.tren_capaian.capaian_tahun_2 !== null && penilaianData.kriteria_data.tren_capaian.capaian_tahun_2 !== undefined ? Number(penilaianData.kriteria_data.tren_capaian.capaian_tahun_2).toFixed(2) : '-'}%</div>
             </div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Tren Capaian (%)</Label>
-            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.tren_capaian.tren ? Number(penilaianData.kriteria_data.tren_capaian.tren).toFixed(2) : '-'}%</div>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.tren_capaian.tren !== null && penilaianData.kriteria_data.tren_capaian.tren !== undefined ? Number(penilaianData.kriteria_data.tren_capaian.tren).toFixed(2) : '-'}%</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Kategori</Label>
@@ -158,7 +158,7 @@ const RiskAssessmentDetailPage: React.FC = () => {
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Nilai</Label>
-            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.tren_capaian.nilai || '-'}</div>
+            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.tren_capaian.nilai ?? '-'}</div>
           </div>
         </CardContent>
       </Card>
@@ -184,7 +184,7 @@ const RiskAssessmentDetailPage: React.FC = () => {
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Persentase Realisasi (%)</Label>
-            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.realisasi_anggaran.persentase ? Number(penilaianData.kriteria_data.realisasi_anggaran.persentase).toFixed(2) : '-'}%</div>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.realisasi_anggaran.persentase !== null && penilaianData.kriteria_data.realisasi_anggaran.persentase !== undefined ? Number(penilaianData.kriteria_data.realisasi_anggaran.persentase).toFixed(2) : '-'}%</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Kategori</Label>
@@ -192,7 +192,7 @@ const RiskAssessmentDetailPage: React.FC = () => {
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Nilai</Label>
-            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.realisasi_anggaran.nilai || '-'}</div>
+            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.realisasi_anggaran.nilai ?? '-'}</div>
           </div>
         </CardContent>
       </Card>
@@ -208,7 +208,7 @@ const RiskAssessmentDetailPage: React.FC = () => {
         <CardContent className="space-y-4">
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Deskripsi Tren (%)</Label>
-            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.tren_ekspor.deskripsi || '-'}</div>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.tren_ekspor.deskripsi !== null && penilaianData.kriteria_data.tren_ekspor.deskripsi !== undefined ? Number(penilaianData.kriteria_data.tren_ekspor.deskripsi).toFixed(2) : '-'}%</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Kategori</Label>
@@ -216,7 +216,7 @@ const RiskAssessmentDetailPage: React.FC = () => {
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Nilai</Label>
-            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.tren_ekspor.nilai || '-'}</div>
+            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.tren_ekspor.nilai ?? '-'}</div>
           </div>
         </CardContent>
       </Card>
@@ -236,7 +236,7 @@ const RiskAssessmentDetailPage: React.FC = () => {
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Nilai</Label>
-            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.audit_itjen.nilai || '-'}</div>
+            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.audit_itjen.nilai ?? '-'}</div>
           </div>
         </CardContent>
       </Card>
@@ -256,7 +256,7 @@ const RiskAssessmentDetailPage: React.FC = () => {
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Nilai</Label>
-            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.perjanjian_perdagangan.nilai || '-'}</div>
+            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.perjanjian_perdagangan.nilai ?? '-'}</div>
           </div>
         </CardContent>
       </Card>
@@ -272,7 +272,7 @@ const RiskAssessmentDetailPage: React.FC = () => {
         <CardContent className="space-y-4">
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Peringkat</Label>
-            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.peringkat_ekspor.deskripsi || '-'}</div>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.peringkat_ekspor.deskripsi !== null && penilaianData.kriteria_data.peringkat_ekspor.deskripsi !== undefined ? Number(penilaianData.kriteria_data.peringkat_ekspor.deskripsi).toFixed(2) : '-'}</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Kategori</Label>
@@ -280,7 +280,7 @@ const RiskAssessmentDetailPage: React.FC = () => {
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Nilai</Label>
-            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.peringkat_ekspor.nilai || '-'}</div>
+            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.peringkat_ekspor.nilai ?? '-'}</div>
           </div>
         </CardContent>
       </Card>
@@ -306,7 +306,7 @@ const RiskAssessmentDetailPage: React.FC = () => {
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Persentase IK Tidak Tercapai (%)</Label>
-            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.persentase_ik.persentase ? Number(penilaianData.kriteria_data.persentase_ik.persentase).toFixed(2) : '-'}%</div>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.persentase_ik.persentase !== null && penilaianData.kriteria_data.persentase_ik.persentase !== undefined ? Number(penilaianData.kriteria_data.persentase_ik.persentase).toFixed(2) : '-'}%</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Kategori</Label>
@@ -314,7 +314,7 @@ const RiskAssessmentDetailPage: React.FC = () => {
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Nilai</Label>
-            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.persentase_ik.nilai || '-'}</div>
+            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.persentase_ik.nilai ?? '-'}</div>
           </div>
         </CardContent>
       </Card>
@@ -340,7 +340,7 @@ const RiskAssessmentDetailPage: React.FC = () => {
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Deskripsi (%)</Label>
-            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.realisasi_tei.deskripsi ? Number(penilaianData.kriteria_data.realisasi_tei.deskripsi).toFixed(2) : '-'}%</div>
+            <div className="mt-1 text-lg font-semibold">{penilaianData.kriteria_data.realisasi_tei.deskripsi !== null && penilaianData.kriteria_data.realisasi_tei.deskripsi !== undefined ? Number(penilaianData.kriteria_data.realisasi_tei.deskripsi).toFixed(2) : '-'}%</div>
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Kategori</Label>
@@ -348,7 +348,7 @@ const RiskAssessmentDetailPage: React.FC = () => {
           </div>
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Nilai</Label>
-            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.realisasi_tei.nilai || '-'}</div>
+            <div className="mt-1 text-2xl font-bold text-blue-600">{penilaianData.kriteria_data.realisasi_tei.nilai ?? '-'}</div>
           </div>
         </CardContent>
       </Card>
@@ -364,7 +364,7 @@ const RiskAssessmentDetailPage: React.FC = () => {
         <CardContent className="space-y-4">
           <div>
             <Label className="text-sm font-medium text-muted-foreground">Total Nilai Risiko</Label>
-            <div className="mt-1 text-4xl font-bold text-blue-600">{penilaianData.total_nilai_risiko ? Number(penilaianData.total_nilai_risiko).toFixed(2) : '-'}</div>
+            <div className="mt-1 text-4xl font-bold text-blue-600">{penilaianData.total_nilai_risiko !== null && penilaianData.total_nilai_risiko !== undefined ? Number(penilaianData.total_nilai_risiko).toFixed(2) : '-'}</div>
           </div>
           <Separator />
           <div>

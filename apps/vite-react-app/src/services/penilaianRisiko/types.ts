@@ -5,9 +5,9 @@ import { PaginatedResponse } from "../base/types";
 // 8 Kriteria Data Types
 export interface TrenCapaianData {
   tahun_pembanding_1: number;
-  capaian_tahun_1?: number;
+  capaian_tahun_1?: number | null;
   tahun_pembanding_2: number;
-  capaian_tahun_2?: number;
+  capaian_tahun_2?: number | null;
   tren?: number | null;
   pilihan?: string | null;
   nilai?: number | null;
@@ -15,8 +15,8 @@ export interface TrenCapaianData {
 
 export interface RealisasiAnggaranData {
   tahun_pembanding: number;
-  realisasi?: number;
-  pagu?: number;
+  realisasi?: number | null;
+  pagu?: number | null;
   persentase?: number | null;
   pilihan?: string | null;
   nilai?: number | null;
@@ -24,36 +24,36 @@ export interface RealisasiAnggaranData {
 
 export interface TrenEksporData {
   tahun_pembanding: number;
-  deskripsi?: number;
-  pilihan?: string;
-  nilai?: number;
+  deskripsi?: number | null;
+  pilihan?: string | null;
+  nilai?: number | null;
 }
 
 export interface AuditItjenData {
   tahun_pembanding: number;
-  deskripsi?: string;
-  pilihan?: string;
-  nilai?: number;
+  deskripsi?: string | null;
+  pilihan?: string | null;
+  nilai?: number | null;
 }
 
 export interface PerjanjianPerdaganganData {
   tahun_pembanding: number;
-  deskripsi?: string;
-  pilihan?: string;
-  nilai?: number;
+  deskripsi?: string | null;
+  pilihan?: string | null;
+  nilai?: number | null;
 }
 
 export interface PeringkatEksporData {
   tahun_pembanding: number;
-  deskripsi?: number;
-  pilihan?: string;
-  nilai?: number;
+  deskripsi?: number | null;
+  pilihan?: string | null;
+  nilai?: number | null;
 }
 
 export interface PersentaseIkData {
   tahun_pembanding: number;
-  ik_tidak_tercapai?: number;
-  total_ik?: number;
+  ik_tidak_tercapai?: number | null;
+  total_ik?: number | null;
   persentase?: number | null;
   pilihan?: string | null;
   nilai?: number | null;
@@ -61,8 +61,8 @@ export interface PersentaseIkData {
 
 export interface RealisasiTeiData {
   tahun_pembanding: number;
-  nilai_realisasi?: number;
-  nilai_potensi?: number;
+  nilai_realisasi?: number | null;
+  nilai_potensi?: number | null;
   deskripsi?: number | null;
   pilihan?: string | null;
   nilai?: number | null;
@@ -133,7 +133,7 @@ export interface PenilaianRisiko {
 // Request Types
 export interface PenilaianRisikoUpdate {
   kriteria_data: Partial<KriteriaData>;
-  catatan?: string; // max 1000 chars
+  catatan?: string | null; // max 1000 chars
   auto_calculate?: boolean; // default: true
 }
 

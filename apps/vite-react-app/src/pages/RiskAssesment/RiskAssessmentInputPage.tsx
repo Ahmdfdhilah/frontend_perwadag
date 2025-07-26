@@ -1019,7 +1019,7 @@ const RiskAssessmentInputPage: React.FC = () => {
           variant="outline"
           onClick={() => navigate('/penilaian-resiko')}
         >
-          Batal
+          Kembali
         </Button>
         <Button
           onClick={handleSave}
