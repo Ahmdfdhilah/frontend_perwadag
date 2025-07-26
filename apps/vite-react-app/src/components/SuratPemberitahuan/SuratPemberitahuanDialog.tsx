@@ -95,15 +95,15 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
     setUploadFiles(files);
   };
 
-  const handleExistingFilesRemove = async (index: number) => {
-    if (!item?.id || !item.file_metadata) return;
+  const handleExistingFilesRemove = (index: number) => {
+    if (!item?.file_metadata) return;
 
-    try {
-      await suratPemberitahuanService.deleteFile(item.id, item.file_metadata.original_filename || item.file_metadata.filename);
-      setExistingFiles(prev => prev.filter((_, i) => i !== index));
-    } catch (error) {
-      console.error('Error deleting file:', error);
-    }
+    // Mark file for deletion (will be executed on save)
+    const filename = item.file_metadata.original_filename || item.file_metadata.filename;
+    setFilesToDelete(prev => [...prev, filename]);
+    
+    // Remove from UI immediately
+    setExistingFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
