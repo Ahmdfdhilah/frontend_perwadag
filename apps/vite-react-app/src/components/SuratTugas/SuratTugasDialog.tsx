@@ -16,6 +16,7 @@ import { PerwadagSummary } from '@/services/users/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import FileUpload from '@/components/common/FileUpload';
 import { formatDateForAPI } from '@/utils/timeFormat';
+import { suratTugasService } from '@/services/suratTugas';
 
 interface SuratTugasDialogProps {
   open: boolean;
@@ -44,7 +45,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
 
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
-  const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
+  const [fileToDelete, setFileToDelete] = useState<string | null>(null);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
 
   useEffect(() => {
@@ -57,15 +58,18 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       });
       
       // Set existing files for display
-      if (editingItem.file_surat_tugas) {
+      if (editingItem.file_surat_tugas && editingItem.file_metadata) {
         setExistingFiles([{ 
-          name: 'Surat Tugas', 
-          url: editingItem.file_surat_tugas_url,
-          viewUrl: editingItem.file_surat_tugas_url
+          name: editingItem.file_metadata.original_filename || editingItem.file_metadata.filename || 'Surat Tugas',
+          url: editingItem.file_urls?.download_url,
+          viewUrl: editingItem.file_urls?.file_url
         }]);
       } else {
         setExistingFiles([]);
       }
+      
+      // Reset file to delete when opening dialog
+      setFileToDelete(null);
     } else {
       setFormData({
         no_surat: '',
@@ -75,7 +79,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       });
       setUploadFiles([]);
       setExistingFiles([]);
-      setFilesToDelete([]);
+      setFileToDelete(null);
     }
     // Reset search when dialog opens/closes
     setPerwadagSearchValue('');
@@ -93,16 +97,12 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       return;
     }
 
-    // First, delete files that were marked for deletion (only in edit mode)
-    if (mode === 'edit' && editingItem?.id && filesToDelete.length > 0) {
-      for (const filename of filesToDelete) {
-        try {
-          await import('@/services/suratTugas').then(module => 
-            module.suratTugasService.deleteFile(editingItem.id, filename)
-          );
-        } catch (error) {
-          console.error('Error deleting file:', error);
-        }
+    // First, delete file that was marked for deletion (only in edit mode)
+    if (mode === 'edit' && editingItem?.id && fileToDelete) {
+      try {
+        await suratTugasService.deleteFile(editingItem.id, fileToDelete);
+      } catch (error) {
+        console.error('Error deleting file:', error);
       }
     }
 
@@ -126,13 +126,32 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   };
 
   const handleExistingFileRemove = (index: number) => {
-    if (!editingItem?.file_surat_tugas) return;
+    if (!editingItem?.file_metadata) return;
 
     // Mark file for deletion (will be executed on save)
-    setFilesToDelete(prev => [...prev, editingItem.file_surat_tugas!]);
+    const filename = editingItem.file_metadata.original_filename || editingItem.file_metadata.filename;
+    setFileToDelete(filename);
     
     // Remove from UI immediately
     setExistingFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
+    if (!editingItem?.id) return;
+    
+    try {
+      const blob = await suratTugasService.downloadFile(editingItem.id);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = file.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
   };
 
 
@@ -241,11 +260,12 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
               maxSize={10 * 1024 * 1024} // 10MB
               maxFiles={1}
               files={uploadFiles}
-              existingFiles={existingFiles}
+              existingFiles={fileToDelete ? [] : existingFiles}
               mode={canEdit ? 'edit' : 'view'}
               disabled={!canEdit}
               onFilesChange={handleUploadFilesChange}
               onExistingFileRemove={handleExistingFileRemove}
+              onFileDownload={handleFileDownload}
               description="Format yang didukung: PDF, DOC, DOCX (Max 10MB)"
             />
           </div>

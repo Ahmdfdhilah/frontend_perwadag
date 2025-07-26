@@ -61,6 +61,25 @@ export interface SuratTugasResponse {
   tanggal_evaluasi_selesai: string;
   no_surat: string;
   file_surat_tugas?: string;
+  nama_pengedali_mutu?: string;
+  nama_pengendali_teknis?: string;
+  nama_ketua_tim?: string;
+  file_urls?: {
+    file_url?: string;
+    download_url?: string;
+    view_url?: string;
+  };
+  file_metadata?: {
+    filename: string;
+    original_filename?: string;
+    size: number;
+    size_mb: number;
+    content_type: string;
+    extension: string;
+    uploaded_at: string;
+    uploaded_by?: string;
+    is_viewable: boolean;
+  };
   tahun_evaluasi?: number;
   durasi_evaluasi?: number;
   is_evaluation_active?: boolean;

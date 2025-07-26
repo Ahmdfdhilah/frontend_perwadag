@@ -330,6 +330,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
               <Eye className="w-4 h-4" />
             </Button>
           )}
+          {/* //jangan ada download */}
           {/* {file.url && (
             <Button
               size="sm"
