@@ -4,9 +4,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 
 import { Button } from '@workspace/ui/components/button';
+import { LoadingButton } from '@/components/common/LoadingButton';
 import { Input } from '@workspace/ui/components/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Alert, AlertDescription } from '@workspace/ui/components/alert';
@@ -285,20 +286,14 @@ export function LoginPage() {
                   </CardContent>
 
                   <CardFooter className="flex flex-col space-y-4 mt-4">
-                    <Button
+                    <LoadingButton
                       type="submit"
                       className="w-full"
-                      disabled={authLoading}
+                      loading={authLoading}
+                      loadingText="Masuk..."
                     >
-                      {authLoading ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Masuk...
-                        </>
-                      ) : (
-                        'Masuk'
-                      )}
-                    </Button>
+                      Masuk
+                    </LoadingButton>
                   </CardFooter>
                 </form>
               </Form>
@@ -446,20 +441,14 @@ export function LoginPage() {
                 </CardContent>
 
                 <CardFooter className="flex flex-col space-y-4 mt-4">
-                  <Button
+                  <LoadingButton
                     type="submit"
                     className="w-full"
-                    disabled={authLoading}
+                    loading={authLoading}
+                    loadingText="Masuk..."
                   >
-                    {authLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Masuk...
-                      </>
-                    ) : (
-                      'Masuk'
-                    )}
-                  </Button>
+                    Masuk
+                  </LoadingButton>
                 </CardFooter>
               </form>
             </Form>

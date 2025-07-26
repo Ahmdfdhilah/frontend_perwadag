@@ -11,6 +11,7 @@ interface AuthGuardProps {
   requireMfa?: boolean;
   redirectTo?: string;
   allowUnauthenticated?: boolean;
+  preserveLayout?: boolean; // New prop to preserve layout during loading
 }
 
 interface LoadingSpinnerProps {
@@ -26,12 +27,22 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ message = "Loading..." 
   </div>
 );
 
+const AuthLoadingOverlay: React.FC<LoadingSpinnerProps> = ({ message = "Verifying..." }) => (
+  <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div className="flex flex-col items-center space-y-4 bg-card p-6 rounded-lg border shadow-lg">
+      <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      <p className="text-muted-foreground text-sm">{message}</p>
+    </div>
+  </div>
+);
+
 export const AuthGuard: React.FC<AuthGuardProps> = ({ 
   children, 
   fallback = null, 
   requireRoles = [],
   redirectTo = '/login',
-  allowUnauthenticated = false
+  allowUnauthenticated = false,
+  preserveLayout = false
 }) => {
   const { 
     isAuthenticated, 
@@ -51,6 +62,14 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
 
   // Show loading spinner while authentication is being checked
   if (loading) {
+    if (preserveLayout) {
+      return (
+        <>
+          {children}
+          <AuthLoadingOverlay message="Verifying authentication..." />
+        </>
+      );
+    }
     return <LoadingSpinner message="Verifying authentication..." />;
   }
 
@@ -164,7 +183,13 @@ export const PublicRoute: React.FC<{ children: ReactNode; redirectTo?: string }>
   }, []);
 
   if (loading) {
-    return <LoadingSpinner message="Checking authentication..." />;
+    // For auth pages, use overlay that preserves the page layout
+    return (
+      <>
+        {children}
+        <AuthLoadingOverlay message="Checking authentication..." />
+      </>
+    );
   }
 
   // If already authenticated with valid token and user data, redirect to dashboard

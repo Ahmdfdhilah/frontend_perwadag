@@ -3,12 +3,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
 import { requestPasswordResetAsync } from '@/redux/features/authSlice';
 
 import { Button } from '@workspace/ui/components/button';
+import { LoadingButton } from '@/components/common/LoadingButton';
 import { Input } from '@workspace/ui/components/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Alert, AlertDescription } from '@workspace/ui/components/alert';
@@ -163,20 +164,14 @@ export function ForgotPasswordPage() {
                   </CardContent>
 
                   <CardFooter className="flex flex-col space-y-4 mt-4">
-                    <Button
+                    <LoadingButton
                       type="submit"
                       className="w-full"
-                      disabled={loading}
+                      loading={loading}
+                      loadingText="Mengirim..."
                     >
-                      {loading ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Mengirim...
-                        </>
-                      ) : (
-                        'Kirim Link Reset Password'
-                      )}
-                    </Button>
+                      Kirim Link Reset Password
+                    </LoadingButton>
                     
                     <Button
                       type="button"
@@ -255,20 +250,14 @@ export function ForgotPasswordPage() {
                 </CardContent>
 
                 <CardFooter className="flex flex-col space-y-4 mt-4">
-                  <Button
+                  <LoadingButton
                     type="submit"
                     className="w-full"
-                    disabled={loading}
+                    loading={loading}
+                    loadingText="Mengirim..."
                   >
-                    {loading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Mengirim...
-                      </>
-                    ) : (
-                      'Kirim Link Reset Password'
-                    )}
-                  </Button>
+                    Kirim Link Reset Password
+                  </LoadingButton>
                   
                   <Button
                     type="button"

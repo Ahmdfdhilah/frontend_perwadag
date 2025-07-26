@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from '@workspace/ui/components/dialog';
 import { Button } from '@workspace/ui/components/button';
+import { LoadingButton } from '@/components/common/LoadingButton';
 import { Input } from '@workspace/ui/components/input';
 import {
   Form,
@@ -278,9 +279,9 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
               <Button type="button" variant="outline" onClick={handleCancel} disabled={isLoading}>
                 Batal
               </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? 'Mengubah...' : 'Ubah Password'}
-              </Button>
+              <LoadingButton type="submit" loading={isLoading} loadingText="Mengubah...">
+                Ubah Password
+              </LoadingButton>
             </div>
           </form>
         </Form>

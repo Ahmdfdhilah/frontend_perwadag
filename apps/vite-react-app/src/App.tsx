@@ -69,7 +69,7 @@ function App() {
                   
                   {/* Protected routes */}
                   <Route path="/" element={
-                    <AuthGuard>
+                    <AuthGuard preserveLayout={true}>
                       <DashboardLayout />
                     </AuthGuard>
                   }>
