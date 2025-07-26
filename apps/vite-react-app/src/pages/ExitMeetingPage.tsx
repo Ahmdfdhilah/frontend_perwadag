@@ -176,11 +176,22 @@ const ExitMeetingPage: React.FC = () => {
     try {
       const updateData = {
         tanggal_meeting: data.tanggal_meeting,
-        link_zoom: data.link_zoom || undefined,
-        link_daftar_hadir: data.link_daftar_hadir || undefined,
+        link_zoom: data.link_zoom !== undefined ? data.link_zoom : undefined,
+        link_daftar_hadir: data.link_daftar_hadir !== undefined ? data.link_daftar_hadir : undefined,
       };
 
       await meetingService.updateMeeting(editingItem.id, updateData);
+
+      // Handle file deletions first
+      if (data.filesToDelete && data.filesToDelete.length > 0) {
+        for (const filename of data.filesToDelete) {
+          try {
+            await meetingService.deleteFile(editingItem.id, filename);
+          } catch (error) {
+            console.error(`Failed to delete file ${filename}:`, error);
+          }
+        }
+      }
 
       // Handle file uploads if any
       if (data.files && data.files.length > 0) {

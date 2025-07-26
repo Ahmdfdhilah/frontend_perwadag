@@ -39,6 +39,7 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   const [selectedExitDate, setSelectedExitDate] = useState<Date>();
   const [meetingFiles, setMeetingFiles] = useState<File[]>([]);
   const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
+  const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
 
   useEffect(() => {
     if (item && open) {
@@ -64,19 +65,21 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
       setSelectedExitDate(undefined);
       setMeetingFiles([]);
       setExistingFiles([]);
+      setFilesToDelete([]);
     }
   }, [item, open]);
 
   const handleSave = () => {
     const dataToSave: any = {
       files: meetingFiles,
+      filesToDelete,
     };
     
     // Only include fields that the user can edit
     if (canEditAllFields) {
       dataToSave.tanggal_meeting = selectedExitDate ? formatDateForAPI(selectedExitDate) : formData.tanggal_meeting;
-      dataToSave.link_zoom = formData.link_zoom;
-      dataToSave.link_daftar_hadir = formData.link_daftar_hadir;
+      dataToSave.link_zoom = formData.link_zoom || '';
+      dataToSave.link_daftar_hadir = formData.link_daftar_hadir || '';
     }
     
     onSave(dataToSave);
@@ -98,7 +101,11 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   };
 
   const handleExistingFilesRemove = (index: number) => {
-    setExistingFiles(prev => prev.filter((_, i) => i !== index));
+    const fileToRemove = existingFiles[index];
+    if (fileToRemove) {
+      setFilesToDelete(prev => [...prev, fileToRemove.name]);
+      setExistingFiles(prev => prev.filter((_, i) => i !== index));
+    }
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {

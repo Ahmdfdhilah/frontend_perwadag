@@ -173,7 +173,7 @@ const SuratPemberitahuanPage: React.FC = () => {
 
     try {
       const updateData = {
-        tanggal_surat_pemberitahuan: data.tanggal_surat_pemberitahuan || undefined,
+        tanggal_surat_pemberitahuan: data.tanggal_surat_pemberitahuan !== undefined ? data.tanggal_surat_pemberitahuan : undefined,
       };
 
       await suratPemberitahuanService.updateSuratPemberitahuan(selectedItem.id, updateData);

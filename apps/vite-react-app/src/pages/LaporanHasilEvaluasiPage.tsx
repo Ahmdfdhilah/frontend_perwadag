@@ -183,8 +183,8 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
 
     try {
       const updateData = {
-        nomor_laporan: data.nomor_laporan || undefined,
-        tanggal_laporan: data.tanggal_laporan || undefined,
+        nomor_laporan: data.nomor_laporan !== undefined ? data.nomor_laporan : undefined,
+        tanggal_laporan: data.tanggal_laporan !== undefined ? data.tanggal_laporan : undefined,
       };
 
       await laporanHasilService.updateLaporanHasil(editingItem.id, updateData);

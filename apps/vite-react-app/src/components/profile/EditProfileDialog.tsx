@@ -26,7 +26,7 @@ import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 const editProfileSchema = z.object({
   nama: z.string().min(1, 'Nama wajib diisi').min(2, 'Nama minimal 2 karakter'),
   jabatan: z.string().min(1, 'Jabatan wajib diisi'),
-  email: z.string().email('Format email tidak valid').optional().or(z.literal('')),
+  email: z.string().min(1, 'Email is required').email('Format email tidak valid'),
 });
 
 type EditProfileData = z.infer<typeof editProfileSchema>;
@@ -69,7 +69,7 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
     const updateData: UserUpdate = {
       nama: data.nama,
       jabatan: data.jabatan,
-      email: data.email || undefined,
+      email: data.email !== undefined ? data.email : undefined,
     };
     onSave(updateData);
   };
@@ -102,7 +102,7 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
               </div>
 
               {/* Form Fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex flex-col gap-6">
                 <FormField
                   control={form.control}
                   name="nama"
@@ -145,7 +145,7 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email (Opsional)</FormLabel>
+                      <FormLabel>Email *</FormLabel>
                       <FormControl>
                         <Input
                           type="email"
@@ -161,7 +161,7 @@ export const EditProfileDialog: React.FC<EditProfileDialogProps> = ({
               </div>
 
               {/* Read-only fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="flex flex-col gap-6">
                 <div className="space-y-2">
                   <Label>Username</Label>
                   <div className="p-3 bg-muted rounded-md text-sm">

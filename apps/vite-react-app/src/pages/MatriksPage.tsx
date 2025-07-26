@@ -236,7 +236,7 @@ const MatriksPage: React.FC = () => {
 
     try {
       const updateData = {
-        temuan_rekomendasi: data.temuan_rekomendasi && data.temuan_rekomendasi.length > 0 ? {
+        temuan_rekomendasi: data.temuan_rekomendasi !== undefined ? {
           items: data.temuan_rekomendasi
         } : undefined,
       };

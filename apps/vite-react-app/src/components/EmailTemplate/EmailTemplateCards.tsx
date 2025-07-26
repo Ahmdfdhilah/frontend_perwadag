@@ -153,11 +153,11 @@ export const EmailTemplateCards: React.FC<EmailTemplateCardsProps> = ({
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => onView(template)}>
                       <Eye className="mr-2 h-4 w-4" />
-                      Lihat Detail
+                      Lihat
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onEdit(template)}>
                       <Edit className="mr-2 h-4 w-4" />
-                      Edit Template
+                      Edit 
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem 

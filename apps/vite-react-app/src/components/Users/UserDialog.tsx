@@ -37,10 +37,10 @@ export const UserDialog: React.FC<UserDialogProps> = ({
       const transformedData = {
         nama: data.nama,
         jabatan: data.jabatan,
-        email: data.email || undefined,
+        email: data.email !== undefined ? data.email : undefined,
         is_active: data.is_active,
         role: data.role,
-        inspektorat: data.inspektorat || undefined,
+        inspektorat: data.inspektorat !== undefined ? data.inspektorat : undefined,
       };
 
       onSave(transformedData);

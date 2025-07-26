@@ -95,7 +95,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       user_perwadag_id: formData.user_perwadag_id,
       tanggal_evaluasi_mulai: formatDateForAPI(formData.tanggal_evaluasi_mulai),
       tanggal_evaluasi_selesai: formData.tanggal_evaluasi_selesai ? formatDateForAPI(formData.tanggal_evaluasi_selesai) : undefined,
-      no_surat: formData.no_surat,
+      no_surat: formData.no_surat || '',
       file: uploadFiles.length > 0 ? uploadFiles[0] : null, // Send null instead of undefined
     };
 

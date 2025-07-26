@@ -70,7 +70,7 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
 
   const handleSave = () => {
     const dataToSave = {
-      nomor_laporan: formData.nomor_laporan,
+      nomor_laporan: formData.nomor_laporan || '',
       tanggal_laporan: selectedDate ? formatDateForAPI(selectedDate) : formData.tanggal_laporan,
       files: uploadFiles,
     };

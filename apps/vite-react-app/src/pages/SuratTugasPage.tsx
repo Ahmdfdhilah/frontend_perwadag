@@ -274,9 +274,9 @@ const SuratTugasPage: React.FC = () => {
       if (selectedItem && dialogMode === 'edit') {
         // Update existing surat tugas
         const updateData = {
-          tanggal_evaluasi_mulai: data.tanggal_evaluasi_mulai,
-          tanggal_evaluasi_selesai: data.tanggal_evaluasi_selesai,
-          no_surat: data.no_surat,
+          tanggal_evaluasi_mulai: data.tanggal_evaluasi_mulai !== undefined ? data.tanggal_evaluasi_mulai : undefined,
+          tanggal_evaluasi_selesai: data.tanggal_evaluasi_selesai !== undefined ? data.tanggal_evaluasi_selesai : undefined,
+          no_surat: data.no_surat !== undefined ? data.no_surat : undefined,
         };
 
         await suratTugasService.updateSuratTugas(selectedItem.id, updateData);

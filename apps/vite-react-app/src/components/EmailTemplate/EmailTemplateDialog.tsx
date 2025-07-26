@@ -65,12 +65,8 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
   }, [open, template, mode]);
 
   const handleSave = async () => {
-    if (!name.trim() || !subjectTemplate.trim() || !bodyTemplate.trim()) {
-      toast({
-        title: 'Error',
-        description: 'Semua field harus diisi.',
-        variant: 'destructive'
-      });
+    // Skip validation if form is invalid
+    if (!isFormValid) {
       return;
     }
 
@@ -147,6 +143,7 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
   };
 
   const isReadOnly = mode === 'view';
+  const isFormValid = name.trim() && subjectTemplate.trim() && bodyTemplate.trim() && !loading;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -181,7 +178,7 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
               <ScrollArea className="h-[60vh] pr-4">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="template-name">Nama Template</Label>
+                    <Label htmlFor="template-name">Nama Template *</Label>
                     <Input
                       id="template-name"
                       value={name}
@@ -193,7 +190,7 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="subject-template">Subject Template</Label>
+                    <Label htmlFor="subject-template">Subject Template *</Label>
                     <div className="space-y-2">
                       <Textarea
                         id="subject-template"
@@ -223,7 +220,7 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="body-template">Body Template</Label>
+                    <Label htmlFor="body-template">Body Template *</Label>
                     <div className="space-y-2">
                       <Textarea
                         id="body-template"
@@ -295,7 +292,7 @@ export const EmailTemplateDialog: React.FC<EmailTemplateDialogProps> = ({
               {isReadOnly ? 'Tutup' : 'Batal'}
             </Button>
             {!isReadOnly && (
-              <Button onClick={handleSave} disabled={loading}>
+              <Button onClick={handleSave} disabled={!isFormValid}>
                 {loading && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 {mode === 'create' ? 'Buat Template' : 'Simpan Perubahan'}
               </Button>

@@ -23,7 +23,7 @@ import {
   FormMessage,
 } from '@workspace/ui/components/form';
 
-const userSchema = z.object({
+const createUserSchema = z.object({
   nama: z.string().min(1, 'Nama is required').min(2, 'Nama must be at least 2 characters').max(200),
   jabatan: z.string().min(1, 'Jabatan is required').max(200),
   email: z.string().email('Please enter a valid email address').optional().or(z.literal('')),
@@ -32,9 +32,36 @@ const userSchema = z.object({
     required_error: 'Please select a role',
   }),
   inspektorat: z.string().optional(),
+}).refine((data) => {
+  if (data.role === USER_ROLES.INSPEKTORAT || data.role === USER_ROLES.PERWADAG) {
+    return data.inspektorat && data.inspektorat.trim().length > 0;
+  }
+  return true;
+}, {
+  message: 'Inspektorat is required for this role',
+  path: ['inspektorat'],
 });
 
-type UserFormData = z.infer<typeof userSchema>;
+const editUserSchema = z.object({
+  nama: z.string().min(1, 'Nama is required').min(2, 'Nama must be at least 2 characters').max(200),
+  jabatan: z.string().min(1, 'Jabatan is required').max(200),
+  email: z.string().min(1, 'Email is required').email('Please enter a valid email address'),
+  is_active: z.boolean().optional(),
+  role: z.enum([USER_ROLES.ADMIN, USER_ROLES.INSPEKTORAT, USER_ROLES.PERWADAG], {
+    required_error: 'Please select a role',
+  }),
+  inspektorat: z.string().optional(),
+}).refine((data) => {
+  if (data.role === USER_ROLES.INSPEKTORAT || data.role === USER_ROLES.PERWADAG) {
+    return data.inspektorat && data.inspektorat.trim().length > 0;
+  }
+  return true;
+}, {
+  message: 'Inspektorat is required for this role',
+  path: ['inspektorat'],
+});
+
+type UserFormData = z.infer<typeof createUserSchema> | z.infer<typeof editUserSchema>;
 
 interface UserFormProps {
   initialData?: Partial<User>;
@@ -51,13 +78,17 @@ export const UserForm: React.FC<UserFormProps> = ({
   onCancel,
   loading = false,
   disabled = false,
+  mode = 'create',
 }) => {
   const [showInspektoratSelect, setShowInspektoratSelect] = useState(
     initialData?.role === USER_ROLES.INSPEKTORAT || initialData?.role === USER_ROLES.PERWADAG || false
   );
 
+  const isEditMode = mode === 'edit' && initialData;
+  const schema = isEditMode ? editUserSchema : createUserSchema;
+  
   const form = useForm<UserFormData>({
-    resolver: zodResolver(userSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       nama: initialData?.nama || '',
       jabatan: initialData?.jabatan || '',
@@ -83,6 +114,10 @@ export const UserForm: React.FC<UserFormProps> = ({
     onSubmit(data);
   };
 
+  // Get form validation state
+  const { formState: { isValid, errors } } = form;
+  const isFormValid = isValid && !loading && !disabled;
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -94,7 +129,7 @@ export const UserForm: React.FC<UserFormProps> = ({
             name="nama"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nama Lengkap</FormLabel>
+                <FormLabel>Nama Lengkap *</FormLabel>
                 <FormControl>
                   <Input placeholder="Masukkan nama lengkap" disabled={loading || disabled} {...field} />
                 </FormControl>
@@ -109,7 +144,7 @@ export const UserForm: React.FC<UserFormProps> = ({
             name="jabatan"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Jabatan</FormLabel>
+                <FormLabel>Jabatan *</FormLabel>
                 <FormControl>
                   <Input placeholder="Masukkan jabatan" disabled={loading || disabled} {...field} />
                 </FormControl>
@@ -123,7 +158,7 @@ export const UserForm: React.FC<UserFormProps> = ({
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email (Opsional)</FormLabel>
+                <FormLabel>Email {isEditMode ? '*' : '(Opsional)'}</FormLabel>
                 <FormControl>
                   <Input type="email" placeholder="Masukkan alamat email" disabled={loading || disabled} {...field} />
                 </FormControl>
@@ -141,7 +176,7 @@ export const UserForm: React.FC<UserFormProps> = ({
             name="role"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Role</FormLabel>
+                <FormLabel>Role *</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading || disabled}>
                   <FormControl>
                     <SelectTrigger>
@@ -168,7 +203,7 @@ export const UserForm: React.FC<UserFormProps> = ({
             name="inspektorat"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Inspektorat</FormLabel>
+                <FormLabel>Inspektorat *</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading || disabled}>
                   <FormControl>
                     <SelectTrigger>
@@ -216,7 +251,7 @@ export const UserForm: React.FC<UserFormProps> = ({
           <Button type="button" variant="outline" onClick={onCancel} disabled={loading || disabled}>
             Cancel
           </Button>
-          <Button type="submit" disabled={loading || disabled}>
+          <Button type="submit" disabled={!isFormValid}>
             {loading ? 'Menyimpan...' : initialData ? 'Update User' : 'Buat User'}
           </Button>
         </div>

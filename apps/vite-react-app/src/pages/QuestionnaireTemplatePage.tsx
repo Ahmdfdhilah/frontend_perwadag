@@ -149,9 +149,9 @@ const QuestionnaireTemplatePage: React.FC = () => {
       if (editingItem) {
         // Update existing template
         const updateData = {
-          nama_template: data.nama_template,
-          deskripsi: data.deskripsi,
-          tahun: data.tahun,
+          nama_template: data.nama_template !== undefined ? data.nama_template : undefined,
+          deskripsi: data.deskripsi !== undefined ? data.deskripsi : undefined,
+          tahun: data.tahun !== undefined ? data.tahun : undefined,
         };
         await formatKuisionerService.updateFormatKuisioner(editingItem.id, updateData);
         

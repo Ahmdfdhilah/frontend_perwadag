@@ -71,7 +71,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   const handleSave = () => {
     const dataToSave = {
       tanggal_kuisioner: selectedDate ? formatDateForAPI(selectedDate) : formData.tanggal_kuisioner,
-      link_dokumen_data_dukung: formData.link_dokumen_data_dukung,
+      link_dokumen_data_dukung: formData.link_dokumen_data_dukung || '',
       files: uploadFiles,
     };
     onSave(dataToSave);

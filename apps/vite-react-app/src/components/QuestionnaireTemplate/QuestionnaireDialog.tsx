@@ -67,28 +67,15 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
   }, [item, open]);
 
   const handleSave = () => {
-    // Admin-only validation for creating/editing template
-    if (!isAdmin()) {
-      alert('Hanya admin yang dapat mengelola template kuesioner');
-      return;
-    }
-
-    // Validation for required fields
-    if (!formData.nama_template) {
-      alert('Nama template harus diisi');
-      return;
-    }
-    if (!formData.deskripsi) {
-      alert('Deskripsi template harus diisi');
-      return;
-    }
-    if (!formData.tahun) {
-      alert('Tahun harus diisi');
+    // Skip validation if form is invalid
+    if (!isFormValid) {
       return;
     }
 
     const dataToSave = {
       ...formData,
+      nama_template: formData.nama_template || '',
+      deskripsi: formData.deskripsi || '',
       file: uploadFile || undefined,
     };
     onSave(dataToSave);
@@ -111,6 +98,11 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
     }
   };
 
+  const isFormValid = formData.nama_template.trim() && 
+    formData.deskripsi.trim() && 
+    formData.tahun &&
+    isAdmin();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
@@ -123,7 +115,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
         <div className="flex-1 overflow-y-auto py-4">
           <div className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="nama_template">Nama Template</Label>
+              <Label htmlFor="nama_template">Nama Template *</Label>
               <Input
                 id="nama_template"
                 value={formData.nama_template || ''}
@@ -135,7 +127,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="deskripsi">Deskripsi Template</Label>
+              <Label htmlFor="deskripsi">Deskripsi Template *</Label>
               <Textarea
                 id="deskripsi"
                 value={formData.deskripsi || ''}
@@ -148,7 +140,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tahun">Tahun</Label>
+              <Label htmlFor="tahun">Tahun *</Label>
               <Input
                 id="tahun"
                 type="number"
@@ -193,7 +185,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
             </Button>
           )}
           {mode === 'edit' && isAdmin() && (
-            <Button onClick={handleSave}>
+            <Button onClick={handleSave} disabled={!isFormValid}>
               Simpan
             </Button>
           )}

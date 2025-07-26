@@ -70,10 +70,15 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     if (!onSave) return;
 
     // Send full JSON of temuan_rekomendasi, including existing IDs for updates
-    const filteredTemuanRekomendasi = temuanRekomendasi.filter(tr => tr.temuan.trim() && tr.rekomendasi.trim());
+    // Allow empty strings to be sent for clearing data
+    const processedTemuanRekomendasi = temuanRekomendasi.map(tr => ({
+      ...tr,
+      temuan: tr.temuan || '',
+      rekomendasi: tr.rekomendasi || ''
+    }));
     
     const dataToSave = {
-      temuan_rekomendasi: filteredTemuanRekomendasi,
+      temuan_rekomendasi: processedTemuanRekomendasi,
       file: uploadFile,
     };
     onSave(dataToSave);
