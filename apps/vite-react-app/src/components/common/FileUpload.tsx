@@ -81,7 +81,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
       const acceptedTypes = accept.split(',').map(type => type.trim());
       const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
       const mimeType = file.type;
-      
+
       const isValidType = acceptedTypes.some(type => {
         if (type.startsWith('.')) {
           return type === fileExtension;
@@ -151,15 +151,15 @@ const FileUpload: React.FC<FileUploadProps> = ({
   const handleDrop = (event: React.DragEvent) => {
     event.preventDefault();
     setIsDragOver(false);
-    
+
     if (disabled || !dragAndDrop) return;
-    
+
     handleFileSelection(event.dataTransfer.files);
   };
 
   const handleRemoveFile = (index: number) => {
     if (!allowRemove) return;
-    
+
     const updatedFiles = currentFiles.filter((_, i) => i !== index);
     setCurrentFiles(updatedFiles);
     onFilesChange?.(updatedFiles);
@@ -272,7 +272,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
               size="sm"
               variant="ghost"
               onClick={() => isExisting ? handleRemoveExistingFile(index) : handleRemoveFile(index)}
-              className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
             >
               <X className="w-4 h-4" />
             </Button>
@@ -357,7 +356,6 @@ const FileUpload: React.FC<FileUploadProps> = ({
               size="sm"
               variant="ghost"
               onClick={() => handleRemoveExistingFile(index)}
-              className="h-8 w-8 p-0 text-red-500 hover:text-red-700"
               title="Remove file"
             >
               <X className="w-4 h-4" />
@@ -392,7 +390,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
           {required && <span className="text-red-500 ml-1">*</span>}
         </Label>
       )}
-      
+
       {description && (
         <p className="text-sm text-gray-500 dark:text-gray-400 break-words">
           {description}
@@ -457,7 +455,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
         <div className="space-y-2">
           {/* Existing Files */}
           {existingFiles.map((file, index) => renderExistingFileItem(file, index))}
-          
+
           {/* New Files */}
           {currentFiles.map((file, index) => renderFileItem(file, index))}
         </div>

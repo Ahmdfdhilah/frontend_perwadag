@@ -184,17 +184,6 @@ const EntryMeetingPage: React.FC = () => {
 
       await meetingService.updateMeeting(editingItem.id, updateData);
 
-      // Handle file deletions first
-      if (data.filesToDelete && data.filesToDelete.length > 0) {
-        for (const filename of data.filesToDelete) {
-          try {
-            await meetingService.deleteFile(editingItem.id, filename);
-          } catch (error) {
-            console.error(`Failed to delete file ${filename}:`, error);
-          }
-        }
-      }
-
       // Handle file uploads if any
       if (data.files && data.files.length > 0) {
         await meetingService.uploadFiles(editingItem.id, data.files);

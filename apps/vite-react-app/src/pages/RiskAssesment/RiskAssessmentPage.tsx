@@ -490,9 +490,9 @@ const RiskAssessmentPage: React.FC = () => {
       <AlertDialog open={!!itemToDelete} onOpenChange={() => setItemToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Konfirmasi Hapus</AlertDialogTitle>
+            <AlertDialogTitle>Konfirmasi Hapus Isi Input</AlertDialogTitle>
             <AlertDialogDescription>
-              Tindakan ini tidak dapat dibatalkan. Data penilaian risiko{' '}
+              Tindakan ini tidak dapat dibatalkan. Data input penilaian risiko{' '}
               <strong>{itemToDelete?.nama_perwadag}</strong> akan dihapus dari sistem.
             </AlertDialogDescription>
           </AlertDialogHeader>

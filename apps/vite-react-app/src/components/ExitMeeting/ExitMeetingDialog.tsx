@@ -16,7 +16,9 @@ import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useRole } from '@/hooks/useRole';
 import { formatIndonesianDate, formatIndonesianDateRange, formatDateForAPI } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
+import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { meetingService } from '@/services/meeting';
+import { useToast } from '@workspace/ui/components/sonner';
 
 interface ExitMeetingDialogProps {
   open: boolean;
@@ -35,11 +37,14 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
 }) => {
   const { canEditForm } = useFormPermissions();
   const { isAdmin, isInspektorat } = useRole();
+  const { toast } = useToast();
   const [formData, setFormData] = useState<any>({});
   const [selectedExitDate, setSelectedExitDate] = useState<Date>();
   const [meetingFiles, setMeetingFiles] = useState<File[]>([]);
-  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
-  const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
+  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string; filename?: string }>>([]);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [fileToDelete, setFileToDelete] = useState<{ index: number; name: string; filename: string } | null>(null);
+  const [deletingFile, setDeletingFile] = useState(false);
 
   useEffect(() => {
     if (item && open) {
@@ -55,7 +60,8 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
         name: file.original_filename || `Bukti Hadir ${index + 1}`, 
         url: file.download_url,
         viewUrl: file.file_url,
-        size: file.size
+        size: file.size,
+        filename: file.filename
       })) : []);
     } else {
       setFormData({
@@ -66,14 +72,14 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
       setSelectedExitDate(undefined);
       setMeetingFiles([]);
       setExistingFiles([]);
-      setFilesToDelete([]);
+      setFileToDelete(null);
+      setDeleteConfirmOpen(false);
     }
   }, [item, open]);
 
   const handleSave = () => {
     const dataToSave: any = {
       files: meetingFiles,
-      filesToDelete,
     };
     
     // Only include fields that the user can edit
@@ -102,12 +108,45 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   };
 
   const handleExistingFilesRemove = (index: number) => {
-    if (!item?.files_info?.files?.[index]) return;
+    if (!existingFiles[index]) return;
     
-    const fileMetadata = item.files_info.files[index];
-    const filename = fileMetadata.filename;
-    setFilesToDelete(prev => [...prev, filename]);
-    setExistingFiles(prev => prev.filter((_, i) => i !== index));
+    const fileToRemove = existingFiles[index];
+    if (!fileToRemove.filename) return;
+    
+    setFileToDelete({
+      index,
+      name: fileToRemove.name,
+      filename: fileToRemove.filename
+    });
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!fileToDelete || !item?.id) return;
+    
+    setDeletingFile(true);
+    try {
+      await meetingService.deleteFile(item.id, fileToDelete.filename);
+      
+      // Remove from UI
+      setExistingFiles(prev => prev.filter((_, i) => i !== fileToDelete.index));
+      
+      toast({
+        title: 'File berhasil dihapus',
+        description: `File ${fileToDelete.name} telah dihapus.`,
+        variant: 'default'
+      });
+    } catch (error) {
+      console.error('Error deleting file:', error);
+      toast({
+        title: 'Gagal menghapus file',
+        description: `Terjadi kesalahan saat menghapus file ${fileToDelete.name}.`,
+        variant: 'destructive'
+      });
+    } finally {
+      setDeletingFile(false);
+      setFileToDelete(null);
+    }
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }, index: number) => {
@@ -291,6 +330,15 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
           )}
         </DialogFooter>
       </DialogContent>
+
+      {/* File Delete Confirmation Dialog */}
+      <FileDeleteConfirmDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+        fileName={fileToDelete?.name || ''}
+        onConfirm={handleConfirmDelete}
+        loading={deletingFile}
+      />
     </Dialog>
   );
 };
