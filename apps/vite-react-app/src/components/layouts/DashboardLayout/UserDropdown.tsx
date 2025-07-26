@@ -45,23 +45,31 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
     return user.nama.charAt(0).toUpperCase();
   };
 
-  // Get user display name
-  const getUserDisplayName = () => {
-    return user?.nama || 'User';
+  // Get user display name with truncation
+  const getUserDisplayName = (maxLength = 20) => {
+    const name = user?.nama || 'User';
+    if (name.length <= maxLength) return name;
+    return name.substring(0, maxLength - 3) + '...';
   };
 
-  // Get user role display
-  const getUserRole = () => {
+  // Get user role display with truncation
+  const getUserRole = (maxLength = 15) => {
+    let role;
     switch (currentRole) {
       case 'ADMIN':
-        return 'Administrator';
+        role = 'Administrator';
+        break;
       case 'INSPEKTORAT':
-        return 'Inspektorat';
+        role = 'Inspektorat';
+        break;
       case 'PERWADAG':
-        return 'Perwadag';
+        role = 'Perwadag';
+        break;
       default:
-        return currentRole;
+        role = currentRole;
     }
+    if (role && role.length <= maxLength) return role;
+    return role ? role.substring(0, maxLength - 3) + '...' : '';
   };
 
   const handleLogout = async () => {
@@ -126,12 +134,12 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
             {!collapsed && (
               <>
                 <div className="flex flex-col items-start flex-1 min-w-0">
-                  <span className="text-sm font-medium text-sidebar-foreground truncate">
-                    {getUserDisplayName()}
+                  <span className="text-sm font-medium text-sidebar-foreground truncate max-w-[120px]" title={user?.nama}>
+                    {getUserDisplayName(18)}
                   </span>
                   <div className="flex items-center gap-1">
-                    <span className="text-xs text-muted-foreground truncate">
-                      {getUserRole()}
+                    <span className="text-xs text-muted-foreground truncate max-w-[100px]" title={getUserRole(50)}>
+                      {getUserRole(12)}
                     </span>
                   </div>
                 </div>
@@ -144,10 +152,10 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
         <DropdownMenuContent align={collapsed ? "start" : "end"} className="w-56" side={collapsed ? "right" : "bottom"}>
           <DropdownMenuLabel>
             <div className="flex flex-col space-y-1">
-              <span className="font-medium">{getUserDisplayName()}</span>
-              {user.email && <span className="text-xs text-muted-foreground">{user.email}</span>}
-              <span className="text-xs text-muted-foreground">{getUserRole()}</span>
-              {user.inspektorat && <span className="text-xs text-muted-foreground">{user.inspektorat}</span>}
+              <span className="font-medium truncate" title={user?.nama}>{getUserDisplayName(25)}</span>
+              {user.email && <span className="text-xs text-muted-foreground truncate" title={user.email}>{user.email}</span>}
+              <span className="text-xs text-muted-foreground truncate" title={getUserRole(50)}>{getUserRole(20)}</span>
+              {user.inspektorat && <span className="text-xs text-muted-foreground truncate" title={user.inspektorat}>{user.inspektorat}</span>}
             </div>
           </DropdownMenuLabel>
 

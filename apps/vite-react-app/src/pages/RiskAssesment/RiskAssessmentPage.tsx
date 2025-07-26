@@ -28,6 +28,16 @@ import RiskAssessmentCards from '@/components/RiskAssesment/RiskAssessmentCards'
 import { Settings } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
 import { useToast } from '@workspace/ui/components/sonner';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@workspace/ui/components/alert-dialog';
 import { getDefaultYearOptions } from '@/utils/yearUtils';
 
 interface RiskAssessmentPageFilters {
@@ -71,6 +81,7 @@ const RiskAssessmentPage: React.FC = () => {
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
   const [isPeriodeDialogOpen, setIsPeriodeDialogOpen] = useState(false);
   const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
+  const [itemToDelete, setItemToDelete] = useState<PenilaianRisikoResponse | null>(null);
 
   // Fetch year options function
   const fetchYearOptions = async () => {
@@ -155,50 +166,56 @@ const RiskAssessmentPage: React.FC = () => {
     navigate(`/penilaian-resiko/${item.id}/edit`);
   };
 
-  const handleDelete = async (item: PenilaianRisikoResponse) => {
+  const handleDelete = (item: PenilaianRisikoResponse) => {
+    setItemToDelete(item);
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
+
     try {
       // Create null kriteria_data to "delete" only user inputable data
       const nullKriteriaData = {
         tren_capaian: {
-          tahun_pembanding_1: item.kriteria_data.tren_capaian.tahun_pembanding_1,
-          tahun_pembanding_2: item.kriteria_data.tren_capaian.tahun_pembanding_2,
+          tahun_pembanding_1: itemToDelete.kriteria_data.tren_capaian.tahun_pembanding_1,
+          tahun_pembanding_2: itemToDelete.kriteria_data.tren_capaian.tahun_pembanding_2,
           capaian_tahun_1: null,
           capaian_tahun_2: null,
         },
         realisasi_anggaran: {
-          tahun_pembanding: item.kriteria_data.realisasi_anggaran.tahun_pembanding,
+          tahun_pembanding: itemToDelete.kriteria_data.realisasi_anggaran.tahun_pembanding,
           realisasi: null,
           pagu: null,
         },
         tren_ekspor: {
-          tahun_pembanding: item.kriteria_data.tren_ekspor.tahun_pembanding,
+          tahun_pembanding: itemToDelete.kriteria_data.tren_ekspor.tahun_pembanding,
           deskripsi: null,
         },
         audit_itjen: {
-          tahun_pembanding: item.kriteria_data.audit_itjen.tahun_pembanding,
+          tahun_pembanding: itemToDelete.kriteria_data.audit_itjen.tahun_pembanding,
           pilihan: null,
         },
         perjanjian_perdagangan: {
-          tahun_pembanding: item.kriteria_data.perjanjian_perdagangan.tahun_pembanding,
+          tahun_pembanding: itemToDelete.kriteria_data.perjanjian_perdagangan.tahun_pembanding,
           pilihan: null,
         },
         peringkat_ekspor: {
-          tahun_pembanding: item.kriteria_data.peringkat_ekspor.tahun_pembanding,
+          tahun_pembanding: itemToDelete.kriteria_data.peringkat_ekspor.tahun_pembanding,
           deskripsi: null,
         },
         persentase_ik: {
-          tahun_pembanding: item.kriteria_data.persentase_ik.tahun_pembanding,
+          tahun_pembanding: itemToDelete.kriteria_data.persentase_ik.tahun_pembanding,
           ik_tidak_tercapai: null,
           total_ik: null,
         },
         realisasi_tei: {
-          tahun_pembanding: item.kriteria_data.realisasi_tei.tahun_pembanding,
+          tahun_pembanding: itemToDelete.kriteria_data.realisasi_tei.tahun_pembanding,
           nilai_realisasi: null,
           nilai_potensi: null,
         },
       };
 
-      await penilaianRisikoService.updatePenilaianRisiko(item.id, {
+      await penilaianRisikoService.updatePenilaianRisiko(itemToDelete.id, {
         kriteria_data: nullKriteriaData,
         catatan: null,
         auto_calculate: true,
@@ -206,12 +223,13 @@ const RiskAssessmentPage: React.FC = () => {
 
       toast({
         title: 'Berhasil',
-        description: `Data penilaian risiko ${item.nama_perwadag} berhasil dihapus.`,
+        description: `Data penilaian risiko ${itemToDelete.nama_perwadag} berhasil dihapus.`,
         variant: 'default',
       });
 
       // Refresh the data
       fetchRiskAssessments();
+      setItemToDelete(null);
     } catch (error) {
       console.error('Failed to delete risk assessment:', error);
       toast({
@@ -467,6 +485,28 @@ const RiskAssessmentPage: React.FC = () => {
         onOpenChange={setIsPeriodeDialogOpen}
         onRefresh={fetchRiskAssessments}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!itemToDelete} onOpenChange={() => setItemToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Konfirmasi Hapus</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tindakan ini tidak dapat dibatalkan. Data penilaian risiko{' '}
+              <strong>{itemToDelete?.nama_perwadag}</strong> akan dihapus dari sistem.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={confirmDelete} 
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -6,16 +6,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@workspace/ui/components/dialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@workspace/ui/components/alert-dialog';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
@@ -28,7 +18,7 @@ import {
 } from '@workspace/ui/components/select';
 import { Switch } from '@workspace/ui/components/switch';
 import { useToast } from '@workspace/ui/components/sonner';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit } from 'lucide-react';
 import {
   PeriodeEvaluasiResponse,
   PeriodeEvaluasiCreate,
@@ -52,7 +42,6 @@ const PeriodeManagementDialog: React.FC<PeriodeManagementDialogProps> = ({
   const [selectedPeriode, setSelectedPeriode] = useState<PeriodeEvaluasiResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [mode, setMode] = useState<'view' | 'edit' | 'create'>('view');
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [formData, setFormData] = useState<{
     tahun: string;
     status: 'aktif' | 'tutup';
@@ -93,7 +82,6 @@ const PeriodeManagementDialog: React.FC<PeriodeManagementDialogProps> = ({
     });
     setSelectedPeriode(null);
     setMode('view');
-    setShowDeleteDialog(false);
   };
 
   // Handle period selection
@@ -173,31 +161,6 @@ const PeriodeManagementDialog: React.FC<PeriodeManagementDialogProps> = ({
     }
   };
 
-  // Handle delete period
-  const handleDeletePeriode = async () => {
-    if (!selectedPeriode) return;
-
-
-    setIsLoading(true);
-    try {
-      await periodeEvaluasiService.deletePeriodeEvaluasi(selectedPeriode.id);
-
-      toast({
-        title: 'Berhasil',
-        description: `Periode ${selectedPeriode.tahun} berhasil dihapus.`,
-        variant: 'default',
-      });
-
-      await fetchPeriodeList();
-      resetForm();
-      onRefresh?.();
-    } catch (error: any) {
-      console.error('Failed to delete periode:', error);
-    } finally {
-      setIsLoading(false);
-    }
-    setShowDeleteDialog(false);
-  };
 
 
   return (
@@ -309,18 +272,7 @@ const PeriodeManagementDialog: React.FC<PeriodeManagementDialogProps> = ({
 
           <DialogFooter>
             <div className="flex justify-between w-full">
-              <div className="flex space-x-2">
-                {mode === 'edit' && (
-                  <Button
-                    variant="destructive"
-                    onClick={() => setShowDeleteDialog(true)}
-                    disabled={isLoading}
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Hapus
-                  </Button>
-                )}
-              </div>
+              <div />
 
               <div className="flex space-x-2">
                 <Button
@@ -370,27 +322,6 @@ const PeriodeManagementDialog: React.FC<PeriodeManagementDialogProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Konfirmasi Hapus Periode</AlertDialogTitle>
-            <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus periode {selectedPeriode?.tahun}?
-              Semua data penilaian risiko akan ikut terhapus. Tindakan ini tidak dapat dibatalkan.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeletePeriode}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Hapus
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 };
