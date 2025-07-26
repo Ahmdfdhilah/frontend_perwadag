@@ -465,8 +465,11 @@ const RiskAssessmentInputPage: React.FC = () => {
                 <Input
                   type="number"
                   step="0.01"
-                  value={penilaianData.kriteria_data.tren_capaian.capaian_tahun_1 || ''}
-                  onChange={(e) => handleInputChange('tren_capaian', 'capaian_tahun_1', parseFloat(e.target.value))}
+                  value={penilaianData.kriteria_data.tren_capaian.capaian_tahun_1 || 0}
+                  onChange={(e) => {
+                    const value = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0;
+                    handleInputChange('tren_capaian', 'capaian_tahun_1', value);
+                  }}
                 />
               </div>
               <div>
@@ -474,8 +477,11 @@ const RiskAssessmentInputPage: React.FC = () => {
                 <Input
                   type="number"
                   step="0.01"
-                  value={penilaianData.kriteria_data.tren_capaian.capaian_tahun_2 || ''}
-                  onChange={(e) => handleInputChange('tren_capaian', 'capaian_tahun_2', parseFloat(e.target.value))}
+                  value={penilaianData.kriteria_data.tren_capaian.capaian_tahun_2 || 0}
+                  onChange={(e) => {
+                    const value = e.target.value === '' ? 0 : parseFloat(e.target.value) || 0;
+                    handleInputChange('tren_capaian', 'capaian_tahun_2', value);
+                  }}
                 />
               </div>
             </div>
