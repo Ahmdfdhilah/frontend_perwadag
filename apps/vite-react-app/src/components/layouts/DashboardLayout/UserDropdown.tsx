@@ -2,6 +2,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@workspace/ui/components/button';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
+import { useToast } from '@workspace/ui/components/sonner';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +31,7 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
   const { user, logout, loading } = useAuth();
   const { currentRole } = useRole();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const { toast } = useToast();
 
   const navigate = useNavigate();
 
@@ -66,9 +68,19 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
     try {
       setIsLoggingOut(true);
       await logout();
+      toast({
+        title: 'Logout berhasil',
+        description: 'Anda telah berhasil keluar dari sistem.',
+        variant: 'default'
+      });
       navigate('/login', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
+      toast({
+        title: 'Logout gagal',
+        description: 'Terjadi kesalahan saat logout. Silakan coba lagi.',
+        variant: 'destructive'
+      });
     } finally {
       setIsLoggingOut(false);
     }

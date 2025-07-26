@@ -13,6 +13,7 @@ import { Input } from '@workspace/ui/components/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Alert, AlertDescription } from '@workspace/ui/components/alert';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@workspace/ui/components/form';
+import { useToast } from '@workspace/ui/components/sonner';
 
 import { useTheme } from '@/hooks/useTheme';
 import logoLightMode from '@/assets/logoLightMode.png';
@@ -31,6 +32,7 @@ export function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const dispatch = useDispatch<AppDispatch>();
+  const { toast } = useToast();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -54,6 +56,11 @@ export function ForgotPasswordPage() {
 
     try {
       await dispatch(requestPasswordResetAsync({ email: data.email })).unwrap();
+      toast({
+        title: 'Email reset password terkirim',
+        description: 'Silakan cek email Anda untuk mendapatkan link reset password.',
+        variant: 'default'
+      });
       navigate('/callback', {
         state: { email: data.email }
       });

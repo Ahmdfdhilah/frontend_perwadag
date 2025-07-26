@@ -5,7 +5,7 @@ import * as z from 'zod';
 import { useToast } from '@workspace/ui/components/sonner';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/redux/store';
-import { changePasswordAsync } from '@/redux/features/authSlice';
+import { changePasswordAsync, logoutAsync } from '@/redux/features/authSlice';
 import {
   Dialog,
   DialogContent,
@@ -41,14 +41,12 @@ type ChangePasswordData = z.infer<typeof changePasswordSchema>;
 interface ChangePasswordDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSave: () => void;
   loading?: boolean;
 }
 
 export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
   open,
   onOpenChange,
-  onSave,
   loading: externalLoading
 }) => {
   const { toast } = useToast();
@@ -90,15 +88,24 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
         new_password: data.new_password
       })).unwrap();
       
-      onSave();
       toast({
         title: 'Password berhasil diubah',
-        description: 'Password Anda telah berhasil diperbarui.',
+        description: 'Anda akan dialihkan ke halaman login dalam 3 detik. Silakan login ulang dengan password baru.',
         variant: 'default'
       });
       
       form.reset();
       onOpenChange(false);
+      
+      // Logout user after 3 seconds
+      setTimeout(async () => {
+        await dispatch(logoutAsync());
+        toast({
+          title: 'Sesi berakhir',
+          description: 'Silakan login ulang dengan password baru Anda.',
+          variant: 'default'
+        });
+      }, 3000);
       
     } catch (error: any) {
       console.error('Error changing password:', error);

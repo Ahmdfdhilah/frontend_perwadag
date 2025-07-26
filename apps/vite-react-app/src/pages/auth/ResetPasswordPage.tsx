@@ -13,6 +13,7 @@ import { Input } from '@workspace/ui/components/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Alert, AlertDescription } from '@workspace/ui/components/alert';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@workspace/ui/components/form';
+import { useToast } from '@workspace/ui/components/sonner';
 
 import { useTheme } from '@/hooks/useTheme';
 import logoLightMode from '@/assets/logoLightMode.png';
@@ -39,6 +40,7 @@ export function ResetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
+  const { toast } = useToast();
 
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -78,6 +80,12 @@ export function ResetPasswordPage() {
         token, 
         new_password: data.new_password 
       })).unwrap();
+      
+      toast({
+        title: 'Password berhasil direset',
+        description: 'Password Anda telah berhasil diperbarui. Silakan login dengan password baru.',
+        variant: 'default'
+      });
       
       navigate('/login', {
         state: { message: 'Password berhasil direset. Silakan login dengan password baru.' }

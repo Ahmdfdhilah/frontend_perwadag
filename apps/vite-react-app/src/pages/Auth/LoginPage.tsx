@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@workspace/ui/components/alert';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@workspace/ui/components/form';
 import { Checkbox } from '@workspace/ui/components/checkbox';
+import { useToast } from '@workspace/ui/components/sonner';
 
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/components/Auth/AuthProvider';
@@ -34,6 +35,7 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
+  const { toast } = useToast();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -95,6 +97,12 @@ export function LoginPage() {
       if (data.rememberMe) {
         localStorage.setItem('rememberMe', 'true');
       }
+
+      toast({
+        title: 'Login berhasil',
+        description: 'Selamat datang! Anda berhasil masuk ke sistem.',
+        variant: 'default'
+      });
 
       // Navigation will be handled by useEffect when isAuthenticated becomes true
     } catch (error: any) {
