@@ -75,6 +75,14 @@ class SuratPemberitahuanService extends BaseService {
   ): Promise<Blob> {
     return this.get(`/${suratPemberitahuanId}/view`);
   }
+
+  // Delete surat pemberitahuan file by filename
+  async deleteFile(
+    suratPemberitahuanId: string,
+    filename: string
+  ): Promise<{ success: boolean; message: string; deleted_file?: string }> {
+    return this.delete(`/${suratPemberitahuanId}/files/${encodeURIComponent(filename)}`);
+  }
 }
 
 export const suratPemberitahuanService = new SuratPemberitahuanService();

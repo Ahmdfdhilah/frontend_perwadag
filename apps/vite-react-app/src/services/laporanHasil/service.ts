@@ -75,6 +75,14 @@ class LaporanHasilService extends BaseService {
   ): Promise<Blob> {
     return this.get(`/${laporanHasilId}/view`);
   }
+
+  // Delete laporan hasil file by filename
+  async deleteFile(
+    laporanHasilId: string,
+    filename: string
+  ): Promise<{ success: boolean; message: string; deleted_file?: string }> {
+    return this.delete(`/${laporanHasilId}/files/${encodeURIComponent(filename)}`);
+  }
 }
 
 export const laporanHasilService = new LaporanHasilService();

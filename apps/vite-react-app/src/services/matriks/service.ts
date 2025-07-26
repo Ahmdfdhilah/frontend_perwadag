@@ -75,6 +75,14 @@ class MatriksService extends BaseService {
   ): Promise<Blob> {
     return this.get(`/${matriksId}/view`);
   }
+
+  // Delete matriks file by filename
+  async deleteFile(
+    matriksId: string,
+    filename: string
+  ): Promise<{ success: boolean; message: string; deleted_file?: string }> {
+    return this.delete(`/${matriksId}/files/${encodeURIComponent(filename)}`);
+  }
 }
 
 export const matriksService = new MatriksService();

@@ -111,6 +111,21 @@ class SuratTugasService extends BaseService {
     
     return this.get(endpoint);
   }
+
+  // Download surat tugas file
+  async downloadFile(
+    suratTugasId: string
+  ): Promise<Blob> {
+    return this.get(`/${suratTugasId}/download`);
+  }
+
+  // Delete surat tugas file by filename
+  async deleteFile(
+    suratTugasId: string,
+    filename: string
+  ): Promise<{ success: boolean; message: string; deleted_file?: string }> {
+    return this.delete(`/${suratTugasId}/files/${encodeURIComponent(filename)}`);
+  }
 }
 
 export const suratTugasService = new SuratTugasService();

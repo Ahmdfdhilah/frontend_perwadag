@@ -38,6 +38,7 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
+  const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
 
   useEffect(() => {
     if (item && open) {
@@ -65,10 +66,22 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
       setSelectedDate(undefined);
       setUploadFiles([]);
       setExistingFiles([]);
+      setFilesToDelete([]);
     }
   }, [item, open]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    // First, delete files that were marked for deletion
+    if (item?.id && filesToDelete.length > 0) {
+      for (const filename of filesToDelete) {
+        try {
+          await laporanHasilService.deleteFile(item.id, filename);
+        } catch (error) {
+          console.error('Error deleting file:', error);
+        }
+      }
+    }
+
     const dataToSave = {
       nomor_laporan: formData.nomor_laporan || '',
       tanggal_laporan: selectedDate ? formatDateForAPI(selectedDate) : formData.tanggal_laporan,
@@ -86,6 +99,13 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
   };
 
   const handleExistingFilesRemove = (index: number) => {
+    if (!item?.file_metadata) return;
+
+    // Mark file for deletion (will be executed on save)
+    const filename = item.file_metadata.original_filename || item.file_metadata.filename;
+    setFilesToDelete(prev => [...prev, filename]);
+    
+    // Remove from UI immediately
     setExistingFiles(prev => prev.filter((_, i) => i !== index));
   };
 

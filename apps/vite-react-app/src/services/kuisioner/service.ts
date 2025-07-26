@@ -75,6 +75,14 @@ class KuisionerService extends BaseService {
   ): Promise<Blob> {
     return this.get(`/${kuisionerId}/view`);
   }
+
+  // Delete kuisioner file by filename
+  async deleteFile(
+    kuisionerId: string,
+    filename: string
+  ): Promise<{ success: boolean; message: string; deleted_file?: string }> {
+    return this.delete(`/${kuisionerId}/files/${encodeURIComponent(filename)}`);
+  }
 }
 
 export const kuisionerService = new KuisionerService();

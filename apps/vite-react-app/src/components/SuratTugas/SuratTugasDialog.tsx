@@ -44,6 +44,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
 
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
+  const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
 
   useEffect(() => {
@@ -74,12 +75,13 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       });
       setUploadFiles([]);
       setExistingFiles([]);
+      setFilesToDelete([]);
     }
     // Reset search when dialog opens/closes
     setPerwadagSearchValue('');
   }, [editingItem, open]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Validate all required fields
     if (!formData.no_surat || !formData.user_perwadag_id || !formData.tanggal_evaluasi_mulai || !formData.tanggal_evaluasi_selesai) {
       return;
@@ -89,6 +91,19 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
     // For edit mode, file is only required if there's no existing file
     if (mode === 'create' && uploadFiles.length === 0) {
       return;
+    }
+
+    // First, delete files that were marked for deletion (only in edit mode)
+    if (mode === 'edit' && editingItem?.id && filesToDelete.length > 0) {
+      for (const filename of filesToDelete) {
+        try {
+          await import('@/services/suratTugas').then(module => 
+            module.suratTugasService.deleteFile(editingItem.id, filename)
+          );
+        } catch (error) {
+          console.error('Error deleting file:', error);
+        }
+      }
     }
 
     const saveData = {
@@ -111,6 +126,12 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   };
 
   const handleExistingFileRemove = (index: number) => {
+    if (!editingItem?.file_surat_tugas) return;
+
+    // Mark file for deletion (will be executed on save)
+    setFilesToDelete(prev => [...prev, editingItem.file_surat_tugas!]);
+    
+    // Remove from UI immediately
     setExistingFiles(prev => prev.filter((_, i) => i !== index));
   };
 

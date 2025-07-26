@@ -37,6 +37,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
   const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
+  const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
 
   useEffect(() => {
     if (item && open) {
@@ -62,10 +63,22 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
       setSelectedDate(undefined);
       setUploadFiles([]);
       setExistingFiles([]);
+      setFilesToDelete([]);
     }
   }, [item, open]);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    // First, delete files that were marked for deletion
+    if (item?.id && filesToDelete.length > 0) {
+      for (const filename of filesToDelete) {
+        try {
+          await suratPemberitahuanService.deleteFile(item.id, filename);
+        } catch (error) {
+          console.error('Error deleting file:', error);
+        }
+      }
+    }
+
     const dataToSave = {
       tanggal_surat_pemberitahuan: selectedDate ? formatDateForAPI(selectedDate) : formData.tanggal_surat_pemberitahuan,
       files: uploadFiles,
@@ -81,8 +94,15 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
     setUploadFiles(files);
   };
 
-  const handleExistingFilesRemove = (index: number) => {
-    setExistingFiles(prev => prev.filter((_, i) => i !== index));
+  const handleExistingFilesRemove = async (index: number) => {
+    if (!item?.id || !item.file_metadata) return;
+
+    try {
+      await suratPemberitahuanService.deleteFile(item.id, item.file_metadata.original_filename || item.file_metadata.filename);
+      setExistingFiles(prev => prev.filter((_, i) => i !== index));
+    } catch (error) {
+      console.error('Error deleting file:', error);
+    }
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {

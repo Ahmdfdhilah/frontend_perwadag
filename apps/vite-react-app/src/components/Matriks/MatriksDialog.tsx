@@ -37,6 +37,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   const canEdit = canEditForm('matriks') && isEditable;
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [temuanRekomendasi, setTemuanRekomendasi] = useState<TemuanRekomendasi[]>([]);
+  const [fileToDelete, setFileToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (item && open) {
@@ -44,6 +45,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     } else {
       setUploadFile(null);
       setTemuanRekomendasi([]);
+      setFileToDelete(null);
     }
   }, [item, open]);
 
@@ -66,8 +68,17 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     setTemuanRekomendasi(updated);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!onSave) return;
+
+    // First, delete file that was marked for deletion
+    if (item?.id && fileToDelete) {
+      try {
+        await matriksService.deleteFile(item.id, fileToDelete);
+      } catch (error) {
+        console.error('Error deleting file:', error);
+      }
+    }
 
     // Send full JSON of temuan_rekomendasi, including existing IDs for updates
     // Allow empty strings to be sent for clearing data
@@ -104,6 +115,14 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     } catch (error) {
       console.error('Error downloading file:', error);
     }
+  };
+
+  const handleExistingFileRemove = () => {
+    if (!item?.file_metadata) return;
+    
+    // Mark file for deletion (will be executed on save)
+    const filename = item.file_metadata.original_filename || item.file_metadata.filename;
+    setFileToDelete(filename);
   };
 
   return (
@@ -226,13 +245,14 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                 multiple={false}
                 maxSize={10 * 1024 * 1024} // 10MB
                 files={uploadFile ? [uploadFile] : []}
-                existingFiles={item?.has_file ? [{
+                existingFiles={item?.has_file && !fileToDelete ? [{
                   name: item.file_metadata?.original_filename || 'Matriks',
                   url: item.file_urls?.file_url,
                   size: item.file_metadata?.size_mb ? Math.round(item.file_metadata.size_mb * 1024 * 1024) : undefined
                 }] : []}
                 mode="edit"
                 onFilesChange={handleUploadFileChange}
+                onExistingFileRemove={handleExistingFileRemove}
                 onFileDownload={handleFileDownload}
                 description="Format yang didukung: PDF, DOC, DOCX, XLS, XLSX (Max 10MB)"
               />
