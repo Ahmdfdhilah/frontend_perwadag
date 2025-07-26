@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useRole } from '@/hooks/useRole';
+import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { PageHeader } from '@/components/common/PageHeader';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Button } from '@workspace/ui/components/button';
@@ -15,7 +16,7 @@ import {
   SelectValue,
 } from '@workspace/ui/components/select';
 import { Separator } from '@workspace/ui/components/separator';
-import { ArrowLeft, Save, Calculator, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, Calculator, Loader2, Edit } from 'lucide-react';
 import { formatNumber, handleNumberInput, parseFormattedNumber } from '@/utils/numberUtils';
 import {
   calculateTrendChoice,
@@ -33,11 +34,23 @@ import { PenilaianRisiko, KriteriaData } from '@/services/penilaianRisiko/types'
 import { useToast } from '@workspace/ui/components/sonner';
 import { AUDIT_CHOICES, TRADE_AGREEMENT_CHOICES } from '@/lib/constants';
 
-const RiskAssessmentInputPage: React.FC = () => {
+type PageMode = 'view' | 'edit';
+
+interface RiskAssessmentPageProps {
+  mode?: PageMode;
+}
+
+const RiskAssessmentPage: React.FC<RiskAssessmentPageProps> = ({ mode }) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { currentRole } = useRole();
+  const { canEditForm } = useFormPermissions();
   const { toast } = useToast();
+  
+  // Determine mode from props or URL path
+  const pageMode: PageMode = mode || (location.pathname.includes('/edit') ? 'edit' : 'view');
+  const isEditMode = pageMode === 'edit';
   const [penilaianData, setPenilaianData] = useState<PenilaianRisiko | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -54,6 +67,23 @@ const RiskAssessmentInputPage: React.FC = () => {
   const userIsAdmin = currentRole === 'ADMIN';
   const userIsInspektorat = currentRole === 'INSPEKTORAT';
   const hasAccess = userIsAdmin || userIsInspektorat;
+  
+  // Helper function to check if a record can be edited based on periode status
+  const canEditRecord = () => {
+    if (!penilaianData) return false;
+    if (!canEditForm('risk_assessment')) return false;
+    
+    // Check if the periode is locked or status is "tutup"
+    if (penilaianData.periode_info?.is_locked || penilaianData.periode_info?.status === 'tutup') {
+      return false;
+    }
+    
+    return true;
+  };
+  
+  const handleEdit = () => {
+    navigate(`/penilaian-resiko/${id}/edit`);
+  };
 
   // Load penilaian data from API
   useEffect(() => {
@@ -536,6 +566,7 @@ const RiskAssessmentInputPage: React.FC = () => {
       variant: 'default'
     });
   };
+  
 
   const handleSave = async () => {
     if (!penilaianData) return;
@@ -604,17 +635,27 @@ const RiskAssessmentInputPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title={`Input Penilaian Risiko - ${penilaianData.nama_perwadag}`}
-        description={`Tahun ${penilaianData.tahun}`}
+        title={`${isEditMode ? 'Input' : 'Detail'} Penilaian Risiko - ${penilaianData.nama_perwadag}`}
+        description={`Tahun ${penilaianData.tahun}${!isEditMode ? ` | Total Risiko: ${penilaianData.total_nilai_risiko !== null && penilaianData.total_nilai_risiko !== undefined ? Number(penilaianData.total_nilai_risiko).toFixed(2) : '-'}` : ''}`}
         actions={
-          <Button
-            variant="outline"
-            onClick={() => navigate('/penilaian-resiko')}
-            className="mb-4"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Kembali ke Daftar
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={() => navigate('/penilaian-resiko')}
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Kembali ke Daftar
+            </Button>
+            {!isEditMode && canEditRecord() && (
+              <Button
+                onClick={handleEdit}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                <Edit className="mr-2 h-4 w-4" />
+                Edit Assessment
+              </Button>
+            )}
+          </div>
         }
       />
 
@@ -639,6 +680,8 @@ const RiskAssessmentInputPage: React.FC = () => {
                     handleInputChange('tren_capaian', 'capaian_tahun_1', value);
                   }}
                   placeholder="Contoh: 85.5"
+                  readOnly={!isEditMode}
+                  className={!isEditMode ? 'bg-muted' : ''}
                 />
               </div>
               <div>
@@ -652,6 +695,8 @@ const RiskAssessmentInputPage: React.FC = () => {
                     handleInputChange('tren_capaian', 'capaian_tahun_2', value);
                   }}
                   placeholder="Contoh: 90.2"
+                  readOnly={!isEditMode}
+                  className={!isEditMode ? 'bg-muted' : ''}
                 />
               </div>
             </div>
@@ -699,6 +744,8 @@ const RiskAssessmentInputPage: React.FC = () => {
                 value={formattedValues.budgetRealization2024}
                 onChange={(e) => handleNumberInputChange('realisasi_anggaran', 'realisasi', 'budgetRealization2024', e.target.value)}
                 placeholder="Contoh: 15,000,000,000"
+                readOnly={!isEditMode}
+                className={!isEditMode ? 'bg-muted' : ''}
               />
             </div>
             <div>
@@ -708,6 +755,8 @@ const RiskAssessmentInputPage: React.FC = () => {
                 value={formattedValues.budgetPagu2024}
                 onChange={(e) => handleNumberInputChange('realisasi_anggaran', 'pagu', 'budgetPagu2024', e.target.value)}
                 placeholder="Contoh: 20,000,000,000"
+                readOnly={!isEditMode}
+                className={!isEditMode ? 'bg-muted' : ''}
               />
             </div>
             <div>
@@ -758,6 +807,8 @@ const RiskAssessmentInputPage: React.FC = () => {
                   handleInputChange('tren_ekspor', 'deskripsi', value);
                 }}
                 placeholder="Contoh: 4.71"
+                readOnly={!isEditMode}
+                className={!isEditMode ? 'bg-muted' : ''}
               />
             </div>
             <div>
@@ -789,21 +840,29 @@ const RiskAssessmentInputPage: React.FC = () => {
           <CardContent className="space-y-4">
             <div>
               <Label>Status Audit</Label>
-              <Select
-                value={penilaianData.kriteria_data.audit_itjen.pilihan || ''}
-                onValueChange={(value) => handleInputChange('audit_itjen', 'pilihan', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih status audit" />
-                </SelectTrigger>
-                <SelectContent>
-                  {AUDIT_CHOICES.map((choice) => (
-                    <SelectItem key={choice.value} value={choice.label}>
-                      {choice.label} (Nilai: {choice.score})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {isEditMode ? (
+                <Select
+                  value={penilaianData.kriteria_data.audit_itjen.pilihan || ''}
+                  onValueChange={(value) => handleInputChange('audit_itjen', 'pilihan', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih status audit" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {AUDIT_CHOICES.map((choice) => (
+                      <SelectItem key={choice.value} value={choice.label}>
+                        {choice.label} (Nilai: {choice.score})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  value={penilaianData.kriteria_data.audit_itjen.pilihan || ''}
+                  readOnly
+                  className="bg-muted"
+                />
+              )}
             </div>
             <div>
               <Label>Nilai</Label>
@@ -830,21 +889,29 @@ const RiskAssessmentInputPage: React.FC = () => {
           <CardContent className="space-y-4">
             <div>
               <Label>Status Perjanjian</Label>
-              <Select
-                value={penilaianData.kriteria_data.perjanjian_perdagangan.pilihan || ''}
-                onValueChange={(value) => handleInputChange('perjanjian_perdagangan', 'pilihan', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Pilih status perjanjian" />
-                </SelectTrigger>
-                <SelectContent>
-                  {TRADE_AGREEMENT_CHOICES.map((choice) => (
-                    <SelectItem key={choice.value} value={choice.label}>
-                      {choice.label} (Nilai: {choice.score})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              {isEditMode ? (
+                <Select
+                  value={penilaianData.kriteria_data.perjanjian_perdagangan.pilihan || ''}
+                  onValueChange={(value) => handleInputChange('perjanjian_perdagangan', 'pilihan', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih status perjanjian" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TRADE_AGREEMENT_CHOICES.map((choice) => (
+                      <SelectItem key={choice.value} value={choice.label}>
+                        {choice.label} (Nilai: {choice.score})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  value={penilaianData.kriteria_data.perjanjian_perdagangan.pilihan || ''}
+                  readOnly
+                  className="bg-muted"
+                />
+              )}
             </div>
             <div>
               <Label>Nilai</Label>
@@ -874,6 +941,8 @@ const RiskAssessmentInputPage: React.FC = () => {
                   handleInputChange('peringkat_ekspor', 'deskripsi', value);
                 }}
                 placeholder="Contoh: 27"
+                readOnly={!isEditMode}
+                className={!isEditMode ? 'bg-muted' : ''}
               />
             </div>
             <div>
@@ -911,6 +980,8 @@ const RiskAssessmentInputPage: React.FC = () => {
                   value={formattedValues.ikNotAchieved}
                   onChange={(e) => handleNumberInputChange('persentase_ik', 'ik_tidak_tercapai', 'ikNotAchieved', e.target.value)}
                   placeholder="Contoh: 5"
+                  readOnly={!isEditMode}
+                  className={!isEditMode ? 'bg-muted' : ''}
                 />
               </div>
               <div>
@@ -920,6 +991,8 @@ const RiskAssessmentInputPage: React.FC = () => {
                   value={formattedValues.ikTotal}
                   onChange={(e) => handleNumberInputChange('persentase_ik', 'total_ik', 'ikTotal', e.target.value)}
                   placeholder="Contoh: 25"
+                  readOnly={!isEditMode}
+                  className={!isEditMode ? 'bg-muted' : ''}
                 />
               </div>
             </div>
@@ -968,6 +1041,8 @@ const RiskAssessmentInputPage: React.FC = () => {
                   value={formattedValues.teiRealizationValue}
                   onChange={(e) => handleNumberInputChange('realisasi_tei', 'nilai_realisasi', 'teiRealizationValue', e.target.value)}
                   placeholder="Contoh: 1,500,000,000"
+                  readOnly={!isEditMode}
+                  className={!isEditMode ? 'bg-muted' : ''}
                 />
               </div>
               <div>
@@ -977,6 +1052,8 @@ const RiskAssessmentInputPage: React.FC = () => {
                   value={formattedValues.teiPotentialValue}
                   onChange={(e) => handleNumberInputChange('realisasi_tei', 'nilai_potensi', 'teiPotentialValue', e.target.value)}
                   placeholder="Contoh: 2,000,000,000"
+                  readOnly={!isEditMode}
+                  className={!isEditMode ? 'bg-muted' : ''}
                 />
               </div>
             </div>
@@ -1020,14 +1097,16 @@ const RiskAssessmentInputPage: React.FC = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={triggerCalculation}
-            >
-              <Calculator className="mr-2 h-4 w-4" />
-              Hitung Ulang Nilai Risiko
-            </Button>
+            {isEditMode && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={triggerCalculation}
+              >
+                <Calculator className="mr-2 h-4 w-4" />
+                Hitung Ulang Nilai Risiko
+              </Button>
+            )}
             <div className="flex items-center gap-2">
               <Label>Total Nilai Risiko:</Label>
               <Input
@@ -1048,29 +1127,33 @@ const RiskAssessmentInputPage: React.FC = () => {
               onChange={(e) => setPenilaianData(prev => ({ ...prev!, catatan: e.target.value }))}
               placeholder="Tambahkan catatan atau keterangan..."
               rows={4}
+              readOnly={!isEditMode}
+              className={!isEditMode ? 'bg-muted' : ''}
             />
           </div>
         </CardContent>
       </Card>
 
       {/* Action Buttons */}
-      <div className="flex justify-end gap-4">
-        <Button
-          variant="outline"
-          onClick={() => navigate('/penilaian-resiko')}
-        >
-          Kembali
-        </Button>
-        <Button
-          onClick={handleSave}
-          disabled={isSaving}
-        >
-          <Save className="mr-2 h-4 w-4" />
-          {isSaving ? 'Menyimpan...' : 'Simpan Assessment'}
-        </Button>
-      </div>
+      {isEditMode && (
+        <div className="flex justify-end gap-4">
+          <Button
+            variant="outline"
+            onClick={() => navigate('/penilaian-resiko')}
+          >
+            Kembali
+          </Button>
+          <Button
+            onClick={handleSave}
+            disabled={isSaving}
+          >
+            <Save className="mr-2 h-4 w-4" />
+            {isSaving ? 'Menyimpan...' : 'Simpan Assessment'}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
 
-export default RiskAssessmentInputPage;
+export default RiskAssessmentPage;

@@ -10,8 +10,7 @@ import { Toaster } from "@workspace/ui/components/sonner";
 import { AuthProvider } from './components/Auth/AuthProvider';
 import { DashboardLayout } from './components/layouts/DashboardLayout';
 import RiskAssessmentPage from './pages/RiskAssesment/RiskAssessmentPage';
-import RiskAssessmentInputPage from './pages/RiskAssesment/RiskAssessmentInputPage';
-import RiskAssessmentDetailPage from './pages/RiskAssesment/RiskAssessmentDetailPage';
+import RiskAssessmentMergedPage from './pages/RiskAssesment/RiskAssessmentInputPage';
 import SuratTugasPage from './pages/SuratTugasPage';
 import SuratPemberitahuanPage from './pages/SuratPemberitahuanPage';
 import EntryMeetingPage from './pages/EntryMeetingPage';
@@ -91,12 +90,12 @@ function App() {
                     } />
                     <Route path="penilaian-resiko/:id" element={
                       <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT']}>
-                        <RiskAssessmentDetailPage />
+                        <RiskAssessmentMergedPage mode="view" />
                       </RoleProtectedRoute>
                     } />
                     <Route path="penilaian-resiko/:id/edit" element={
                       <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT']}>
-                        <RiskAssessmentInputPage />
+                        <RiskAssessmentMergedPage mode="edit" />
                       </RoleProtectedRoute>
                     } />
                     
