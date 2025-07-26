@@ -5,21 +5,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@workspace/ui/components/dialog';
-import { Button } from '@workspace/ui/components/button';
 import { Card, CardContent } from '@workspace/ui/components/card';
-import { Badge } from '@workspace/ui/components/badge';
 import { Skeleton } from '@workspace/ui/components/skeleton';
-import { 
-  FileText, 
-  Calendar, 
-  Eye,
-  Download
+import {
+  FileText,
 } from 'lucide-react';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
-import { FormatKuisioner } from '@/services/formatKuisioner/types';
+import { FormatKuisionerResponse } from '@/services/formatKuisioner/types';
 import { formatKuisionerService } from '@/services/formatKuisioner';
 import { useToast } from '@workspace/ui/components/sonner';
+import FileUpload from '@/components/common/FileUpload';
 
 interface TemplateKuisionerDialogProps {
   open: boolean;
@@ -31,7 +25,7 @@ const TemplateKuisionerDialog: React.FC<TemplateKuisionerDialogProps> = ({
   onOpenChange,
 }) => {
   const { toast } = useToast();
-  const [latestTemplate, setLatestTemplate] = useState<FormatKuisioner | null>(null);
+  const [latestTemplate, setLatestTemplate] = useState<FormatKuisionerResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
   const fetchLatestTemplate = useCallback(async () => {
@@ -42,19 +36,19 @@ const TemplateKuisionerDialog: React.FC<TemplateKuisionerDialogProps> = ({
         page: 1,
         size: 1,
       };
-      
+
       const response = await formatKuisionerService.getFormatKuisionerList(params);
-      
+
       if (response.items && response.items.length > 0) {
         // Get the latest template by sorting by created_at
-        const sortedTemplates = response.items.sort((a, b) => 
+        const sortedTemplates = response.items.sort((a, b) =>
           new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
         );
         setLatestTemplate(sortedTemplates[0]);
       } else {
         setLatestTemplate(null);
       }
-      
+
     } catch (error) {
       console.error('Error fetching latest template:', error);
       setLatestTemplate(null);
@@ -70,31 +64,25 @@ const TemplateKuisionerDialog: React.FC<TemplateKuisionerDialogProps> = ({
     }
   }, [open]);
 
-  const handleViewTemplate = (template: FormatKuisioner) => {
-    if (template.link_template) {
-      window.open(template.link_template, '_blank');
-    }
-  };
 
-  const handleDownloadTemplate = (template: FormatKuisioner) => {
-    if (template.link_template) {
+  const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
+    if (!latestTemplate?.id) return;
+
+    try {
+      const blob = await formatKuisionerService.downloadTemplate(latestTemplate.id);
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
-      link.href = template.link_template;
-      link.download = `${template.nama_template}.pdf`;
+      link.href = url;
+      link.download = file.name;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading file:', error);
     }
   };
 
-
-  const formatDate = (dateString: string) => {
-    try {
-      return format(new Date(dateString), 'dd MMM yyyy', { locale: id });
-    } catch {
-      return dateString;
-    }
-  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -129,63 +117,20 @@ const TemplateKuisionerDialog: React.FC<TemplateKuisionerDialogProps> = ({
             </Card>
           ) : latestTemplate ? (
             // Latest template display
-            <Card className="hover:shadow-md transition-shadow">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <FileText className="h-5 w-5 text-primary flex-shrink-0" />
-                      <h3 className="font-medium text-sm sm:text-base truncate">
-                        {latestTemplate.nama_template}
-                      </h3>
-                      <Badge variant="outline" className="text-xs">
-                        {latestTemplate.tahun}
-                      </Badge>
-                    </div>
-                    
-                    {latestTemplate.deskripsi && (
-                      <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
-                        {latestTemplate.deskripsi}
-                      </p>
-                    )}
-                    
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        <span>Dibuat {formatDate(latestTemplate.created_at)}</span>
-                      </div>
-                      {latestTemplate.updated_at && (
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          <span>Diperbarui {formatDate(latestTemplate.updated_at)}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 ml-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleViewTemplate(latestTemplate)}
-                      className="flex items-center gap-1"
-                    >
-                      <Eye className="h-3 w-3" />
-                      <span className="hidden sm:inline">Lihat</span>
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDownloadTemplate(latestTemplate)}
-                      className="flex items-center gap-1"
-                    >
-                      <Download className="h-3 w-3" />
-                      <span className="hidden sm:inline">Download</span>
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <FileUpload
+              label="File Template"
+              existingFiles={latestTemplate.has_file ? [{
+                name: latestTemplate.file_metadata?.original_filename || latestTemplate.file_metadata?.filename || latestTemplate.nama_template,
+                url: latestTemplate.file_urls?.file_url,
+                viewUrl: latestTemplate.file_urls?.file_url,
+                size: latestTemplate.file_metadata?.size
+              }] : []}
+              mode="view"
+              disabled={true}
+              showPreview={true}
+              allowRemove={false}
+              onFileDownload={handleFileDownload}
+            />
           ) : (
             // No template found
             <div className="text-center py-12">

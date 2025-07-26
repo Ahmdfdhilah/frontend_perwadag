@@ -58,7 +58,7 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Tanggal Surat Pemberitahuan</TableHead>
             <TableHead>Tanggal Evaluasi</TableHead>
-            <TableHead>File Surat</TableHead>
+            <TableHead>File Surat Pemberitahuan</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>

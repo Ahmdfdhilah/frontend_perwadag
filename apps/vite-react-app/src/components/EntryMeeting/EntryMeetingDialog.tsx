@@ -54,7 +54,8 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
       setExistingFiles(item.files_info?.files ? item.files_info.files.map((file, index) => ({ 
         name: file.original_filename || `Bukti Hadir ${index + 1}`, 
         url: file.download_url,
-        viewUrl: file.file_url
+        viewUrl: file.file_url,
+        size: file.size
       })) : []);
     } else {
       setFormData({});
@@ -97,18 +98,21 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
   };
 
   const handleExistingFilesRemove = (index: number) => {
-    const fileToRemove = existingFiles[index];
-    if (fileToRemove) {
-      setFilesToDelete(prev => [...prev, fileToRemove.name]);
-      setExistingFiles(prev => prev.filter((_, i) => i !== index));
-    }
+    if (!item?.files_info?.files?.[index]) return;
+    
+    const fileMetadata = item.files_info.files[index];
+    const filename = fileMetadata.filename;
+    setFilesToDelete(prev => [...prev, filename]);
+    setExistingFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
-    if (!item?.id) return;
+  const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }, index: number) => {
+    if (!item?.id || !item?.files_info?.files?.[index]) return;
     
     try {
-      const blob = await meetingService.downloadFile(item.id, file.name);
+      const fileMetadata = item.files_info.files[index];
+      const filename = fileMetadata.filename;
+      const blob = await meetingService.downloadFile(item.id, filename);
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
