@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { SuratPemberitahuanResponse } from '@/services/suratPemberitahuan/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import FileViewLink from '@/components/common/FileViewLink';
 import { formatIndonesianDate, formatIndonesianDateRange } from '@/utils/timeFormat';
 
 interface SuratPemberitahuanCardsProps {
@@ -85,6 +86,21 @@ const SuratPemberitahuanCards: React.FC<SuratPemberitahuanCardsProps> = ({
               <div>
                 <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
                 <span className="ml-2">{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</span>
+              </div>
+
+              <div>
+                <span className="font-medium text-muted-foreground">File Surat Pemberitahuan:</span>
+                <div className="ml-2">
+                  <FileViewLink
+                    hasFile={item.has_file}
+                    fileUrls={{
+                      view_url: item.file_urls?.view_url,
+                      file_url: item.file_urls?.file_url
+                    }}
+                    fileName="Surat Pemberitahuan"
+                    linkText="Lihat File"
+                  />
+                </div>
               </div>
 
               <div>

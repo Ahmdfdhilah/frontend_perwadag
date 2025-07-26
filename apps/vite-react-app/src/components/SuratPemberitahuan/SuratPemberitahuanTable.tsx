@@ -8,6 +8,7 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import FileViewLink from '@/components/common/FileViewLink';
 import { SuratPemberitahuanResponse } from '@/services/suratPemberitahuan/types';
 import { formatIndonesianDate, formatIndonesianDateRange } from '@/utils/timeFormat';
 
@@ -57,6 +58,7 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Tanggal Surat Pemberitahuan</TableHead>
             <TableHead>Tanggal Evaluasi</TableHead>
+            <TableHead>File Surat</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
@@ -64,7 +66,7 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
         <TableBody>
           {data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
                 Tidak ada data surat pemberitahuan yang ditemukan.
               </TableCell>
             </TableRow>
@@ -75,6 +77,17 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
                 <TableCell>{item.nama_perwadag}</TableCell>
                 <TableCell>{item.tanggal_surat_pemberitahuan ? formatIndonesianDate(item.tanggal_surat_pemberitahuan) : '-'}</TableCell>
                 <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
+                <TableCell>
+                  <FileViewLink
+                    hasFile={item.has_file}
+                    fileUrls={{
+                      view_url: item.file_urls?.view_url,
+                      file_url: item.file_urls?.file_url
+                    }}
+                    fileName="Surat Pemberitahuan"
+                    linkText="Lihat File"
+                  />
+                </TableCell>
                 <TableCell>
                   {getStatusBadge(item)}
                 </TableCell>
