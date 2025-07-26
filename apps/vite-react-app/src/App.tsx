@@ -19,7 +19,7 @@ import ExitMeetingPage from './pages/ExitMeetingPage';
 import LaporanHasilEvaluasiPage from './pages/LaporanHasilEvaluasiPage';
 import KuesionerPage from './pages/KuesionerPage';
 import MatriksPage from './pages/MatriksPage';
-import QuestionnaireTemplatePage from './pages/QuestionnaireTemplatePage';
+import QuestionnaireTemplatePage from './pages/FormatKuisionerPage';
 import KonfirmasiMeetingPage from './pages/KonfirmasiMeetingPage';
 import EmailTemplatesPage from './pages/EmailTemplatesPage';
 import { LoginPage } from './pages/auth/LoginPage';

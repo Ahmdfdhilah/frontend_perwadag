@@ -18,9 +18,9 @@ import { FormatKuisionerResponse, FormatKuisionerFilterParams } from '@/services
 import { formatKuisionerService } from '@/services/formatKuisioner';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
-import QuestionnaireTable from '@/components/QuestionnaireTemplate/QuestionnaireTable';
-import QuestionnaireCards from '@/components/QuestionnaireTemplate/QuestionnaireCards';
-import QuestionnaireDialog from '@/components/QuestionnaireTemplate/QuestionnaireDialog';
+import QuestionnaireTable from '@/components/FormatKuisioner/FormatKuisionerTable';
+import QuestionnaireCards from '@/components/FormatKuisioner/FormatKuisionerCards';
+import QuestionnaireDialog from '@/components/FormatKuisioner/FormatKuisionerDialog';
 import { Button } from '@workspace/ui/components/button';
 import { Plus } from 'lucide-react';
 import { getDefaultYearOptions } from '@/utils/yearUtils';
