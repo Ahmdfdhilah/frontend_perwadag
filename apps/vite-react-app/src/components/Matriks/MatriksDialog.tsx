@@ -246,9 +246,10 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                 maxSize={10 * 1024 * 1024} // 10MB
                 files={uploadFile ? [uploadFile] : []}
                 existingFiles={item?.has_file && !fileToDelete ? [{
-                  name: item.file_metadata?.original_filename || 'Matriks',
-                  url: item.file_urls?.file_url,
-                  size: item.file_metadata?.size_mb ? Math.round(item.file_metadata.size_mb * 1024 * 1024) : undefined
+                  name: item.file_metadata?.original_filename || item.file_metadata?.filename || 'Matriks',
+                  url: item.file_urls?.download_url,
+                  viewUrl: item.file_urls?.file_url,
+                  size: item.file_metadata?.size
                 }] : []}
                 mode="edit"
                 onFilesChange={handleUploadFileChange}

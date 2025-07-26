@@ -216,6 +216,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
     const isImage = file.type.startsWith('image/');
     const isPDF = file.type === 'application/pdf';
     const isDocument = file.type.includes('document') || file.type.includes('word') || file.type.includes('text');
+    const isExcel = file.name.match(/\.(xls|xlsx)$/i);
 
     return (
       <div
@@ -235,6 +236,10 @@ const FileUpload: React.FC<FileUploadProps> = ({
             ) : isDocument ? (
               <div className="w-8 h-8 bg-green-100 dark:bg-green-900 rounded flex items-center justify-center">
                 <File className="w-4 h-4 text-green-600 dark:text-green-400" />
+              </div>
+            ) : isExcel ? (
+              <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-900 rounded flex items-center justify-center">
+                <File className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               </div>
             ) : (
               <div className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center">
@@ -283,6 +288,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
     const isImage = fileName.match(/\.(jpg|jpeg|png|gif|webp)$/i);
     const isPDF = fileName.match(/\.pdf$/i);
     const isDocument = fileName.match(/\.(doc|docx|txt|rtf)$/i);
+    const isExcel = fileName.match(/\.(xls|xlsx)$/i);
 
     return (
       <div
@@ -302,6 +308,10 @@ const FileUpload: React.FC<FileUploadProps> = ({
             ) : isDocument ? (
               <div className="w-8 h-8 bg-green-100 dark:bg-green-900 rounded flex items-center justify-center">
                 <File className="w-4 h-4 text-green-600 dark:text-green-400" />
+              </div>
+            ) : isExcel ? (
+              <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-900 rounded flex items-center justify-center">
+                <File className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               </div>
             ) : (
               <div className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center">

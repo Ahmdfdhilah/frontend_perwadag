@@ -53,7 +53,8 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
         setExistingFiles([{
           name: item.file_metadata.original_filename || item.file_metadata.filename || 'Laporan Hasil Evaluasi',
           url: item.file_urls?.download_url,
-          viewUrl: item.file_urls?.file_url
+          viewUrl: item.file_urls?.file_url,
+          size: item.file_metadata.size
         }]);
       } else {
         setExistingFiles([]);

@@ -44,7 +44,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   });
 
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
-  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
+  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string; size?: number }>>([]);
   const [fileToDelete, setFileToDelete] = useState<string | null>(null);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
 
@@ -62,7 +62,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
         setExistingFiles([{ 
           name: editingItem.file_metadata.original_filename || editingItem.file_metadata.filename || 'Surat Tugas',
           url: editingItem.file_urls?.download_url,
-          viewUrl: editingItem.file_urls?.file_url
+          viewUrl: editingItem.file_urls?.file_url,
+          size: editingItem.file_metadata.size
         }]);
       } else {
         setExistingFiles([]);
