@@ -37,7 +37,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   const [formData, setFormData] = useState<any>({});
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
-  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string }>>([]);
+  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string; size?: number }>>([]);
   const [filesToDelete, setFilesToDelete] = useState<string[]>([]);
 
   useEffect(() => {

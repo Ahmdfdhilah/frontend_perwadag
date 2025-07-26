@@ -115,7 +115,7 @@ export const UserForm: React.FC<UserFormProps> = ({
   };
 
   // Get form validation state
-  const { formState: { isValid, errors } } = form;
+  const { formState: { isValid } } = form;
   const isFormValid = isValid && !loading && !disabled;
 
   return (

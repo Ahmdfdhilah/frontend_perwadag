@@ -8,7 +8,6 @@ import InfiniteScrollPagination from '@/components/common/InfiniteScrollPaginati
 import { useDebounce } from '@/hooks/useDebounce';
 import { formatDistanceToNow } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { cn } from '@workspace/ui/lib/utils';
 
 interface LogActivitySectionProps {
   className?: string;
@@ -80,7 +79,7 @@ const LogActivitySection: React.FC<LogActivitySectionProps> = ({
 
 
 
-  const renderLogActivity = (log: LogActivityResponse, index: number) => (
+  const renderLogActivity = (log: LogActivityResponse) => (
     <div
       key={log.id}
       className="flex items-start space-x-3 p-4 rounded-lg border bg-card"
