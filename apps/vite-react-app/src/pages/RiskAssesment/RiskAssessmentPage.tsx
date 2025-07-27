@@ -39,6 +39,7 @@ import {
   AlertDialogTitle,
 } from '@workspace/ui/components/alert-dialog';
 import { getDefaultYearOptions } from '@/utils/yearUtils';
+import { riskAssessmentStateManager } from '@/utils/urlStateUtils';
 
 interface RiskAssessmentPageFilters {
   search: string;
@@ -58,7 +59,7 @@ const RiskAssessmentPage: React.FC = () => {
   const { toast } = useToast();
 
   // URL Filters configuration
-  const { updateURL, getCurrentFilters } = useURLFilters<RiskAssessmentPageFilters>({
+  const { updateURL, getCurrentFilters, getShareableURL } = useURLFilters<RiskAssessmentPageFilters>({
     defaults: {
       search: '',
       inspektorat: 'all',
@@ -146,6 +147,17 @@ const RiskAssessmentPage: React.FC = () => {
     }
   };
 
+  // Check for saved filters and restore them on mount
+  useEffect(() => {
+    // Only restore if we're on the correct page
+    if (location.pathname === '/penilaian-resiko' && riskAssessmentStateManager.hasSaved()) {
+      riskAssessmentStateManager.restore(
+        (path) => navigate(path, { replace: true }),
+        true // Clear after use
+      );
+    }
+  }, [navigate, location.pathname]);
+
   // Effect to fetch data when filters change
   useEffect(() => {
     if (hasAccess) {
@@ -159,10 +171,14 @@ const RiskAssessmentPage: React.FC = () => {
   const totalPages = Math.ceil(totalItems / filters.size);
 
   const handleView = (item: PenilaianRisikoResponse) => {
+    // Save current URL state before navigation
+    riskAssessmentStateManager.save(getShareableURL());
     navigate(`/penilaian-resiko/${item.id}`);
   };
 
   const handleEdit = (item: PenilaianRisikoResponse) => {
+    // Save current URL state before navigation
+    riskAssessmentStateManager.save(getShareableURL());
     navigate(`/penilaian-resiko/${item.id}/edit`);
   };
 

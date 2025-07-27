@@ -33,6 +33,7 @@ import { penilaianRisikoService } from '@/services/penilaianRisiko';
 import { PenilaianRisiko, KriteriaData } from '@/services/penilaianRisiko/types';
 import { useToast } from '@workspace/ui/components/sonner';
 import { AUDIT_CHOICES, TRADE_AGREEMENT_CHOICES } from '@/lib/constants';
+import { riskAssessmentStateManager } from '@/utils/urlStateUtils';
 
 type PageMode = 'view' | 'edit';
 
@@ -85,11 +86,14 @@ const RiskAssessmentPage: React.FC<RiskAssessmentPageProps> = ({ mode }) => {
     navigate(`/penilaian-resiko/${id}/edit`);
   };
 
+  // Helper function to navigate back with preserved filters
+  const navigateBack = riskAssessmentStateManager.createNavigateBack(navigate);
+
   // Load penilaian data from API
   useEffect(() => {
     const loadData = async () => {
       if (!id) {
-        navigate('/penilaian-resiko');
+        navigateBack();
         return;
       }
 
@@ -111,7 +115,7 @@ const RiskAssessmentPage: React.FC<RiskAssessmentPageProps> = ({ mode }) => {
         });
       } catch (error) {
         console.error('Error loading data:', error);
-        navigate('/penilaian-resiko');
+        navigateBack();
       } finally {
         setIsLoading(false);
       }
@@ -641,7 +645,7 @@ const RiskAssessmentPage: React.FC<RiskAssessmentPageProps> = ({ mode }) => {
           <div className="flex gap-2">
             <Button
               variant="outline"
-              onClick={() => navigate('/penilaian-resiko')}
+              onClick={navigateBack}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Kembali ke Daftar
@@ -1139,7 +1143,7 @@ const RiskAssessmentPage: React.FC<RiskAssessmentPageProps> = ({ mode }) => {
         <div className="flex justify-end gap-4">
           <Button
             variant="outline"
-            onClick={() => navigate('/penilaian-resiko')}
+            onClick={navigateBack}
           >
             Kembali
           </Button>

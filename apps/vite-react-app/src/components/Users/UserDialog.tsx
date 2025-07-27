@@ -163,7 +163,7 @@ const UserDialog: React.FC<UserDialogProps> = ({
       const transformedData = {
         nama: data.nama,
         jabatan: data.jabatan,
-        email: data.email && data.email.trim() !== '' ? data.email : undefined,
+        email: data.email && data.email.trim() !== '' ? data.email : null,
         is_active: data.is_active,
         role: data.role,
         inspektorat: data.inspektorat && data.inspektorat.trim() !== '' ? data.inspektorat : undefined,

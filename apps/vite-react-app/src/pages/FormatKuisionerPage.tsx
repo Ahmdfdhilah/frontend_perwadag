@@ -14,6 +14,16 @@ import {
   SelectValue
 } from '@workspace/ui/components/select';
 import { Label } from '@workspace/ui/components/label';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@workspace/ui/components/alert-dialog';
 import { FormatKuisionerResponse, FormatKuisionerFilterParams } from '@/services/formatKuisioner/types';
 import { formatKuisionerService } from '@/services/formatKuisioner';
 import { PageHeader } from '@/components/common/PageHeader';
@@ -60,6 +70,10 @@ const QuestionnaireTemplatePage: React.FC = () => {
   const [editingItem, setEditingItem] = useState<FormatKuisionerResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
   const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
+  
+  // Delete confirmation dialog state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<FormatKuisionerResponse | null>(null);
 
   // Fetch year options function
   const fetchYearOptions = async () => {
@@ -127,20 +141,33 @@ const QuestionnaireTemplatePage: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = async (item: FormatKuisionerResponse) => {
+  const handleDelete = (item: FormatKuisionerResponse) => {
     if (!isAdmin()) return;
-    if (confirm(`Apakah Anda yakin ingin menghapus template "${item.nama_template}"?`)) {
-      try {
-        await formatKuisionerService.deleteFormatKuisioner(item.id);
-        fetchTemplates(); // Refresh the list
-        toast({
-          title: 'Berhasil dihapus',
-          description: `Template "${item.nama_template}" telah dihapus.`,
-          variant: 'default'
-        });
-      } catch (error) {
-        console.error('Failed to delete template:', error);
-      }
+    setItemToDelete(item);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
+    
+    try {
+      await formatKuisionerService.deleteFormatKuisioner(itemToDelete.id);
+      fetchTemplates(); // Refresh the list
+      toast({
+        title: 'Berhasil dihapus',
+        description: `Template "${itemToDelete.nama_template}" telah dihapus.`,
+        variant: 'default'
+      });
+    } catch (error) {
+      console.error('Failed to delete template:', error);
+      toast({
+        title: 'Gagal menghapus',
+        description: 'Terjadi kesalahan saat menghapus template.',
+        variant: 'destructive'
+      });
+    } finally {
+      setDeleteDialogOpen(false);
+      setItemToDelete(null);
     }
   };
 
@@ -351,7 +378,7 @@ const QuestionnaireTemplatePage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Dialog */}
+      {/* Main Dialog */}
       <QuestionnaireDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
@@ -359,6 +386,27 @@ const QuestionnaireTemplatePage: React.FC = () => {
         mode={dialogMode}
         onSave={handleSave}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Konfirmasi Hapus</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus template "{itemToDelete?.nama_template}"? 
+              Tindakan ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>
+              Batal
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
