@@ -101,12 +101,14 @@ const ComboboxList = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.List>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.List> & {
     onScroll?: (e: React.UIEvent<HTMLDivElement>) => void
+    onWheel?: (e: React.WheelEvent<HTMLDivElement>) => void
   }
->(({ className, onScroll, ...props }, ref) => (
+>(({ className, onScroll, onWheel, ...props }, ref) => (
   <CommandPrimitive.List
     ref={ref}
     className={cn("max-h-[300px] overflow-y-auto overflow-x-hidden", className)}
     onScroll={onScroll}
+    onWheel={onWheel}
     {...props}
   />
 ))
@@ -237,6 +239,10 @@ export function Combobox({
           <ComboboxList 
             ref={listRef}
             onScroll={enableInfiniteScroll ? handleScroll : undefined}
+            onWheel={(e) => {
+              // Allow wheel events to propagate to the list for scrolling
+              e.stopPropagation();
+            }}
           >
             {isLoading && options.length === 0 ? (
               <div className="flex items-center justify-center py-6 text-sm text-muted-foreground">
@@ -249,10 +255,7 @@ export function Combobox({
                   <div
                     key={option.value}
                     className="relative flex cursor-pointer select-none items-start rounded-sm px-3 py-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 gap-1"
-                    onMouseDown={(e) => {
-                      e.preventDefault()
-                      handleSelect(option.value)
-                    }}
+                    onClick={() => handleSelect(option.value)}
                   >
                     <div className="flex flex-col gap-1 w-full">
                       <div className="font-medium leading-none">
