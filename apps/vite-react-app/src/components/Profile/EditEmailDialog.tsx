@@ -13,6 +13,7 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
+import { Loader2 } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -60,6 +61,8 @@ export const EditEmailDialog: React.FC<EditEmailDialogProps> = ({
   }, [open, user, form]);
 
   const onSubmit = (data: EditEmailData) => {
+    if (loading) return;
+    
     const updateData: UserUpdate = {
       email: data.email !== undefined ? data.email : undefined,
     };
@@ -106,6 +109,7 @@ export const EditEmailDialog: React.FC<EditEmailDialogProps> = ({
                           type="email"
                           placeholder="Masukkan email"
                           disabled={loading}
+                          className={loading ? "bg-muted" : ""}
                           {...field}
                         />
                       </FormControl>
@@ -163,7 +167,11 @@ export const EditEmailDialog: React.FC<EditEmailDialogProps> = ({
           <Button
             type="button"
             variant="outline"
-            onClick={() => onOpenChange(false)}
+            onClick={() => {
+              // Prevent closing if operations are in progress
+              if (loading) return;
+              onOpenChange(false);
+            }}
             disabled={loading}
           >
             Batal
@@ -172,7 +180,14 @@ export const EditEmailDialog: React.FC<EditEmailDialogProps> = ({
             onClick={form.handleSubmit(onSubmit)}
             disabled={loading}
           >
-            {loading ? 'Menyimpan...' : 'Simpan Email'}
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Menyimpan...
+              </>
+            ) : (
+              'Simpan Email'
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

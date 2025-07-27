@@ -9,6 +9,7 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
+import { Loader2 } from 'lucide-react';
 import DatePicker from '@/components/common/DatePicker';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -44,6 +45,10 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<{ name: string; filename: string } | null>(null);
   const [deletingFile, setDeletingFile] = useState(false);
+  
+  // Loading states for different operations
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     if (item && open) {
@@ -76,27 +81,48 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
       setFileToDelete(null);
       setDeleteConfirmOpen(false);
     }
+    
+    // Reset loading states when dialog opens/closes
+    setIsSaving(false);
+    setIsDownloading(false);
   }, [item, open]);
 
   const handleSave = async () => {
-    const dataToSave = {
-      nomor_laporan: formData.nomor_laporan || '',
-      tanggal_laporan: selectedDate ? formatDateForAPI(selectedDate) : formData.tanggal_laporan,
-      files: uploadFiles,
-    };
-    onSave(dataToSave);
+    if (isSaving) return;
+    
+    setIsSaving(true);
+    try {
+      const dataToSave = {
+        nomor_laporan: formData.nomor_laporan || '',
+        tanggal_laporan: selectedDate ? formatDateForAPI(selectedDate) : formData.tanggal_laporan,
+        files: uploadFiles,
+      };
+      await onSave(dataToSave);
+    } catch (error) {
+      console.error('Error saving:', error);
+      // Error toast is handled by base service
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancel = () => {
+    // Prevent closing if operations are in progress
+    if (isSaving || isDownloading || deletingFile) {
+      return;
+    }
     onOpenChange(false);
   };
 
   const handleUploadFilesChange = (files: File[]) => {
+    // Prevent file changes during save operation
+    if (isSaving) return;
     setUploadFiles(files);
   };
 
   const handleExistingFilesRemove = (index: number) => {
-    if (!existingFiles[index] || !existingFiles[index].filename) return;
+    // Prevent file removal during save operation
+    if (isSaving || !existingFiles[index] || !existingFiles[index].filename) return;
     
     const fileToRemove = existingFiles[index];
     setFileToDelete({
@@ -107,7 +133,7 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
   };
 
   const handleConfirmDelete = async () => {
-    if (!fileToDelete || !item?.id) return;
+    if (!fileToDelete || !item?.id || deletingFile) return;
     
     setDeletingFile(true);
     try {
@@ -123,7 +149,7 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
       });
     } catch (error) {
       console.error('Error deleting file:', error);
-      
+      // Error toast is handled by base service
     } finally {
       setDeletingFile(false);
       setFileToDelete(null);
@@ -132,8 +158,9 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
-    if (!item?.id) return;
+    if (!item?.id || isDownloading) return;
     
+    setIsDownloading(true);
     try {
       const blob = await laporanHasilService.downloadFile(item.id);
       const url = window.URL.createObjectURL(blob);
@@ -144,13 +171,25 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'Download berhasil',
+        description: 'File berhasil didownload.',
+        variant: 'default'
+      });
     } catch (error) {
       console.error('Error downloading file:', error);
+      // Error toast is handled by base service
+    } finally {
+      setIsDownloading(false);
     }
   };
 
   const isEditable = mode === 'edit';
   const canEdit = canEditForm('laporan_hasil_evaluasi') && isEditable;
+  
+  // Determine if any operation is in progress
+  const isOperationInProgress = isSaving || isDownloading || deletingFile;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -188,6 +227,8 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
                   value={formData.nomor_laporan || ''}
                   onChange={(e) => setFormData({ ...formData, nomor_laporan: e.target.value })}
                   placeholder="LHE/001/2024"
+                  disabled={isSaving}
+                  className={isSaving ? "bg-muted" : ""}
                 />
               ) : (
                 <div className="p-3 bg-muted rounded-md">
@@ -203,7 +244,7 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
                   value={selectedDate}
                   onChange={setSelectedDate}
                   placeholder="Pilih tanggal laporan"
-                  disabled={!canEdit}
+                  disabled={!canEdit || isSaving}
                 />
               ) : (
                 <div className="p-3 bg-muted rounded-md">
@@ -221,8 +262,8 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
               maxFiles={1}
               files={uploadFiles}
               existingFiles={existingFiles}
-              mode={canEdit ? 'edit' : 'view'}
-              disabled={!canEdit}
+              mode={canEdit && !isSaving ? 'edit' : 'view'}
+              disabled={!canEdit || isSaving}
               onFilesChange={handleUploadFilesChange}
               onExistingFileRemove={handleExistingFilesRemove}
               onFileDownload={handleFileDownload}
@@ -232,12 +273,26 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
         </div>
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
-          <Button variant="outline" onClick={handleCancel}>
+          <Button 
+            variant="outline" 
+            onClick={handleCancel}
+            disabled={isOperationInProgress}
+          >
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
           {canEdit && (
-            <Button onClick={handleSave}>
-              Simpan
+            <Button 
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Menyimpan...
+                </>
+              ) : (
+                'Simpan'
+              )}
             </Button>
           )}
         </DialogFooter>
@@ -246,7 +301,12 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
       {/* File Delete Confirmation Dialog */}
       <FileDeleteConfirmDialog
         open={deleteConfirmOpen}
-        onOpenChange={setDeleteConfirmOpen}
+        onOpenChange={(open) => {
+          // Prevent closing during delete operation
+          if (!deletingFile) {
+            setDeleteConfirmOpen(open);
+          }
+        }}
         fileName={fileToDelete?.name || ''}
         onConfirm={handleConfirmDelete}
         loading={deletingFile}

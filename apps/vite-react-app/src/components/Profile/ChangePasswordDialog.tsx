@@ -116,10 +116,12 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
   };
 
   const handleCancel = () => {
-    if (!isLoading) {
-      form.reset();
-      onOpenChange(false);
+    // Prevent closing if operations are in progress
+    if (isLoading) {
+      return;
     }
+    form.reset();
+    onOpenChange(false);
   };
 
   const passwordRequirements = getPasswordStrength(watchNewPassword || '');
@@ -149,6 +151,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
                         type={showCurrentPassword ? "text" : "password"}
                         placeholder="Masukkan password saat ini"
                         disabled={isLoading}
+                        className={isLoading ? "bg-muted" : ""}
                         {...field}
                       />
                       <Button
@@ -185,6 +188,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
                         type={showNewPassword ? "text" : "password"}
                         placeholder="Masukkan password baru"
                         disabled={isLoading}
+                        className={isLoading ? "bg-muted" : ""}
                         {...field}
                       />
                       <Button
@@ -240,6 +244,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
                         type={showConfirmPassword ? "text" : "password"}
                         placeholder="Konfirmasi password baru"
                         disabled={isLoading}
+                        className={isLoading ? "bg-muted" : ""}
                         {...field}
                       />
                       <Button

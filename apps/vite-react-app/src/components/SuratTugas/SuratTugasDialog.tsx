@@ -9,6 +9,7 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
+import { Loader2 } from 'lucide-react';
 import { Combobox } from '@workspace/ui/components/combobox';
 import DatePicker from '@/components/common/DatePicker';
 import { SuratTugasResponse } from '@/services/suratTugas/types';
@@ -52,6 +53,10 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   const [fileToDelete, setFileToDelete] = useState<{ name: string; filename: string } | null>(null);
   const [deletingFile, setDeletingFile] = useState(false);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
+  
+  // Loading states for different operations
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     if (editingItem) {
@@ -90,11 +95,18 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       setFileToDelete(null);
       setDeleteConfirmOpen(false);
     }
+    
     // Reset search when dialog opens/closes
     setPerwadagSearchValue('');
+    
+    // Reset loading states when dialog opens/closes
+    setIsSaving(false);
+    setIsDownloading(false);
   }, [editingItem, open]);
 
   const handleSave = async () => {
+    if (isSaving) return;
+    
     // Validate all required fields
     if (!formData.no_surat || !formData.user_perwadag_id || !formData.tanggal_evaluasi_mulai || !formData.tanggal_evaluasi_selesai) {
       return;
@@ -106,28 +118,42 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       return;
     }
 
+    setIsSaving(true);
+    try {
+      const saveData = {
+        user_perwadag_id: formData.user_perwadag_id,
+        tanggal_evaluasi_mulai: formatDateForAPI(formData.tanggal_evaluasi_mulai),
+        tanggal_evaluasi_selesai: formData.tanggal_evaluasi_selesai ? formatDateForAPI(formData.tanggal_evaluasi_selesai) : undefined,
+        no_surat: formData.no_surat || '',
+        file: uploadFiles.length > 0 ? uploadFiles[0] : null, // Send null instead of undefined
+      };
 
-    const saveData = {
-      user_perwadag_id: formData.user_perwadag_id,
-      tanggal_evaluasi_mulai: formatDateForAPI(formData.tanggal_evaluasi_mulai),
-      tanggal_evaluasi_selesai: formData.tanggal_evaluasi_selesai ? formatDateForAPI(formData.tanggal_evaluasi_selesai) : undefined,
-      no_surat: formData.no_surat || '',
-      file: uploadFiles.length > 0 ? uploadFiles[0] : null, // Send null instead of undefined
-    };
-
-    onSave(saveData);
+      await onSave(saveData);
+    } catch (error) {
+      console.error('Error saving:', error);
+      // Error toast is handled by base service
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancel = () => {
+    // Prevent closing if operations are in progress
+    if (isSaving || isDownloading || deletingFile) {
+      return;
+    }
     onOpenChange(false);
   };
 
   const handleUploadFilesChange = (files: File[]) => {
+    // Prevent file changes during save operation
+    if (isSaving) return;
     setUploadFiles(files);
   };
 
   const handleExistingFileRemove = (index: number) => {
-    if (!existingFiles[index] || !existingFiles[index].filename) return;
+    // Prevent file removal during save operation
+    if (isSaving || !existingFiles[index] || !existingFiles[index].filename) return;
     
     const fileToRemove = existingFiles[index];
     setFileToDelete({
@@ -138,7 +164,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   };
 
   const handleConfirmDelete = async () => {
-    if (!fileToDelete || !editingItem?.id) return;
+    if (!fileToDelete || !editingItem?.id || deletingFile) return;
     
     setDeletingFile(true);
     try {
@@ -154,6 +180,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       });
     } catch (error) {
       console.error('Error deleting file:', error);
+      // Error toast is handled by base service
     } finally {
       setDeletingFile(false);
       setFileToDelete(null);
@@ -162,8 +189,9 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
-    if (!editingItem?.id) return;
+    if (!editingItem?.id || isDownloading) return;
     
+    setIsDownloading(true);
     try {
       const blob = await suratTugasService.downloadFile(editingItem.id);
       const url = window.URL.createObjectURL(blob);
@@ -174,8 +202,17 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'Download berhasil',
+        description: 'File berhasil didownload.',
+        variant: 'default'
+      });
     } catch (error) {
       console.error('Error downloading file:', error);
+      // Error toast is handled by base service
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -187,6 +224,9 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
     (mode !== 'create' || uploadFiles.length > 0);
   const isEditable = mode !== 'view';
   const canEdit = canEditForm('surat_tugas') && isEditable;
+  
+  // Determine if any operation is in progress
+  const isOperationInProgress = isSaving || isDownloading || deletingFile;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -208,7 +248,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                 value={formData.no_surat}
                 onChange={(e) => setFormData(prev => ({ ...prev, no_surat: e.target.value }))}
                 placeholder="Contoh: ST/001/I/2024"
-                disabled={!canEdit}
+                disabled={!canEdit || isSaving}
+                className={isSaving ? "bg-muted" : ""}
               />
             </div>
 
@@ -252,7 +293,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                   value={formData.tanggal_evaluasi_mulai}
                   onChange={(date) => setFormData(prev => ({ ...prev, tanggal_evaluasi_mulai: date }))}
                   placeholder="Pilih tanggal mulai"
-                  disabled={!canEdit}
+                  disabled={!canEdit || isSaving}
                 />
               </div>
 
@@ -262,7 +303,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                   value={formData.tanggal_evaluasi_selesai}
                   onChange={(date) => setFormData(prev => ({ ...prev, tanggal_evaluasi_selesai: date }))}
                   placeholder="Pilih tanggal selesai"
-                  disabled={!canEdit}
+                  disabled={!canEdit || isSaving}
                   disabledDates={(date) => {
                     if (!formData.tanggal_evaluasi_mulai) return false;
                     return date < formData.tanggal_evaluasi_mulai;
@@ -286,8 +327,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
               maxFiles={1}
               files={uploadFiles}
               existingFiles={existingFiles}
-              mode={canEdit ? 'edit' : 'view'}
-              disabled={!canEdit}
+              mode={canEdit && !isSaving ? 'edit' : 'view'}
+              disabled={!canEdit || isSaving}
               onFilesChange={handleUploadFilesChange}
               onExistingFileRemove={handleExistingFileRemove}
               onFileDownload={handleFileDownload}
@@ -297,12 +338,26 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
         </div>
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
-          <Button variant="outline" onClick={handleCancel}>
+          <Button 
+            variant="outline" 
+            onClick={handleCancel}
+            disabled={isOperationInProgress}
+          >
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
           {canEdit && (
-            <Button onClick={handleSave} disabled={!isFormValid}>
-              {mode === 'edit' ? 'Simpan' : 'Buat'}
+            <Button 
+              onClick={handleSave} 
+              disabled={!isFormValid || isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Menyimpan...
+                </>
+              ) : (
+                mode === 'edit' ? 'Simpan' : 'Buat'
+              )}
             </Button>
           )}
         </DialogFooter>
@@ -311,7 +366,12 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       {/* File Delete Confirmation Dialog */}
       <FileDeleteConfirmDialog
         open={deleteConfirmOpen}
-        onOpenChange={setDeleteConfirmOpen}
+        onOpenChange={(open) => {
+          // Prevent closing during delete operation
+          if (!deletingFile) {
+            setDeleteConfirmOpen(open);
+          }
+        }}
         fileName={fileToDelete?.name || ''}
         onConfirm={handleConfirmDelete}
         loading={deletingFile}

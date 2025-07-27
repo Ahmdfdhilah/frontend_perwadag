@@ -6,7 +6,7 @@ import { LogActivityResponse, LogActivityFilterParams } from '@/services/log-act
 import SearchContainer from '@/components/common/SearchContainer';
 import InfiniteScrollPagination from '@/components/common/InfiniteScrollPagination';
 import { useDebounce } from '@/hooks/useDebounce';
-import { formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
 interface LogActivitySectionProps {
@@ -107,10 +107,7 @@ const LogActivitySection: React.FC<LogActivitySectionProps> = ({
           <div className="flex items-center space-x-1">
             <Clock className="h-3 w-3" />
             <span>
-              {formatDistanceToNow(new Date(log.date), {
-                addSuffix: true,
-                locale: id
-              })}
+              {format(new Date(log.date), 'dd/MM/yyyy HH:mm', { locale: id })} WIB
             </span>
           </div>
         </div>

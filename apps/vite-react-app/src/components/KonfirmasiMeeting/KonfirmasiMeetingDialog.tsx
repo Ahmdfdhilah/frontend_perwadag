@@ -9,7 +9,7 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Loader2 } from 'lucide-react';
 import DatePicker from '@/components/common/DatePicker';
 import { MeetingResponse } from '@/services/meeting/types';
 import { PerwadagSummary } from '@/services/users/types';
@@ -49,6 +49,10 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<{ index: number; name: string; filename: string } | null>(null);
   const [deletingFile, setDeletingFile] = useState(false);
+  
+  // Loading states for different operations
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     if (item && open) {
@@ -79,24 +83,42 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
       setFileToDelete(null);
       setDeleteConfirmOpen(false);
     }
+    
+    // Reset loading states when dialog opens/closes
+    setIsSaving(false);
+    setIsDownloading(false);
   }, [item, open]);
 
-  const handleSave = () => {
-    const dataToSave: any = {
-      files: meetingFiles,
-    };
+  const handleSave = async () => {
+    if (isSaving) return;
     
-    // Only include fields that the user can edit
-    if (canEditAllFields) {
-      dataToSave.tanggal_meeting = selectedKonfirmasiDate ? formatDateForAPI(selectedKonfirmasiDate) : formData.tanggal_meeting;
-      dataToSave.link_zoom = formData.link_zoom || '';
-      dataToSave.link_daftar_hadir = formData.link_daftar_hadir || '';
+    setIsSaving(true);
+    try {
+      const dataToSave: any = {
+        files: meetingFiles,
+      };
+      
+      // Only include fields that the user can edit
+      if (canEditAllFields) {
+        dataToSave.tanggal_meeting = selectedKonfirmasiDate ? formatDateForAPI(selectedKonfirmasiDate) : formData.tanggal_meeting;
+        dataToSave.link_zoom = formData.link_zoom || '';
+        dataToSave.link_daftar_hadir = formData.link_daftar_hadir || '';
+      }
+      
+      await onSave(dataToSave);
+    } catch (error) {
+      console.error('Error saving:', error);
+      // Error toast is handled by base service
+    } finally {
+      setIsSaving(false);
     }
-    
-    onSave(dataToSave);
   };
 
   const handleCancel = () => {
+    // Prevent closing if operations are in progress
+    if (isSaving || isDownloading || deletingFile) {
+      return;
+    }
     onOpenChange(false);
   };
 
@@ -107,11 +129,14 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
   };
 
   const handleMeetingFilesChange = (files: File[]) => {
+    // Prevent file changes during save operation
+    if (isSaving) return;
     setMeetingFiles(files);
   };
 
   const handleExistingFilesRemove = (index: number) => {
-    if (!existingFiles[index]) return;
+    // Prevent file removal during save operation
+    if (isSaving || !existingFiles[index]) return;
     
     const fileToRemove = existingFiles[index];
     if (!fileToRemove.filename) return;
@@ -125,7 +150,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
   };
 
   const handleConfirmDelete = async () => {
-    if (!fileToDelete || !item?.id) return;
+    if (!fileToDelete || !item?.id || deletingFile) return;
     
     setDeletingFile(true);
     try {
@@ -141,16 +166,18 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
       });
     } catch (error) {
       console.error('Error deleting file:', error);
-      
+      // Error toast is handled by base service
     } finally {
       setDeletingFile(false);
       setFileToDelete(null);
+      setDeleteConfirmOpen(false);
     }
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }, index: number) => {
-    if (!item?.id || !item?.files_info?.files?.[index]) return;
+    if (!item?.id || !item?.files_info?.files?.[index] || isDownloading) return;
     
+    setIsDownloading(true);
     try {
       const fileMetadata = item.files_info.files[index];
       const filename = fileMetadata.filename;
@@ -163,8 +190,17 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'Download berhasil',
+        description: 'File berhasil didownload.',
+        variant: 'default'
+      });
     } catch (error) {
       console.error('Error downloading file:', error);
+      // Error toast is handled by base service
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -174,6 +210,9 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
   const canEdit = canEditForm('konfirmasi_meeting') && isEditable;
   const canEditAllFields = canEdit && (isAdmin() || isInspektorat());
   const canEditBuktiHadir = canEdit; // All roles can edit bukti hadir
+  
+  // Determine if any operation is in progress
+  const isOperationInProgress = isSaving || isDownloading || deletingFile;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -211,6 +250,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
                   value={selectedKonfirmasiDate}
                   onChange={setSelectedKonfirmasiDate}
                   placeholder="Pilih tanggal"
+                  disabled={isSaving}
                 />
               ) : (
                 <div className="p-3 bg-muted rounded-md">
@@ -229,6 +269,8 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
                     value={formData.link_zoom || ''}
                     onChange={(e) => setFormData({ ...formData, link_zoom: e.target.value })}
                     placeholder="https://zoom.us/j/..."
+                    disabled={isSaving}
+                    className={isSaving ? "bg-muted" : ""}
                   />
                   {formData.link_zoom && (
                     <Button
@@ -236,6 +278,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
                       variant="outline"
                       size="sm"
                       onClick={() => handleOpenLink(formData.link_zoom!)}
+                      disabled={isSaving}
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
@@ -270,6 +313,8 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
                     value={formData.link_daftar_hadir || ''}
                     onChange={(e) => setFormData({ ...formData, link_daftar_hadir: e.target.value })}
                     placeholder="https://forms.google.com/..."
+                    disabled={isSaving}
+                    className={isSaving ? "bg-muted" : ""}
                   />
                   {formData.link_daftar_hadir && (
                     <Button
@@ -277,6 +322,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
                       variant="outline"
                       size="sm"
                       onClick={() => handleOpenLink(formData.link_daftar_hadir!)}
+                      disabled={isSaving}
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
@@ -310,8 +356,8 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
               maxFiles={5}
               files={meetingFiles}
               existingFiles={existingFiles}
-              mode={canEditBuktiHadir ? 'edit' : 'view'}
-              disabled={!canEditBuktiHadir}
+              mode={canEditBuktiHadir && !isSaving ? 'edit' : 'view'}
+              disabled={!canEditBuktiHadir || isSaving}
               onFilesChange={handleMeetingFilesChange}
               onExistingFileRemove={handleExistingFilesRemove}
               onFileDownload={handleFileDownload}
@@ -321,12 +367,26 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
         </div>
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
-          <Button variant="outline" onClick={handleCancel}>
+          <Button 
+            variant="outline" 
+            onClick={handleCancel}
+            disabled={isOperationInProgress}
+          >
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
           {(canEditAllFields || canEditBuktiHadir) && (
-            <Button onClick={handleSave}>
-              Simpan
+            <Button 
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Menyimpan...
+                </>
+              ) : (
+                'Simpan'
+              )}
             </Button>
           )}
         </DialogFooter>
@@ -335,7 +395,12 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
       {/* File Delete Confirmation Dialog */}
       <FileDeleteConfirmDialog
         open={deleteConfirmOpen}
-        onOpenChange={setDeleteConfirmOpen}
+        onOpenChange={(open) => {
+          // Prevent closing during delete operation
+          if (!deletingFile) {
+            setDeleteConfirmOpen(open);
+          }
+        }}
         fileName={fileToDelete?.name || ''}
         onConfirm={handleConfirmDelete}
         loading={deletingFile}
