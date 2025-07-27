@@ -349,6 +349,7 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
             <PerwadagCombobox
               value={filters.user_perwadag_id}
               onChange={handlePerwadagChange}
+              inspektoratFilter={filters.inspektorat}
             />
           </div>
         )}

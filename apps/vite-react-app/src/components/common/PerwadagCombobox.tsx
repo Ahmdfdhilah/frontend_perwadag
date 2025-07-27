@@ -11,6 +11,7 @@ interface PerwadagComboboxProps {
   includeAllOption?: boolean;
   allOptionLabel?: string;
   className?: string;
+  inspektoratFilter?: string; // New prop to filter by inspektorat
 }
 
 export const PerwadagCombobox: React.FC<PerwadagComboboxProps> = ({
@@ -19,7 +20,8 @@ export const PerwadagCombobox: React.FC<PerwadagComboboxProps> = ({
   placeholder = "Pilih perwadag",
   includeAllOption = true,
   allOptionLabel = "Semua Perwadag",
-  className
+  className,
+  inspektoratFilter
 }) => {
   const { isInspektorat, user } = useRole();
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
@@ -34,8 +36,12 @@ export const PerwadagCombobox: React.FC<PerwadagComboboxProps> = ({
         size: 100
       };
 
-      // If current user is inspektorat, filter by their inspektorat
-      if (isInspektorat() && user?.inspektorat) {
+      // Apply inspektorat filter priority:
+      // 1. If inspektoratFilter prop is provided and not 'all', use it
+      // 2. If current user is inspektorat, filter by their inspektorat
+      if (inspektoratFilter && inspektoratFilter !== 'all') {
+        params.inspektorat = inspektoratFilter;
+      } else if (isInspektorat() && user?.inspektorat) {
         params.inspektorat = user.inspektorat;
       }
 
@@ -50,7 +56,7 @@ export const PerwadagCombobox: React.FC<PerwadagComboboxProps> = ({
 
   useEffect(() => {
     fetchAvailablePerwadag();
-  }, []);
+  }, [inspektoratFilter]); // Re-fetch when inspektoratFilter changes
 
   // Prepare options
   const options = [
