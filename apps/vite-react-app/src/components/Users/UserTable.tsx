@@ -10,8 +10,7 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import { Skeleton } from '@workspace/ui/components/skeleton';
-import { Badge } from '@workspace/ui/components/badge';
-import ActionDropdown  from '@/components/common/ActionDropdown';
+import ActionDropdown from '@/components/common/ActionDropdown';
 
 interface UserTableProps {
   users: User[];
@@ -34,17 +33,56 @@ export const UserTable: React.FC<UserTableProps> = ({
 }) => {
   const getStatusBadge = (isActive: boolean) => {
     return (
-      <Badge variant={isActive ? 'default' : 'destructive'}>
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${isActive
+        ? 'bg-green-100 text-green-800'
+        : 'bg-red-100 text-red-800'
+        }`}>
         {isActive ? 'Aktif' : 'Tidak Aktif'}
-      </Badge>
+      </span>
     );
   };
 
   const getRoleBadge = (role: string) => {
+    const getRoleStyle = (role: string) => {
+      switch (role) {
+        case 'ADMIN':
+          return 'bg-blue-100 text-blue-800';
+        case 'INSPEKTORAT':
+          return 'bg-purple-100 text-purple-800';
+        case 'PERWADAG':
+          return 'bg-orange-100 text-orange-800';
+        default:
+          return 'bg-gray-100 text-gray-800';
+      }
+    };
+
     return (
-      <Badge variant="secondary" className="text-xs">
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleStyle(role)}`}>
         {ROLE_LABELS[role as keyof typeof ROLE_LABELS] || role}
-      </Badge>
+      </span>
+    );
+  };
+
+  const getInspektoratSpan = (inspektorat: string) => {
+    const getInspektoratStyle = (inspektorat: string) => {
+      switch (inspektorat) {
+        case 'Inspektorat 1':
+          return 'bg-emerald-100 text-emerald-800';
+        case 'Inspektorat 2':
+          return 'bg-cyan-100 text-cyan-800';
+        case 'Inspektorat 3':
+          return 'bg-amber-100 text-amber-800';
+        case 'Inspektorat 4':
+          return 'bg-rose-100 text-rose-800';
+        default:
+          return 'bg-gray-100 text-gray-800';
+      }
+    };
+
+    return (
+      <span className={`px-1 py-1 rounded-full text-xs font-medium ${getInspektoratStyle(inspektorat)}`}>
+        {inspektorat}
+      </span>
     );
   };
 
@@ -93,24 +131,22 @@ export const UserTable: React.FC<UserTableProps> = ({
                   {(currentPage - 1) * itemsPerPage + index + 1}
                 </TableCell>
                 <TableCell>
-                  <span className="font-medium">{user.nama}</span>
+                  {user.nama}
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">{user.username}</span>
+                  {user.username}
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">{user.jabatan}</span>
+                  {user.jabatan}
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">{user.email || '-'}</span>
+                  {user.email || '-'}
                 </TableCell>
                 <TableCell>
                   {getRoleBadge(user.role)}
                 </TableCell>
                 <TableCell>
-                  <span className="text-sm">
-                    {user.inspektorat || '-'}
-                  </span>
+                  {user.inspektorat ? getInspektoratSpan(user.inspektorat) : '-'}
                 </TableCell>
                 <TableCell>
                   {getStatusBadge(user.is_active)}

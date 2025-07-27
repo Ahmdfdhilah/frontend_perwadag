@@ -3,14 +3,12 @@ import { User } from '@/services/users/types';
 import { ROLE_LABELS } from '@/lib/constants';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import { Skeleton } from '@workspace/ui/components/skeleton';
-import { Badge } from '@workspace/ui/components/badge';
 import ActionDropdown  from '@/components/common/ActionDropdown';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { 
   Mail, 
   Calendar, 
-  CreditCard,
   Building
 } from 'lucide-react';
 
@@ -35,17 +33,57 @@ export const UserCards: React.FC<UserCardsProps> = ({
 }) => {
   const getStatusBadge = (isActive: boolean) => {
     return (
-      <Badge variant={isActive ? 'default' : 'destructive'} className="text-xs">
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+        isActive
+          ? 'bg-green-100 text-green-800' 
+          : 'bg-red-100 text-red-800'
+      }`}>
         {isActive ? 'Aktif' : 'Tidak Aktif'}
-      </Badge>
+      </span>
     );
   };
 
   const getRoleBadge = (role: string) => {
+    const getRoleStyle = (role: string) => {
+      switch (role) {
+        case 'ADMIN':
+          return 'bg-blue-100 text-blue-800';
+        case 'INSPEKTORAT':
+          return 'bg-purple-100 text-purple-800';
+        case 'PERWADAG':
+          return 'bg-orange-100 text-orange-800';
+        default:
+          return 'bg-gray-100 text-gray-800';
+      }
+    };
+
     return (
-      <Badge variant="secondary" className="text-xs">
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRoleStyle(role)}`}>
         {ROLE_LABELS[role as keyof typeof ROLE_LABELS] || role}
-      </Badge>
+      </span>
+    );
+  };
+
+  const getInspektoratSpan = (inspektorat: string) => {
+    const getInspektoratStyle = (inspektorat: string) => {
+      switch (inspektorat) {
+        case 'Inspektorat 1':
+          return 'bg-emerald-100 text-emerald-800';
+        case 'Inspektorat 2':
+          return 'bg-cyan-100 text-cyan-800';
+        case 'Inspektorat 3':
+          return 'bg-amber-100 text-amber-800';
+        case 'Inspektorat 4':
+          return 'bg-rose-100 text-rose-800';
+        default:
+          return 'bg-gray-100 text-gray-800';
+      }
+    };
+
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getInspektoratStyle(inspektorat)}`}>
+        {inspektorat}
+      </span>
     );
   };
 
@@ -152,7 +190,10 @@ export const UserCards: React.FC<UserCardsProps> = ({
             {user.inspektorat && (
               <div className="flex items-start space-x-2 text-sm text-muted-foreground mb-2">
                 <Building className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span className="line-clamp-2">Inspektorat: {user.inspektorat}</span>
+                <div className="flex items-center space-x-2">
+                  <span>Inspektorat:</span>
+                  {getInspektoratSpan(user.inspektorat)}
+                </div>
               </div>
             )}
 

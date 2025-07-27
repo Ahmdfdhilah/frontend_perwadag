@@ -8,7 +8,6 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import { Button } from '@workspace/ui/components/button';
-import { Badge } from '@workspace/ui/components/badge';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import {
   DropdownMenu,
@@ -112,25 +111,24 @@ export const EmailTemplateTable: React.FC<EmailTemplateTableProps> = ({
               <TableCell className="text-center">
                 {(currentPage - 1) * itemsPerPage + index + 1}
               </TableCell>
-              <TableCell className="font-medium">
-                <div>
-                  <p className="font-medium">{template.name}</p>
-                </div>
+              <TableCell>
+              {template.name}
               </TableCell>
               <TableCell>
-                <div className="max-w-[300px]">
+                <div className="max-w-[400px]">
                   <p className="text-sm">
                     {truncateText(template.subject_template, 60)}
                   </p>
                 </div>
               </TableCell>
               <TableCell>
-                <Badge
-                  variant={template.is_active ? "default" : "secondary"}
-                  className={template.is_active ? "bg-green-600 hover:bg-green-700" : ""}
-                >
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  template.is_active
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-red-100 text-red-800'
+                }`}>
                   {template.is_active ? 'Aktif' : 'Tidak Aktif'}
-                </Badge>
+                </span>
               </TableCell>
               <TableCell>
                 <DropdownMenu>

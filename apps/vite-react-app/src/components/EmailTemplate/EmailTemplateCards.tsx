@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader } from '@workspace/ui/components/card';
 import { Button } from '@workspace/ui/components/button';
-import { Badge } from '@workspace/ui/components/badge';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import {
   DropdownMenu,
@@ -106,12 +105,13 @@ export const EmailTemplateCards: React.FC<EmailTemplateCardsProps> = ({
                   <h3 className="font-medium text-lg">{template.name}</h3>
                 </div>
               </div>
-              <Badge
-                variant={template.is_active ? "default" : "secondary"}
-                className={template.is_active ? "bg-green-600 hover:bg-green-700" : ""}
-              >
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                template.is_active
+                  ? 'bg-green-100 text-green-800' 
+                  : 'bg-red-100 text-red-800'
+              }`}>
                 {template.is_active ? 'Aktif' : 'Tidak Aktif'}
-              </Badge>
+              </span>
             </div>
           </CardHeader>
           <CardContent>
