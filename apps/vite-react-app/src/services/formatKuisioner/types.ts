@@ -60,12 +60,12 @@ export interface FormatKuisionerResponse {
   deskripsi?: string;
   tahun: number;
   link_template: string;
-  file_urls: FileUrls;
-  file_metadata: FileMetadata;
+  file_urls?: FileUrls;
+  file_metadata?: FileMetadata;
   display_name: string;
   has_file: boolean;
   is_downloadable: boolean;
-  is_current_year: boolean;
+  is_active: boolean;
   usage_count: number;
   last_used?: string;
   created_at: string;
@@ -74,8 +74,17 @@ export interface FormatKuisionerResponse {
   updated_by?: string;
 }
 
+export interface ModuleStatistics {
+  total_records: number;
+  completed_records: number;
+  with_files: number;
+  without_files: number;
+  completion_rate: number;
+  last_updated: string;
+}
+
 export interface FormatKuisionerListResponse extends PaginatedResponse<FormatKuisionerResponse> {
-  statistics: FormatKuisionerStatistics;
+  statistics?: ModuleStatistics;
 }
 
 export interface FormatKuisionerFileUploadResponse {
@@ -88,11 +97,18 @@ export interface FormatKuisionerFileUploadResponse {
 }
 
 export interface FormatKuisionerByYearResponse {
-  [key: string]: any;
+  tahun: number;
+  templates: FormatKuisionerResponse[];
+  total: number;
 }
 
 export interface FormatKuisionerStatisticsResponse {
-  [key: string]: any;
+  total_templates: number;
+  templates_by_year: Record<number, number>;
+  templates_with_files: number;
+  templates_without_files: number;
+  active_templates: number;
+  completion_rate: number;
 }
 
 // Filter Types

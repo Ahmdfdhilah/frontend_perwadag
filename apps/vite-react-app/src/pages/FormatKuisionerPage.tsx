@@ -2,18 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { useRole } from '@/hooks/useRole';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
+import { FormatKuisionerResponse } from '@/services/formatKuisioner/types';
+import { formatKuisionerService } from '@/services/formatKuisioner';
+import { Button } from '@workspace/ui/components/button';
+import { Card, CardContent } from '@workspace/ui/components/card';
+import { Label } from '@workspace/ui/components/label';
+import { Plus } from 'lucide-react';
+import { FormatKuisionerTable } from '@/components/FormatKuisioner/FormatKuisionerTable';
+import { FormatKuisionerCards } from '@/components/FormatKuisioner/FormatKuisionerCards';
+import { FormatKuisionerDialog } from '@/components/FormatKuisioner/FormatKuisionerDialog';
+import { PageHeader } from '@/components/common/PageHeader';
+import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import Filtering from '@/components/common/Filtering';
 import SearchContainer from '@/components/common/SearchContainer';
 import Pagination from '@/components/common/Pagination';
-import { Card, CardContent } from '@workspace/ui/components/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '@workspace/ui/components/select';
-import { Label } from '@workspace/ui/components/label';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,18 +26,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@workspace/ui/components/alert-dialog';
-import { FormatKuisionerResponse, FormatKuisionerFilterParams } from '@/services/formatKuisioner/types';
-import { formatKuisionerService } from '@/services/formatKuisioner';
-import { PageHeader } from '@/components/common/PageHeader';
-import ListHeaderComposite from '@/components/common/ListHeaderComposite';
-import QuestionnaireTable from '@/components/FormatKuisioner/FormatKuisionerTable';
-import QuestionnaireCards from '@/components/FormatKuisioner/FormatKuisionerCards';
-import QuestionnaireDialog from '@/components/FormatKuisioner/FormatKuisionerDialog';
-import { Button } from '@workspace/ui/components/button';
-import { Plus } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@workspace/ui/components/select';
 import { getDefaultYearOptions } from '@/utils/yearUtils';
 
-interface QuestionnaireTemplatePageFilters {
+interface FormatKuisionerPageFilters {
   search: string;
   tahun: string;
   has_file: string;
@@ -44,12 +44,12 @@ interface QuestionnaireTemplatePageFilters {
   [key: string]: string | number;
 }
 
-const QuestionnaireTemplatePage: React.FC = () => {
-  const { isAdmin, isInspektorat, isPerwadag } = useRole();
+const FormatKuisionerPage: React.FC = () => {
+  const { isAdmin } = useRole();
   const { toast } = useToast();
 
   // URL Filters configuration
-  const { updateURL, getCurrentFilters } = useURLFilters<QuestionnaireTemplatePageFilters>({
+  const { updateURL, getCurrentFilters } = useURLFilters<FormatKuisionerPageFilters>({
     defaults: {
       search: '',
       tahun: 'all',
@@ -68,13 +68,15 @@ const QuestionnaireTemplatePage: React.FC = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<FormatKuisionerResponse | null>(null);
-  const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
+  const [dialogMode, setDialogMode] = useState<'view' | 'create' | 'edit'>('create');
+  const [selectedTemplate, setSelectedTemplate] = useState<FormatKuisionerResponse | null>(null);
+  const [templateToDelete, setTemplateToDelete] = useState<FormatKuisionerResponse | null>(null);
+  const [templateToActivate, setTemplateToActivate] = useState<FormatKuisionerResponse | null>(null);
+  const [activatingTemplate, setActivatingTemplate] = useState<FormatKuisionerResponse | null>(null);
   const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
-  
-  // Delete confirmation dialog state
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [itemToDelete, setItemToDelete] = useState<FormatKuisionerResponse | null>(null);
+
+  // Calculate access control
+  const hasAccess = isAdmin();
 
   // Fetch year options function
   const fetchYearOptions = async () => {
@@ -86,22 +88,18 @@ const QuestionnaireTemplatePage: React.FC = () => {
     }
   };
 
-  // Calculate access control
-  const hasAccess = isAdmin() || isInspektorat() || isPerwadag();
-
   // Fetch templates function
   const fetchTemplates = async () => {
     setLoading(true);
     try {
-      const params: FormatKuisionerFilterParams = {
+      const response = await formatKuisionerService.getFormatKuisionerList({
         page: filters.page,
         size: filters.size,
         search: filters.search || undefined,
         tahun: filters.tahun !== 'all' ? parseInt(filters.tahun) : undefined,
         has_file: filters.has_file !== 'all' ? filters.has_file === 'true' : undefined,
-      };
+      });
 
-      const response = await formatKuisionerService.getFormatKuisionerList(params);
       setTemplates(response.items);
       setTotalItems(response.total);
       setTotalPages(response.pages);
@@ -112,7 +110,7 @@ const QuestionnaireTemplatePage: React.FC = () => {
     }
   };
 
-  // Effect to fetch data when filters change
+  // Effect to fetch templates when filters change
   useEffect(() => {
     if (hasAccess) {
       fetchTemplates();
@@ -120,96 +118,89 @@ const QuestionnaireTemplatePage: React.FC = () => {
     }
   }, [filters.page, filters.size, filters.search, filters.tahun, filters.has_file, hasAccess]);
 
-  // Pagination is handled by totalPages state from API response
+  // Handlers
+  const handleCreate = () => {
+    setSelectedTemplate(null);
+    setDialogMode('create');
+    setIsDialogOpen(true);
+  };
 
-  const handleView = (item: FormatKuisionerResponse) => {
-    setEditingItem(item);
+  const handleEdit = (template: FormatKuisionerResponse) => {
+    setSelectedTemplate(template);
+    setDialogMode('edit');
+    setIsDialogOpen(true);
+  };
+
+  const handleView = (template: FormatKuisionerResponse) => {
+    setSelectedTemplate(template);
     setDialogMode('view');
     setIsDialogOpen(true);
   };
 
-  const handleEdit = (item: FormatKuisionerResponse) => {
-    if (!isAdmin()) return;
-    setEditingItem(item);
-    setDialogMode('edit');
-    setIsDialogOpen(true);
+  const handleActivateClick = (template: FormatKuisionerResponse) => {
+    if (template.is_active) return;
+    setTemplateToActivate(template);
   };
 
-  const handleAdd = () => {
-    if (!isAdmin()) return;
-    setEditingItem(null);
-    setDialogMode('edit');
-    setIsDialogOpen(true);
+  const handleConfirmActivate = async () => {
+    if (!templateToActivate) return;
+
+    setActivatingTemplate(templateToActivate);
+    setTemplateToActivate(null);
+    try {
+      await formatKuisionerService.activateTemplate(templateToActivate.id);
+      await fetchTemplates();
+      toast({
+        title: 'Template Diaktifkan',
+        description: `Template "${templateToActivate.nama_template}" telah diaktifkan.`,
+        variant: 'default'
+      });
+    } catch (error) {
+      console.error('Failed to activate template:', error);
+      toast({
+        title: 'Gagal Mengaktifkan Template',
+        description: 'Terjadi kesalahan saat mengaktifkan template.',
+        variant: 'destructive'
+      });
+    } finally {
+      setActivatingTemplate(null);
+    }
   };
 
-  const handleDelete = (item: FormatKuisionerResponse) => {
-    if (!isAdmin()) return;
-    setItemToDelete(item);
-    setDeleteDialogOpen(true);
+  const handleDelete = (template: FormatKuisionerResponse) => {
+    if (template.is_active) {
+      toast({
+        title: 'Tidak Dapat Menghapus',
+        description: 'Template yang sedang aktif tidak dapat dihapus.',
+        variant: 'destructive'
+      });
+      return;
+    }
+    setTemplateToDelete(template);
   };
 
   const confirmDelete = async () => {
-    if (!itemToDelete) return;
-    
+    if (!templateToDelete) return;
+
     try {
-      await formatKuisionerService.deleteFormatKuisioner(itemToDelete.id);
-      fetchTemplates(); // Refresh the list
+      await formatKuisionerService.deleteFormatKuisioner(templateToDelete.id);
+      await fetchTemplates();
       toast({
-        title: 'Berhasil dihapus',
-        description: `Template "${itemToDelete.nama_template}" telah dihapus.`,
+        title: 'Template Dihapus',
+        description: `Template "${templateToDelete.nama_template}" telah dihapus.`,
         variant: 'default'
       });
     } catch (error) {
       console.error('Failed to delete template:', error);
-     
     } finally {
-      setDeleteDialogOpen(false);
-      setItemToDelete(null);
+      setTemplateToDelete(null);
     }
   };
 
-  const handleSave = async (data: any) => {
-    try {
-      if (editingItem) {
-        // Update existing template
-        const updateData = {
-          nama_template: data.nama_template !== undefined ? data.nama_template : undefined,
-          deskripsi: data.deskripsi !== undefined ? data.deskripsi : undefined,
-          tahun: data.tahun !== undefined ? data.tahun : undefined,
-        };
-        await formatKuisionerService.updateFormatKuisioner(editingItem.id, updateData);
-        
-        // Handle file upload if any
-        if (data.file) {
-          await formatKuisionerService.uploadFile(editingItem.id, data.file);
-        }
-        
-        toast({
-          title: 'Berhasil diperbarui',
-          description: `Template "${data.nama_template}" telah diperbarui.`,
-          variant: 'default'
-        });
-      } else {
-        // Create new template
-        await formatKuisionerService.createFormatKuisioner({
-          nama_template: data.nama_template,
-          deskripsi: data.deskripsi,
-          tahun: data.tahun,
-        }, data.file);
-        
-        toast({
-          title: 'Berhasil ditambahkan',
-          description: `Template "${data.nama_template}" telah ditambahkan.`,
-          variant: 'default'
-        });
-      }
-      
-      setIsDialogOpen(false);
-      setEditingItem(null);
-      fetchTemplates(); // Refresh the list
-    } catch (error) {
-      console.error('Failed to save template:', error);
-    }
+  const handleSave = async () => {
+    await fetchTemplates();
+    setIsDialogOpen(false);
+    setSelectedTemplate(null);
   };
 
   // Filter handlers
@@ -235,30 +226,22 @@ const QuestionnaireTemplatePage: React.FC = () => {
 
   // Generate composite title
   const getCompositeTitle = () => {
-    let title = "Template Kuesioner";
+    let title = "Template Kuisioner";
     const activeFilters = [];
-    
+
     if (filters.tahun !== 'all') {
       activeFilters.push(`Tahun ${filters.tahun}`);
     }
-    
+
     if (filters.has_file !== 'all') {
       activeFilters.push(filters.has_file === 'true' ? 'Dengan File' : 'Tanpa File');
     }
-    
+
     if (activeFilters.length > 0) {
       title += " - " + activeFilters.join(" - ");
     }
-    
+
     return title;
-  };
-
-  const canEdit = () => {
-    return isAdmin();
-  };
-
-  const canDelete = () => {
-    return isAdmin();
   };
 
   // Check access after all hooks have been called
@@ -278,11 +261,11 @@ const QuestionnaireTemplatePage: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Template Kuesioner"
-        description="Template kuesioner yang dapat digunakan untuk evaluasi"
+        title="Format Kuisioner"
+        description="Kelola template format kuisioner untuk evaluasi"
         actions={
-          <Button variant="default" onClick={isAdmin() ? handleAdd : undefined}>
-            <Plus className='w-4'/>
+          <Button onClick={handleCreate} className="gap-2">
+            <Plus className="h-4 w-4" />
             Tambah Template
           </Button>
         }
@@ -325,7 +308,7 @@ const QuestionnaireTemplatePage: React.FC = () => {
           <div className="space-y-4">
             <ListHeaderComposite
               title={getCompositeTitle()}
-              subtitle="Template kuesioner yang dapat digunakan untuk evaluasi"
+              subtitle="Kelola template format kuisioner berdasarkan filter yang dipilih"
             />
 
             <SearchContainer
@@ -336,14 +319,14 @@ const QuestionnaireTemplatePage: React.FC = () => {
 
             {/* Desktop Table */}
             <div className="hidden lg:block">
-              <QuestionnaireTable
+              <FormatKuisionerTable
                 data={templates}
                 loading={loading}
                 onView={handleView}
                 onEdit={handleEdit}
+                onActivate={handleActivateClick}
                 onDelete={handleDelete}
-                canEdit={canEdit}
-                canDelete={canDelete}
+                activatingTemplate={activatingTemplate}
                 currentPage={filters.page}
                 itemsPerPage={filters.size}
               />
@@ -351,14 +334,13 @@ const QuestionnaireTemplatePage: React.FC = () => {
 
             {/* Mobile Cards */}
             <div className="lg:hidden">
-              <QuestionnaireCards
+              <FormatKuisionerCards
                 data={templates}
                 loading={loading}
                 onView={handleView}
                 onEdit={handleEdit}
+                onActivate={handleActivateClick}
                 onDelete={handleDelete}
-                canEdit={canEdit}
-                canDelete={canDelete}
                 currentPage={filters.page}
                 itemsPerPage={filters.size}
               />
@@ -379,29 +361,48 @@ const QuestionnaireTemplatePage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Main Dialog */}
-      <QuestionnaireDialog
+      {/* Unified Dialog */}
+      <FormatKuisionerDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        item={editingItem}
         mode={dialogMode}
+        template={selectedTemplate}
         onSave={handleSave}
       />
 
-      {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+      {/* Activate Confirmation Dialog */}
+      <AlertDialog open={!!templateToActivate} onOpenChange={() => setTemplateToActivate(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Konfirmasi Hapus</AlertDialogTitle>
+            <AlertDialogTitle>Aktifkan Template Format Kuisioner</AlertDialogTitle>
             <AlertDialogDescription>
-              Apakah Anda yakin ingin menghapus template "{itemToDelete?.nama_template}"? 
-              Tindakan ini tidak dapat dibatalkan.
+              Apakah Anda yakin ingin mengaktifkan template "{templateToActivate?.nama_template}"?
+              <br />
+              <br />
+              Template yang aktif saat ini akan dinonaktifkan secara otomatis.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setDeleteDialogOpen(false)}>
-              Batal
-            </AlertDialogCancel>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmActivate}>
+              Aktifkan
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!templateToDelete} onOpenChange={() => setTemplateToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Hapus Template</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin menghapus template "{templateToDelete?.nama_template}"?
+              Aksi ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
             <AlertDialogAction onClick={confirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Hapus
             </AlertDialogAction>
@@ -412,4 +413,4 @@ const QuestionnaireTemplatePage: React.FC = () => {
   );
 };
 
-export default QuestionnaireTemplatePage;
+export default FormatKuisionerPage;

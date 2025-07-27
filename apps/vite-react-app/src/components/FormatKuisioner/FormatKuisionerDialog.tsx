@@ -11,38 +11,32 @@ import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Textarea } from '@workspace/ui/components/textarea';
-import { FormatKuisionerResponse } from '@/services/formatKuisioner/types';
+import { FormatKuisionerResponse, FormatKuisionerCreate, FormatKuisionerUpdate } from '@/services/formatKuisioner/types';
 import { Download, Loader2 } from 'lucide-react';
 import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { formatKuisionerService } from '@/services/formatKuisioner';
 import { useToast } from '@workspace/ui/components/sonner';
 
-interface QuestionnaireFormData {
-  nama_template: string;
-  deskripsi: string;
-  tahun: number;
-  file?: File;
-}
-
-interface QuestionnaireDialogProps {
+interface FormatKuisionerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  item: FormatKuisionerResponse | null;
-  mode: 'view' | 'edit';
-  onSave: (data: QuestionnaireFormData) => void;
+  template: FormatKuisionerResponse | null;
+  mode: 'view' | 'create' | 'edit';
+  onSave: () => void;
 }
 
-const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
+export const FormatKuisionerDialog: React.FC<FormatKuisionerDialogProps> = ({
   open,
   onOpenChange,
-  item,
+  template,
   mode,
   onSave,
 }) => {
   const { isAdmin } = useRole();
   const { toast } = useToast();
-  const [formData, setFormData] = useState<QuestionnaireFormData>({
+  
+  const [formData, setFormData] = useState<FormatKuisionerCreate>({
     nama_template: '',
     deskripsi: '',
     tahun: new Date().getFullYear(),
@@ -57,26 +51,26 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const isCreating = !item;
-  const isEditable = mode === 'edit' && isAdmin();
+  const isCreating = mode === 'create';
+  const isEditable = mode === 'edit' || mode === 'create';
 
   useEffect(() => {
-    if (item && open) {
+    if (template && open && mode !== 'create') {
       setFormData({
-        nama_template: item.nama_template,
-        deskripsi: item.deskripsi || '',
-        tahun: item.tahun,
+        nama_template: template.nama_template,
+        deskripsi: template.deskripsi || '',
+        tahun: template.tahun,
       });
 
       // Set existing files for display
-      setExistingFiles(item.has_file ? [{
-        name: item.file_metadata?.original_filename || item.file_metadata?.filename || item.nama_template,
-        url: item.file_urls?.file_url,
-        viewUrl: item.file_urls?.view_url,
-        size: item.file_metadata?.size,
-        filename: item.file_metadata?.original_filename || item.file_metadata?.filename
+      setExistingFiles(template.has_file ? [{
+        name: template.file_metadata?.original_filename || template.file_metadata?.filename || template.nama_template,
+        url: template.file_urls?.file_url,
+        viewUrl: template.file_urls?.view_url,
+        size: template.file_metadata?.size,
+        filename: template.file_metadata?.original_filename || template.file_metadata?.filename || ''
       }] : []);
-    } else {
+    } else if (mode === 'create') {
       // Initialize empty form for new template
       setFormData({
         nama_template: '',
@@ -85,40 +79,69 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       });
       setUploadFile(null);
       setExistingFiles([]);
-      setFileToDelete(null);
-      setDeleteConfirmOpen(false);
     }
 
-    // Reset loading states when dialog opens/closes
+    // Reset states when dialog opens/closes
+    setFileToDelete(null);
+    setDeleteConfirmOpen(false);
     setIsSaving(false);
     setIsDownloading(false);
-  }, [item, open]);
+  }, [template, open, mode]);
 
   const handleSave = async () => {
-    // Skip validation if form is invalid
     if (!isFormValid || isSaving) {
       return;
     }
 
     setIsSaving(true);
     try {
-      const dataToSave = {
-        ...formData,
-        nama_template: formData.nama_template || '',
-        deskripsi: formData.deskripsi || '',
-        file: uploadFile || undefined,
-      };
-      await onSave(dataToSave);
+      if (isCreating) {
+        // Create new template
+        await formatKuisionerService.createFormatKuisioner(formData, uploadFile || undefined);
+        toast({
+          title: 'Template Dibuat',
+          description: `Template "${formData.nama_template}" berhasil dibuat.`,
+          variant: 'default'
+        });
+      } else if (template) {
+        // Update existing template
+        const updateData: FormatKuisionerUpdate = {
+          nama_template: formData.nama_template !== template.nama_template ? formData.nama_template : undefined,
+          deskripsi: formData.deskripsi !== (template.deskripsi || '') ? formData.deskripsi : undefined,
+          tahun: formData.tahun !== template.tahun ? formData.tahun : undefined,
+        };
+
+        // Only update if there are actual changes
+        if (Object.values(updateData).some(value => value !== undefined)) {
+          await formatKuisionerService.updateFormatKuisioner(template.id, updateData);
+        }
+        
+        // Handle file upload if any
+        if (uploadFile) {
+          await formatKuisionerService.uploadFile(template.id, uploadFile);
+        }
+
+        toast({
+          title: 'Template Diperbarui',
+          description: `Template "${formData.nama_template}" berhasil diperbarui.`,
+          variant: 'default'
+        });
+      }
+      
+      onSave();
     } catch (error) {
-      console.error('Error saving:', error);
-      // Error handling is typically done in the parent component
+      console.error('Error saving template:', error);
+      toast({
+        title: 'Gagal Menyimpan',
+        description: 'Terjadi kesalahan saat menyimpan template.',
+        variant: 'destructive'
+      });
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleCancel = () => {
-    // Prevent closing if operations are in progress
     if (isSaving || isDownloading || deletingFile) {
       return;
     }
@@ -126,40 +149,43 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
   };
 
   const handleUploadFileChange = (files: File[]) => {
-    // Prevent file changes during save operation
     if (isSaving) return;
     setUploadFile(files[0] || null);
   };
 
   const handleDownloadTemplate = async () => {
-    if (!item?.id || isDownloading) return;
+    if (!template?.id || isDownloading) return;
 
     setIsDownloading(true);
     try {
-      const blob = await formatKuisionerService.downloadTemplate(item.id);
+      const blob = await formatKuisionerService.downloadTemplate(template.id);
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = item.file_metadata?.original_filename || `template_${item.nama_template}.pdf`;
+      link.download = template.file_metadata?.original_filename || `template_${template.nama_template}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
       toast({
-        title: 'Download berhasil',
+        title: 'Download Berhasil',
         description: 'Template berhasil didownload.',
         variant: 'default'
       });
     } catch (error) {
       console.error('Error downloading file:', error);
+      toast({
+        title: 'Gagal Download',
+        description: 'Terjadi kesalahan saat download template.',
+        variant: 'destructive'
+      });
     } finally {
       setIsDownloading(false);
     }
   };
 
   const handleExistingFileRemove = () => {
-    // Prevent file removal during save operation
     if (isSaving || !existingFiles[0] || !existingFiles[0].filename) return;
 
     const fileToRemove = existingFiles[0];
@@ -171,23 +197,27 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
   };
 
   const handleConfirmDelete = async () => {
-    if (!fileToDelete || !item?.id || deletingFile) return;
+    if (!fileToDelete || !template?.id || deletingFile) return;
 
     setDeletingFile(true);
     try {
-      await formatKuisionerService.deleteFile(item.id, fileToDelete.filename);
+      await formatKuisionerService.deleteFile(template.id, fileToDelete.filename);
 
       // Remove from UI
       setExistingFiles([]);
 
       toast({
-        title: 'File berhasil dihapus',
-        description: `File ${fileToDelete.name} telah dihapus.`,
+        title: 'File Dihapus',
+        description: `File ${fileToDelete.name} berhasil dihapus.`,
         variant: 'default'
       });
     } catch (error) {
       console.error('Error deleting file:', error);
-
+      toast({
+        title: 'Gagal Hapus File',
+        description: 'Terjadi kesalahan saat menghapus file.',
+        variant: 'destructive'
+      });
     } finally {
       setDeletingFile(false);
       setFileToDelete(null);
@@ -196,11 +226,11 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
-    if (!item?.id || isDownloading) return;
+    if (!template?.id || isDownloading) return;
 
     setIsDownloading(true);
     try {
-      const blob = await formatKuisionerService.downloadTemplate(item.id);
+      const blob = await formatKuisionerService.downloadTemplate(template.id);
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -211,32 +241,47 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       window.URL.revokeObjectURL(url);
 
       toast({
-        title: 'Download berhasil',
+        title: 'Download Berhasil',
         description: 'File berhasil didownload.',
         variant: 'default'
       });
     } catch (error) {
       console.error('Error downloading file:', error);
+      toast({
+        title: 'Gagal Download',
+        description: 'Terjadi kesalahan saat download file.',
+        variant: 'destructive'
+      });
     } finally {
       setIsDownloading(false);
     }
   };
 
   const isFormValid = formData.nama_template.trim() &&
-    formData.deskripsi.trim() &&
+    formData.deskripsi?.trim() &&
     formData.tahun &&
-    isAdmin();
+    (isCreating ? uploadFile : true); // For create mode, file is required
 
-  // Determine if any operation is in progress
   const isOperationInProgress = isSaving || isDownloading || deletingFile;
+
+  const getDialogTitle = () => {
+    switch (mode) {
+      case 'view':
+        return 'Detail Template Format Kuisioner';
+      case 'create':
+        return 'Tambah Template Format Kuisioner';
+      case 'edit':
+        return 'Edit Template Format Kuisioner';
+      default:
+        return 'Template Format Kuisioner';
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0 border-b pb-4">
-          <DialogTitle>
-            {mode === 'view' ? 'Lihat Template Kuesioner' : isCreating ? 'Tambah Template Kuesioner' : 'Edit Template Kuesioner'}
-          </DialogTitle>
+          <DialogTitle>{getDialogTitle()}</DialogTitle>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto py-4">
@@ -249,7 +294,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
                 onChange={(e) => setFormData({ ...formData, nama_template: e.target.value })}
                 disabled={!isEditable || isSaving}
                 className={(!isEditable || isSaving) ? "bg-muted" : ""}
-                placeholder="Nama template kuesioner"
+                placeholder="Nama template format kuisioner"
               />
             </div>
 
@@ -261,7 +306,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
                 onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
                 disabled={!isEditable || isSaving}
                 className={(!isEditable || isSaving) ? "bg-muted" : ""}
-                placeholder="Deskripsi template kuesioner"
+                placeholder="Deskripsi template format kuisioner"
                 rows={4}
               />
             </div>
@@ -276,8 +321,8 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
                 disabled={!isEditable || isSaving}
                 className={(!isEditable || isSaving) ? "bg-muted" : ""}
                 placeholder="Tahun"
-                min="2000"
-                max="2099"
+                min="2020"
+                max="2030"
               />
             </div>
 
@@ -308,7 +353,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
 
-          {mode === 'view' && item?.has_file && (
+          {mode === 'view' && template?.has_file && (
             <Button
               onClick={handleDownloadTemplate}
               disabled={isDownloading}
@@ -327,7 +372,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
             </Button>
           )}
 
-          {mode === 'edit' && isAdmin() && (
+          {isEditable && isAdmin() && (
             <Button
               onClick={handleSave}
               disabled={!isFormValid || isSaving}
@@ -349,7 +394,6 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       <FileDeleteConfirmDialog
         open={deleteConfirmOpen}
         onOpenChange={(open) => {
-          // Prevent closing during delete operation
           if (!deletingFile) {
             setDeleteConfirmOpen(open);
           }
@@ -361,5 +405,3 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
     </Dialog>
   );
 };
-
-export default QuestionnaireDialog;

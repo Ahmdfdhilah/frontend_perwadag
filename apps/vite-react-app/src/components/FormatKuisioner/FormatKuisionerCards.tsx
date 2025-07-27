@@ -5,52 +5,39 @@ import { FormatKuisionerResponse } from '@/services/formatKuisioner/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import FileViewLink from '@/components/common/FileViewLink';
 
-interface QuestionnaireCardsProps {
+interface FormatKuisionerCardsProps {
   data: FormatKuisionerResponse[];
   loading?: boolean;
   onView?: (item: FormatKuisionerResponse) => void;
   onEdit?: (item: FormatKuisionerResponse) => void;
+  onActivate?: (item: FormatKuisionerResponse) => void;
   onDelete?: (item: FormatKuisionerResponse) => void;
-  canEdit?: (item?: FormatKuisionerResponse) => boolean;
-  canDelete?: (item?: FormatKuisionerResponse) => boolean;
+  activatingTemplate?: FormatKuisionerResponse | null;
   currentPage?: number;
   itemsPerPage?: number;
 }
 
-const QuestionnaireCards: React.FC<QuestionnaireCardsProps> = ({
+export const FormatKuisionerCards: React.FC<FormatKuisionerCardsProps> = ({
   data,
   loading = false,
   onView,
   onEdit,
+  onActivate,
   onDelete,
-  canEdit,
-  canDelete,
+  activatingTemplate,
   currentPage = 1,
   itemsPerPage = 10,
 }) => {
-  const getStatusBadge = (template: FormatKuisionerResponse) => {
-    const hasFile = template.has_file;
-    const isCurrentYear = template.is_current_year;
-    
-    if (hasFile && isCurrentYear) {
-      return (
-        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-          Tersedia
-        </span>
-      );
-    } else if (hasFile && !isCurrentYear) {
-      return (
-        <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-          Archived
-        </span>
-      );
-    } else {
-      return (
-        <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-          Belum Tersedia
-        </span>
-      );
-    }
+  const getStatusSpan = (template: FormatKuisionerResponse) => {
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+        template.is_active
+          ? 'bg-green-100 text-green-800' 
+          : 'bg-red-100 text-red-800'
+      }`}>
+        {template.is_active ? 'Aktif' : 'Tidak Aktif'}
+      </span>
+    );
   };
 
   const renderDocumentLink = (template: FormatKuisionerResponse) => {
@@ -108,7 +95,7 @@ const QuestionnaireCards: React.FC<QuestionnaireCardsProps> = ({
   if (data.length === 0) {
     return (
       <div className="flex items-center justify-center h-32 text-muted-foreground">
-        Tidak ada template kuesioner yang ditemukan.
+        Tidak ada template format kuisioner yang ditemukan.
       </div>
     );
   }
@@ -124,11 +111,16 @@ const QuestionnaireCards: React.FC<QuestionnaireCardsProps> = ({
               </CardTitle>
               <ActionDropdown
                 onView={() => onView?.(item)}
-                onEdit={canEdit?.() ? () => onEdit?.(item) : undefined}
-                onDelete={canDelete?.() ? () => onDelete?.(item) : undefined}
+                onEdit={() => onEdit?.(item)}
+                onActivate={!item.is_active ? () => onActivate?.(item) : undefined}
+                onDelete={() => onDelete?.(item)}
                 showView={true}
-                showEdit={canEdit?.() && !!onEdit}
-                showDelete={canDelete?.() && !!onDelete}
+                showEdit={true}
+                showActivate={!item.is_active}
+                showDelete={true}
+                isActivating={activatingTemplate?.id === item.id}
+                deleteDisabled={item.is_active}
+                deleteTooltip={item.is_active ? "Tidak dapat menghapus template aktif" : undefined}
               />
             </div>
           </CardHeader>
@@ -155,7 +147,7 @@ const QuestionnaireCards: React.FC<QuestionnaireCardsProps> = ({
               <div>
                 <span className="font-medium text-muted-foreground">Status:</span>
                 <span className="ml-2">
-                  {getStatusBadge(item)}
+                  {getStatusSpan(item)}
                 </span>
               </div>
             </div>
@@ -165,5 +157,3 @@ const QuestionnaireCards: React.FC<QuestionnaireCardsProps> = ({
     </div>
   );
 };
-
-export default QuestionnaireCards;

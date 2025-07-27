@@ -91,6 +91,18 @@ class FormatKuisionerService extends BaseService {
     return this.delete(`/${formatKuisionerId}`);
   }
 
+  // Get active template
+  async getActiveTemplate(): Promise<FormatKuisionerResponse> {
+    return this.get("/active");
+  }
+
+  // Activate template
+  async activateTemplate(
+    formatKuisionerId: string
+  ): Promise<FormatKuisionerResponse> {
+    return this.post(`/${formatKuisionerId}/activate`, {});
+  }
+
   // Download template file
   async downloadTemplate(
     formatKuisionerId: string
