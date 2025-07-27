@@ -29,7 +29,7 @@ Pastikan Anda memiliki yang berikut terinstal di sistem:
 
 1. **Clone repository:**
 ```bash
-git clone [repository-url]
+git clone https://github.com/Ahmdfdhilah/frontend_perwadag.git frontend
 cd perwadag/frontend
 ```
 

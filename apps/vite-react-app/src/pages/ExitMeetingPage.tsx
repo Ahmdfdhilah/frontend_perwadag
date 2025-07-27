@@ -297,10 +297,10 @@ const ExitMeetingPage: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Semua Inspektorat</SelectItem>
-                <SelectItem value="1">Inspektorat I</SelectItem>
-                <SelectItem value="2">Inspektorat II</SelectItem>
-                <SelectItem value="3">Inspektorat III</SelectItem>
-                <SelectItem value="4">Inspektorat IV</SelectItem>
+<SelectItem value="1">Inspektorat 1</SelectItem>
+<SelectItem value="2">Inspektorat 2</SelectItem>
+<SelectItem value="3">Inspektorat 3</SelectItem>
+<SelectItem value="4">Inspektorat 4</SelectItem>
               </SelectContent>
             </Select>
           </div>
