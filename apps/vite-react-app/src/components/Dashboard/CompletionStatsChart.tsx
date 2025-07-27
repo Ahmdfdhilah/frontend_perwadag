@@ -20,6 +20,7 @@ import {
   ChartTooltipContent,
 } from "@workspace/ui/components/chart";
 import { CompletionStat } from "../../services/suratTugas/types";
+import { useRole } from "@/hooks/useRole";
 
 interface CompletionStatsChartProps {
   completionStats?: {
@@ -38,6 +39,35 @@ const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({
   completionStats,
   loading = false
 }) => {
+  const { isAdmin } = useRole();
+  
+  // Filter completion stats based on role
+  const filteredStats = React.useMemo(() => {
+    if (!completionStats) return {};
+    
+    return Object.fromEntries(
+      Object.entries(completionStats).filter(([stepKey]) => {
+        if (stepKey === 'laporan_hasil' && !isAdmin()) {
+          return false;
+        }
+        return true;
+      })
+    );
+  }, [completionStats, isAdmin]);
+  
+  // Determine grid classes based on chart count
+  const chartCount = Object.keys(filteredStats).length;
+  const getGridClasses = () => {
+    if (chartCount === 6) {
+      // 6 charts: 2x3 grid on large screens, responsive on smaller
+      return "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6";
+    } else if (chartCount === 7) {
+      // 7 charts: flexible grid that handles odd number well
+      return "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6";
+    }
+    // Default fallback
+    return "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6";
+  };
   if (loading || !completionStats) {
     return (
       <Card>
@@ -48,8 +78,8 @@ const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {Array.from({ length: 7 }).map((_, index) => (
+          <div className={getGridClasses()}>
+            {Array.from({ length: isAdmin() ? 7 : 6 }).map((_, index) => (
               <Card key={index} className="flex flex-col">
                 <CardHeader className="items-center pb-0">
                   <div className="flex items-center space-x-2">
@@ -174,14 +204,12 @@ const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({
       </CardHeader>
       <CardContent>
         {/* Grid of Donut Charts */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {Object.entries(completionStats)
+        <div className={getGridClasses()}>
+          {Object.entries(filteredStats)
             .sort(([, a], [, b]) => b.percentage - a.percentage)
             .map(([stepKey, stats]) => {
             const pieData = preparePieData(stats);
-            const totalTasks = React.useMemo(() => {
-              return stats.total;
-            }, [stats]);
+            const totalTasks = stats.total;
             
             return (
               <Card key={stepKey} className="flex flex-col">
@@ -253,19 +281,19 @@ const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({
           <div className="grid grid-cols-3 gap-4 text-center">
             <div className="space-y-1">
               <div className="text-2xl font-bold text-green-600">
-                {Object.values(completionStats).reduce((sum, stat) => sum + stat.completed, 0)}
+                {Object.values(filteredStats).reduce((sum, stat) => sum + stat.completed, 0)}
               </div>
               <div className="text-sm text-muted-foreground">Total Selesai</div>
             </div>
             <div className="space-y-1">
               <div className="text-2xl font-bold text-yellow-600">
-                {Object.values(completionStats).reduce((sum, stat) => sum + stat.remaining, 0)}
+                {Object.values(filteredStats).reduce((sum, stat) => sum + stat.remaining, 0)}
               </div>
               <div className="text-sm text-muted-foreground">Total Tersisa</div>
             </div>
             <div className="space-y-1">
               <div className="text-2xl font-bold text-blue-600">
-                {Object.values(completionStats).reduce((sum, stat) => sum + stat.total, 0)}
+                {Object.values(filteredStats).reduce((sum, stat) => sum + stat.total, 0)}
               </div>
               <div className="text-sm text-muted-foreground">Total Keseluruhan</div>
             </div>
