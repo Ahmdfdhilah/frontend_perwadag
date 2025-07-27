@@ -43,7 +43,7 @@ interface EmailTemplatePageFilters {
 const EmailTemplatesPage: React.FC = () => {
   const { isAdmin } = useRole();
   const { toast } = useToast();
-  
+
   // URL Filters configuration
   const { updateURL, getCurrentFilters } = useURLFilters<EmailTemplatePageFilters>({
     defaults: {
@@ -56,7 +56,7 @@ const EmailTemplatesPage: React.FC = () => {
 
   // Get current filters from URL
   const filters = getCurrentFilters();
-  
+
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
@@ -65,6 +65,7 @@ const EmailTemplatesPage: React.FC = () => {
   const [dialogMode, setDialogMode] = useState<'view' | 'create' | 'edit'>('create');
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
   const [templateToDelete, setTemplateToDelete] = useState<EmailTemplate | null>(null);
+  const [templateToActivate, setTemplateToActivate] = useState<EmailTemplate | null>(null);
   const [activatingTemplate, setActivatingTemplate] = useState<EmailTemplate | null>(null);
 
   // Calculate access control
@@ -78,7 +79,7 @@ const EmailTemplatesPage: React.FC = () => {
         page: filters.page,
         size: filters.size
       });
-      
+
       let filteredTemplates = response.items;
 
       // Apply client-side status filter
@@ -126,20 +127,31 @@ const EmailTemplatesPage: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-  const handleActivate = async (template: EmailTemplate) => {
+  const handleActivateClick = (template: EmailTemplate) => {
     if (template.is_active) return;
-    
-    setActivatingTemplate(template);
+    setTemplateToActivate(template);
+  };
+
+  const handleConfirmActivate = async () => {
+    if (!templateToActivate) return;
+
+    setActivatingTemplate(templateToActivate);
+    setTemplateToActivate(null);
     try {
-      await emailTemplateService.activateTemplate(template.id);
+      await emailTemplateService.activateTemplate(templateToActivate.id);
       await fetchTemplates();
       toast({
         title: 'Template Diaktifkan',
-        description: `Template "${template.name}" telah diaktifkan.`,
+        description: `Template "${templateToActivate.name}" telah diaktifkan.`,
         variant: 'default'
       });
     } catch (error) {
       console.error('Failed to activate template:', error);
+      toast({
+        title: 'Gagal Mengaktifkan Template',
+        description: 'Terjadi kesalahan saat mengaktifkan template.',
+        variant: 'destructive'
+      });
     } finally {
       setActivatingTemplate(null);
     }
@@ -269,7 +281,7 @@ const EmailTemplatesPage: React.FC = () => {
                 loading={loading}
                 onView={handleView}
                 onEdit={handleEdit}
-                onActivate={handleActivate}
+                onActivate={handleActivateClick}
                 onDelete={handleDelete}
                 activatingTemplate={activatingTemplate}
                 currentPage={filters.page}
@@ -284,9 +296,8 @@ const EmailTemplatesPage: React.FC = () => {
                 loading={loading}
                 onView={handleView}
                 onEdit={handleEdit}
-                onActivate={handleActivate}
+                onActivate={handleActivateClick}
                 onDelete={handleDelete}
-                activatingTemplate={activatingTemplate}
                 currentPage={filters.page}
                 itemsPerPage={filters.size}
               />
@@ -315,6 +326,27 @@ const EmailTemplatesPage: React.FC = () => {
         template={selectedTemplate}
         onSave={handleSave}
       />
+
+      {/* Activate Confirmation Dialog */}
+      <AlertDialog open={!!templateToActivate} onOpenChange={() => setTemplateToActivate(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Aktifkan Template Email</AlertDialogTitle>
+            <AlertDialogDescription>
+              Apakah Anda yakin ingin mengaktifkan template "{templateToActivate?.name}"?
+              <br />
+              <br />
+              Template yang aktif saat ini akan dinonaktifkan secara otomatis.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmActivate}>
+              Aktifkan
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={!!templateToDelete} onOpenChange={() => setTemplateToDelete(null)}>

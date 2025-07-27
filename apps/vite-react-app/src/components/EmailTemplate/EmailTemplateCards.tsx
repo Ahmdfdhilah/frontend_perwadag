@@ -9,7 +9,9 @@ interface EmailTemplateCardsProps {
   loading: boolean;
   onView: (template: EmailTemplate) => void;
   onEdit: (template: EmailTemplate) => void;
+  onActivate: (template: EmailTemplate) => void;
   onDelete: (template: EmailTemplate) => void;
+  activatingTemplate?: EmailTemplate | null;
   currentPage?: number;
   itemsPerPage?: number;
 }
@@ -19,7 +21,9 @@ export const EmailTemplateCards: React.FC<EmailTemplateCardsProps> = ({
   loading,
   onView,
   onEdit,
+  onActivate,
   onDelete,
+  activatingTemplate,
   currentPage = 1,
   itemsPerPage = 10,
 }) => {
@@ -92,10 +96,13 @@ export const EmailTemplateCards: React.FC<EmailTemplateCardsProps> = ({
               <ActionDropdown
                 onView={() => onView(template)}
                 onEdit={() => onEdit(template)}
+                onActivate={!template.is_active ? () => onActivate(template) : undefined}
                 onDelete={() => onDelete(template)}
                 showView={true}
                 showEdit={true}
+                showActivate={!template.is_active}
                 showDelete={true}
+                isActivating={activatingTemplate?.id === template.id}
               />
             </div>
           </CardHeader>

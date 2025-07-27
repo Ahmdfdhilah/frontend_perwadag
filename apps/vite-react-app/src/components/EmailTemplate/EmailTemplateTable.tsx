@@ -163,7 +163,7 @@ export const EmailTemplateTable: React.FC<EmailTemplateTableProps> = ({
                     <DropdownMenuItem
                       onClick={() => onDelete(template)}
                       disabled={template.is_active}
-                      className="text-destructive focus:text-destructive"
+                      className="text-destructive"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
                       {template.is_active ? 'Tidak Dapat Dihapus' : 'Hapus'}

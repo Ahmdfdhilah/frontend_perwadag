@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit, Eye, Trash2, Mail, Download } from 'lucide-react';
+import { Edit, Eye, Trash2, Mail, Download, Power, Loader2 } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,27 +11,33 @@ import { Button } from '@workspace/ui/components/button';
 interface ActionDropdownProps {
   onView?: () => void;
   onEdit?: () => void;
+  onActivate?: () => void;
   onDelete?: () => void;
   onComposeEmail?: () => void;
   onExport?: () => void;
   showView?: boolean;
   showEdit?: boolean;
+  showActivate?: boolean;
   showDelete?: boolean;
   showComposeEmail?: boolean;
   showExport?: boolean;
+  isActivating?: boolean;
 }
 
 const ActionDropdown: React.FC<ActionDropdownProps> = ({
   onView,
   onEdit,
+  onActivate,
   onDelete,
   onComposeEmail,
   onExport,
   showView = true,
   showEdit = true,
+  showActivate = false,
   showDelete = true,
   showComposeEmail = false,
   showExport = false,
+  isActivating = false,
 }) => {
   return (
     <DropdownMenu>
@@ -51,6 +57,19 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
           <DropdownMenuItem onClick={onEdit}>
             <Edit className="mr-2 h-4 w-4" />
             Edit
+          </DropdownMenuItem>
+        )}
+        {showActivate && onActivate && (
+          <DropdownMenuItem 
+            onClick={onActivate}
+            disabled={isActivating}
+          >
+            {isActivating ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Power className="mr-2 h-4 w-4" />
+            )}
+            {isActivating ? 'Mengaktifkan...' : 'Aktifkan'}
           </DropdownMenuItem>
         )}
         {showComposeEmail && onComposeEmail && (
