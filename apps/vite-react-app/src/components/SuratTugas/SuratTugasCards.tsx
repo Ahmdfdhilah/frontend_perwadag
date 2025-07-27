@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
+import { Skeleton } from '@workspace/ui/components/skeleton';
 import { SuratTugasResponse } from '@/services/suratTugas/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import FileViewLink from '@/components/common/FileViewLink';
@@ -31,8 +32,41 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-32 text-muted-foreground">
-        Loading surat tugas...
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 gap-4">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <Card key={index} className="w-full">
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <Skeleton className="h-6 w-48" />
+                  {!isDashboard && <Skeleton className="h-8 w-24" />}
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="space-y-3 text-sm">
+                  <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <Skeleton className="h-4 w-12" />
+                      <Skeleton className="h-4 w-8 mt-1" />
+                    </div>
+                    <div>
+                      <Skeleton className="h-4 w-20" />
+                      <Skeleton className="h-4 w-32 mt-1" />
+                    </div>
+                  </div>
+                  <div>
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-20 mt-1" />
+                  </div>
+                  <div>
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-20 mt-1" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     );
   }

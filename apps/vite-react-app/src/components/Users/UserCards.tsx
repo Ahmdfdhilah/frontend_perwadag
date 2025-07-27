@@ -2,6 +2,7 @@ import React from 'react';
 import { User } from '@/services/users/types';
 import { ROLE_LABELS } from '@/lib/constants';
 import { Card, CardContent } from '@workspace/ui/components/card';
+import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Badge } from '@workspace/ui/components/badge';
 import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import ActionDropdown  from '@/components/common/ActionDropdown';
@@ -48,8 +49,48 @@ export const UserCards: React.FC<UserCardsProps> = ({
 
   if (loading) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        Loading users...
+      <div className="grid grid-cols-1 gap-4">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <Card key={index} className="hover:shadow-md transition-shadow">
+            <CardContent className="p-4">
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center space-x-3">
+                  <Skeleton className="w-10 h-10 rounded-full" />
+                  <div>
+                    <Skeleton className="h-4 w-32" />
+                    <div className="flex items-center space-x-2 mt-1">
+                      <Skeleton className="h-5 w-12" />
+                    </div>
+                  </div>
+                </div>
+                <Skeleton className="h-8 w-24" />
+              </div>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Skeleton className="w-4 h-4" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+                <Skeleton className="h-4 w-32" />
+                <div className="flex items-center space-x-2">
+                  <Skeleton className="w-4 h-4" />
+                  <Skeleton className="h-4 w-40" />
+                </div>
+                <div className="flex items-start space-x-2">
+                  <Skeleton className="w-4 h-4 mt-0.5" />
+                  <Skeleton className="h-4 w-48" />
+                </div>
+                <div>
+                  <Skeleton className="h-3 w-16 mb-1" />
+                  <Skeleton className="h-5 w-20" />
+                </div>
+                <div className="flex items-center space-x-2 pt-2 border-t">
+                  <Skeleton className="w-3 h-3" />
+                  <Skeleton className="h-3 w-32" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
     );
   }

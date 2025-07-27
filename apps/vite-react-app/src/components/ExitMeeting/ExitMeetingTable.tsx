@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from '@workspace/ui/components/table';
+import { Skeleton } from '@workspace/ui/components/skeleton';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { MeetingResponse } from '@/services/meeting/types';
 import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
@@ -40,14 +41,6 @@ const ExitMeetingTable: React.FC<ExitMeetingTableProps> = ({
     );
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-32 text-muted-foreground">
-        Loading meetings...
-      </div>
-    );
-  }
-
   return (
     <div className="rounded-md border">
       <Table>
@@ -64,7 +57,20 @@ const ExitMeetingTable: React.FC<ExitMeetingTableProps> = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.length === 0 ? (
+          {loading ? (
+            Array.from({ length: 5 }).map((_, index) => (
+              <TableRow key={index}>
+                <TableCell><Skeleton className="h-4 w-8" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-48" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-28" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                <TableCell className="text-right"><Skeleton className="h-8 w-24 ml-auto" /></TableCell>
+              </TableRow>
+            ))
+          ) : data.length === 0 ? (
             <TableRow>
               <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
                 Tidak ada data exit meeting yang ditemukan.

@@ -7,6 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from '@workspace/ui/components/table';
+import { Skeleton } from '@workspace/ui/components/skeleton';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import FileViewLink from '@/components/common/FileViewLink';
 import { MatriksResponse } from '@/services/matriks/types';
@@ -57,14 +58,6 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
     );
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-32 text-muted-foreground">
-        Loading matriks...
-      </div>
-    );
-  }
-
   const renderAdminInspektoratColumns = () => {
     // Check if any item can be edited, viewed, or exported
     const hasActionableItems = data.some(item => canEdit?.(item) || canView?.(item) || onExport);
@@ -95,6 +88,32 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
       </>
     );
   };
+
+  if (loading) {
+    return (
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              {userRole === 'perwadag' ? renderPerwadagColumns() : renderAdminInspektoratColumns()}
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <TableRow key={index}>
+                <TableCell><Skeleton className="h-4 w-8" /></TableCell>
+                {userRole !== 'perwadag' && <TableCell><Skeleton className="h-4 w-48" /></TableCell>}
+                <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                <TableCell className="text-right"><Skeleton className="h-8 w-24 ml-auto" /></TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    );
+  }
 
   const renderAdminInspektoratRow = (item: MatriksResponse, index: number) => {
     // Check if any item can be edited, viewed, or exported to determine if we need the Actions column
