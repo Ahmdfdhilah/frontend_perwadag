@@ -11,7 +11,6 @@ import {
 } from '@workspace/ui/components/table';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Badge } from '@workspace/ui/components/badge';
-import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import ActionDropdown  from '@/components/common/ActionDropdown';
 
 interface UserTableProps {
@@ -20,6 +19,8 @@ interface UserTableProps {
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
   onView: (user: User) => void;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 export const UserTable: React.FC<UserTableProps> = ({
@@ -27,7 +28,9 @@ export const UserTable: React.FC<UserTableProps> = ({
   loading = false,
   onEdit,
   onDelete,
-  onView
+  onView,
+  currentPage = 1,
+  itemsPerPage = 10
 }) => {
   const getStatusBadge = (isActive: boolean) => {
     return (
@@ -51,7 +54,9 @@ export const UserTable: React.FC<UserTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>User</TableHead>
+            <TableHead className="w-[60px]">No</TableHead>
+            <TableHead>Nama</TableHead>
+            <TableHead>Username</TableHead>
             <TableHead>Jabatan</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Role</TableHead>
@@ -64,15 +69,9 @@ export const UserTable: React.FC<UserTableProps> = ({
           {loading ? (
             Array.from({ length: 5 }).map((_, index) => (
               <TableRow key={index}>
-                <TableCell>
-                  <div className="flex items-center space-x-3">
-                    <Skeleton className="w-8 h-8 rounded-full" />
-                    <div>
-                      <Skeleton className="h-4 w-32" />
-                      <Skeleton className="h-3 w-24 mt-1" />
-                    </div>
-                  </div>
-                </TableCell>
+                <TableCell><Skeleton className="h-4 w-[30px]" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-24" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-40" /></TableCell>
                 <TableCell><Skeleton className="h-5 w-20" /></TableCell>
@@ -83,25 +82,21 @@ export const UserTable: React.FC<UserTableProps> = ({
             ))
           ) : users.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                 Tidak ada user ditemukan
               </TableCell>
             </TableRow>
           ) : (
-            users.map((user) => (
+            users.map((user, index) => (
               <TableRow key={user.id}>
+                <TableCell className="text-center">
+                  {(currentPage - 1) * itemsPerPage + index + 1}
+                </TableCell>
                 <TableCell>
-                  <div className="flex items-center space-x-3">
-                    <Avatar className="w-8 h-8">
-                      <AvatarFallback className="text-xs">
-                        {user.nama.split(' ').map(n => n[0]).join('').toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="font-medium">{user.nama}</p>
-                      <p className="text-sm text-muted-foreground">@{user.username}</p>
-                    </div>
-                  </div>
+                  <span className="font-medium">{user.nama}</span>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">{user.username}</span>
                 </TableCell>
                 <TableCell>
                   <span className="text-sm">{user.jabatan}</span>

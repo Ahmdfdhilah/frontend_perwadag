@@ -303,6 +303,8 @@ const UsersPage: React.FC = () => {
                 onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 
@@ -314,6 +316,8 @@ const UsersPage: React.FC = () => {
                 onView={handleView}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 

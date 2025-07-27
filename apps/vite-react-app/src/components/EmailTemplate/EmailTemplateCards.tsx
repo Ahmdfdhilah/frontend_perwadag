@@ -11,14 +11,13 @@ import {
   DropdownMenuTrigger,
 } from '@workspace/ui/components/dropdown-menu';
 import { EmailTemplate } from '@/services/emailTemplate/types';
-import { 
-  Eye, 
-  Edit, 
-  Power, 
-  Trash2, 
+import {
+  Eye,
+  Edit,
+  Power,
+  Trash2,
   Loader2,
   Calendar,
-  Hash
 } from 'lucide-react';
 
 interface EmailTemplateCardsProps {
@@ -29,6 +28,8 @@ interface EmailTemplateCardsProps {
   onActivate: (template: EmailTemplate) => void;
   onDelete: (template: EmailTemplate) => void;
   activatingTemplate?: EmailTemplate | null;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 export const EmailTemplateCards: React.FC<EmailTemplateCardsProps> = ({
@@ -39,6 +40,8 @@ export const EmailTemplateCards: React.FC<EmailTemplateCardsProps> = ({
   onActivate,
   onDelete,
   activatingTemplate,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
   const truncateText = (text: string, maxLength: number = 80) => {
     if (text.length <= maxLength) return text;
@@ -91,18 +94,19 @@ export const EmailTemplateCards: React.FC<EmailTemplateCardsProps> = ({
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
-      {data.map((template) => (
+      {data.map((template, index) => (
         <Card key={template.id} className="relative">
           <CardHeader className="pb-3">
             <div className="flex items-start justify-between">
               <div className="space-y-1 flex-1">
-                <h3 className="font-medium text-lg">{template.name}</h3>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Hash className="h-3 w-3" />
-                  <span>ID: {template.id.substring(0, 8)}...</span>
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-medium">
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </span>
+                  <h3 className="font-medium text-lg">{template.name}</h3>
                 </div>
               </div>
-              <Badge 
+              <Badge
                 variant={template.is_active ? "default" : "secondary"}
                 className={template.is_active ? "bg-green-600 hover:bg-green-700" : ""}
               >
@@ -136,11 +140,7 @@ export const EmailTemplateCards: React.FC<EmailTemplateCardsProps> = ({
                   <span>
                     {new Date(template.created_at).toLocaleDateString('id-ID')}
                   </span>
-                  {template.updated_at && (
-                    <span className="ml-2">
-                      • Diperbarui {new Date(template.updated_at).toLocaleDateString('id-ID')}
-                    </span>
-                  )}
+
                 </div>
 
                 <DropdownMenu>
@@ -157,10 +157,10 @@ export const EmailTemplateCards: React.FC<EmailTemplateCardsProps> = ({
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onEdit(template)}>
                       <Edit className="mr-2 h-4 w-4" />
-                      Edit 
+                      Edit
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={() => onActivate(template)}
                       disabled={template.is_active || activatingTemplate?.id === template.id}
                     >
@@ -172,7 +172,7 @@ export const EmailTemplateCards: React.FC<EmailTemplateCardsProps> = ({
                       {template.is_active ? 'Sudah Aktif' : 'Aktifkan'}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={() => onDelete(template)}
                       disabled={template.is_active}
                       className="text-destructive focus:text-destructive"

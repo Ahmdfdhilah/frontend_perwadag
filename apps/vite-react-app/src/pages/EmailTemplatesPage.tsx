@@ -272,6 +272,8 @@ const EmailTemplatesPage: React.FC = () => {
                 onActivate={handleActivate}
                 onDelete={handleDelete}
                 activatingTemplate={activatingTemplate}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 
@@ -285,6 +287,8 @@ const EmailTemplatesPage: React.FC = () => {
                 onActivate={handleActivate}
                 onDelete={handleDelete}
                 activatingTemplate={activatingTemplate}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 

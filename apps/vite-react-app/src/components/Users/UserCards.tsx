@@ -4,7 +4,6 @@ import { ROLE_LABELS } from '@/lib/constants';
 import { Card, CardContent } from '@workspace/ui/components/card';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { Badge } from '@workspace/ui/components/badge';
-import { Avatar, AvatarFallback } from '@workspace/ui/components/avatar';
 import ActionDropdown  from '@/components/common/ActionDropdown';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
@@ -21,6 +20,8 @@ interface UserCardsProps {
   onEdit: (user: User) => void;
   onDelete: (user: User) => void;
   onView: (user: User) => void;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 export const UserCards: React.FC<UserCardsProps> = ({
@@ -28,7 +29,9 @@ export const UserCards: React.FC<UserCardsProps> = ({
   loading = false,
   onEdit,
   onDelete,
-  onView
+  onView,
+  currentPage = 1,
+  itemsPerPage = 10
 }) => {
   const getStatusBadge = (isActive: boolean) => {
     return (
@@ -55,9 +58,10 @@ export const UserCards: React.FC<UserCardsProps> = ({
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center space-x-3">
-                  <Skeleton className="w-10 h-10 rounded-full" />
+                  <Skeleton className="w-8 h-8 rounded-full" />
                   <div>
                     <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-4 w-24 mt-1" />
                     <div className="flex items-center space-x-2 mt-1">
                       <Skeleton className="h-5 w-12" />
                     </div>
@@ -105,19 +109,18 @@ export const UserCards: React.FC<UserCardsProps> = ({
 
   return (
     <div className="grid grid-cols-1 gap-4">
-      {users.map((user) => (
+      {users.map((user, index) => (
         <Card key={user.id} className="hover:shadow-md transition-shadow">
           <CardContent className="p-4">
-            {/* Header with Avatar and Actions */}
+            {/* Header with Number and Actions */}
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center space-x-3">
-                <Avatar className="w-10 h-10">
-                  <AvatarFallback className="text-sm">
-                    {user.nama.split(' ').map(n => n[0]).join('').toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
+                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-medium">
+                  {(currentPage - 1) * itemsPerPage + index + 1}
+                </span>
                 <div>
                   <h3 className="font-medium text-sm">{user.nama}</h3>
+                  <p className="text-sm text-muted-foreground mt-1">{user.username}</p>
                   <div className="flex items-center space-x-2 mt-1">
                     {getStatusBadge(user.is_active)}
                   </div>
@@ -130,11 +133,6 @@ export const UserCards: React.FC<UserCardsProps> = ({
               />
             </div>
 
-            {/* Username */}
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
-              <CreditCard className="w-4 h-4" />
-              <span>@{user.username}</span>
-            </div>
 
             {/* Jabatan */}
             <div className="mb-2">

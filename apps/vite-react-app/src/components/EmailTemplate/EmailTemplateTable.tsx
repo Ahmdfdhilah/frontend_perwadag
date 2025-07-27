@@ -18,12 +18,12 @@ import {
   DropdownMenuTrigger,
 } from '@workspace/ui/components/dropdown-menu';
 import { EmailTemplate } from '@/services/emailTemplate/types';
-import { 
-  Eye, 
-  Edit, 
-  Power, 
-  Trash2, 
-  Loader2 
+import {
+  Eye,
+  Edit,
+  Power,
+  Trash2,
+  Loader2
 } from 'lucide-react';
 
 interface EmailTemplateTableProps {
@@ -34,6 +34,8 @@ interface EmailTemplateTableProps {
   onActivate: (template: EmailTemplate) => void;
   onDelete: (template: EmailTemplate) => void;
   activatingTemplate?: EmailTemplate | null;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 export const EmailTemplateTable: React.FC<EmailTemplateTableProps> = ({
@@ -44,6 +46,8 @@ export const EmailTemplateTable: React.FC<EmailTemplateTableProps> = ({
   onActivate,
   onDelete,
   activatingTemplate,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
   const truncateText = (text: string, maxLength: number = 50) => {
     if (text.length <= maxLength) return text;
@@ -56,20 +60,20 @@ export const EmailTemplateTable: React.FC<EmailTemplateTableProps> = ({
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[60px]">No.</TableHead>
               <TableHead>Nama Template</TableHead>
               <TableHead>Subject</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Dibuat</TableHead>
               <TableHead className="w-[70px]">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {Array.from({ length: 5 }).map((_, index) => (
               <TableRow key={index}>
+                <TableCell><Skeleton className="h-4 w-[30px]" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-[200px]" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-[300px]" /></TableCell>
                 <TableCell><Skeleton className="h-6 w-[80px]" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-[100px]" /></TableCell>
                 <TableCell><Skeleton className="h-8 w-[40px]" /></TableCell>
               </TableRow>
             ))}
@@ -95,22 +99,22 @@ export const EmailTemplateTable: React.FC<EmailTemplateTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-[60px]">No.</TableHead>
             <TableHead>Nama Template</TableHead>
             <TableHead>Subject Template</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead>Dibuat</TableHead>
             <TableHead className="w-[70px]">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.map((template) => (
+          {data.map((template, index) => (
             <TableRow key={template.id}>
+              <TableCell className="text-center">
+                {(currentPage - 1) * itemsPerPage + index + 1}
+              </TableCell>
               <TableCell className="font-medium">
                 <div>
                   <p className="font-medium">{template.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    ID: {template.id.substring(0, 8)}...
-                  </p>
                 </div>
               </TableCell>
               <TableCell>
@@ -121,23 +125,12 @@ export const EmailTemplateTable: React.FC<EmailTemplateTableProps> = ({
                 </div>
               </TableCell>
               <TableCell>
-                <Badge 
+                <Badge
                   variant={template.is_active ? "default" : "secondary"}
                   className={template.is_active ? "bg-green-600 hover:bg-green-700" : ""}
                 >
                   {template.is_active ? 'Aktif' : 'Tidak Aktif'}
                 </Badge>
-              </TableCell>
-              <TableCell>
-                <div className="text-sm">
-                  <p>{new Date(template.created_at).toLocaleDateString('id-ID')}</p>
-                  <p className="text-muted-foreground text-xs">
-                    {new Date(template.created_at).toLocaleTimeString('id-ID', {
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </p>
-                </div>
               </TableCell>
               <TableCell>
                 <DropdownMenu>
@@ -150,14 +143,14 @@ export const EmailTemplateTable: React.FC<EmailTemplateTableProps> = ({
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem onClick={() => onView(template)}>
                       <Eye className="mr-2 h-4 w-4" />
-                      Lihat 
+                      Lihat
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onEdit(template)}>
                       <Edit className="mr-2 h-4 w-4" />
-                      Edit 
+                      Edit
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={() => onActivate(template)}
                       disabled={template.is_active || activatingTemplate?.id === template.id}
                     >
@@ -169,7 +162,7 @@ export const EmailTemplateTable: React.FC<EmailTemplateTableProps> = ({
                       {template.is_active ? 'Sudah Aktif' : 'Aktifkan'}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem 
+                    <DropdownMenuItem
                       onClick={() => onDelete(template)}
                       disabled={template.is_active}
                       className="text-destructive focus:text-destructive"
