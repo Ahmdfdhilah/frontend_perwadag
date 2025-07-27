@@ -3,7 +3,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
 import { Skeleton } from "@workspace/ui/components/skeleton";
-import { 
+import {
   FileText,
   Users,
   MessageSquare,
@@ -35,16 +35,16 @@ interface CompletionStatsChartProps {
   loading?: boolean;
 }
 
-const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({ 
+const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({
   completionStats,
   loading = false
 }) => {
   const { isAdmin } = useRole();
-  
+
   // Filter completion stats based on role
   const filteredStats = React.useMemo(() => {
     if (!completionStats) return {};
-    
+
     return Object.fromEntries(
       Object.entries(completionStats).filter(([stepKey]) => {
         if (stepKey === 'laporan_hasil' && !isAdmin()) {
@@ -54,7 +54,7 @@ const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({
       })
     );
   }, [completionStats, isAdmin]);
-  
+
   // Determine grid classes based on chart count
   const chartCount = Object.keys(filteredStats).length;
   const getGridClasses = () => {
@@ -95,7 +95,7 @@ const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({
               </Card>
             ))}
           </div>
-          
+
           <div className="mt-8 pt-6 border-t">
             <div className="grid grid-cols-3 gap-4 text-center">
               {Array.from({ length: 3 }).map((_, index) => (
@@ -113,7 +113,7 @@ const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({
 
   // Check if all stats are zero (no data)
   const hasNoData = Object.values(completionStats).every(stat => stat.total === 0);
-  
+
   // Early return for debugging
   if (hasNoData) {
     return (
@@ -208,96 +208,72 @@ const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({
           {Object.entries(filteredStats)
             .sort(([, a], [, b]) => b.percentage - a.percentage)
             .map(([stepKey, stats]) => {
-            const pieData = preparePieData(stats);
-            const totalTasks = stats.total;
-            
-            return (
-              <Card key={stepKey} className="flex flex-col">
-                <CardHeader className="items-center pb-0">
-                  <div className="flex items-center space-x-2">
-                    {getStepIcon(stepKey)}
-                    <CardTitle className="text-sm font-medium">
-                      {getStepName(stepKey)}
-                    </CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1 pb-0">
-                  <ChartContainer
-                    config={chartConfig}
-                    className="mx-auto aspect-square max-h-[200px]"
-                  >
-                    <PieChart>
-                      <ChartTooltip
-                        cursor={false}
-                        content={<ChartTooltipContent hideLabel />}
-                      />
-                      <Pie
-                        data={pieData}
-                        dataKey="count"
-                        nameKey="status"
-                        innerRadius={50}
-                        strokeWidth={5}
-                      >
-                        <Label
-                          content={({ viewBox }) => {
-                            if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                              return (
-                                <text
-                                  x={viewBox.cx}
-                                  y={viewBox.cy}
-                                  textAnchor="middle"
-                                  dominantBaseline="middle"
-                                >
-                                  <tspan
+              const pieData = preparePieData(stats);
+              const totalTasks = stats.total;
+
+              return (
+                <Card key={stepKey} className="flex flex-col">
+                  <CardHeader className="items-center pb-0">
+                    <div className="flex items-center space-x-2">
+                      {getStepIcon(stepKey)}
+                      <CardTitle className="text-sm font-medium">
+                        {getStepName(stepKey)}
+                      </CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex-1 pb-0">
+                    <ChartContainer
+                      config={chartConfig}
+                      className="mx-auto aspect-square max-h-[200px]"
+                    >
+                      <PieChart>
+                        <ChartTooltip
+                          cursor={false}
+                          content={<ChartTooltipContent hideLabel />}
+                        />
+                        <Pie
+                          data={pieData}
+                          dataKey="count"
+                          nameKey="status"
+                          innerRadius={50}
+                          strokeWidth={5}
+                        >
+                          <Label
+                            content={({ viewBox }) => {
+                              if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                                return (
+                                  <text
                                     x={viewBox.cx}
                                     y={viewBox.cy}
-                                    className="fill-foreground text-2xl font-bold"
+                                    textAnchor="middle"
+                                    dominantBaseline="middle"
                                   >
-                                    {stats.completed}
-                                  </tspan>
-                                  <tspan
-                                    x={viewBox.cx}
-                                    y={(viewBox.cy || 0) + 20}
-                                    className="fill-muted-foreground text-sm"
-                                  >
-                                    dari {totalTasks}
-                                  </tspan>
-                                </text>
-                              )
-                            }
-                          }}
-                        />
-                      </Pie>
-                    </PieChart>
-                  </ChartContainer>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {/* Summary Section */}
-        <div className="mt-8 pt-6 border-t">
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div className="space-y-1">
-              <div className="text-2xl font-bold text-green-600">
-                {Object.values(filteredStats).reduce((sum, stat) => sum + stat.completed, 0)}
-              </div>
-              <div className="text-sm text-muted-foreground">Total Selesai</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-2xl font-bold text-yellow-600">
-                {Object.values(filteredStats).reduce((sum, stat) => sum + stat.remaining, 0)}
-              </div>
-              <div className="text-sm text-muted-foreground">Total Tersisa</div>
-            </div>
-            <div className="space-y-1">
-              <div className="text-2xl font-bold text-blue-600">
-                {Object.values(filteredStats).reduce((sum, stat) => sum + stat.total, 0)}
-              </div>
-              <div className="text-sm text-muted-foreground">Total Keseluruhan</div>
-            </div>
-          </div>
+                                    <tspan
+                                      x={viewBox.cx}
+                                      y={viewBox.cy}
+                                      className="fill-foreground text-2xl font-bold"
+                                    >
+                                      {stats.completed}
+                                    </tspan>
+                                    <tspan
+                                      x={viewBox.cx}
+                                      y={(viewBox.cy || 0) + 20}
+                                      className="fill-muted-foreground text-sm"
+                                    >
+                                      dari {totalTasks}
+                                    </tspan>
+                                  </text>
+                                )
+                              }
+                            }}
+                          />
+                        </Pie>
+                      </PieChart>
+                    </ChartContainer>
+                  </CardContent>
+                </Card>
+              );
+            })}
         </div>
       </CardContent>
     </Card>

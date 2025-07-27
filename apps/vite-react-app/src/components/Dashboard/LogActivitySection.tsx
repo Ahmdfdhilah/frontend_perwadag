@@ -81,31 +81,31 @@ const LogActivitySection: React.FC<LogActivitySectionProps> = ({
   const renderLogActivity = (log: LogActivityResponse) => (
     <div
       key={log.id}
-      className="flex items-start space-x-3 p-4 rounded-lg border bg-card"
+      className="flex flex-col p-4 rounded-lg border bg-card space-y-3"
     >
       <div className="flex-1 min-w-0 space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">
+        <div className="flex items-start justify-between">
+          <span className="text-sm font-medium leading-relaxed">
             {log.activity}
           </span>
         </div>
 
-        <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+        <div className="flex flex-col space-y-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:space-y-0 sm:space-x-4 sm:text-sm">
           <div className="flex items-center space-x-1">
-            <User className="h-3 w-3" />
-            <span>{log.user_name || 'Unknown User'}</span>
+            <User className="h-3 w-3 flex-shrink-0 sm:h-4 sm:w-4" />
+            <span className="truncate">{log.user_name || 'Unknown User'}</span>
           </div>
           
           {log.ip_address && (
             <div className="flex items-center space-x-1">
-              <Globe className="h-3 w-3" />
-              <span>{log.ip_address}</span>
+              <Globe className="h-3 w-3 flex-shrink-0 sm:h-4 sm:w-4" />
+              <span className="font-mono text-xs sm:text-sm">{log.ip_address}</span>
             </div>
           )}
 
           <div className="flex items-center space-x-1">
-            <Clock className="h-3 w-3" />
-            <span>
+            <Clock className="h-3 w-3 flex-shrink-0 sm:h-4 sm:w-4" />
+            <span className="text-xs sm:text-sm">
               {formatIndonesianDateTime(log.date)} WIB
             </span>
           </div>
@@ -116,11 +116,11 @@ const LogActivitySection: React.FC<LogActivitySectionProps> = ({
 
   return (
     <Card className={className}>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
           <div className="flex items-center space-x-2">
             <Activity className="h-5 w-5" />
-            <span>Log Aktivitas Terbaru</span>
+            <span className="text-base sm:text-lg">Log Aktivitas Terbaru</span>
           </div>
         </CardTitle>
         <div className="pt-2">
@@ -128,7 +128,7 @@ const LogActivitySection: React.FC<LogActivitySectionProps> = ({
             searchQuery={searchQuery}
             onSearchChange={onSearchChange || setInternalSearchQuery}
             placeholder="Cari aktivitas, user, atau URL..."
-            className="max-w-md"
+            className="w-full sm:max-w-md"
           />
         </div>
       </CardHeader>
