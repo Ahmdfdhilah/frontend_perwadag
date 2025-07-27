@@ -67,6 +67,7 @@ const KuesionerPage: React.FC = () => {
   const [kuisioner, setKuisioner] = useState<KuisionerResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<KuisionerResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
@@ -125,6 +126,7 @@ const KuesionerPage: React.FC = () => {
       const response = await kuisionerService.getKuisionerList(params);
       setKuisioner(response.items);
       setTotalItems(response.total);
+      setTotalPages(response.pages);
     } catch (error) {
       console.error('Failed to fetch kuisioner:', error);
     } finally {
@@ -159,8 +161,7 @@ const KuesionerPage: React.FC = () => {
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, filters.has_file, hasAccess]);
 
-  // Pagination
-  const totalPages = Math.ceil(totalItems / filters.size);
+  // Pagination is handled by totalPages state from API response
 
   const handleView = (item: KuisionerResponse) => {
     setEditingItem(item);

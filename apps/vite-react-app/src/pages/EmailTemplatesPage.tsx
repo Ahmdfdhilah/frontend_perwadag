@@ -60,6 +60,7 @@ const EmailTemplatesPage: React.FC = () => {
   const [templates, setTemplates] = useState<EmailTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'view' | 'create' | 'edit'>('create');
   const [selectedTemplate, setSelectedTemplate] = useState<EmailTemplate | null>(null);
@@ -89,6 +90,7 @@ const EmailTemplatesPage: React.FC = () => {
 
       setTemplates(filteredTemplates);
       setTotalItems(response.total);
+      setTotalPages(response.pages);
     } catch (error) {
       console.error('Failed to fetch templates:', error);
     } finally {
@@ -103,8 +105,7 @@ const EmailTemplatesPage: React.FC = () => {
     }
   }, [filters.page, filters.size, filters.status, hasAccess]);
 
-  // Pagination
-  const totalPages = Math.ceil(totalItems / filters.size);
+  // Pagination is handled by totalPages state from API response
 
   // Handlers
   const handleCreate = () => {

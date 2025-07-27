@@ -78,6 +78,7 @@ const RiskAssessmentPage: React.FC = () => {
   const [riskAssessments, setRiskAssessments] = useState<PenilaianRisikoResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
   const [isPeriodeDialogOpen, setIsPeriodeDialogOpen] = useState(false);
@@ -123,6 +124,7 @@ const RiskAssessmentPage: React.FC = () => {
       const response = await penilaianRisikoService.getPenilaianRisiko(params);
       setRiskAssessments(response.items);
       setTotalItems(response.total);
+      setTotalPages(response.pages);
     } catch (error) {
       console.error('Failed to fetch risk assessments:', error);
     } finally {
@@ -167,8 +169,7 @@ const RiskAssessmentPage: React.FC = () => {
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun, filters.sort_by, hasAccess]);
 
-  // Pagination
-  const totalPages = Math.ceil(totalItems / filters.size);
+  // Pagination is handled by totalPages state from API response
 
   const handleView = (item: PenilaianRisikoResponse) => {
     // Save current URL state before navigation

@@ -71,6 +71,7 @@ const MatriksPage: React.FC = () => {
   const [matriks, setMatriks] = useState<MatriksResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MatriksResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'edit' | 'view'>('edit');
@@ -129,6 +130,7 @@ const MatriksPage: React.FC = () => {
       const response = await matriksService.getMatriksList(params);
       setMatriks(response.items);
       setTotalItems(response.total);
+      setTotalPages(response.pages);
     } catch (error) {
       console.error('Failed to fetch matriks:', error);
     } finally {
@@ -163,8 +165,7 @@ const MatriksPage: React.FC = () => {
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, filters.has_file, filters.is_completed, hasAccess]);
 
-  // Pagination
-  const totalPages = Math.ceil(totalItems / filters.size);
+  // Pagination - totalPages is now set from API response
 
   const handleEdit = (item: MatriksResponse) => {
     setSelectedItem(item);

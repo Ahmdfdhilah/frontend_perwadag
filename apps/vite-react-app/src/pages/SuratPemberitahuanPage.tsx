@@ -63,6 +63,7 @@ const SuratPemberitahuanPage: React.FC = () => {
   const [suratPemberitahuan, setSuratPemberitahuan] = useState<SuratPemberitahuanResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SuratPemberitahuanResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
@@ -119,6 +120,7 @@ const SuratPemberitahuanPage: React.FC = () => {
       const response = await suratPemberitahuanService.getSuratPemberitahuanList(params);
       setSuratPemberitahuan(response.items);
       setTotalItems(response.total);
+      setTotalPages(response.pages);
     } catch (error) {
       console.error('Failed to fetch surat pemberitahuan:', error);
     } finally {
@@ -153,8 +155,7 @@ const SuratPemberitahuanPage: React.FC = () => {
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, hasAccess]);
 
-  // Pagination
-  const totalPages = Math.ceil(totalItems / filters.size);
+  // Pagination is handled by totalPages state from API response
 
   const handleView = (item: SuratPemberitahuanResponse) => {
     setSelectedItem(item);

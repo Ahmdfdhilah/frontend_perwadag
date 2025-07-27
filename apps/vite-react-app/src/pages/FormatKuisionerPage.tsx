@@ -66,6 +66,7 @@ const QuestionnaireTemplatePage: React.FC = () => {
   const [templates, setTemplates] = useState<FormatKuisionerResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<FormatKuisionerResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
@@ -103,6 +104,7 @@ const QuestionnaireTemplatePage: React.FC = () => {
       const response = await formatKuisionerService.getFormatKuisionerList(params);
       setTemplates(response.items);
       setTotalItems(response.total);
+      setTotalPages(response.pages);
     } catch (error) {
       console.error('Failed to fetch templates:', error);
     } finally {
@@ -118,8 +120,7 @@ const QuestionnaireTemplatePage: React.FC = () => {
     }
   }, [filters.page, filters.size, filters.search, filters.tahun, filters.has_file, hasAccess]);
 
-  // Pagination
-  const totalPages = Math.ceil(totalItems / filters.size);
+  // Pagination is handled by totalPages state from API response
 
   const handleView = (item: FormatKuisionerResponse) => {
     setEditingItem(item);

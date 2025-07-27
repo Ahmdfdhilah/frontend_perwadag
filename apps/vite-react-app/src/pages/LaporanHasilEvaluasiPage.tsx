@@ -70,6 +70,7 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
   const [laporanHasil, setLaporanHasil] = useState<LaporanHasilResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<LaporanHasilResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
@@ -129,6 +130,7 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
       const response = await laporanHasilService.getLaporanHasilList(params);
       setLaporanHasil(response.items);
       setTotalItems(response.total);
+      setTotalPages(response.pages);
     } catch (error) {
       console.error('Failed to fetch laporan hasil:', error);
     } finally {
@@ -163,8 +165,7 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, filters.has_file, filters.has_nomor, filters.is_completed, hasAccess]);
 
-  // Pagination
-  const totalPages = Math.ceil(totalItems / filters.size);
+  // Pagination is handled by totalPages state from API response
 
   const handleView = (item: LaporanHasilResponse) => {
     setEditingItem(item);

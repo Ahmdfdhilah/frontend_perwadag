@@ -62,6 +62,7 @@ const ExitMeetingPage: React.FC = () => {
   const [meetings, setMeetings] = useState<MeetingResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MeetingResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
@@ -121,6 +122,7 @@ const ExitMeetingPage: React.FC = () => {
       const response = await meetingService.getMeetingList(params);
       setMeetings(response.items);
       setTotalItems(response.total);
+      setTotalPages(response.pages);
     } catch (error) {
       console.error('Failed to fetch meetings:', error);
     } finally {
@@ -155,8 +157,7 @@ const ExitMeetingPage: React.FC = () => {
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, filters.has_files, filters.has_date, filters.has_links, filters.is_completed, hasAccess]);
 
-  // Pagination
-  const totalPages = Math.ceil(totalItems / filters.size);
+  // Pagination is handled by totalPages state from API response
 
   const handleView = (item: MeetingResponse) => {
     setEditingItem(item);
