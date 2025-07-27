@@ -185,19 +185,19 @@ const MatriksPage: React.FC = () => {
     
     try {
       const params: MatriksFilterParams = {
+        // Remove page and size to get all data
+        search: filters.search || undefined,
+        inspektorat: filters.inspektorat !== 'all' ? filters.inspektorat : undefined,
+        user_perwadag_id: filters.user_perwadag_id !== 'all' ? filters.user_perwadag_id : undefined,
         tahun_evaluasi: filters.tahun_evaluasi !== 'all' ? parseInt(filters.tahun_evaluasi) : undefined,
+        has_file: filters.has_file !== 'all' ? filters.has_file === 'true' : undefined,
+        is_completed: filters.is_completed !== 'all' ? filters.is_completed === 'true' : undefined,
       };
 
       const response = await matriksService.getMatriksList(params);
-      let filteredItems = response.items;
-
-      // Apply frontend filtering for inspektorat
-      if (filters.inspektorat !== 'all') {
-        filteredItems = filteredItems.filter(item => item.inspektorat === filters.inspektorat);
-      }
 
       // Sort by tahun_evaluasi (evaluation year) in descending order
-      return filteredItems.sort((a, b) => b.tahun_evaluasi - a.tahun_evaluasi);
+      return response.items.sort((a, b) => b.tahun_evaluasi - a.tahun_evaluasi);
     } catch (error) {
       console.error('Failed to fetch all matriks for export:', error);
       return [];
