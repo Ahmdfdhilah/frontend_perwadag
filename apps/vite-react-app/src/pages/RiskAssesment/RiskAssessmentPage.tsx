@@ -419,6 +419,8 @@ const RiskAssessmentPage: React.FC = () => {
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 canEdit={canEditRecord}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 
@@ -431,6 +433,8 @@ const RiskAssessmentPage: React.FC = () => {
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 canEdit={canEditRecord}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 

@@ -344,6 +344,8 @@ const QuestionnaireTemplatePage: React.FC = () => {
                 onDelete={handleDelete}
                 canEdit={canEdit}
                 canDelete={canDelete}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 
@@ -357,6 +359,8 @@ const QuestionnaireTemplatePage: React.FC = () => {
                 onDelete={handleDelete}
                 canEdit={canEdit}
                 canDelete={canDelete}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 

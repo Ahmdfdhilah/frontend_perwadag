@@ -23,6 +23,8 @@ interface SuratTugasTableProps {
   canDelete?: (item: SuratTugasResponse) => boolean;
   isPerwadag?: boolean;
   isDashboard?: boolean;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
@@ -35,6 +37,8 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
   canDelete = () => false,
   isPerwadag = false,
   isDashboard = false,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
 
   return (
@@ -72,7 +76,7 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
             ) : (
               data.map((item, index) => (
                 <TableRow key={item.id}>
-                  <TableCell className="font-medium">{index + 1}</TableCell>
+                  <TableCell className="font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                   <TableCell>{item.nama_perwadag}</TableCell>
                   <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
                   <TableCell>{item.no_surat}</TableCell>

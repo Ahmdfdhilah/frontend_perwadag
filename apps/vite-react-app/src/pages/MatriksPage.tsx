@@ -425,6 +425,8 @@ const MatriksPage: React.FC = () => {
                 canEdit={canEdit}
                 canView={canView}
                 userRole={isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : 'perwadag'}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 
@@ -438,6 +440,8 @@ const MatriksPage: React.FC = () => {
                 canEdit={canEdit}
                 canView={canView}
                 userRole={isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : 'perwadag'}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 

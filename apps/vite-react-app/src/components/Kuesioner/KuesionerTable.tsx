@@ -19,6 +19,8 @@ interface KuesionerTableProps {
   onView?: (item: KuisionerResponse) => void;
   onEdit?: (item: KuisionerResponse) => void;
   canEdit?: (item: KuisionerResponse) => boolean;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 const KuesionerTable: React.FC<KuesionerTableProps> = ({
@@ -27,6 +29,8 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
   onView,
   onEdit,
   canEdit,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
 
   const getStatusBadge = (kuisioner: KuisionerResponse) => {
@@ -80,7 +84,7 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
           ) : (
             data.map((item, index) => (
               <TableRow key={item.id}>
-                <TableCell className="font-medium">{index + 1}</TableCell>
+                <TableCell className="font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                 <TableCell>{item.nama_perwadag}</TableCell>
                 <TableCell>{item.tanggal_kuisioner ? formatIndonesianDate(item.tanggal_kuisioner) : '-'}</TableCell>
                 <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>

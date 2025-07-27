@@ -11,6 +11,8 @@ interface RiskAssessmentCardsProps {
   onEdit?: (item: PenilaianRisikoResponse) => void;
   onDelete?: (item: PenilaianRisikoResponse) => void;
   canEdit?: (item: PenilaianRisikoResponse) => boolean;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
@@ -20,6 +22,8 @@ const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
   onEdit,
   onDelete,
   canEdit = () => true,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
   if (loading) {
     return (
@@ -90,7 +94,7 @@ const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
             <div className="flex flex-col gap-3 text-sm">
               <div>
                 <span className="font-medium text-muted-foreground">No:</span>
-                <span className="ml-2">{index + 1}</span>
+                <span className="ml-2">{(currentPage - 1) * itemsPerPage + index + 1}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Tahun:</span>

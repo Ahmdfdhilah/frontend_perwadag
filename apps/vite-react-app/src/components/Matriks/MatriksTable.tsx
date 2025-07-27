@@ -22,6 +22,8 @@ interface MatriksTableProps {
   canEdit?: (item: MatriksResponse) => boolean;
   canView?: (item: MatriksResponse) => boolean;
   userRole: 'admin' | 'inspektorat' | 'perwadag';
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 const MatriksTable: React.FC<MatriksTableProps> = ({
@@ -33,6 +35,8 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
   canEdit,
   canView,
   userRole,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
 
   const getStatusBadge = (matriks: MatriksResponse) => {
@@ -117,7 +121,7 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
     
     return (
       <TableRow key={item.id}>
-        <TableCell className="font-medium">{index + 1}</TableCell>
+        <TableCell className="font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
         <TableCell>{item.nama_perwadag}</TableCell>
         <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
         <TableCell>{renderDocumentLink(item)}</TableCell>
@@ -151,7 +155,7 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
     
     return (
       <TableRow key={item.id}>
-        <TableCell className="font-medium">{index + 1}</TableCell>
+        <TableCell className="font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
         <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
         <TableCell>{renderDocumentLink(item)}</TableCell>
         <TableCell>

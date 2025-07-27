@@ -445,6 +445,8 @@ const SuratTugasPage: React.FC = () => {
                 canEdit={canEditItem}
                 canDelete={canDeleteItem}
                 isPerwadag={isPerwadag()}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 
@@ -459,6 +461,8 @@ const SuratTugasPage: React.FC = () => {
                 canEdit={canEditItem}
                 canDelete={canDeleteItem}
                 isPerwadag={isPerwadag()}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 

@@ -19,6 +19,8 @@ interface SuratPemberitahuanTableProps {
   onView?: (item: SuratPemberitahuanResponse) => void;
   onEdit?: (item: SuratPemberitahuanResponse) => void;
   canEdit?: (item: SuratPemberitahuanResponse) => boolean;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
@@ -27,6 +29,8 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
   onView,
   onEdit,
   canEdit,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
 
   const getStatusBadge = (suratPemberitahuan: SuratPemberitahuanResponse) => {
@@ -78,7 +82,7 @@ const SuratPemberitahuanTable: React.FC<SuratPemberitahuanTableProps> = ({
           ) : (
             data.map((item, index) => (
               <TableRow key={item.id}>
-                <TableCell className="font-medium">{index + 1}</TableCell>
+                <TableCell className="font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                 <TableCell>{item.nama_perwadag}</TableCell>
                 <TableCell>{item.tanggal_surat_pemberitahuan ? formatIndonesianDate(item.tanggal_surat_pemberitahuan) : '-'}</TableCell>
                 <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>

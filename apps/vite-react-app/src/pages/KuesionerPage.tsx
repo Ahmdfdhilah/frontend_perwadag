@@ -349,6 +349,8 @@ const KuesionerPage: React.FC = () => {
                 onView={handleView}
                 onEdit={handleEdit}
                 canEdit={canEdit}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 
@@ -360,6 +362,8 @@ const KuesionerPage: React.FC = () => {
                 onView={handleView}
                 onEdit={handleEdit}
                 canEdit={canEdit}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 

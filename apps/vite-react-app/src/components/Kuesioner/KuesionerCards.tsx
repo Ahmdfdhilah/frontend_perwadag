@@ -12,6 +12,8 @@ interface KuesionerCardsProps {
   onView?: (item: KuisionerResponse) => void;
   onEdit?: (item: KuisionerResponse) => void;
   canEdit?: (item: KuisionerResponse) => boolean;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 const KuesionerCards: React.FC<KuesionerCardsProps> = ({
@@ -20,6 +22,8 @@ const KuesionerCards: React.FC<KuesionerCardsProps> = ({
   onView,
   onEdit,
   canEdit,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
 
   const getStatusBadge = (kuisioner: KuisionerResponse) => {
@@ -111,7 +115,7 @@ const KuesionerCards: React.FC<KuesionerCardsProps> = ({
             <div className="space-y-2 text-sm">
               <div>
                 <span className="font-medium text-muted-foreground">No:</span>
-                <span className="ml-2">{index + 1}</span>
+                <span className="ml-2">{(currentPage - 1) * itemsPerPage + index + 1}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Tanggal Kuesioner:</span>

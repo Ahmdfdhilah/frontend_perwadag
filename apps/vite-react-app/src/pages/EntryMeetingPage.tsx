@@ -336,6 +336,8 @@ const EntryMeetingPage: React.FC = () => {
                 onView={handleView}
                 onEdit={handleEdit}
                 canEdit={canEdit}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 
@@ -347,6 +349,8 @@ const EntryMeetingPage: React.FC = () => {
                 onView={handleView}
                 onEdit={handleEdit}
                 canEdit={canEdit}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 

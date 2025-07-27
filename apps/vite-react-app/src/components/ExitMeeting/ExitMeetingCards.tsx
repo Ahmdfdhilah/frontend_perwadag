@@ -11,6 +11,8 @@ interface ExitMeetingCardsProps {
   onView?: (item: MeetingResponse) => void;
   onEdit?: (item: MeetingResponse) => void;
   canEdit?: (item: MeetingResponse) => boolean;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 const ExitMeetingCards: React.FC<ExitMeetingCardsProps> = ({
@@ -19,6 +21,8 @@ const ExitMeetingCards: React.FC<ExitMeetingCardsProps> = ({
   onView,
   onEdit,
   canEdit,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
   
   const getStatusBadge = (meeting: MeetingResponse) => {
@@ -110,7 +114,7 @@ const ExitMeetingCards: React.FC<ExitMeetingCardsProps> = ({
               <div className="space-y-2 text-sm">
                 <div>
                   <span className="font-medium text-muted-foreground">No:</span>
-                  <span className="ml-2">{index + 1}</span>
+                  <span className="ml-2">{(currentPage - 1) * itemsPerPage + index + 1}</span>
                 </div>
                 <div>
                   <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>

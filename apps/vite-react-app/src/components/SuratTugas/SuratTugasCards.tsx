@@ -16,6 +16,8 @@ interface SuratTugasCardsProps {
   canDelete?: (item: SuratTugasResponse) => boolean;
   isPerwadag?: boolean;
   isDashboard?: boolean;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
@@ -28,6 +30,8 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
   canDelete = () => true,
   isPerwadag = false,
   isDashboard = false,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
 
   if (loading) {
@@ -106,7 +110,7 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
                 <div className="grid grid-cols-1 gap-4">
                   <div>
                     <span className="font-medium text-muted-foreground">No:</span>
-                    <span className="ml-2">{index + 1}</span>
+                    <span className="ml-2">{(currentPage - 1) * itemsPerPage + index + 1}</span>
                   </div>
                   <div>
                     <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>

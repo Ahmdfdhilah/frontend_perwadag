@@ -20,6 +20,8 @@ interface LaporanHasilEvaluasiTableProps {
   onEdit?: (item: LaporanHasilResponse) => void;
   onComposeEmail?: (item: LaporanHasilResponse) => void;
   canEdit?: (item: LaporanHasilResponse) => boolean;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
@@ -29,6 +31,8 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
   onEdit,
   onComposeEmail,
   canEdit,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
 
   const getStatusBadge = (laporan: LaporanHasilResponse) => {
@@ -82,7 +86,7 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
           ) : (
             data.map((item, index) => (
               <TableRow key={item.id}>
-                <TableCell className="font-medium">{index + 1}</TableCell>
+                <TableCell className="font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                 <TableCell>{item.nama_perwadag}</TableCell>
                 <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
                 <TableCell>{item.nomor_laporan || '-'}</TableCell>

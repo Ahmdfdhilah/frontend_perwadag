@@ -20,6 +20,8 @@ interface QuestionnaireTableProps {
   onDelete?: (item: FormatKuisionerResponse) => void;
   canEdit?: (item?: FormatKuisionerResponse) => boolean;
   canDelete?: (item?: FormatKuisionerResponse) => boolean;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 const QuestionnaireTable: React.FC<QuestionnaireTableProps> = ({
@@ -30,6 +32,8 @@ const QuestionnaireTable: React.FC<QuestionnaireTableProps> = ({
   onDelete,
   canEdit,
   canDelete,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
   const getStatusBadge = (template: FormatKuisionerResponse) => {
     const hasFile = template.has_file;
@@ -103,7 +107,7 @@ const QuestionnaireTable: React.FC<QuestionnaireTableProps> = ({
           ) : (
             data.map((item, index) => (
               <TableRow key={item.id}>
-                <TableCell className="font-medium">{index + 1}</TableCell>
+                <TableCell className="font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                 <TableCell className="font-medium">{item.nama_template}</TableCell>
                 <TableCell className="max-w-md">
                   <div className="truncate" title={item.deskripsi}>

@@ -339,6 +339,8 @@ const SuratPemberitahuanPage: React.FC = () => {
                 onView={handleView}
                 onEdit={handleEdit}
                 canEdit={canEdit}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 
@@ -350,6 +352,8 @@ const SuratPemberitahuanPage: React.FC = () => {
                 onView={handleView}
                 onEdit={handleEdit}
                 canEdit={canEdit}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 

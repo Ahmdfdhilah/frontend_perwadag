@@ -377,6 +377,8 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
                 onEdit={handleEdit}
                 onComposeEmail={handleComposeEmail}
                 canEdit={canEdit}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 
@@ -389,6 +391,8 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
                 onEdit={handleEdit}
                 onComposeEmail={handleComposeEmail}
                 canEdit={canEdit}
+                currentPage={filters.page}
+                itemsPerPage={filters.size}
               />
             </div>
 

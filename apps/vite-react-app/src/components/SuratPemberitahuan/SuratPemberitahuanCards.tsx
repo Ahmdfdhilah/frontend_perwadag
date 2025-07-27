@@ -12,6 +12,8 @@ interface SuratPemberitahuanCardsProps {
   onView?: (item: SuratPemberitahuanResponse) => void;
   onEdit?: (item: SuratPemberitahuanResponse) => void;
   canEdit?: (item: SuratPemberitahuanResponse) => boolean;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 const SuratPemberitahuanCards: React.FC<SuratPemberitahuanCardsProps> = ({
@@ -20,6 +22,8 @@ const SuratPemberitahuanCards: React.FC<SuratPemberitahuanCardsProps> = ({
   onView,
   onEdit,
   canEdit,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
 
   const getStatusBadge = (suratPemberitahuan: SuratPemberitahuanResponse) => {
@@ -110,7 +114,7 @@ const SuratPemberitahuanCards: React.FC<SuratPemberitahuanCardsProps> = ({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <span className="font-medium text-muted-foreground">No:</span>
-                  <span className="ml-2">{index + 1}</span>
+                  <span className="ml-2">{(currentPage - 1) * itemsPerPage + index + 1}</span>
                 </div>
               </div>
 

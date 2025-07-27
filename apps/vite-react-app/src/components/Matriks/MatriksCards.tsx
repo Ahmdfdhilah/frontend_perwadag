@@ -15,6 +15,8 @@ interface MatriksCardsProps {
   canEdit?: (item: MatriksResponse) => boolean;
   canView?: (item: MatriksResponse) => boolean;
   userRole: 'admin' | 'inspektorat' | 'perwadag';
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 const MatriksCards: React.FC<MatriksCardsProps> = ({
@@ -26,6 +28,8 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
   canEdit,
   canView,
   userRole,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
 
   const getStatusBadge = (matriks: MatriksResponse) => {
@@ -125,7 +129,7 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
         <div className="space-y-3 text-sm">
           <div>
             <span className="font-medium text-muted-foreground">No:</span>
-            <span className="ml-2">{index + 1}</span>
+            <span className="ml-2">{(currentPage - 1) * itemsPerPage + index + 1}</span>
           </div>
 
           <div>
@@ -161,7 +165,7 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
       <CardHeader className="pb-3">
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg font-semibold">
-            Matriks #{index + 1}
+            Matriks #{(currentPage - 1) * itemsPerPage + index + 1}
           </CardTitle>
           {(canEdit?.(item) || canView?.(item) || onExport) && (
             <ActionDropdown

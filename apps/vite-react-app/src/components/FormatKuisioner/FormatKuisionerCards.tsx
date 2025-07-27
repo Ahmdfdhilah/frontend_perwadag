@@ -13,6 +13,8 @@ interface QuestionnaireCardsProps {
   onDelete?: (item: FormatKuisionerResponse) => void;
   canEdit?: (item?: FormatKuisionerResponse) => boolean;
   canDelete?: (item?: FormatKuisionerResponse) => boolean;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 const QuestionnaireCards: React.FC<QuestionnaireCardsProps> = ({
@@ -23,6 +25,8 @@ const QuestionnaireCards: React.FC<QuestionnaireCardsProps> = ({
   onDelete,
   canEdit,
   canDelete,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
   const getStatusBadge = (template: FormatKuisionerResponse) => {
     const hasFile = template.has_file;
@@ -132,7 +136,7 @@ const QuestionnaireCards: React.FC<QuestionnaireCardsProps> = ({
             <div className="space-y-2 text-sm">
               <div>
                 <span className="font-medium text-muted-foreground">No:</span>
-                <span className="ml-2">{index + 1}</span>
+                <span className="ml-2">{(currentPage - 1) * itemsPerPage + index + 1}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Deskripsi:</span>

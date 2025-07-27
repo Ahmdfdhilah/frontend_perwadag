@@ -18,6 +18,8 @@ interface KonfirmasiMeetingTableProps {
   onView?: (item: MeetingResponse) => void;
   onEdit?: (item: MeetingResponse) => void;
   canEdit?: (item: MeetingResponse) => boolean;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 const KonfirmasiMeetingTable: React.FC<KonfirmasiMeetingTableProps> = ({
@@ -26,6 +28,8 @@ const KonfirmasiMeetingTable: React.FC<KonfirmasiMeetingTableProps> = ({
   onView,
   onEdit,
   canEdit,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
 
   const getStatusBadge = (meeting: MeetingResponse) => {
@@ -80,7 +84,7 @@ const KonfirmasiMeetingTable: React.FC<KonfirmasiMeetingTableProps> = ({
             data.map((item, index) => {
               return (
                 <TableRow key={item.id}>
-                  <TableCell className="font-medium">{index + 1}</TableCell>
+                  <TableCell className="font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                   <TableCell>{item.nama_perwadag}</TableCell>
                   <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
                   <TableCell>{item.tanggal_meeting ? formatIndonesianDate(item.tanggal_meeting) : '-'}</TableCell>

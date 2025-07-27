@@ -18,6 +18,8 @@ interface RiskAssessmentTableProps {
   onEdit?: (item: PenilaianRisikoResponse) => void;
   onDelete?: (item: PenilaianRisikoResponse) => void;
   canEdit?: (item: PenilaianRisikoResponse) => boolean;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 const RiskAssessmentTable: React.FC<RiskAssessmentTableProps> = ({
@@ -27,6 +29,8 @@ const RiskAssessmentTable: React.FC<RiskAssessmentTableProps> = ({
   onEdit,
   onDelete,
   canEdit = () => true,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
   return (
     <div className="rounded-md border">
@@ -64,7 +68,7 @@ const RiskAssessmentTable: React.FC<RiskAssessmentTableProps> = ({
           ) : (
             data.map((item, index) => (
               <TableRow key={item.id}>
-                <TableCell className="font-medium">{index + 1}</TableCell>
+                <TableCell className="font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                 <TableCell>{item.tahun}</TableCell>
                 <TableCell>{item.inspektorat}</TableCell>
                 <TableCell>{item.nama_perwadag}</TableCell>

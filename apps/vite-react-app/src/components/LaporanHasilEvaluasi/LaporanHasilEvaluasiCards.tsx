@@ -13,6 +13,8 @@ interface LaporanHasilEvaluasiCardsProps {
   onEdit?: (item: LaporanHasilResponse) => void;
   onComposeEmail?: (item: LaporanHasilResponse) => void;
   canEdit?: (item: LaporanHasilResponse) => boolean;
+  currentPage?: number;
+  itemsPerPage?: number;
 }
 
 const LaporanHasilEvaluasiCards: React.FC<LaporanHasilEvaluasiCardsProps> = ({
@@ -22,6 +24,8 @@ const LaporanHasilEvaluasiCards: React.FC<LaporanHasilEvaluasiCardsProps> = ({
   onEdit,
   onComposeEmail,
   canEdit,
+  currentPage = 1,
+  itemsPerPage = 10,
 }) => {
 
   const getStatusBadge = (laporan: LaporanHasilResponse) => {
@@ -115,7 +119,7 @@ const LaporanHasilEvaluasiCards: React.FC<LaporanHasilEvaluasiCardsProps> = ({
             <div className="space-y-2 text-sm">
               <div>
                 <span className="font-medium text-muted-foreground">No:</span>
-                <span className="ml-2">{index + 1}</span>
+                <span className="ml-2">{(currentPage - 1) * itemsPerPage + index + 1}</span>
               </div>
               <div>
                 <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
