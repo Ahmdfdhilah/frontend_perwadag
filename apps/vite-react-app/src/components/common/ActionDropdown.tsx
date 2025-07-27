@@ -22,6 +22,8 @@ interface ActionDropdownProps {
   showComposeEmail?: boolean;
   showExport?: boolean;
   isActivating?: boolean;
+  deleteDisabled?: boolean;
+  deleteTooltip?: string;
 }
 
 const ActionDropdown: React.FC<ActionDropdownProps> = ({
@@ -38,6 +40,8 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
   showComposeEmail = false,
   showExport = false,
   isActivating = false,
+  deleteDisabled = false,
+  deleteTooltip,
 }) => {
   return (
     <DropdownMenu>
@@ -85,9 +89,14 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
           </DropdownMenuItem>
         )}
         {showDelete && onDelete && (
-          <DropdownMenuItem onClick={onDelete} className="text-red-600">
+          <DropdownMenuItem 
+            onClick={onDelete} 
+            className="text-red-600"
+            disabled={deleteDisabled}
+            title={deleteTooltip}
+          >
             <Trash2 className="mr-2 h-4 w-4" />
-            Hapus
+            {deleteDisabled ? 'Tidak Dapat Dihapus' : 'Hapus'}
           </DropdownMenuItem>
         )}
       </DropdownMenuContent>
