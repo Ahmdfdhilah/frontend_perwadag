@@ -10,7 +10,7 @@ import { Button } from '@workspace/ui/components/button';
 import { Label } from '@workspace/ui/components/label';
 import { Textarea } from '@workspace/ui/components/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
-import { Trash2, Plus } from 'lucide-react';
+import { Trash2, Plus, Loader2 } from 'lucide-react';
 import { MatriksResponse, TemuanRekomendasi } from '@/services/matriks/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
@@ -44,6 +44,10 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<{ name: string; filename: string } | null>(null);
   const [deletingFile, setDeletingFile] = useState(false);
+  
+  // Loading states for different operations
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     if (item && open) {
@@ -64,52 +68,76 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
       setFileToDelete(null);
       setDeleteConfirmOpen(false);
     }
+    
+    // Reset loading states when dialog opens/closes
+    setIsSaving(false);
+    setIsDownloading(false);
   }, [item, open]);
 
   const handleUploadFileChange = (files: File[]) => {
+    // Prevent file changes during save operation
+    if (isSaving) return;
     setUploadFile(files[0] || null);
   };
 
   const handleAddTemuanRekomendasi = () => {
-    if (temuanRekomendasi.length >= 20) return;
+    // Prevent adding during save operation
+    if (isSaving || temuanRekomendasi.length >= 20) return;
     setTemuanRekomendasi([...temuanRekomendasi, { temuan: '', rekomendasi: '' }]);
   };
 
   const handleRemoveTemuanRekomendasi = (index: number) => {
+    // Prevent removing during save operation
+    if (isSaving) return;
     setTemuanRekomendasi(temuanRekomendasi.filter((_, i) => i !== index));
   };
 
   const handleTemuanRekomendasiChange = (index: number, field: 'temuan' | 'rekomendasi', value: string) => {
+    // Prevent changes during save operation
+    if (isSaving) return;
     const updated = [...temuanRekomendasi];
     updated[index] = { ...updated[index], [field]: value };
     setTemuanRekomendasi(updated);
   };
 
   const handleSave = async () => {
-    if (!onSave) return;
+    if (!onSave || isSaving) return;
 
-    // Send full JSON of temuan_rekomendasi, including existing IDs for updates
-    // Allow empty strings to be sent for clearing data
-    const processedTemuanRekomendasi = temuanRekomendasi.map(tr => ({
-      ...tr,
-      temuan: tr.temuan || '',
-      rekomendasi: tr.rekomendasi || ''
-    }));
+    setIsSaving(true);
+    try {
+      // Send full JSON of temuan_rekomendasi, including existing IDs for updates
+      // Allow empty strings to be sent for clearing data
+      const processedTemuanRekomendasi = temuanRekomendasi.map(tr => ({
+        ...tr,
+        temuan: tr.temuan || '',
+        rekomendasi: tr.rekomendasi || ''
+      }));
 
-    const dataToSave = {
-      temuan_rekomendasi: processedTemuanRekomendasi,
-      file: uploadFile,
-    };
-    onSave(dataToSave);
+      const dataToSave = {
+        temuan_rekomendasi: processedTemuanRekomendasi,
+        file: uploadFile,
+      };
+      await onSave(dataToSave);
+    } catch (error) {
+      console.error('Error saving:', error);
+      // Error toast is handled by base service
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancel = () => {
+    // Prevent closing if operations are in progress
+    if (isSaving || isDownloading || deletingFile) {
+      return;
+    }
     onOpenChange(false);
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
-    if (!item?.id) return;
+    if (!item?.id || isDownloading) return;
 
+    setIsDownloading(true);
     try {
       const blob = await matriksService.downloadFile(item.id);
       const url = window.URL.createObjectURL(blob);
@@ -120,13 +148,23 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'Download berhasil',
+        description: 'File berhasil didownload.',
+        variant: 'default'
+      });
     } catch (error) {
       console.error('Error downloading file:', error);
+      // Error toast is handled by base service
+    } finally {
+      setIsDownloading(false);
     }
   };
 
   const handleExistingFileRemove = () => {
-    if (!existingFiles[0] || !existingFiles[0].filename) return;
+    // Prevent file removal during save operation
+    if (isSaving || !existingFiles[0] || !existingFiles[0].filename) return;
 
     const fileToRemove = existingFiles[0];
     setFileToDelete({
@@ -137,7 +175,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   };
 
   const handleConfirmDelete = async () => {
-    if (!fileToDelete || !item?.id) return;
+    if (!fileToDelete || !item?.id || deletingFile) return;
 
     setDeletingFile(true);
     try {
@@ -153,13 +191,16 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
       });
     } catch (error) {
       console.error('Error deleting file:', error);
-      
+      // Error toast is handled by base service
     } finally {
       setDeletingFile(false);
       setFileToDelete(null);
       setDeleteConfirmOpen(false);
     }
   };
+
+  // Determine if any operation is in progress
+  const isOperationInProgress = isSaving || isDownloading || deletingFile;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -189,7 +230,6 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
               </div>
             </div>
 
-
             {/* Temuan Rekomendasi */}
             <Card>
               <CardHeader>
@@ -201,7 +241,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                       variant="outline"
                       size="sm"
                       onClick={handleAddTemuanRekomendasi}
-                      disabled={temuanRekomendasi.length >= 20}
+                      disabled={temuanRekomendasi.length >= 20 || isSaving}
                       className="ml-2"
                     >
                       <Plus className="h-4 w-4 mr-2" />
@@ -225,6 +265,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                               variant="ghost"
                               size="sm"
                               onClick={() => handleRemoveTemuanRekomendasi(index)}
+                              disabled={isSaving}
                               className="text-red-500 hover:text-red-700"
                             >
                               <Trash2 className="h-4 w-4" />
@@ -241,6 +282,8 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                                 onChange={(e) => handleTemuanRekomendasiChange(index, 'temuan', e.target.value)}
                                 placeholder="Masukkan temuan..."
                                 rows={3}
+                                disabled={isSaving}
+                                className={isSaving ? "bg-muted" : ""}
                               />
                             ) : (
                               <div className="p-3 bg-muted rounded-md text-sm">
@@ -257,6 +300,8 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                                 onChange={(e) => handleTemuanRekomendasiChange(index, 'rekomendasi', e.target.value)}
                                 placeholder="Masukkan rekomendasi..."
                                 rows={3}
+                                disabled={isSaving}
+                                className={isSaving ? "bg-muted" : ""}
                               />
                             ) : (
                               <div className="p-3 bg-muted rounded-md text-sm">
@@ -272,7 +317,6 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
               </CardContent>
             </Card>
 
-
             {/* File Upload */}
             {canEdit && (
               <FileUpload
@@ -282,7 +326,8 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                 maxSize={10 * 1024 * 1024} // 10MB
                 files={uploadFile ? [uploadFile] : []}
                 existingFiles={existingFiles}
-                mode="edit"
+                mode={isSaving ? 'view' : 'edit'}
+                disabled={isSaving}
                 onFilesChange={handleUploadFileChange}
                 onExistingFileRemove={handleExistingFileRemove}
                 onFileDownload={handleFileDownload}
@@ -293,12 +338,26 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
         </div>
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
-          <Button variant="outline" onClick={handleCancel}>
+          <Button 
+            variant="outline" 
+            onClick={handleCancel}
+            disabled={isOperationInProgress}
+          >
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
           {canEdit && onSave && mode === 'edit' && (
-            <Button onClick={handleSave}>
-              Simpan
+            <Button 
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Menyimpan...
+                </>
+              ) : (
+                'Simpan'
+              )}
             </Button>
           )}
         </DialogFooter>
@@ -307,7 +366,12 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
       {/* File Delete Confirmation Dialog */}
       <FileDeleteConfirmDialog
         open={deleteConfirmOpen}
-        onOpenChange={setDeleteConfirmOpen}
+        onOpenChange={(open) => {
+          // Prevent closing during delete operation
+          if (!deletingFile) {
+            setDeleteConfirmOpen(open);
+          }
+        }}
         fileName={fileToDelete?.name || ''}
         onConfirm={handleConfirmDelete}
         loading={deletingFile}

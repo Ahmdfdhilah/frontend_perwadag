@@ -18,6 +18,7 @@ import { suratPemberitahuanService } from '@/services/suratPemberitahuan';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale/id';
 import { useToast } from '@workspace/ui/components/sonner';
+import { Loader2 } from 'lucide-react';
 
 interface SuratPemberitahuanDialogProps {
   open: boolean;
@@ -43,6 +44,10 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<{ name: string; filename: string } | null>(null);
   const [deletingFile, setDeletingFile] = useState(false);
+  
+  // Loading states for different operations
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     if (item && open) {
@@ -73,26 +78,46 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
       setFileToDelete(null);
       setDeleteConfirmOpen(false);
     }
+    
+    // Reset loading states when dialog opens/closes
+    setIsSaving(false);
+    setIsDownloading(false);
   }, [item, open]);
 
   const handleSave = async () => {
-    const dataToSave = {
-      tanggal_surat_pemberitahuan: selectedDate ? formatDateForAPI(selectedDate) : formData.tanggal_surat_pemberitahuan,
-      files: uploadFiles,
-    };
-    onSave?.(dataToSave);
+    if (isSaving) return;
+    
+    setIsSaving(true);
+    try {
+      const dataToSave = {
+        tanggal_surat_pemberitahuan: selectedDate ? formatDateForAPI(selectedDate) : formData.tanggal_surat_pemberitahuan,
+        files: uploadFiles,
+      };
+      await onSave?.(dataToSave);
+    } catch (error) {
+      console.error('Error saving:', error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancel = () => {
+    // Prevent closing if operations are in progress
+    if (isSaving || isDownloading || deletingFile) {
+      return;
+    }
     onOpenChange(false);
   };
 
   const handleUploadFilesChange = (files: File[]) => {
+    // Prevent file changes during save operation
+    if (isSaving) return;
     setUploadFiles(files);
   };
 
   const handleExistingFilesRemove = (index: number) => {
-    if (!existingFiles[index] || !existingFiles[index].filename) return;
+    // Prevent file removal during save operation
+    if (isSaving || !existingFiles[index] || !existingFiles[index].filename) return;
     
     const fileToRemove = existingFiles[index];
     setFileToDelete({
@@ -103,7 +128,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
   };
 
   const handleConfirmDelete = async () => {
-    if (!fileToDelete || !item?.id) return;
+    if (!fileToDelete || !item?.id || deletingFile) return;
     
     setDeletingFile(true);
     try {
@@ -119,7 +144,11 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
       });
     } catch (error) {
       console.error('Error deleting file:', error);
-      
+      toast({
+        title: 'Hapus file gagal',
+        description: 'Terjadi kesalahan saat menghapus file.',
+        variant: 'destructive'
+      });
     } finally {
       setDeletingFile(false);
       setFileToDelete(null);
@@ -128,8 +157,9 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
-    if (!item?.id) return;
+    if (!item?.id || isDownloading) return;
     
+    setIsDownloading(true);
     try {
       const blob = await suratPemberitahuanService.downloadFile(item.id);
       const url = window.URL.createObjectURL(blob);
@@ -140,14 +170,29 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'Download berhasil',
+        description: 'File berhasil didownload.',
+        variant: 'default'
+      });
     } catch (error) {
       console.error('Error downloading file:', error);
+      toast({
+        title: 'Download gagal',
+        description: 'Terjadi kesalahan saat mendownload file.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsDownloading(false);
     }
   };
 
-
   const isEditable = mode === 'edit';
   const canEdit = canEditForm('surat_pemberitahuan') && isEditable;
+  
+  // Determine if any operation is in progress
+  const isOperationInProgress = isSaving || isDownloading || deletingFile;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -184,6 +229,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
                   value={selectedDate}
                   onChange={setSelectedDate}
                   placeholder="Pilih tanggal"
+                  disabled={isSaving}
                 />
               ) : (
                 <div className="p-3 bg-muted rounded-md">
@@ -201,8 +247,8 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
               maxFiles={1}
               files={uploadFiles}
               existingFiles={existingFiles}
-              mode={canEdit ? 'edit' : 'view'}
-              disabled={!canEdit}
+              mode={canEdit && !isSaving ? 'edit' : 'view'}
+              disabled={!canEdit || isSaving}
               onFilesChange={handleUploadFilesChange}
               onExistingFileRemove={handleExistingFilesRemove}
               onFileDownload={handleFileDownload}
@@ -212,12 +258,26 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
         </div>
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
-          <Button variant="outline" onClick={handleCancel}>
+          <Button 
+            variant="outline" 
+            onClick={handleCancel}
+            disabled={isOperationInProgress}
+          >
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
           {canEdit && (
-            <Button onClick={handleSave}>
-              Simpan
+            <Button 
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Menyimpan...
+                </>
+              ) : (
+                'Simpan'
+              )}
             </Button>
           )}
         </DialogFooter>
@@ -226,7 +286,12 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
       {/* File Delete Confirmation Dialog */}
       <FileDeleteConfirmDialog
         open={deleteConfirmOpen}
-        onOpenChange={setDeleteConfirmOpen}
+        onOpenChange={(open) => {
+          // Prevent closing during delete operation
+          if (!deletingFile) {
+            setDeleteConfirmOpen(open);
+          }
+        }}
         fileName={fileToDelete?.name || ''}
         onConfirm={handleConfirmDelete}
         loading={deletingFile}

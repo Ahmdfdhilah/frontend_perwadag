@@ -12,7 +12,7 @@ import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Textarea } from '@workspace/ui/components/textarea';
 import { FormatKuisionerResponse } from '@/services/formatKuisioner/types';
-import { Download } from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react';
 import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { formatKuisionerService } from '@/services/formatKuisioner';
@@ -52,6 +52,10 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<{ name: string; filename: string } | null>(null);
   const [deletingFile, setDeletingFile] = useState(false);
+  
+  // Loading states for different operations
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const isCreating = !item;
   const isEditable = mode === 'edit' && isAdmin();
@@ -84,34 +88,53 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       setFileToDelete(null);
       setDeleteConfirmOpen(false);
     }
+    
+    // Reset loading states when dialog opens/closes
+    setIsSaving(false);
+    setIsDownloading(false);
   }, [item, open]);
 
   const handleSave = async () => {
     // Skip validation if form is invalid
-    if (!isFormValid) {
+    if (!isFormValid || isSaving) {
       return;
     }
 
-    const dataToSave = {
-      ...formData,
-      nama_template: formData.nama_template || '',
-      deskripsi: formData.deskripsi || '',
-      file: uploadFile || undefined,
-    };
-    onSave(dataToSave);
+    setIsSaving(true);
+    try {
+      const dataToSave = {
+        ...formData,
+        nama_template: formData.nama_template || '',
+        deskripsi: formData.deskripsi || '',
+        file: uploadFile || undefined,
+      };
+      await onSave(dataToSave);
+    } catch (error) {
+      console.error('Error saving:', error);
+      // Error handling is typically done in the parent component
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancel = () => {
+    // Prevent closing if operations are in progress
+    if (isSaving || isDownloading || deletingFile) {
+      return;
+    }
     onOpenChange(false);
   };
 
   const handleUploadFileChange = (files: File[]) => {
+    // Prevent file changes during save operation
+    if (isSaving) return;
     setUploadFile(files[0] || null);
   };
 
   const handleDownloadTemplate = async () => {
-    if (!item?.id) return;
+    if (!item?.id || isDownloading) return;
     
+    setIsDownloading(true);
     try {
       const blob = await formatKuisionerService.downloadTemplate(item.id);
       const url = window.URL.createObjectURL(blob);
@@ -122,13 +145,27 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'Download berhasil',
+        description: 'Template berhasil didownload.',
+        variant: 'default'
+      });
     } catch (error) {
       console.error('Error downloading file:', error);
+      toast({
+        title: 'Download gagal',
+        description: 'Terjadi kesalahan saat mendownload template.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsDownloading(false);
     }
   };
 
   const handleExistingFileRemove = () => {
-    if (!existingFiles[0] || !existingFiles[0].filename) return;
+    // Prevent file removal during save operation
+    if (isSaving || !existingFiles[0] || !existingFiles[0].filename) return;
     
     const fileToRemove = existingFiles[0];
     setFileToDelete({
@@ -139,7 +176,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
   };
 
   const handleConfirmDelete = async () => {
-    if (!fileToDelete || !item?.id) return;
+    if (!fileToDelete || !item?.id || deletingFile) return;
     
     setDeletingFile(true);
     try {
@@ -155,7 +192,11 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       });
     } catch (error) {
       console.error('Error deleting file:', error);
-      
+      toast({
+        title: 'Hapus file gagal',
+        description: 'Terjadi kesalahan saat menghapus file.',
+        variant: 'destructive'
+      });
     } finally {
       setDeletingFile(false);
       setFileToDelete(null);
@@ -164,8 +205,9 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
-    if (!item?.id) return;
+    if (!item?.id || isDownloading) return;
     
+    setIsDownloading(true);
     try {
       const blob = await formatKuisionerService.downloadTemplate(item.id);
       const url = window.URL.createObjectURL(blob);
@@ -176,8 +218,21 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'Download berhasil',
+        description: 'File berhasil didownload.',
+        variant: 'default'
+      });
     } catch (error) {
       console.error('Error downloading file:', error);
+      toast({
+        title: 'Download gagal',
+        description: 'Terjadi kesalahan saat mendownload file.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -185,6 +240,9 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
     formData.deskripsi.trim() && 
     formData.tahun &&
     isAdmin();
+
+  // Determine if any operation is in progress
+  const isOperationInProgress = isSaving || isDownloading || deletingFile;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -203,8 +261,8 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
                 id="nama_template"
                 value={formData.nama_template || ''}
                 onChange={(e) => setFormData({ ...formData, nama_template: e.target.value })}
-                disabled={!isEditable}
-                className={!isEditable ? "bg-muted" : ""}
+                disabled={!isEditable || isSaving}
+                className={(!isEditable || isSaving) ? "bg-muted" : ""}
                 placeholder="Nama template kuesioner"
               />
             </div>
@@ -215,8 +273,8 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
                 id="deskripsi"
                 value={formData.deskripsi || ''}
                 onChange={(e) => setFormData({ ...formData, deskripsi: e.target.value })}
-                disabled={!isEditable}
-                className={!isEditable ? "bg-muted" : ""}
+                disabled={!isEditable || isSaving}
+                className={(!isEditable || isSaving) ? "bg-muted" : ""}
                 placeholder="Deskripsi template kuesioner"
                 rows={4}
               />
@@ -229,8 +287,8 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
                 type="number"
                 value={formData.tahun || ''}
                 onChange={(e) => setFormData({ ...formData, tahun: parseInt(e.target.value) || new Date().getFullYear() })}
-                disabled={!isEditable}
-                className={!isEditable ? "bg-muted" : ""}
+                disabled={!isEditable || isSaving}
+                className={(!isEditable || isSaving) ? "bg-muted" : ""}
                 placeholder="Tahun"
                 min="2000"
                 max="2099"
@@ -245,8 +303,8 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
               maxFiles={1}
               files={uploadFile ? [uploadFile] : []}
               existingFiles={existingFiles}
-              mode={isEditable ? 'edit' : 'view'}
-              disabled={!isEditable}
+              mode={isEditable && !isSaving ? 'edit' : 'view'}
+              disabled={!isEditable || isSaving}
               onFilesChange={handleUploadFileChange}
               onExistingFileRemove={handleExistingFileRemove}
               onFileDownload={handleFileDownload}
@@ -256,18 +314,46 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
         </div>
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
-          <Button variant="outline" onClick={handleCancel}>
+          <Button 
+            variant="outline" 
+            onClick={handleCancel}
+            disabled={isOperationInProgress}
+          >
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
+          
           {mode === 'view' && item?.has_file && (
-            <Button onClick={handleDownloadTemplate}>
-              <Download className="w-4 h-4 mr-2" />
-              Download Template
+            <Button 
+              onClick={handleDownloadTemplate}
+              disabled={isDownloading}
+            >
+              {isDownloading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Downloading...
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4 mr-2" />
+                  Download Template
+                </>
+              )}
             </Button>
           )}
+          
           {mode === 'edit' && isAdmin() && (
-            <Button onClick={handleSave} disabled={!isFormValid}>
-              Simpan
+            <Button 
+              onClick={handleSave} 
+              disabled={!isFormValid || isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  {isCreating ? 'Menyimpan...' : 'Memperbarui...'}
+                </>
+              ) : (
+                'Simpan'
+              )}
             </Button>
           )}
         </DialogFooter>
@@ -276,7 +362,12 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       {/* File Delete Confirmation Dialog */}
       <FileDeleteConfirmDialog
         open={deleteConfirmOpen}
-        onOpenChange={setDeleteConfirmOpen}
+        onOpenChange={(open) => {
+          // Prevent closing during delete operation
+          if (!deletingFile) {
+            setDeleteConfirmOpen(open);
+          }
+        }}
         fileName={fileToDelete?.name || ''}
         onConfirm={handleConfirmDelete}
         loading={deletingFile}

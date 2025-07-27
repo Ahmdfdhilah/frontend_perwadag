@@ -19,6 +19,7 @@ import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { kuisionerService } from '@/services/kuisioner';
 import { useToast } from '@workspace/ui/components/sonner';
+import { Loader2 } from 'lucide-react';
 
 interface KuesionerDialogProps {
   open: boolean;
@@ -44,6 +45,10 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<{ name: string; filename: string } | null>(null);
   const [deletingFile, setDeletingFile] = useState(false);
+  
+  // Loading states for different operations
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     if (item && open) {
@@ -76,27 +81,47 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
       setFileToDelete(null);
       setDeleteConfirmOpen(false);
     }
+    
+    // Reset loading states when dialog opens/closes
+    setIsSaving(false);
+    setIsDownloading(false);
   }, [item, open]);
 
   const handleSave = async () => {
-    const dataToSave = {
-      tanggal_kuisioner: selectedDate ? formatDateForAPI(selectedDate) : formData.tanggal_kuisioner,
-      link_dokumen_data_dukung: formData.link_dokumen_data_dukung || '',
-      files: uploadFiles,
-    };
-    onSave(dataToSave);
+    if (isSaving) return;
+    
+    setIsSaving(true);
+    try {
+      const dataToSave = {
+        tanggal_kuisioner: selectedDate ? formatDateForAPI(selectedDate) : formData.tanggal_kuisioner,
+        link_dokumen_data_dukung: formData.link_dokumen_data_dukung || '',
+        files: uploadFiles,
+      };
+      await onSave(dataToSave);
+    } catch (error) {
+      console.error('Error saving:', error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleCancel = () => {
+    // Prevent closing if operations are in progress
+    if (isSaving || isDownloading || deletingFile) {
+      return;
+    }
     onOpenChange(false);
   };
 
   const handleUploadFilesChange = (files: File[]) => {
+    // Prevent file changes during save operation
+    if (isSaving) return;
     setUploadFiles(files);
   };
 
   const handleExistingFilesRemove = (index: number) => {
-    if (!existingFiles[index] || !existingFiles[index].filename) return;
+    // Prevent file removal during save operation
+    if (isSaving || !existingFiles[index] || !existingFiles[index].filename) return;
     
     const fileToRemove = existingFiles[index];
     setFileToDelete({
@@ -107,7 +132,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   };
 
   const handleConfirmDelete = async () => {
-    if (!fileToDelete || !item?.id) return;
+    if (!fileToDelete || !item?.id || deletingFile) return;
     
     setDeletingFile(true);
     try {
@@ -123,7 +148,11 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
       });
     } catch (error) {
       console.error('Error deleting file:', error);
-      
+      toast({
+        title: 'Hapus file gagal',
+        description: 'Terjadi kesalahan saat menghapus file.',
+        variant: 'destructive'
+      });
     } finally {
       setDeletingFile(false);
       setFileToDelete(null);
@@ -132,8 +161,9 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
-    if (!item?.id) return;
+    if (!item?.id || isDownloading) return;
     
+    setIsDownloading(true);
     try {
       const blob = await kuisionerService.downloadFile(item.id);
       const url = window.URL.createObjectURL(blob);
@@ -144,21 +174,36 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: 'Download berhasil',
+        description: 'File berhasil didownload.',
+        variant: 'default'
+      });
     } catch (error) {
       console.error('Error downloading file:', error);
+      toast({
+        title: 'Download gagal',
+        description: 'Terjadi kesalahan saat mendownload file.',
+        variant: 'destructive'
+      });
+    } finally {
+      setIsDownloading(false);
     }
   };
 
-
   const isEditable = mode === 'edit';
   const canEdit = canEditForm('kuesioner') && isEditable;
+  
+  // Determine if any operation is in progress
+  const isOperationInProgress = isSaving || isDownloading || deletingFile;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0 border-b pb-4">
           <DialogTitle>
-            {mode === 'view' ? 'Lihat Kuesioner' : 'Edit Kuesioner'}
+            {canEdit ? 'Edit Kuesioner' : 'Lihat Kuesioner'}
           </DialogTitle>
         </DialogHeader>
 
@@ -182,13 +227,13 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="tanggal_kuisioner">Tanggal Kuesioner</Label>
+              <Label htmlFor="tanggal_kuisioner">Tanggal Kuisioner</Label>
               {canEdit ? (
                 <DatePicker
                   value={selectedDate}
                   onChange={setSelectedDate}
-                  placeholder="Pilih tanggal kuesioner"
-                  disabled={!canEdit}
+                  placeholder="Pilih tanggal"
+                  disabled={isSaving}
                 />
               ) : (
                 <div className="p-3 bg-muted rounded-md">
@@ -197,49 +242,29 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
               )}
             </div>
 
-            {/* Link Dokumen Data Dukung */}
             <div className="space-y-2">
               <Label htmlFor="link_dokumen_data_dukung">Link Dokumen Data Dukung</Label>
-              {canEdit ? (
-                <Input
-                  id="link_dokumen_data_dukung"
-                  type="url"
-                  placeholder="https://drive.google.com/..."
-                  value={formData.link_dokumen_data_dukung || ''}
-                  onChange={(e) => setFormData((prev: any) => ({ 
-                    ...prev, 
-                    link_dokumen_data_dukung: e.target.value 
-                  }))}
-                />
-              ) : (
-                <div className="p-3 bg-muted rounded-md">
-                  {item?.link_dokumen_data_dukung ? (
-                    <a
-                      href={item.link_dokumen_data_dukung}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 underline break-all"
-                    >
-                      {item.link_dokumen_data_dukung}
-                    </a>
-                  ) : (
-                    '-'
-                  )}
-                </div>
-              )}
+              <Input
+                id="link_dokumen_data_dukung"
+                value={formData.link_dokumen_data_dukung || ''}
+                onChange={(e) => setFormData({ ...formData, link_dokumen_data_dukung: e.target.value })}
+                disabled={!canEdit || isSaving}
+                className={(!canEdit || isSaving) ? "bg-muted" : ""}
+                placeholder="https://example.com/dokumen"
+              />
             </div>
 
-            {/* Upload File Kuesioner */}
+            {/* Upload File Kuisioner */}
             <FileUpload
-              label="Upload File Kuesioner"
+              label="Upload File Kuisioner"
               accept=".pdf,.doc,.docx"
               multiple={false}
               maxSize={10 * 1024 * 1024} // 10MB
               maxFiles={1}
               files={uploadFiles}
               existingFiles={existingFiles}
-              mode={canEdit ? 'edit' : 'view'}
-              disabled={!canEdit}
+              mode={canEdit && !isSaving ? 'edit' : 'view'}
+              disabled={!canEdit || isSaving}
               onFilesChange={handleUploadFilesChange}
               onExistingFileRemove={handleExistingFilesRemove}
               onFileDownload={handleFileDownload}
@@ -249,12 +274,26 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
         </div>
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
-          <Button variant="outline" onClick={handleCancel}>
+          <Button 
+            variant="outline" 
+            onClick={handleCancel}
+            disabled={isOperationInProgress}
+          >
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
           {canEdit && (
-            <Button onClick={handleSave}>
-              Simpan
+            <Button 
+              onClick={handleSave}
+              disabled={isSaving}
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Menyimpan...
+                </>
+              ) : (
+                'Simpan'
+              )}
             </Button>
           )}
         </DialogFooter>
@@ -263,7 +302,12 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
       {/* File Delete Confirmation Dialog */}
       <FileDeleteConfirmDialog
         open={deleteConfirmOpen}
-        onOpenChange={setDeleteConfirmOpen}
+        onOpenChange={(open) => {
+          // Prevent closing during delete operation
+          if (!deletingFile) {
+            setDeleteConfirmOpen(open);
+          }
+        }}
         fileName={fileToDelete?.name || ''}
         onConfirm={handleConfirmDelete}
         loading={deletingFile}

@@ -9,7 +9,7 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Loader2 } from 'lucide-react';
 import DatePicker from '@/components/common/DatePicker';
 import { MeetingResponse } from '@/services/meeting/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
@@ -45,6 +45,10 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<{ index: number; name: string; filename: string } | null>(null);
   const [deletingFile, setDeletingFile] = useState(false);
+  
+  // Loading states for different operations
+  const [isSaving, setIsSaving] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     if (item && open) {
@@ -75,6 +79,10 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
       setFileToDelete(null);
       setDeleteConfirmOpen(false);
     }
+    
+    // Reset loading states when dialog opens/closes
+    setIsSaving(false);
+    setIsDownloading(false);
   }, [item, open]);
 
   const handleSave = () => {
