@@ -5,8 +5,6 @@ import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import { MeetingResponse, MeetingFilterParams } from '@/services/meeting/types';
 import { meetingService } from '@/services/meeting';
-import { userService } from '@/services/users';
-import { PerwadagSummary, PerwadagSearchParams } from '@/services/users/types';
 import { getDefaultYearOptions, findPeriodeByYear } from '@/utils/yearUtils';
 import { periodeEvaluasiService } from '@/services/periodeEvaluasi';
 import { PeriodeEvaluasi } from '@/services/periodeEvaluasi/types';
@@ -20,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@workspace/ui/components/select';
-import { Combobox } from '@workspace/ui/components/combobox';
+import { PerwadagCombobox } from '@/components/common/PerwadagCombobox';
 import { Label } from '@workspace/ui/components/label';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
@@ -66,8 +64,6 @@ const ExitMeetingPage: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MeetingResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
-  const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
-  const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
   const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
   const [periodeEvaluasi, setPeriodeEvaluasi] = useState<PeriodeEvaluasi[]>([]);
 
@@ -130,28 +126,11 @@ const ExitMeetingPage: React.FC = () => {
     }
   };
 
-  // Fetch available perwadag
-  const fetchAvailablePerwadag = async () => {
-    try {
-      const params: PerwadagSearchParams = {};
-
-      // If current user is inspektorat, filter by their inspektorat
-      if (isInspektorat() && user?.inspektorat) {
-        params.inspektorat = user.inspektorat;
-      }
-
-      const response = await userService.getPerwadagList(params);
-      setAvailablePerwadag(response.items || []);
-    } catch (error) {
-      console.error('Failed to fetch perwadag list:', error);
-    }
-  };
 
   // Effect to fetch meetings when filters change
   useEffect(() => {
     if (hasAccess) {
       fetchMeetings();
-      fetchAvailablePerwadag();
       fetchYearOptions();
       fetchPeriodeEvaluasi();
     }
@@ -237,10 +216,7 @@ const ExitMeetingPage: React.FC = () => {
     }
 
     if (filters.user_perwadag_id !== 'all') {
-      const selectedPerwadag = availablePerwadag.find(p => p.id === filters.user_perwadag_id);
-      if (selectedPerwadag) {
-        activeFilters.push(`Perwadag ${selectedPerwadag.nama}`);
-      }
+      activeFilters.push(`Perwadag Terpilih`);
     }
 
     if (activeFilters.length > 0) {
@@ -334,28 +310,9 @@ const ExitMeetingPage: React.FC = () => {
         {(isAdmin() || isInspektorat()) && (
           <div className="space-y-2">
             <Label htmlFor="perwadag-filter">Perwadag</Label>
-            <Combobox
-              options={[
-                { value: 'all', label: 'Semua Perwadag' },
-                ...availablePerwadag
-                  .filter(perwadag =>
-                    perwadagSearchValue === '' ||
-                    perwadag.nama.toLowerCase().includes(perwadagSearchValue.toLowerCase()) ||
-                    perwadag.inspektorat?.toLowerCase().includes(perwadagSearchValue.toLowerCase())
-                  )
-                  .map(perwadag => ({
-                    value: perwadag.id,
-                    label: perwadag.nama,
-                    description: perwadag.inspektorat || ''
-                  }))
-              ]}
+            <PerwadagCombobox
               value={filters.user_perwadag_id}
-              onChange={(value) => handlePerwadagChange(value.toString())}
-              placeholder="Pilih perwadag"
-              searchPlaceholder="Cari perwadag..."
-              searchValue={perwadagSearchValue}
-              onSearchChange={setPerwadagSearchValue}
-              emptyMessage="Tidak ada perwadag yang ditemukan"
+              onChange={handlePerwadagChange}
             />
           </div>
         )}

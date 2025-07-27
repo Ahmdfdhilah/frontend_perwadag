@@ -79,8 +79,10 @@ ComboboxSeparator.displayName = CommandPrimitive.Separator.displayName
 
 const ComboboxItem = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item> & { 
+    showCheck?: boolean 
+  }
+>(({ className, children, showCheck = true, ...props }, ref) => (
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
@@ -89,7 +91,7 @@ const ComboboxItem = React.forwardRef<
     )}
     {...props}
   >
-    <Check className="mr-2 h-4 w-4 opacity-0 aria-selected:opacity-100" />
+    {showCheck && <Check className="mr-2 h-4 w-4 opacity-0 aria-selected:opacity-100" />}
     {children}
   </CommandPrimitive.Item>
 ))
@@ -221,7 +223,11 @@ export function Combobox({
           {selectedOption ? selectedOption.label : placeholder}
         </ComboboxButton>
       </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+      <PopoverContent 
+        className="w-[var(--radix-popover-trigger-width)] p-0" 
+        align="start"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <ComboboxRoot shouldFilter={false}>
           <ComboboxInput 
             placeholder={searchPlaceholder} 
@@ -242,9 +248,11 @@ export function Combobox({
                 {options.map((option) => (
                   <div
                     key={option.value}
-                    className="relative flex cursor-pointer select-none items-start rounded-sm px-3 py-2 text-sm outline-none hover:bg-primary hover:text-accent-foreground"
-                    onClick={() => handleSelect(option.value)}
-                    onMouseDown={(e) => e.preventDefault()}
+                    className="relative flex cursor-pointer select-none items-start rounded-sm px-3 py-2 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50 gap-1"
+                    onMouseDown={(e) => {
+                      e.preventDefault()
+                      handleSelect(option.value)
+                    }}
                   >
                     <div className="flex flex-col gap-1 w-full">
                       <div className="font-medium leading-none">
