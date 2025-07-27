@@ -134,11 +134,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
       });
     } catch (error) {
       console.error('Error deleting file:', error);
-      toast({
-        title: 'Gagal menghapus file',
-        description: `Terjadi kesalahan saat menghapus file ${fileToDelete.name}.`,
-        variant: 'destructive'
-      });
+      
     } finally {
       setDeletingFile(false);
       setFileToDelete(null);
