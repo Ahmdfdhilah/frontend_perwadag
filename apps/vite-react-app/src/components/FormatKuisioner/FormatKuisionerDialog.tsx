@@ -52,7 +52,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<{ name: string; filename: string } | null>(null);
   const [deletingFile, setDeletingFile] = useState(false);
-  
+
   // Loading states for different operations
   const [isSaving, setIsSaving] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -67,7 +67,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
         deskripsi: item.deskripsi || '',
         tahun: item.tahun,
       });
-      
+
       // Set existing files for display
       setExistingFiles(item.has_file ? [{
         name: item.file_metadata?.original_filename || item.file_metadata?.filename || item.nama_template,
@@ -88,7 +88,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       setFileToDelete(null);
       setDeleteConfirmOpen(false);
     }
-    
+
     // Reset loading states when dialog opens/closes
     setIsSaving(false);
     setIsDownloading(false);
@@ -133,7 +133,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
 
   const handleDownloadTemplate = async () => {
     if (!item?.id || isDownloading) return;
-    
+
     setIsDownloading(true);
     try {
       const blob = await formatKuisionerService.downloadTemplate(item.id);
@@ -145,7 +145,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      
+
       toast({
         title: 'Download berhasil',
         description: 'Template berhasil didownload.',
@@ -153,11 +153,6 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       });
     } catch (error) {
       console.error('Error downloading file:', error);
-      toast({
-        title: 'Download gagal',
-        description: 'Terjadi kesalahan saat mendownload template.',
-        variant: 'destructive'
-      });
     } finally {
       setIsDownloading(false);
     }
@@ -166,7 +161,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
   const handleExistingFileRemove = () => {
     // Prevent file removal during save operation
     if (isSaving || !existingFiles[0] || !existingFiles[0].filename) return;
-    
+
     const fileToRemove = existingFiles[0];
     setFileToDelete({
       name: fileToRemove.name,
@@ -177,14 +172,14 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
 
   const handleConfirmDelete = async () => {
     if (!fileToDelete || !item?.id || deletingFile) return;
-    
+
     setDeletingFile(true);
     try {
       await formatKuisionerService.deleteFile(item.id, fileToDelete.filename);
-      
+
       // Remove from UI
       setExistingFiles([]);
-      
+
       toast({
         title: 'File berhasil dihapus',
         description: `File ${fileToDelete.name} telah dihapus.`,
@@ -192,11 +187,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       });
     } catch (error) {
       console.error('Error deleting file:', error);
-      toast({
-        title: 'Hapus file gagal',
-        description: 'Terjadi kesalahan saat menghapus file.',
-        variant: 'destructive'
-      });
+
     } finally {
       setDeletingFile(false);
       setFileToDelete(null);
@@ -206,7 +197,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
     if (!item?.id || isDownloading) return;
-    
+
     setIsDownloading(true);
     try {
       const blob = await formatKuisionerService.downloadTemplate(item.id);
@@ -218,7 +209,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      
+
       toast({
         title: 'Download berhasil',
         description: 'File berhasil didownload.',
@@ -226,18 +217,13 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
       });
     } catch (error) {
       console.error('Error downloading file:', error);
-      toast({
-        title: 'Download gagal',
-        description: 'Terjadi kesalahan saat mendownload file.',
-        variant: 'destructive'
-      });
     } finally {
       setIsDownloading(false);
     }
   };
 
-  const isFormValid = formData.nama_template.trim() && 
-    formData.deskripsi.trim() && 
+  const isFormValid = formData.nama_template.trim() &&
+    formData.deskripsi.trim() &&
     formData.tahun &&
     isAdmin();
 
@@ -314,16 +300,16 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
         </div>
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={handleCancel}
             disabled={isOperationInProgress}
           >
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
-          
+
           {mode === 'view' && item?.has_file && (
-            <Button 
+            <Button
               onClick={handleDownloadTemplate}
               disabled={isDownloading}
             >
@@ -340,10 +326,10 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
               )}
             </Button>
           )}
-          
+
           {mode === 'edit' && isAdmin() && (
-            <Button 
-              onClick={handleSave} 
+            <Button
+              onClick={handleSave}
               disabled={!isFormValid || isSaving}
             >
               {isSaving ? (

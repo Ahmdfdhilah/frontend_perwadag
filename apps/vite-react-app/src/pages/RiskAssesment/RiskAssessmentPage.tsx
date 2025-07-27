@@ -248,11 +248,7 @@ const RiskAssessmentPage: React.FC = () => {
       setItemToDelete(null);
     } catch (error) {
       console.error('Failed to delete risk assessment:', error);
-      toast({
-        title: 'Error',
-        description: 'Gagal menghapus data penilaian risiko.',
-        variant: 'destructive',
-      });
+     
     }
   };
 

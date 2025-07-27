@@ -45,7 +45,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<{ name: string; filename: string } | null>(null);
   const [deletingFile, setDeletingFile] = useState(false);
-  
+
   // Loading states for different operations
   const [isSaving, setIsSaving] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -81,7 +81,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
       setFileToDelete(null);
       setDeleteConfirmOpen(false);
     }
-    
+
     // Reset loading states when dialog opens/closes
     setIsSaving(false);
     setIsDownloading(false);
@@ -89,7 +89,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
 
   const handleSave = async () => {
     if (isSaving) return;
-    
+
     setIsSaving(true);
     try {
       const dataToSave = {
@@ -122,7 +122,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
   const handleExistingFilesRemove = (index: number) => {
     // Prevent file removal during save operation
     if (isSaving || !existingFiles[index] || !existingFiles[index].filename) return;
-    
+
     const fileToRemove = existingFiles[index];
     setFileToDelete({
       name: fileToRemove.name,
@@ -133,14 +133,14 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
 
   const handleConfirmDelete = async () => {
     if (!fileToDelete || !item?.id || deletingFile) return;
-    
+
     setDeletingFile(true);
     try {
       await kuisionerService.deleteFile(item.id, fileToDelete.filename);
-      
+
       // Remove from UI
       setExistingFiles([]);
-      
+
       toast({
         title: 'File berhasil dihapus',
         description: `File ${fileToDelete.name} telah dihapus.`,
@@ -148,11 +148,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
       });
     } catch (error) {
       console.error('Error deleting file:', error);
-      toast({
-        title: 'Hapus file gagal',
-        description: 'Terjadi kesalahan saat menghapus file.',
-        variant: 'destructive'
-      });
+
     } finally {
       setDeletingFile(false);
       setFileToDelete(null);
@@ -162,7 +158,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
     if (!item?.id || isDownloading) return;
-    
+
     setIsDownloading(true);
     try {
       const blob = await kuisionerService.downloadFile(item.id);
@@ -174,7 +170,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-      
+
       toast({
         title: 'Download berhasil',
         description: 'File berhasil didownload.',
@@ -182,11 +178,6 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
       });
     } catch (error) {
       console.error('Error downloading file:', error);
-      toast({
-        title: 'Download gagal',
-        description: 'Terjadi kesalahan saat mendownload file.',
-        variant: 'destructive'
-      });
     } finally {
       setIsDownloading(false);
     }
@@ -194,7 +185,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
 
   const isEditable = mode === 'edit';
   const canEdit = canEditForm('kuesioner') && isEditable;
-  
+
   // Determine if any operation is in progress
   const isOperationInProgress = isSaving || isDownloading || deletingFile;
 
@@ -274,15 +265,15 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
         </div>
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={handleCancel}
             disabled={isOperationInProgress}
           >
             {mode === 'view' ? 'Tutup' : 'Batal'}
           </Button>
           {canEdit && (
-            <Button 
+            <Button
               onClick={handleSave}
               disabled={isSaving}
             >

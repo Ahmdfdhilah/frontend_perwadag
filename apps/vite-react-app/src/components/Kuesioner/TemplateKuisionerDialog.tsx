@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import { FormatKuisionerResponse } from '@/services/formatKuisioner/types';
 import { formatKuisionerService } from '@/services/formatKuisioner';
-import { useToast } from '@workspace/ui/components/sonner';
 import FileUpload from '@/components/common/FileUpload';
 
 interface TemplateKuisionerDialogProps {
@@ -26,7 +25,6 @@ const TemplateKuisionerDialog: React.FC<TemplateKuisionerDialogProps> = ({
   open,
   onOpenChange,
 }) => {
-  const { toast } = useToast();
   const [latestTemplate, setLatestTemplate] = useState<FormatKuisionerResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -57,7 +55,7 @@ const TemplateKuisionerDialog: React.FC<TemplateKuisionerDialogProps> = ({
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, []);
 
   // Fetch latest template when dialog opens
   useEffect(() => {

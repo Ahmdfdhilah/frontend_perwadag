@@ -160,11 +160,7 @@ const QuestionnaireTemplatePage: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to delete template:', error);
-      toast({
-        title: 'Gagal menghapus',
-        description: 'Terjadi kesalahan saat menghapus template.',
-        variant: 'destructive'
-      });
+     
     } finally {
       setDeleteDialogOpen(false);
       setItemToDelete(null);

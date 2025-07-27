@@ -304,23 +304,6 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
 
     } catch (error) {
       console.error('Failed to compose email:', error);
-      
-      // Handle specific error cases
-      let errorMessage = 'Gagal membuat email. Silakan coba lagi.';
-      
-      if (error instanceof Error) {
-        if (error.message.includes('404')) {
-          errorMessage = 'Template email tidak ditemukan atau laporan tidak ditemukan.';
-        } else if (error.message.includes('Tidak ada template email yang aktif')) {
-          errorMessage = 'Tidak ada template email yang aktif. Silakan hubungi administrator.';
-        }
-      }
-      
-      toast({
-        title: 'Error',
-        description: errorMessage,
-        variant: 'destructive'
-      });
     }
   };
 

@@ -84,11 +84,6 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
       navigate('/login', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
-      toast({
-        title: 'Logout gagal',
-        description: 'Terjadi kesalahan saat logout. Silakan coba lagi.',
-        variant: 'destructive'
-      });
     } finally {
       setIsLoggingOut(false);
     }

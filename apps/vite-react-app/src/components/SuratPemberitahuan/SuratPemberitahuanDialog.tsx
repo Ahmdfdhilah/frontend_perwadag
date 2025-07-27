@@ -144,11 +144,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
       });
     } catch (error) {
       console.error('Error deleting file:', error);
-      toast({
-        title: 'Hapus file gagal',
-        description: 'Terjadi kesalahan saat menghapus file.',
-        variant: 'destructive'
-      });
+    
     } finally {
       setDeletingFile(false);
       setFileToDelete(null);
@@ -178,11 +174,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
       });
     } catch (error) {
       console.error('Error downloading file:', error);
-      toast({
-        title: 'Download gagal',
-        description: 'Terjadi kesalahan saat mendownload file.',
-        variant: 'destructive'
-      });
+   
     } finally {
       setIsDownloading(false);
     }
