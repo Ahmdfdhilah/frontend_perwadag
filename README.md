@@ -1,13 +1,13 @@
-# 🏛️ Perwadag Frontend - Sistem Evaluasi Pemerintahan
+# 🏛️ SIELANGMERAH Frontend - Sistem Evaluasi Kinerja Perwakilan Perdagangan
 
-Aplikasi web frontend modern untuk **Sistem Evaluasi Perdagangan (Perwadag)** yang dibangun dengan React, TypeScript, dan arsitektur monorepo Turborepo. Sistem ini menyediakan platform komprehensif untuk mengelola proses evaluasi pemerintahan dengan fitur manajemen surat tugas, meeting, kuisioner, dan pelaporan.
+Aplikasi web frontend modern untuk **SIELANGMERAH (Sistem Evaluasi Kinerja Perwakilan Perdagangan Metode Jarak Jauh)** yang dibangun dengan React, TypeScript, dan arsitektur monorepo Turborepo. Platform digital untuk evaluasi kinerja perwakilan perdagangan Indonesia di luar negeri menggunakan metode jarak jauh, dikembangkan oleh Kementerian Perdagangan Republik Indonesia.
 
 ## 🏗️ Arsitektur Sistem
 
-Proyek ini menggunakan struktur monorepo yang diperkuat oleh Turborepo, memungkinkan berbagi kode yang efisien dan pengembangan terkoordinasi di seluruh aplikasi evaluasi pemerintahan.
+Proyek ini menggunakan struktur monorepo yang diperkuat oleh Turborepo, memungkinkan berbagi kode yang efisien dan pengembangan terkoordinasi di seluruh aplikasi evaluasi kinerja perwakilan perdagangan.
 
 ### 📱 Aplikasi
-- **vite-react-app** - Aplikasi utama sistem evaluasi Perwadag dengan dashboard, manajemen user, dan workflow evaluasi
+- **vite-react-app** - Aplikasi utama sistem evaluasi SIELANGMERAH dengan dashboard, manajemen user, dan workflow evaluasi
 
 ### 📦 Shared Packages
 - **@workspace/ui** - Komponen UI yang dapat digunakan ulang dengan Tailwind CSS dan Shadcn UI
@@ -51,7 +51,7 @@ pnpm --version
 1. **Clone repository:**
 ```bash
 git clone https://github.com/Ahmdfdhilah/frontend_perwadag.git frontend
-cd perwadag/frontend
+cd sielangmerah/frontend
 ```
 
 2. **Install dependencies:**
@@ -69,7 +69,7 @@ pnpm dev
 
 **Start aplikasi tertentu:**
 ```bash
-# Aplikasi Perwadag utama
+# Aplikasi SIELANGMERAH utama
 pnpm --filter vite-react-app dev
 ```
 
@@ -233,7 +233,7 @@ frontend/
 └── README.md                         # File ini
 ```
 
-## 🌟 Fitur Sistem Perwadag
+## 🌟 Fitur Sistem SIELANGMERAH
 
 ### 🔐 Autentikasi & Otorisasi
 - **Login dengan Nama Lengkap** - Sistem login menggunakan nama lengkap sebagai username
@@ -316,7 +316,7 @@ Buat file `.env.local` di `apps/vite-react-app/`:
 
 ```env
 VITE_API_BASE_URL=http://localhost:8000/api/v1
-VITE_APP_NAME=Sistem Evaluasi Perwadag
+VITE_APP_NAME=SIELANGMERAH
 VITE_APP_VERSION=1.0.0
 ```
 
@@ -363,4 +363,4 @@ Jika Anda mengalami masalah atau memiliki pertanyaan:
 
 ---
 
-Dibangun dengan ❤️ untuk Sistem Evaluasi Pemerintahan Indonesia
+Dibangun dengan ❤️ oleh Kementerian Perdagangan Republik Indonesia
