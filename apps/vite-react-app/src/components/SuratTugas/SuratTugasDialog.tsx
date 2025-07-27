@@ -10,10 +10,9 @@ import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Loader2 } from 'lucide-react';
-import { Combobox } from '@workspace/ui/components/combobox';
+import { PerwadagCombobox } from '@/components/common/PerwadagCombobox';
 import DatePicker from '@/components/common/DatePicker';
 import { SuratTugasResponse } from '@/services/suratTugas/types';
-import { PerwadagSummary } from '@/services/users/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
@@ -27,7 +26,6 @@ interface SuratTugasDialogProps {
   editingItem: SuratTugasResponse | null;
   mode: 'view' | 'edit' | 'create';
   onSave: (data: any) => void;
-  availablePerwadag: PerwadagSummary[];
 }
 
 const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
@@ -36,7 +34,6 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   editingItem,
   mode,
   onSave,
-  availablePerwadag,
 }) => {
   const { canEditForm } = useFormPermissions();
   const { toast } = useToast();
@@ -52,7 +49,6 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<{ name: string; filename: string } | null>(null);
   const [deletingFile, setDeletingFile] = useState(false);
-  const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
   
   // Loading states for different operations
   const [isSaving, setIsSaving] = useState(false);
@@ -96,8 +92,6 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       setDeleteConfirmOpen(false);
     }
     
-    // Reset search when dialog opens/closes
-    setPerwadagSearchValue('');
     
     // Reset loading states when dialog opens/closes
     setIsSaving(false);
@@ -263,25 +257,10 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                   className="bg-muted"
                 />
               ) : (
-                <Combobox
-                  options={availablePerwadag
-                    .filter(perwadag => 
-                      perwadagSearchValue === '' || 
-                      perwadag.nama.toLowerCase().includes(perwadagSearchValue.toLowerCase()) ||
-                      perwadag.inspektorat?.toLowerCase().includes(perwadagSearchValue.toLowerCase())
-                    )
-                    .map(perwadag => ({
-                      value: perwadag.id,
-                      label: perwadag.nama,
-                      description: perwadag.inspektorat || ''
-                    }))}
+                <PerwadagCombobox
                   value={formData.user_perwadag_id}
-                  onChange={(value) => setFormData(prev => ({ ...prev, user_perwadag_id: value.toString() }))}
-                  placeholder="Pilih perwadag"
-                  searchPlaceholder="Cari perwadag..."
-                  searchValue={perwadagSearchValue}
-                  onSearchChange={setPerwadagSearchValue}
-                  emptyMessage="Tidak ada perwadag yang ditemukan"
+                  onChange={(value) => setFormData(prev => ({ ...prev, user_perwadag_id: value }))}
+                  includeAllOption={false}
                 />
               )}
             </div>

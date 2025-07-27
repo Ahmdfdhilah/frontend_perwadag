@@ -13,12 +13,10 @@ import {
   SelectTrigger,
   SelectValue
 } from '@workspace/ui/components/select';
-import { Combobox } from '@workspace/ui/components/combobox';
+import { PerwadagCombobox } from '@/components/common/PerwadagCombobox';
 import { Label } from '@workspace/ui/components/label';
 import { KuisionerResponse, KuisionerFilterParams } from '@/services/kuisioner/types';
 import { kuisionerService } from '@/services/kuisioner';
-import { userService } from '@/services/users';
-import { PerwadagSummary, PerwadagSearchParams } from '@/services/users/types';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import KuesionerTable from '@/components/Kuesioner/KuesionerTable';
@@ -71,8 +69,6 @@ const KuesionerPage: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<KuisionerResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
-  const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
-  const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
   const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
   const [templateDialogOpen, setTemplateDialogOpen] = useState(false);
   const [periodeEvaluasi, setPeriodeEvaluasi] = useState<PeriodeEvaluasi[]>([]);
@@ -134,28 +130,11 @@ const KuesionerPage: React.FC = () => {
     }
   };
 
-  // Fetch available perwadag
-  const fetchAvailablePerwadag = async () => {
-    try {
-      const params: PerwadagSearchParams = {};
-
-      // If current user is inspektorat, filter by their inspektorat
-      if (isInspektorat() && user?.inspektorat) {
-        params.inspektorat = user.inspektorat;
-      }
-
-      const response = await userService.getPerwadagList(params);
-      setAvailablePerwadag(response.items || []);
-    } catch (error) {
-      console.error('Failed to fetch perwadag list:', error);
-    }
-  };
 
   // Effect to fetch data when filters change
   useEffect(() => {
     if (hasAccess) {
       fetchKuisioner();
-      fetchAvailablePerwadag();
       fetchYearOptions();
       fetchPeriodeEvaluasi();
     }
@@ -241,10 +220,7 @@ const KuesionerPage: React.FC = () => {
     }
 
     if (filters.user_perwadag_id !== 'all') {
-      const selectedPerwadag = availablePerwadag.find(p => p.id === filters.user_perwadag_id);
-      if (selectedPerwadag) {
-        activeFilters.push(`Perwadag ${selectedPerwadag.nama}`);
-      }
+      activeFilters.push('Perwadag Terpilih');
     }
 
     if (filters.has_file !== 'all') {
@@ -349,28 +325,9 @@ const KuesionerPage: React.FC = () => {
         {(isAdmin() || isInspektorat()) && (
           <div className="space-y-2">
             <Label htmlFor="perwadag-filter">Perwadag</Label>
-            <Combobox
-              options={[
-                { value: 'all', label: 'Semua Perwadag' },
-                ...availablePerwadag
-                  .filter(perwadag =>
-                    perwadagSearchValue === '' ||
-                    perwadag.nama.toLowerCase().includes(perwadagSearchValue.toLowerCase()) ||
-                    perwadag.inspektorat?.toLowerCase().includes(perwadagSearchValue.toLowerCase())
-                  )
-                  .map(perwadag => ({
-                    value: perwadag.id,
-                    label: perwadag.nama,
-                    description: perwadag.inspektorat || ''
-                  }))
-              ]}
+            <PerwadagCombobox
               value={filters.user_perwadag_id}
-              onChange={(value) => handlePerwadagChange(value.toString())}
-              placeholder="Pilih perwadag"
-              searchPlaceholder="Cari perwadag..."
-              searchValue={perwadagSearchValue}
-              onSearchChange={setPerwadagSearchValue}
-              emptyMessage="Tidak ada perwadag yang ditemukan"
+              onChange={handlePerwadagChange}
             />
           </div>
         )}

@@ -10,7 +10,6 @@ interface PerwadagComboboxProps {
   placeholder?: string;
   includeAllOption?: boolean;
   allOptionLabel?: string;
-  disabled?: boolean;
   className?: string;
 }
 
@@ -20,7 +19,6 @@ export const PerwadagCombobox: React.FC<PerwadagComboboxProps> = ({
   placeholder = "Pilih perwadag",
   includeAllOption = true,
   allOptionLabel = "Semua Perwadag",
-  disabled = false,
   className
 }) => {
   const { isInspektorat, user } = useRole();

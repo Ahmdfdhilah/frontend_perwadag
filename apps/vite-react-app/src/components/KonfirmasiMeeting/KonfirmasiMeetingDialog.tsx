@@ -12,7 +12,6 @@ import { Label } from '@workspace/ui/components/label';
 import { ExternalLink, Loader2 } from 'lucide-react';
 import DatePicker from '@/components/common/DatePicker';
 import { MeetingResponse } from '@/services/meeting/types';
-import { PerwadagSummary } from '@/services/users/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useRole } from '@/hooks/useRole';
 import { formatIndonesianDateRange, formatDateForAPI } from '@/utils/timeFormat';
@@ -29,7 +28,6 @@ interface KonfirmasiMeetingDialogProps {
   item: MeetingResponse | null;
   mode: 'view' | 'edit';
   onSave: (data: any) => void;
-  availablePerwadag?: PerwadagSummary[];
 }
 
 const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
