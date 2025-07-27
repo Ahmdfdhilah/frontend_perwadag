@@ -48,7 +48,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
     tahun: new Date().getFullYear(),
   });
   const [uploadFile, setUploadFile] = useState<File | null>(null);
-  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string; filename: string }>>([]);
+  const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string; size?: number; filename: string }>>([]);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<{ name: string; filename: string } | null>(null);
   const [deletingFile, setDeletingFile] = useState(false);
@@ -69,6 +69,7 @@ const QuestionnaireDialog: React.FC<QuestionnaireDialogProps> = ({
         name: item.file_metadata?.original_filename || item.file_metadata?.filename || item.nama_template,
         url: item.file_urls?.file_url,
         viewUrl: item.file_urls?.view_url,
+        size: item.file_metadata?.size,
         filename: item.file_metadata?.original_filename || item.file_metadata?.filename
       }] : []);
     } else {
