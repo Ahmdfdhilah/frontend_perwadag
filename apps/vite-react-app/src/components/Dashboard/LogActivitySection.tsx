@@ -6,8 +6,7 @@ import { LogActivityResponse, LogActivityFilterParams } from '@/services/log-act
 import SearchContainer from '@/components/common/SearchContainer';
 import InfiniteScrollPagination from '@/components/common/InfiniteScrollPagination';
 import { useDebounce } from '@/hooks/useDebounce';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
+import { formatIndonesianDateTime } from '@/utils/timeFormat';
 
 interface LogActivitySectionProps {
   className?: string;
@@ -107,7 +106,7 @@ const LogActivitySection: React.FC<LogActivitySectionProps> = ({
           <div className="flex items-center space-x-1">
             <Clock className="h-3 w-3" />
             <span>
-              {format(new Date(log.date), 'dd/MM/yyyy HH:mm', { locale: id })} WIB
+              {formatIndonesianDateTime(log.date)} WIB
             </span>
           </div>
         </div>

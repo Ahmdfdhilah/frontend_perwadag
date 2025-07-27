@@ -103,3 +103,66 @@ export const formatDateForAPI = (date: Date): string => {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 };
+
+// Convert UTC date to Indonesian time (WIB/UTC+7) and format
+export const formatIndonesianDateTime = (dateString: string): string => {
+    try {
+        // Parse the date string - handle both with and without 'Z' suffix
+        let utcDate: Date;
+        if (dateString.endsWith('Z')) {
+            utcDate = new Date(dateString);
+        } else {
+            // If no timezone info, assume it's UTC
+            utcDate = new Date(dateString + 'Z');
+        }
+        
+        // Check if date is valid
+        if (isNaN(utcDate.getTime())) {
+            return 'Waktu tidak valid';
+        }
+        
+        // Convert to Indonesian timezone using toLocaleString
+        const indonesiaTime = utcDate.toLocaleString('id-ID', {
+            timeZone: 'Asia/Jakarta',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false
+        });
+        
+        // Format: "27/07/2025, 11:31" -> "27/07/2025 11:31"
+        return indonesiaTime.replace(',', '');
+        
+    } catch (error) {
+        console.error('Error formatting Indonesian datetime:', error);
+        return 'Waktu tidak valid';
+    }
+};
+
+// Alternative manual conversion for debugging
+export const formatIndonesianDateTimeManual = (dateString: string): string => {
+    try {
+        let utcDate: Date;
+        if (dateString.endsWith('Z')) {
+            utcDate = new Date(dateString);
+        } else {
+            utcDate = new Date(dateString + 'Z');
+        }
+        
+        // Manual offset calculation (UTC+7)
+        const indonesiaOffset = 7 * 60 * 60 * 1000;
+        const indonesiaDate = new Date(utcDate.getTime() + indonesiaOffset);
+        
+        const day = String(indonesiaDate.getUTCDate()).padStart(2, '0');
+        const month = String(indonesiaDate.getUTCMonth() + 1).padStart(2, '0');
+        const year = indonesiaDate.getUTCFullYear();
+        const hours = String(indonesiaDate.getUTCHours()).padStart(2, '0');
+        const minutes = String(indonesiaDate.getUTCMinutes()).padStart(2, '0');
+        
+        return `${day}/${month}/${year} ${hours}:${minutes}`;
+    } catch {
+        return 'Waktu tidak valid';
+    }
+};
