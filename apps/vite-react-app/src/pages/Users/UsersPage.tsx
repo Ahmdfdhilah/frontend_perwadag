@@ -17,8 +17,7 @@ import { Label } from '@workspace/ui/components/label';
 import { Plus } from 'lucide-react';
 import { UserTable } from '@/components/Users/UserTable';
 import { UserCards } from '@/components/Users/UserCards';
-import { UserDialog } from '@/components/Users/UserDialog';
-import { UserViewDialog } from '@/components/Users/UserViewDialog';
+import UserDialog from '@/components/Users/UserDialog';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import SearchContainer from '@/components/common/SearchContainer';
@@ -67,9 +66,8 @@ const UsersPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [viewingUser, setViewingUser] = useState<User | null>(null);
+  const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('create');
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
   // Calculate access control
@@ -108,12 +106,14 @@ const UsersPage: React.FC = () => {
   const totalPages = Math.ceil(totalItems / filters.size);
 
   const handleView = (user: User) => {
-    setViewingUser(user);
-    setIsViewDialogOpen(true);
+    setSelectedUser(user);
+    setDialogMode('view');
+    setIsDialogOpen(true);
   };
 
   const handleEdit = (user: User) => {
-    setEditingUser(user);
+    setSelectedUser(user);
+    setDialogMode('edit');
     setIsDialogOpen(true);
   };
 
@@ -139,21 +139,22 @@ const UsersPage: React.FC = () => {
   };
 
   const handleCreate = () => {
-    setEditingUser(null);
+    setSelectedUser(null);
+    setDialogMode('create');
     setIsDialogOpen(true);
   };
 
   const handleSave = async (userData: any) => {
     try {
-      if (editingUser) {
+      if (dialogMode === 'edit' && selectedUser) {
         // Update existing user
-        await userService.updateUser(editingUser.id, userData);
+        await userService.updateUser(selectedUser.id, userData);
         toast({
           title: 'User berhasil diperbarui',
           description: `Data user ${userData.nama} telah diperbarui.`,
           variant: 'default'
         });
-      } else {
+      } else if (dialogMode === 'create') {
         // Create new user
         await userService.createUser(userData);
         toast({
@@ -163,7 +164,7 @@ const UsersPage: React.FC = () => {
         });
       }
       setIsDialogOpen(false);
-      setEditingUser(null);
+      setSelectedUser(null);
       fetchUsers(); // Refresh the list
     } catch (error) {
       console.error('Failed to save user:', error);
@@ -334,15 +335,9 @@ const UsersPage: React.FC = () => {
       <UserDialog
         open={isDialogOpen}
         onOpenChange={setIsDialogOpen}
-        editingUser={editingUser}
+        user={selectedUser}
+        mode={dialogMode}
         onSave={handleSave}
-      />
-
-      {/* User View Dialog */}
-      <UserViewDialog
-        open={isViewDialogOpen}
-        onOpenChange={setIsViewDialogOpen}
-        user={viewingUser}
       />
 
       {/* Delete Confirmation Dialog */}
