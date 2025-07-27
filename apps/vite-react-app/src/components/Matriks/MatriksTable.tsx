@@ -58,10 +58,7 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
     );
   };
 
-  const renderAdminInspektoratColumns = () => {
-    // Check if any item can be edited, viewed, or exported
-    const hasActionableItems = data.some(item => canEdit?.(item) || canView?.(item) || onExport);
-    
+  const renderAdminInspektoratColumns = (showActions = false) => {
     return (
       <>
         <TableHead>No</TableHead>
@@ -69,33 +66,32 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
         <TableHead>Tanggal Evaluasi</TableHead>
         <TableHead>Dokumen</TableHead>
         <TableHead>Status</TableHead>
-        {hasActionableItems && <TableHead className="w-[80px]">Aksi</TableHead>}
+        {showActions && <TableHead className="w-[80px]">Aksi</TableHead>}
       </>
     );
   };
 
-  const renderPerwadagColumns = () => {
-    // Check if any item can be edited, viewed, or exported
-    const hasActionableItems = data.some(item => canEdit?.(item) || canView?.(item) || onExport);
-    
+  const renderPerwadagColumns = (showActions = false) => {
     return (
       <>
         <TableHead>No</TableHead>
         <TableHead>Tanggal Evaluasi</TableHead>
         <TableHead>Dokumen</TableHead>
         <TableHead>Status</TableHead>
-        {hasActionableItems && <TableHead className="w-[80px]">Aksi</TableHead>}
+        {showActions && <TableHead className="w-[80px]">Aksi</TableHead>}
       </>
     );
   };
 
   if (loading) {
+    const showActionsColumn = !!(onEdit || onView || onExport);
+
     return (
       <div className="rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-              {userRole === 'perwadag' ? renderPerwadagColumns() : renderAdminInspektoratColumns()}
+              {userRole === 'perwadag' ? renderPerwadagColumns(showActionsColumn) : renderAdminInspektoratColumns(showActionsColumn)}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -106,7 +102,7 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
                 <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                <TableCell className="text-right"><Skeleton className="h-8 w-24 ml-auto" /></TableCell>
+                {showActionsColumn && <TableCell className="text-right"><Skeleton className="h-8 w-24 ml-auto" /></TableCell>}
               </TableRow>
             ))}
           </TableBody>
@@ -192,7 +188,7 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
       <Table>
         <TableHeader>
           <TableRow>
-            {userRole === 'perwadag' ? renderPerwadagColumns() : renderAdminInspektoratColumns()}
+            {userRole === 'perwadag' ? renderPerwadagColumns(hasActionableItems) : renderAdminInspektoratColumns(hasActionableItems)}
           </TableRow>
         </TableHeader>
         <TableBody>
