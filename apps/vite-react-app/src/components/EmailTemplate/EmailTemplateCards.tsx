@@ -1,32 +1,15 @@
 import React from 'react';
-import { Card, CardContent, CardHeader } from '@workspace/ui/components/card';
-import { Button } from '@workspace/ui/components/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Skeleton } from '@workspace/ui/components/skeleton';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@workspace/ui/components/dropdown-menu';
 import { EmailTemplate } from '@/services/emailTemplate/types';
-import {
-  Eye,
-  Edit,
-  Power,
-  Trash2,
-  Loader2,
-  Calendar,
-} from 'lucide-react';
+import ActionDropdown from '@/components/common/ActionDropdown';
 
 interface EmailTemplateCardsProps {
   data: EmailTemplate[];
   loading: boolean;
   onView: (template: EmailTemplate) => void;
   onEdit: (template: EmailTemplate) => void;
-  onActivate: (template: EmailTemplate) => void;
   onDelete: (template: EmailTemplate) => void;
-  activatingTemplate?: EmailTemplate | null;
   currentPage?: number;
   itemsPerPage?: number;
 }
@@ -36,41 +19,50 @@ export const EmailTemplateCards: React.FC<EmailTemplateCardsProps> = ({
   loading,
   onView,
   onEdit,
-  onActivate,
   onDelete,
-  activatingTemplate,
   currentPage = 1,
   itemsPerPage = 10,
 }) => {
-  const truncateText = (text: string, maxLength: number = 80) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
+  const getStatusBadge = (isActive: boolean) => {
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+        isActive
+          ? 'bg-green-100 text-green-800' 
+          : 'bg-red-100 text-red-800'
+      }`}>
+        {isActive ? 'Aktif' : 'Tidak Aktif'}
+      </span>
+    );
   };
 
   if (loading) {
     return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
-        {Array.from({ length: 3 }).map((_, index) => (
-          <Card key={index}>
+      <div className="grid grid-cols-1 gap-4">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <Card key={index} className="w-full">
             <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <div className="space-y-2 flex-1">
-                  <Skeleton className="h-5 w-[200px]" />
-                  <Skeleton className="h-4 w-[150px]" />
-                </div>
-                <Skeleton className="h-6 w-[80px]" />
+              <div className="flex justify-between items-start">
+                <Skeleton className="h-6 w-48" />
+                <Skeleton className="h-8 w-24" />
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
+            <CardContent className="pt-0">
+              <div className="space-y-2 text-sm">
                 <div>
-                  <Skeleton className="h-4 w-20 mb-2" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-12" />
+                  <Skeleton className="h-4 w-8 mt-1" />
                 </div>
-                <div className="flex items-center justify-between pt-2">
-                  <Skeleton className="h-4 w-[120px]" />
-                  <Skeleton className="h-8 w-[40px]" />
+                <div>
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-4 w-32 mt-1" />
+                </div>
+                <div>
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-4 w-40 mt-1" />
+                </div>
+                <div>
+                  <Skeleton className="h-4 w-12" />
+                  <Skeleton className="h-4 w-16 mt-1" />
                 </div>
               </div>
             </CardContent>
@@ -82,106 +74,50 @@ export const EmailTemplateCards: React.FC<EmailTemplateCardsProps> = ({
 
   if (data.length === 0) {
     return (
-      <Card className="text-center p-8">
-        <div className="text-muted-foreground">
-          <p className="text-lg font-medium">Belum ada template email</p>
-          <p className="text-sm">Buat template email pertama untuk memulai.</p>
-        </div>
-      </Card>
+      <div className="flex items-center justify-center h-32 text-muted-foreground">
+        Tidak ada template email ditemukan.
+      </div>
     );
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-1">
+    <div className="grid grid-cols-1 gap-4">
       {data.map((template, index) => (
-        <Card key={template.id} className="relative">
+        <Card key={template.id} className="w-full gap-0">
           <CardHeader className="pb-3">
-            <div className="flex items-start justify-between">
-              <div className="space-y-1 flex-1">
-                <div className="flex items-center gap-3">
-                  <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-medium">
-                    {(currentPage - 1) * itemsPerPage + index + 1}
-                  </span>
-                  <h3 className="font-medium text-lg">{template.name}</h3>
-                </div>
-              </div>
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                template.is_active
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-red-100 text-red-800'
-              }`}>
-                {template.is_active ? 'Aktif' : 'Tidak Aktif'}
-              </span>
+            <div className="flex justify-between items-start">
+              <CardTitle className="text-lg font-semibold">
+                {template.name}
+              </CardTitle>
+              <ActionDropdown
+                onView={() => onView(template)}
+                onEdit={() => onEdit(template)}
+                onDelete={() => onDelete(template)}
+                showView={true}
+                showEdit={true}
+                showDelete={true}
+              />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
+          <CardContent className="pt-0">
+            <div className="space-y-2 text-sm">
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">
-                  Subject Template:
-                </p>
-                <p className="text-sm bg-muted p-2 rounded border">
-                  {truncateText(template.subject_template)}
-                </p>
+                <span className="font-medium text-muted-foreground">No:</span>
+                <span className="ml-2">{(currentPage - 1) * itemsPerPage + index + 1}</span>
               </div>
-
               <div>
-                <p className="text-sm font-medium text-muted-foreground mb-1">
-                  Body Template:
-                </p>
-                <p className="text-sm bg-muted p-2 rounded border font-mono">
-                  {truncateText(template.body_template, 120)}
-                </p>
+                <span className="font-medium text-muted-foreground">Subject Template:</span>
+                <span className="ml-2">{template.subject_template}</span>
               </div>
-
-              <div className="flex items-center justify-between pt-2 border-t">
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <Calendar className="h-3 w-3" />
-                  <span>
-                    {new Date(template.created_at).toLocaleDateString('id-ID')}
-                  </span>
-
-                </div>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="h-8 w-8 p-0">
-                      <span className="sr-only">Buka menu</span>
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onView(template)}>
-                      <Eye className="mr-2 h-4 w-4" />
-                      Lihat
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onEdit(template)}>
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => onActivate(template)}
-                      disabled={template.is_active || activatingTemplate?.id === template.id}
-                    >
-                      {activatingTemplate?.id === template.id ? (
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <Power className="mr-2 h-4 w-4" />
-                      )}
-                      {template.is_active ? 'Sudah Aktif' : 'Aktifkan'}
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => onDelete(template)}
-                      disabled={template.is_active}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      {template.is_active ? 'Tidak Dapat Dihapus' : 'Hapus'}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+              <div>
+                <span className="font-medium text-muted-foreground">Body Template:</span>
+                <span className="ml-2 font-mono text-xs">{template.body_template.substring(0, 80)}...</span>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Status:</span>
+                <span className="ml-2">
+                  {getStatusBadge(template.is_active)}
+                </span>
               </div>
             </div>
           </CardContent>

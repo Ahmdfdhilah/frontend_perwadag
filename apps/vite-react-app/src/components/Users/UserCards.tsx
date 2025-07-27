@@ -1,16 +1,9 @@
 import React from 'react';
 import { User } from '@/services/users/types';
 import { ROLE_LABELS } from '@/lib/constants';
-import { Card, CardContent } from '@workspace/ui/components/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Skeleton } from '@workspace/ui/components/skeleton';
-import ActionDropdown  from '@/components/common/ActionDropdown';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
-import { 
-  Mail, 
-  Calendar, 
-  Building
-} from 'lucide-react';
+import ActionDropdown from '@/components/common/ActionDropdown';
 
 interface UserCardsProps {
   users: User[];
@@ -81,7 +74,7 @@ export const UserCards: React.FC<UserCardsProps> = ({
     };
 
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getInspektoratStyle(inspektorat)}`}>
+      <span className={`px-1 py-1 rounded-full text-xs font-medium ${getInspektoratStyle(inspektorat)}`}>
         {inspektorat}
       </span>
     );
@@ -92,42 +85,34 @@ export const UserCards: React.FC<UserCardsProps> = ({
     return (
       <div className="grid grid-cols-1 gap-4">
         {Array.from({ length: 5 }).map((_, index) => (
-          <Card key={index} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center space-x-3">
-                  <Skeleton className="w-8 h-8 rounded-full" />
-                  <div>
-                    <Skeleton className="h-4 w-32" />
-                    <Skeleton className="h-4 w-24 mt-1" />
-                    <div className="flex items-center space-x-2 mt-1">
-                      <Skeleton className="h-5 w-12" />
-                    </div>
-                  </div>
-                </div>
+          <Card key={index} className="w-full">
+            <CardHeader className="pb-3">
+              <div className="flex justify-between items-start">
+                <Skeleton className="h-6 w-48" />
                 <Skeleton className="h-8 w-24" />
               </div>
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <Skeleton className="w-4 h-4" />
-                  <Skeleton className="h-4 w-24" />
-                </div>
-                <Skeleton className="h-4 w-32" />
-                <div className="flex items-center space-x-2">
-                  <Skeleton className="w-4 h-4" />
-                  <Skeleton className="h-4 w-40" />
-                </div>
-                <div className="flex items-start space-x-2">
-                  <Skeleton className="w-4 h-4 mt-0.5" />
-                  <Skeleton className="h-4 w-48" />
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-2 text-sm">
+                <div>
+                  <Skeleton className="h-4 w-12" />
+                  <Skeleton className="h-4 w-8 mt-1" />
                 </div>
                 <div>
-                  <Skeleton className="h-3 w-16 mb-1" />
-                  <Skeleton className="h-5 w-20" />
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-4 w-32 mt-1" />
                 </div>
-                <div className="flex items-center space-x-2 pt-2 border-t">
-                  <Skeleton className="w-3 h-3" />
-                  <Skeleton className="h-3 w-32" />
+                <div>
+                  <Skeleton className="h-4 w-12" />
+                  <Skeleton className="h-4 w-40 mt-1" />
+                </div>
+                <div>
+                  <Skeleton className="h-4 w-16" />
+                  <Skeleton className="h-4 w-20 mt-1" />
+                </div>
+                <div>
+                  <Skeleton className="h-4 w-12" />
+                  <Skeleton className="h-4 w-16 mt-1" />
                 </div>
               </div>
             </CardContent>
@@ -139,8 +124,8 @@ export const UserCards: React.FC<UserCardsProps> = ({
 
   if (users.length === 0) {
     return (
-      <div className="text-center py-8 text-muted-foreground">
-        Tidak ada user ditemukan
+      <div className="flex items-center justify-center h-32 text-muted-foreground">
+        Tidak ada user ditemukan.
       </div>
     );
   }
@@ -148,67 +133,54 @@ export const UserCards: React.FC<UserCardsProps> = ({
   return (
     <div className="grid grid-cols-1 gap-4">
       {users.map((user, index) => (
-        <Card key={user.id} className="hover:shadow-md transition-shadow">
-          <CardContent className="p-4">
-            {/* Header with Number and Actions */}
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center space-x-3">
-                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-medium">
-                  {(currentPage - 1) * itemsPerPage + index + 1}
-                </span>
-                <div>
-                  <h3 className="font-medium text-sm">{user.nama}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{user.username}</p>
-                  <div className="flex items-center space-x-2 mt-1">
-                    {getStatusBadge(user.is_active)}
-                  </div>
-                </div>
-              </div>
+        <Card key={user.id} className="w-full gap-0">
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-start">
+              <CardTitle className="text-lg font-semibold">
+                {user.nama}
+              </CardTitle>
               <ActionDropdown
                 onView={() => onView(user)}
                 onEdit={() => onEdit(user)}
                 onDelete={() => onDelete(user)}
+                showView={true}
+                showEdit={true}
+                showDelete={true}
               />
             </div>
-
-
-            {/* Jabatan */}
-            <div className="mb-2">
-              <p className="text-sm font-medium">{user.jabatan}</p>
-            </div>
-
-            {/* Email */}
-            {user.email && (
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-2">
-                <Mail className="w-4 h-4" />
-                <span className="truncate">{user.email}</span>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="space-y-2 text-sm">
+              <div>
+                <span className="font-medium text-muted-foreground">No:</span>
+                <span className="ml-2">{(currentPage - 1) * itemsPerPage + index + 1}</span>
               </div>
-            )}
-
-
-            {/* Inspektorat */}
-            {user.inspektorat && (
-              <div className="flex items-start space-x-2 text-sm text-muted-foreground mb-2">
-                <Building className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <div className="flex items-center space-x-2">
-                  <span>Inspektorat:</span>
-                  {getInspektoratSpan(user.inspektorat)}
-                </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Username:</span>
+                <span className="ml-2">{user.username}</span>
               </div>
-            )}
-
-            {/* Role */}
-            <div className="mb-3">
-              <p className="text-xs text-muted-foreground mb-1">Role:</p>
-              {getRoleBadge(user.role)}
-            </div>
-
-            {/* Created At */}
-            <div className="flex items-center space-x-2 text-xs text-muted-foreground pt-2 border-t">
-              <Calendar className="w-3 h-3" />
-              <span>
-                Dibuat: {format(new Date(user.created_at), 'dd MMM yyyy', { locale: id })}
-              </span>
+              <div>
+                <span className="font-medium text-muted-foreground">Email:</span>
+                <span className="ml-2">{user.email || '-'}</span>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Jabatan:</span>
+                <span className="ml-2">{user.jabatan || '-'}</span>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Role:</span>
+                <span className="ml-2">{getRoleBadge(user.role)}</span>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Inspektorat:</span>
+                <span className="ml-2">{user.inspektorat ? getInspektoratSpan(user.inspektorat) : '-'}</span>
+              </div>
+              <div>
+                <span className="font-medium text-muted-foreground">Status:</span>
+                <span className="ml-2">
+                  {getStatusBadge(user.is_active)}
+                </span>
+              </div>
             </div>
           </CardContent>
         </Card>
