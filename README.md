@@ -106,38 +106,110 @@ pnpm --filter vite-react-app dev
 
 ```
 frontend/
-├── apps/                          # Aplikasi
-│   └── vite-react-app/           # Aplikasi utama Perwadag
+├── apps/                              # Aplikasi
+│   └── vite-react-app/               # Aplikasi utama Perwadag
 │       ├── src/
-│       │   ├── components/       # Komponen React
-│       │   │   ├── Auth/         # Komponen autentikasi
-│       │   │   ├── Users/        # Manajemen user
-│       │   │   ├── SuratTugas/   # Surat tugas evaluasi
-│       │   │   ├── Meeting/      # Entry/Exit meeting
-│       │   │   ├── Kuisioner/    # Kuisioner evaluasi
-│       │   │   ├── Matriks/      # Matriks evaluasi
-│       │   │   └── common/       # Komponen umum
-│       │   ├── pages/            # Halaman aplikasi
-│       │   ├── services/         # API services layer
-│       │   ├── redux/            # State management
-│       │   ├── hooks/            # Custom React hooks
-│       │   └── utils/            # Utility functions
+│       │   ├── components/           # Komponen React
+│       │   │   ├── Auth/             # Komponen autentikasi (AuthGuard, AuthProvider, RoleProtectedRoute)
+│       │   │   ├── Dashboard/        # Komponen dashboard (Charts, Cards, Activity)
+│       │   │   ├── Users/            # Manajemen user (UserCards, UserDialog, UserTable)
+│       │   │   ├── SuratTugas/       # Surat tugas evaluasi
+│       │   │   ├── SuratPemberitahuan/ # Surat pemberitahuan
+│       │   │   ├── EntryMeeting/     # Entry meeting
+│       │   │   ├── ExitMeeting/      # Exit meeting
+│       │   │   ├── KonfirmasiMeeting/ # Konfirmasi meeting
+│       │   │   ├── Kuesioner/        # Kuisioner evaluasi
+│       │   │   ├── FormatKuisioner/  # Format kuisioner
+│       │   │   ├── Matriks/          # Matriks evaluasi
+│       │   │   ├── LaporanHasilEvaluasi/ # Laporan hasil evaluasi
+│       │   │   ├── RiskAssesment/    # Risk assessment
+│       │   │   ├── EmailTemplate/    # Template email
+│       │   │   ├── Profile/          # Manajemen profil user
+│       │   │   ├── common/           # Komponen umum (Pagination, FileUpload, DatePicker, dll)
+│       │   │   └── layouts/          # Layout komponen (Dashboard, Default)
+│       │   ├── pages/                # Halaman aplikasi
+│       │   │   ├── Auth/             # Halaman autentikasi (Login, ForgotPassword, ResetPassword)
+│       │   │   ├── Dashboard/        # Dashboard utama
+│       │   │   ├── Profile/          # Halaman profil
+│       │   │   ├── Users/            # Halaman manajemen user
+│       │   │   └── RiskAssesment/    # Halaman risk assessment
+│       │   ├── services/             # API services layer
+│       │   │   ├── auth/             # Service autentikasi
+│       │   │   ├── users/            # Service manajemen user
+│       │   │   ├── meeting/          # Service meeting
+│       │   │   ├── kuisioner/        # Service kuisioner
+│       │   │   ├── formatKuisioner/  # Service format kuisioner
+│       │   │   ├── matriks/          # Service matriks
+│       │   │   ├── suratTugas/       # Service surat tugas
+│       │   │   ├── suratPemberitahuan/ # Service surat pemberitahuan
+│       │   │   ├── laporanHasil/     # Service laporan hasil
+│       │   │   ├── penilaianRisiko/  # Service penilaian risiko
+│       │   │   ├── emailTemplate/    # Service template email
+│       │   │   ├── periodeEvaluasi/  # Service periode evaluasi
+│       │   │   ├── log-activity/     # Service log aktivitas
+│       │   │   └── base/             # Base service configurations
+│       │   ├── redux/                # State management
+│       │   │   ├── features/         # Redux slices (auth, theme, role)
+│       │   │   ├── store.ts          # Store configuration
+│       │   │   ├── hooks.ts          # Typed Redux hooks
+│       │   │   └── reducers.ts       # Root reducer
+│       │   ├── hooks/                # Custom React hooks
+│       │   │   ├── useDebounce.ts    # Debounce hook
+│       │   │   ├── useFormPermissions.ts # Form permissions hook
+│       │   │   ├── useInfiniteSearch.ts  # Infinite search hook
+│       │   │   ├── useRole.ts        # Role management hook
+│       │   │   ├── useTheme.ts       # Theme management hook
+│       │   │   └── useURLFilters.ts  # URL filters hook
+│       │   ├── utils/                # Utility functions
+│       │   │   ├── api.ts            # API utilities
+│       │   │   ├── excelExportUtils.ts # Excel export utilities
+│       │   │   ├── imageUtils.ts     # Image processing utilities
+│       │   │   ├── numberUtils.ts    # Number formatting utilities
+│       │   │   ├── riskCalculationUtils.ts # Risk calculation utilities
+│       │   │   ├── textUtils.ts      # Text processing utilities
+│       │   │   ├── timeFormat.ts     # Time formatting utilities
+│       │   │   ├── urlStateUtils.ts  # URL state utilities
+│       │   │   └── yearUtils.ts      # Year utilities
+│       │   ├── config/               # Konfigurasi aplikasi
+│       │   │   └── api.ts            # Konfigurasi API
+│       │   ├── lib/                  # Library utilities
+│       │   │   ├── constants.ts      # Application constants
+│       │   │   └── menus.ts          # Menu configurations
+│       │   ├── types/                # TypeScript type definitions
+│       │   └── assets/               # Static assets (images, icons)
+│       ├── public/                   # Public assets (favicons, PWA assets)
 │       └── package.json
-├── packages/                      # Shared packages
-│   ├── ui/                       # Shared UI components
+├── packages/                          # Shared packages
+│   ├── ui/                           # Shared UI components
 │   │   ├── src/
-│   │   │   ├── components/       # Komponen yang dapat digunakan ulang
-│   │   │   ├── hooks/            # Custom React hooks
-│   │   │   └── utils/            # Utility functions
+│   │   │   ├── components/           # Komponen yang dapat digunakan ulang
+│   │   │   │   ├── ui/               # Custom UI components (carousel, loading, news-card, dll)
+│   │   │   │   └── [radix-components] # Radix UI components (button, dialog, form, dll)
+│   │   │   ├── lib/
+│   │   │   │   └── utils.ts          # Utility functions
+│   │   │   └── globals.css           # Global CSS styles
 │   │   └── package.json
-│   ├── eslint/                   # Konfigurasi ESLint
-│   ├── prettier/                 # Konfigurasi Prettier
-│   ├── tailwind/                 # Konfigurasi Tailwind CSS
-│   └── typescript/               # Konfigurasi TypeScript
-├── turbo.json                    # Konfigurasi Turborepo
-├── package.json                  # Root package.json
-├── pnpm-workspace.yaml          # Konfigurasi PNPM workspace
-└── README.md                     # File ini
+│   ├── eslint/                       # Konfigurasi ESLint
+│   │   ├── src/
+│   │   │   └── index.ts              # ESLint rules configuration
+│   │   └── package.json
+│   ├── prettier/                     # Konfigurasi Prettier
+│   │   ├── base.js                   # Base Prettier configuration
+│   │   └── package.json
+│   ├── tailwind/                     # Konfigurasi Tailwind CSS
+│   │   ├── tailwind.config.ts        # Tailwind configuration
+│   │   ├── globals.css               # Global Tailwind styles
+│   │   └── package.json
+│   └── typescript/                   # Konfigurasi TypeScript
+│       ├── base.json                 # Base TypeScript config
+│       ├── react.json                # React TypeScript config
+│       ├── next.json                 # Next.js TypeScript config
+│       └── package.json
+├── turbo.json                        # Konfigurasi Turborepo
+├── package.json                      # Root package.json
+├── pnpm-workspace.yaml              # Konfigurasi PNPM workspace
+├── CLAUDE.md                         # Claude Code project instructions
+└── README.md                         # File ini
 ```
 
 ## 🌟 Fitur Sistem Perwadag
@@ -161,12 +233,18 @@ frontend/
 - **Exit Meeting** - Meeting penutupan evaluasi
 - **Matriks Evaluasi** - Input dan kelola matriks penilaian
 - **Kuisioner** - Template dan pengisian kuisioner evaluasi
+- **Format Kuisioner** - Manajemen format dan template kuisioner
+- **Risk Assessment** - Penilaian risiko dan analisis
+- **Email Template** - Template email untuk komunikasi otomatis
+- **Periode Evaluasi** - Manajemen periode dan jadwal evaluasi
 - **Laporan Hasil** - Generate dan kelola laporan hasil evaluasi
 
 ### 📊 Dashboard & Reporting
 - **Dashboard Overview** - Ringkasan status evaluasi dan progress
 - **Progress Tracking** - Pelacakan kemajuan setiap tahap evaluasi
 - **Data Visualization** - Charts dan grafik untuk analisis data
+- **Completion Statistics** - Statistik penyelesaian evaluasi per periode
+- **Activity Logging** - Log aktivitas pengguna untuk audit trail
 - **Export Functionality** - Export data ke Excel dan PDF
 
 ### 📁 File Management
@@ -190,11 +268,26 @@ frontend/
 - **Reusable Components** - Komponen yang dapat digunakan ulang di seluruh aplikasi
 - **Compound Components** - Pola compound untuk komponen kompleks
 - **Custom Hooks** - Hooks kustom untuk logic yang dapat digunakan ulang
+  - `useDebounce` - Debouncing untuk input search
+  - `useFormPermissions` - Manajemen permission form berdasarkan role
+  - `useInfiniteSearch` - Infinite scrolling untuk list data
+  - `useRole` - Manajemen role dan permission user
+  - `useTheme` - Theme switching (dark/light mode)
+  - `useURLFilters` - Sinkronisasi filter dengan URL state
 
 ### State Management
 - **Redux Toolkit** - State management modern dengan RTK
 - **Persistent State** - State yang persisten untuk user preferences
 - **Optimistic Updates** - Update optimistik untuk UX yang lebih baik
+
+### Utility Functions
+- **Excel Export** - Utils untuk export data ke format Excel
+- **Image Processing** - Utilities untuk kompresi dan manipulasi gambar
+- **Risk Calculation** - Kalkulasi dan analisis penilaian risiko
+- **Time Formatting** - Formatting tanggal dan waktu yang konsisten
+- **Number Formatting** - Format angka dan currency
+- **Text Processing** - Utilities untuk manipulasi teks dan string
+- **URL State Management** - Manajemen state melalui URL parameters
 
 ## 🔧 Konfigurasi Environment
 

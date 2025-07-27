@@ -120,8 +120,8 @@ const EntryMeetingPage: React.FC = () => {
   // Fetch periode evaluasi data
   const fetchPeriodeEvaluasi = async () => {
     try {
-      const response = await periodeEvaluasiService.getPeriodeEvaluasi({ 
-        size: 100 
+      const response = await periodeEvaluasiService.getPeriodeEvaluasi({
+        size: 100
       });
       setPeriodeEvaluasi(response.items);
     } catch (error) {
@@ -230,7 +230,7 @@ const EntryMeetingPage: React.FC = () => {
 
   const canEdit = (item?: MeetingResponse) => {
     if (!canEditForm('entry_meeting')) return false;
-    
+
     // Check if the periode is locked or status is "tutup"
     if (item) {
       const periode = findPeriodeByYear(periodeEvaluasi, item.tahun_evaluasi);
@@ -238,7 +238,7 @@ const EntryMeetingPage: React.FC = () => {
         return false;
       }
     }
-    
+
     if (isAdmin()) return true;
     if (isInspektorat()) {
       // Check if user can edit this meeting based on inspektorat
@@ -246,7 +246,7 @@ const EntryMeetingPage: React.FC = () => {
     }
     if (isPerwadag()) {
       // Check if user can edit their own meeting
-      return  true;
+      return true;
     }
     return false;
   };
@@ -299,10 +299,10 @@ const EntryMeetingPage: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Semua Inspektorat</SelectItem>
-<SelectItem value="1">Inspektorat 1</SelectItem>
-<SelectItem value="2">Inspektorat 2</SelectItem>
-<SelectItem value="3">Inspektorat 3</SelectItem>
-<SelectItem value="4">Inspektorat 4</SelectItem>
+                <SelectItem value="1">Inspektorat 1</SelectItem>
+                <SelectItem value="2">Inspektorat 2</SelectItem>
+                <SelectItem value="3">Inspektorat 3</SelectItem>
+                <SelectItem value="4">Inspektorat 4</SelectItem>
               </SelectContent>
             </Select>
           </div>

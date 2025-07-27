@@ -228,7 +228,7 @@ const RiskAssessmentPage: React.FC = () => {
       setItemToDelete(null);
     } catch (error) {
       console.error('Failed to delete risk assessment:', error);
-     
+
     }
   };
 
@@ -293,12 +293,12 @@ const RiskAssessmentPage: React.FC = () => {
   // Helper function to check if a record can be edited based on periode status
   const canEditRecord = (item: PenilaianRisikoResponse) => {
     if (!canEdit()) return false;
-    
+
     // Check if the periode is locked or status is "tutup"
     if (item.periode_info?.is_locked || item.periode_info?.status === 'tutup') {
       return false;
     }
-    
+
     return true;
   };
 
@@ -361,10 +361,10 @@ const RiskAssessmentPage: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Semua Inspektorat</SelectItem>
-<SelectItem value="1">Inspektorat 1</SelectItem>
-<SelectItem value="2">Inspektorat 2</SelectItem>
-<SelectItem value="3">Inspektorat 3</SelectItem>
-<SelectItem value="4">Inspektorat 4</SelectItem>
+                <SelectItem value="1">Inspektorat 1</SelectItem>
+                <SelectItem value="2">Inspektorat 2</SelectItem>
+                <SelectItem value="3">Inspektorat 3</SelectItem>
+                <SelectItem value="4">Inspektorat 4</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -473,8 +473,8 @@ const RiskAssessmentPage: React.FC = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={confirmDelete} 
+            <AlertDialogAction
+              onClick={confirmDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Hapus

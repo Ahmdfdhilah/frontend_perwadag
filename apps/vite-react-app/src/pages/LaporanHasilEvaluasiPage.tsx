@@ -88,8 +88,8 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
   // Fetch periode evaluasi data
   const fetchPeriodeEvaluasi = async () => {
     try {
-      const response = await periodeEvaluasiService.getPeriodeEvaluasi({ 
-        size: 100 
+      const response = await periodeEvaluasiService.getPeriodeEvaluasi({
+        size: 100
       });
       setPeriodeEvaluasi(response.items);
     } catch (error) {
@@ -244,13 +244,13 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
 
   const canEdit = (item: LaporanHasilResponse) => {
     if (!canEditForm('laporan_hasil_evaluasi')) return false;
-    
+
     // Check if the periode is locked or status is "tutup"
     const periode = findPeriodeByYear(periodeEvaluasi, item.tahun_evaluasi);
     if (periode?.is_locked || periode?.status === 'tutup') {
       return false;
     }
-    
+
     if (isAdmin()) return true;
     if (isInspektorat()) {
       // Check if user can edit this laporan based on inspektorat
@@ -268,7 +268,7 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
     try {
       // Use template API to compose email
       const composedEmail = await emailTemplateService.composeEmailForLaporanHasil(item.id);
-      
+
       // Open Gmail with composed content
       window.open(composedEmail.gmail_url, '_blank');
 
@@ -333,10 +333,10 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Semua Inspektorat</SelectItem>
-<SelectItem value="1">Inspektorat 1</SelectItem>
-<SelectItem value="2">Inspektorat 2</SelectItem>
-<SelectItem value="3">Inspektorat 3</SelectItem>
-<SelectItem value="4">Inspektorat 4</SelectItem>
+                <SelectItem value="1">Inspektorat 1</SelectItem>
+                <SelectItem value="2">Inspektorat 2</SelectItem>
+                <SelectItem value="3">Inspektorat 3</SelectItem>
+                <SelectItem value="4">Inspektorat 4</SelectItem>
               </SelectContent>
             </Select>
           </div>

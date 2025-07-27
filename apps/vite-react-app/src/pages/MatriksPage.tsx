@@ -27,7 +27,7 @@ import { getDefaultYearOptions, findPeriodeByYear } from '@/utils/yearUtils';
 import { periodeEvaluasiService } from '@/services/periodeEvaluasi';
 import { PeriodeEvaluasi } from '@/services/periodeEvaluasi/types';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
-import {  exportAllMatriksToExcel } from '@/utils/excelExportUtils';
+import { exportAllMatriksToExcel } from '@/utils/excelExportUtils';
 import { Download } from 'lucide-react';
 import { Button } from '@workspace/ui/components/button';
 
@@ -162,7 +162,7 @@ const MatriksPage: React.FC = () => {
   // Function to fetch all matriks data for export (admin only)
   const fetchAllMatriksForExport = async () => {
     if (!isAdmin()) return [];
-    
+
     try {
       const params: MatriksFilterParams = {
         // Remove page and size to get all data
@@ -380,10 +380,10 @@ const MatriksPage: React.FC = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Semua Inspektorat</SelectItem>
-<SelectItem value="1">Inspektorat 1</SelectItem>
-<SelectItem value="2">Inspektorat 2</SelectItem>
-<SelectItem value="3">Inspektorat 3</SelectItem>
-<SelectItem value="4">Inspektorat 4</SelectItem>
+                <SelectItem value="1">Inspektorat 1</SelectItem>
+                <SelectItem value="2">Inspektorat 2</SelectItem>
+                <SelectItem value="3">Inspektorat 3</SelectItem>
+                <SelectItem value="4">Inspektorat 4</SelectItem>
               </SelectContent>
             </Select>
           </div>
