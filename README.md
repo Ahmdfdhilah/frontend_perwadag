@@ -10,7 +10,7 @@ Proyek ini menggunakan struktur monorepo yang diperkuat oleh Turborepo, memungki
 - **vite-react-app** - Aplikasi utama sistem evaluasi Perwadag dengan dashboard, manajemen user, dan workflow evaluasi
 
 ### 📦 Shared Packages
-- **@workspace/ui** - Komponen UI yang dapat digunakan ulang dengan Tailwind CSS dan Radix UI
+- **@workspace/ui** - Komponen UI yang dapat digunakan ulang dengan Tailwind CSS dan Shadcn UI
 - **@workspace/eslint** - Konfigurasi ESLint terpusat untuk kualitas kode yang konsisten
 - **@workspace/prettier** - Aturan formatting kode bersama
 - **@workspace/tailwind** - Konfigurasi Tailwind CSS dan design tokens umum
@@ -24,6 +24,27 @@ Pastikan Anda memiliki yang berikut terinstal di sistem:
 
 - **Node.js** >= 20.0.0
 - **pnpm** >= 9.15.4
+
+> ⚠️ **WAJIB MENGGUNAKAN PNPM** - Proyek ini mengharuskan penggunaan pnpm sebagai package manager untuk memastikan lockfile yang konsisten, workspace management yang tepat, dan dependency resolution yang akurat. Menggunakan npm atau yarn dapat menyebabkan konflik dependency dan masalah dalam monorepo structure.
+
+### Instalasi pnpm
+
+Jika belum memiliki pnpm, install secara global:
+
+```bash
+# Menggunakan npm
+npm install -g pnpm
+
+# Atau menggunakan Node.js Corepack (direkomendasikan)
+corepack enable
+corepack prepare pnpm@latest --activate
+
+# Atau menggunakan script installer
+curl -fsSL https://get.pnpm.io/install.sh | sh -
+
+# Verifikasi instalasi
+pnpm --version
+```
 
 ### Installation
 

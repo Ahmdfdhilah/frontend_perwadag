@@ -113,12 +113,10 @@ const ProfilePage: React.FC = () => {
         description="Kelola informasi profil dan keamanan akun Anda"
         actions={
           <div className="flex gap-2">
-            {user.has_email && (
-              <Button variant="outline" onClick={handleEditEmail}>
-                <Mail className="w-4 h-4 mr-2" />
-                Edit Email
-              </Button>
-            )}
+            <Button variant="outline" onClick={handleEditEmail}>
+              <Mail className="w-4 h-4 mr-2" />
+              Edit Email
+            </Button>
             <Button onClick={handleChangePassword}>
               <Lock className="w-4 h-4 mr-2" />
               Ganti Password
@@ -319,15 +317,13 @@ const ProfilePage: React.FC = () => {
       </div>
 
       {/* Dialogs */}
-      {user.has_email && (
-        <EditEmailDialog
-          open={isEditDialogOpen}
-          onOpenChange={setIsEditDialogOpen}
-          user={user}
-          onSave={handleEmailUpdate}
-          loading={isLoading}
-        />
-      )}
+      <EditEmailDialog
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+        user={user}
+        onSave={handleEmailUpdate}
+        loading={isLoading}
+      />
 
       <ChangePasswordDialog
         open={isPasswordDialogOpen}
