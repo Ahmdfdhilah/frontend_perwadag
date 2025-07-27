@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 import { PageHeader } from "@/components/common/PageHeader";
 import DashboardCards from "@/components/Dashboard/DashboardCards";
 import CompletionStatsChart from "@/components/Dashboard/CompletionStatsChart";
@@ -132,42 +131,10 @@ const DashboardPage: React.FC = () => {
     }
   };
 
-  if (isLoading && !dashboardData) {
+
+  if (!dashboardData && !isLoading) {
     return (
       <div className="space-y-6">
-        <Helmet>
-          <title>Dashboard - Loading...</title>
-        </Helmet>
-
-        <PageHeader
-          title="Dashboard"
-          description="Memuat data dashboard..."
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i}>
-              <CardContent className="p-6">
-                <div className="animate-pulse space-y-2">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-full"></div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (!dashboardData) {
-    return (
-      <div className="space-y-6">
-        <Helmet>
-          <title>Dashboard - Error</title>
-        </Helmet>
-
         <PageHeader
           title="Dashboard"
           description="Gagal memuat data"
@@ -192,14 +159,10 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <Helmet>
-        <title>{getRoleTitle(dashboardData.user_info.role)} - Sistem Evaluasi</title>
-      </Helmet>
-
       {/* Page Header */}
       <PageHeader
-        title={getRoleTitle(dashboardData.user_info.role)}
-        description={getWelcomeMessage(dashboardData.user_info.role, dashboardData.user_info.nama)}
+        title={dashboardData ? getRoleTitle(dashboardData.user_info.role) : 'Dashboard'}
+        description={dashboardData ? getWelcomeMessage(dashboardData.user_info.role, dashboardData.user_info.nama) : 'Memuat data dashboard...'}
         actions={
           <Button
             onClick={handleRefresh}
@@ -236,15 +199,16 @@ const DashboardPage: React.FC = () => {
       </Filtering>
 
       {/* Dashboard Cards */}
-      <DashboardCards dashboardData={dashboardData} />
+      <DashboardCards dashboardData={dashboardData} loading={isLoading} />
 
       {/* Charts and Tables Grid */}
       <CompletionStatsChart
-        completionStats={dashboardData.summary.completion_stats}
+        completionStats={dashboardData?.summary.completion_stats}
+        loading={isLoading}
       />
 
       {/* Recent Surat Tugas */}
-      {dashboardData.summary.recent_surat_tugas.length > 0 && (
+      {(dashboardData?.summary.recent_surat_tugas || isLoading) && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
@@ -265,7 +229,7 @@ const DashboardPage: React.FC = () => {
             {/* Desktop Table */}
             <div className="hidden lg:block">
               <SuratTugasTable
-                data={dashboardData.summary.recent_surat_tugas}
+                data={dashboardData?.summary.recent_surat_tugas || []}
                 loading={isLoading}
                 isDashboard={true}
               />
@@ -274,7 +238,7 @@ const DashboardPage: React.FC = () => {
             {/* Mobile Cards */}
             <div className="lg:hidden">
               <SuratTugasCards
-                data={dashboardData.summary.recent_surat_tugas}
+                data={dashboardData?.summary.recent_surat_tugas || []}
                 loading={isLoading}
                 isDashboard={true}
               />
@@ -285,7 +249,7 @@ const DashboardPage: React.FC = () => {
 
       {/* Log Activity Section - Only for Admin */}
       {isAdmin() && (
-        <LogActivitySection 
+        <LogActivitySection
           searchQuery={filters.search}
           onSearchChange={handleSearchChange}
         />

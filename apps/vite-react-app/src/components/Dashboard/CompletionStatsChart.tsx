@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@workspace/ui/components/card";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 import { 
   FileText,
   Users,
@@ -21,7 +22,7 @@ import {
 import { CompletionStat } from "../../services/suratTugas/types";
 
 interface CompletionStatsChartProps {
-  completionStats: {
+  completionStats?: {
     surat_pemberitahuan: CompletionStat;
     entry_meeting: CompletionStat;
     konfirmasi_meeting: CompletionStat;
@@ -30,11 +31,56 @@ interface CompletionStatsChartProps {
     laporan_hasil: CompletionStat;
     kuisioner: CompletionStat;
   };
+  loading?: boolean;
 }
 
 const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({ 
-  completionStats 
+  completionStats,
+  loading = false
 }) => {
+  if (loading || !completionStats) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Skeleton className="h-5 w-5" />
+            <Skeleton className="h-5 w-48" />
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.from({ length: 7 }).map((_, index) => (
+              <Card key={index} className="flex flex-col">
+                <CardHeader className="items-center pb-0">
+                  <div className="flex items-center space-x-2">
+                    <Skeleton className="h-4 w-4" />
+                    <Skeleton className="h-4 w-24" />
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1 pb-0">
+                  <div className="mx-auto aspect-square max-h-[200px] flex items-center justify-center">
+                    <Skeleton className="h-32 w-32 rounded-full" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+          
+          <div className="mt-8 pt-6 border-t">
+            <div className="grid grid-cols-3 gap-4 text-center">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="space-y-1">
+                  <Skeleton className="h-8 w-16 mx-auto" />
+                  <Skeleton className="h-4 w-20 mx-auto" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   // Check if all stats are zero (no data)
   const hasNoData = Object.values(completionStats).every(stat => stat.total === 0);
   
