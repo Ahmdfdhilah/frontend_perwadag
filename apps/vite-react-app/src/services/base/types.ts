@@ -13,7 +13,7 @@ export interface StatusResponse {
 
 export interface PaginationParams {
   page?: number;
-  limit?: number;
+  size?: number;
   search?: string;
 }
 
@@ -21,7 +21,7 @@ export interface PaginatedResponse<T> {
   items: T[];
   total: number;
   page: number;
-  limit: number;
+  size: number;
   pages: number;
 }
 

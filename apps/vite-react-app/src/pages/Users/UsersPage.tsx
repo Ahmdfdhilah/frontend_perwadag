@@ -65,6 +65,7 @@ const UsersPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('create');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -88,6 +89,7 @@ const UsersPage: React.FC = () => {
       const response = await userService.getUsers(params);
       setUsers(response.items);
       setTotalItems(response.total);
+      setTotalPages(response.pages);
     } catch (error) {
       console.error('Failed to fetch users:', error);
     } finally {
@@ -102,8 +104,7 @@ const UsersPage: React.FC = () => {
     }
   }, [filters.page, filters.size, filters.search, filters.role, filters.status, hasAccess]);
 
-  // Pagination
-  const totalPages = Math.ceil(totalItems / filters.size);
+  // Pagination - totalPages is now set from API response
 
   const handleView = (user: User) => {
     setSelectedUser(user);
