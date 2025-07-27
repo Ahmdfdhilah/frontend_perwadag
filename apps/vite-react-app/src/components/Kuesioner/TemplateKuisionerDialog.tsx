@@ -25,51 +25,35 @@ const TemplateKuisionerDialog: React.FC<TemplateKuisionerDialogProps> = ({
   open,
   onOpenChange,
 }) => {
-  const [latestTemplate, setLatestTemplate] = useState<FormatKuisionerResponse | null>(null);
+  const [activeTemplate, setActiveTemplate] = useState<FormatKuisionerResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const fetchLatestTemplate = useCallback(async () => {
+  const fetchActiveTemplate = useCallback(async () => {
     try {
       setLoading(true);
-
-      const params = {
-        page: 1,
-        size: 1,
-      };
-
-      const response = await formatKuisionerService.getFormatKuisionerList(params);
-
-      if (response.items && response.items.length > 0) {
-        // Get the latest template by sorting by created_at
-        const sortedTemplates = response.items.sort((a, b) =>
-          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        );
-        setLatestTemplate(sortedTemplates[0]);
-      } else {
-        setLatestTemplate(null);
-      }
-
+      const response = await formatKuisionerService.getActiveTemplate();
+      setActiveTemplate(response);
     } catch (error) {
-      console.error('Error fetching latest template:', error);
-      setLatestTemplate(null);
+      console.error('Error fetching active template:', error);
+      setActiveTemplate(null);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // Fetch latest template when dialog opens
+  // Fetch active template when dialog opens
   useEffect(() => {
     if (open) {
-      fetchLatestTemplate();
+      fetchActiveTemplate();
     }
-  }, [open]);
+  }, [open, fetchActiveTemplate]);
 
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
-    if (!latestTemplate?.id) return;
+    if (!activeTemplate?.id) return;
 
     try {
-      const blob = await formatKuisionerService.downloadTemplate(latestTemplate.id);
+      const blob = await formatKuisionerService.downloadTemplate(activeTemplate.id);
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -104,7 +88,7 @@ const TemplateKuisionerDialog: React.FC<TemplateKuisionerDialogProps> = ({
       <DialogContent className="w-[95vw] max-w-4xl max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0 border-b pb-4">
           <DialogTitle className="text-xl font-semibold">
-            Template Kuisioner Terbaru
+            Template Kuisioner Aktif
           </DialogTitle>
         </DialogHeader>
 
@@ -133,7 +117,7 @@ const TemplateKuisionerDialog: React.FC<TemplateKuisionerDialogProps> = ({
                 </CardContent>
               </Card>
             </div>
-          ) : latestTemplate ? (
+          ) : activeTemplate ? (
             <div className="space-y-6">
               {/* Template Context Information */}
               <Card>
@@ -146,14 +130,14 @@ const TemplateKuisionerDialog: React.FC<TemplateKuisionerDialogProps> = ({
                 <CardContent className="space-y-4">
                   {/* Template Name and Description */}
                   <div>
-                    <h3 className="font-semibold text-lg mb-2">{latestTemplate.nama_template}</h3>
-                    {latestTemplate.deskripsi && (
-                      <p className="text-muted-foreground mb-3">{latestTemplate.deskripsi}</p>
+                    <h3 className="font-semibold text-lg mb-2">{activeTemplate.nama_template}</h3>
+                    {activeTemplate.deskripsi && (
+                      <p className="text-muted-foreground mb-3">{activeTemplate.deskripsi}</p>
                     )}
                   </div>
 
                   {/* File Metadata */}
-                  {latestTemplate.has_file && latestTemplate.file_metadata && (
+                  {activeTemplate.has_file && activeTemplate.file_metadata && (
                     <>
                       <Separator />
                       <div>
@@ -162,25 +146,25 @@ const TemplateKuisionerDialog: React.FC<TemplateKuisionerDialogProps> = ({
                           <div>
                             <span className="font-medium">Nama File: </span>
                             <span className="text-muted-foreground">
-                              {latestTemplate.file_metadata.original_filename || latestTemplate.file_metadata.filename}
+                              {activeTemplate.file_metadata.original_filename || activeTemplate.file_metadata.filename}
                             </span>
                           </div>
                           <div>
                             <span className="font-medium">Ukuran: </span>
                             <span className="text-muted-foreground">
-                              {formatFileSize(latestTemplate.file_metadata.size)}
+                              {formatFileSize(activeTemplate.file_metadata.size)}
                             </span>
                           </div>
                           <div>
                             <span className="font-medium">Tipe: </span>
                             <span className="text-muted-foreground">
-                              {latestTemplate.file_metadata.content_type}
+                              {activeTemplate.file_metadata.content_type}
                             </span>
                           </div>
                           <div>
                             <span className="font-medium">Diunggah: </span>
                             <span className="text-muted-foreground">
-                              {formatDate(latestTemplate.file_metadata.uploaded_at)}
+                              {formatDate(activeTemplate.file_metadata.uploaded_at)}
                             </span>
                           </div>
                         </div>
@@ -201,11 +185,11 @@ const TemplateKuisionerDialog: React.FC<TemplateKuisionerDialogProps> = ({
                 <CardContent>
                   <FileUpload
                     label="File Template"
-                    existingFiles={latestTemplate.has_file ? [{
-                      name: latestTemplate.file_metadata?.original_filename || latestTemplate.file_metadata?.filename || latestTemplate.nama_template,
-                      url: latestTemplate.file_urls?.file_url,
-                      viewUrl: latestTemplate.file_urls?.file_url,
-                      size: latestTemplate.file_metadata?.size
+                    existingFiles={activeTemplate.has_file ? [{
+                      name: activeTemplate.file_metadata?.original_filename || activeTemplate.file_metadata?.filename || activeTemplate.nama_template,
+                      url: activeTemplate.file_urls?.file_url,
+                      viewUrl: activeTemplate.file_urls?.file_url,
+                      size: activeTemplate.file_metadata?.size
                     }] : []}
                     mode="view"
                     disabled={true}
@@ -217,12 +201,12 @@ const TemplateKuisionerDialog: React.FC<TemplateKuisionerDialogProps> = ({
               </Card>
             </div>
           ) : (
-            // No template found
+            // No active template found
             <div className="text-center py-12">
               <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="font-medium text-lg mb-2">Tidak ada template ditemukan</h3>
+              <h3 className="font-medium text-lg mb-2">Tidak ada template aktif</h3>
               <p className="text-muted-foreground">
-                Belum ada template kuisioner yang tersedia
+                Belum ada template kuisioner yang diaktifkan
               </p>
             </div>
           )}
