@@ -4,19 +4,18 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import {
   loginAsync,
   logoutAsync,
-  verifyTokenAsync,
-  refreshTokenAsync,
+  verifySessionAsync,
   changePasswordAsync,
   getCurrentUserAsync,
   clearAuth,
   clearError,
+  setUser,
+  extendSession,
   selectIsAuthenticated,
   selectUser,
   selectAuthLoading,
   selectAuthError,
-  selectAccessToken,
-  selectRefreshToken,
-  selectTokenExpiry
+  selectSessionExpiry
 } from '@/redux/features/authSlice';
 import type { User } from '@/services/users/types';
 
@@ -44,9 +43,9 @@ interface AuthContextType {
   changeUserPassword: (passwordData: PasswordChangeData) => Promise<void>;
   clearAuthError: () => void;
 
-  // Token management
-  isTokenValid: () => boolean;
-  getAccessToken: () => string | null;
+  // Session management
+  isSessionValid: () => boolean;
+  extendUserSession: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -61,9 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const user = useAppSelector(selectUser);
   const loading = useAppSelector(selectAuthLoading);
   const error = useAppSelector(selectAuthError);
-  const accessToken = useAppSelector(selectAccessToken);
-  const refreshToken = useAppSelector(selectRefreshToken);
-  const tokenExpiry = useAppSelector(selectTokenExpiry);
+  const sessionExpiry = useAppSelector(selectSessionExpiry);
 
   // Note: Error toast handling removed to avoid duplication with BaseService
   // BaseService automatically shows toast errors for all auth API calls
@@ -88,34 +85,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const checkAuth = async (): Promise<void> => {
-    if (!accessToken) {
-      return;
-    }
-
     try {
-      // Check if token is expired
-      if (tokenExpiry && tokenExpiry < Date.now()) {
-        // Token is expired, try to refresh
-        if (refreshToken) {
-          try {
-            await dispatch(refreshTokenAsync(refreshToken)).unwrap();
-            // Don't fetch user data here - it's already persisted
-          } catch (refreshError) {
-            console.error('Token refresh failed:', refreshError);
-            dispatch(clearAuth());
-          }
-        } else {
-          dispatch(clearAuth());
-        }
+      // Check if session is expired
+      if (sessionExpiry && sessionExpiry < Date.now()) {
+        // Session is expired, clear auth
+        dispatch(clearAuth());
         return;
       }
 
-      // Verify token is still valid
-      await dispatch(verifyTokenAsync()).unwrap();
-
-      // Fetch user data if not available
-      if (!user && isAuthenticated) {
-        await dispatch(getCurrentUserAsync()).unwrap();
+      // Verify session is still valid with the server
+      const sessionResult = await dispatch(verifySessionAsync()).unwrap();
+      
+      if (sessionResult.valid) {
+        // If we have persisted user data but not authenticated state, restore it
+        if (user && !isAuthenticated) {
+          dispatch(setUser(user));
+        }
+        
+        // Fetch current user data if not available
+        if (!user) {
+          await dispatch(getCurrentUserAsync()).unwrap();
+        }
       }
     } catch (error) {
       console.error('Auth check failed:', error);
@@ -135,58 +125,60 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     dispatch(clearError());
   };
 
-  const isTokenValid = (): boolean => {
-    if (!accessToken || !tokenExpiry) {
+  const isSessionValid = (): boolean => {
+    if (!sessionExpiry) {
       return false;
     }
 
-    // Check if token expires in the next 5 minutes
+    // Check if session expires in the next 5 minutes
     const fiveMinutesFromNow = Date.now() + (5 * 60 * 1000);
-    return tokenExpiry > fiveMinutesFromNow;
+    return sessionExpiry > fiveMinutesFromNow;
   };
 
-  const getAccessToken = (): string | null => {
-    return accessToken;
+  const extendUserSession = (): void => {
+    dispatch(extendSession());
   };
 
-  // Check auth on mount and when authentication state changes
+  // Check auth on mount to restore session after refresh
   useEffect(() => {
-    if (isAuthenticated && accessToken) {
+    // If we have user data persisted but not authenticated, try to restore session
+    if (user && !isAuthenticated) {
       checkAuth();
     }
+    // If no user data and not authenticated, no need to check
   }, []); // Only run on mount
 
-  // Auto-refresh token before expiration
+  // Auto-verify session before expiration
   useEffect(() => {
-    if (accessToken && tokenExpiry) {
-      const timeUntilExpiry = tokenExpiry - Date.now();
-      // Refresh 5 minutes before expiry, but not if less than 1 minute remaining
-      const refreshTime = Math.max(timeUntilExpiry - 5 * 60 * 1000, 0);
+    if (sessionExpiry && isAuthenticated) {
+      const timeUntilExpiry = sessionExpiry - Date.now();
+      // Verify session 5 minutes before expiry, but not if less than 1 minute remaining
+      const verifyTime = Math.max(timeUntilExpiry - 5 * 60 * 1000, 0);
 
-      if (refreshTime > 60 * 1000) { // Only set timer if more than 1 minute
+      if (verifyTime > 60 * 1000) { // Only set timer if more than 1 minute
         const timer = setTimeout(() => {
           if (isAuthenticated) {
             checkAuth();
           }
-        }, refreshTime);
+        }, verifyTime);
 
         return () => clearTimeout(timer);
       }
     }
-  }, [accessToken, refreshToken, tokenExpiry, isAuthenticated, dispatch]);
+  }, [sessionExpiry, isAuthenticated, dispatch]);
 
-  // Periodic token validation (every 10 minutes)
+  // Periodic session validation (every 10 minutes)
   useEffect(() => {
-    if (isAuthenticated && accessToken) {
+    if (isAuthenticated) {
       const interval = setInterval(() => {
-        if (!isTokenValid()) {
+        if (!isSessionValid()) {
           checkAuth();
         }
       }, 10 * 60 * 1000); // Check every 10 minutes
 
       return () => clearInterval(interval);
     }
-  }, [isAuthenticated, accessToken]);
+  }, [isAuthenticated]);
 
   const value: AuthContextType = {
     // State
@@ -202,9 +194,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     changeUserPassword,
     clearAuthError,
 
-    // Token management
-    isTokenValid,
-    getAccessToken
+    // Session management
+    isSessionValid,
+    extendUserSession
   };
 
   return (

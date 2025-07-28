@@ -21,8 +21,6 @@ export { emailTemplateService } from "./emailTemplate";
 export type {
   LoginRequest,
   LoginResponse,
-  TokenResponse,
-  TokenRefreshRequest,
   PasswordResetRequest,
   PasswordResetConfirmRequest,
   PasswordResetEligibilityResponse,

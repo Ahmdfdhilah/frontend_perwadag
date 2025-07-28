@@ -3,7 +3,6 @@ import { BaseService } from "../base";
 import {
   LoginRequest,
   LoginResponse,
-  TokenResponse,
   PasswordResetRequest,
   PasswordResetConfirmRequest,
   ChangePasswordRequest,
@@ -31,9 +30,6 @@ class AuthService extends BaseService {
     }
   }
 
-  async refreshToken(refreshToken: string): Promise<TokenResponse> {
-    return this.post("/refresh", { refresh_token: refreshToken });
-  }
 
   async verifyToken(): Promise<TokenVerificationResponse> {
     return this.get("/verify-token");

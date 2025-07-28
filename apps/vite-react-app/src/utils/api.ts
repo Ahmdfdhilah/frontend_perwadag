@@ -1,66 +1,50 @@
 // src/utils/api.ts
 import axios, { AxiosInstance } from 'axios';
-import { clearAuth, refreshTokenAsync } from '@/redux/features/authSlice';
+import { clearAuth, verifySessionAsync } from '@/redux/features/authSlice';
 import { store } from '@/redux/store';
 import { API_BASE_URL } from '@/config/api';
 
 // Create axios instance
 export const api = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true, // Important: This enables cookies to be sent with requests
 });
 
 // Configure interceptors for both API instances
 const configureInterceptors = (api: AxiosInstance) => {
-  // Request interceptor - Add auth token to requests
+  // Request interceptor - No need to add Authorization header as we use cookies
   api.interceptors.request.use(
     (config) => {
-      const state = store.getState();
-      const token = state.auth?.accessToken;
-
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-
+      // Cookies will be automatically sent due to withCredentials: true
       return config;
     },
     (error) => Promise.reject(error)
   );
 
-  // Response interceptor - Handle 401 responses and automatic token refresh
+  // Response interceptor - Handle 401 responses and session verification
   api.interceptors.response.use(
     (response) => response,
     async (error) => {
       const originalRequest = error.config;
 
-      // If error is 401 and we haven't already tried to refresh
+      // If error is 401 and we haven't already tried to verify session
       if (error.response?.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
         
-        const state = store.getState();
-        const refreshToken = state.auth?.refreshToken;
-        
-        // Don't try to refresh if the original request was already a refresh request
-        if (refreshToken && !originalRequest.url?.includes('/refresh')) {
+        // Don't try to verify session if the original request was already a session verification
+        if (!originalRequest.url?.includes('/verify-token')) {
           try {
-            // Try to refresh the token
-            await store.dispatch(refreshTokenAsync(refreshToken)).unwrap();
+            // Try to verify and refresh the session
+            await store.dispatch(verifySessionAsync()).unwrap();
             
-            // Get the new access token
-            const newState = store.getState();
-            const newAccessToken = newState.auth?.accessToken;
-            
-            if (newAccessToken) {
-              // Update the original request with new token
-              originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-              
-              // Retry the original request
-              return api.request(originalRequest);
-            }
-          } catch (refreshError) {
-            console.error('Token refresh failed:', refreshError);
+            // If session verification succeeds, retry the original request
+            return api.request(originalRequest);
+          } catch (sessionError) {
+            console.error('Session verification failed:', sessionError);
             store.dispatch(clearAuth());
           }
         } else {
+          // If verify-token itself fails, clear auth
           store.dispatch(clearAuth());
         }
       }

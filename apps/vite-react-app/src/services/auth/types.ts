@@ -6,9 +6,6 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface TokenRefreshRequest {
-  refresh_token: string;
-}
 
 export interface PasswordResetRequest {
   email: string;
@@ -25,20 +22,15 @@ export interface ChangePasswordRequest {
 }
 
 // Auth Response Types
-export interface TokenResponse {
-  access_token: string;
-  token_type: "bearer";
-  expires_in: number;
-}
 
 export interface MessageResponse {
   message: string;
 }
 
-// Login response includes user data and refresh token
-export interface LoginResponse extends TokenResponse {
-  refresh_token: string;
+// Login response with cookie-based auth (no tokens returned to client)
+export interface LoginResponse {
   user: UserResponse;
+  message: string;
 }
 
 // User Response Type (simplified structure from backend)

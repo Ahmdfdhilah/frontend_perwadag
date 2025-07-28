@@ -1,4 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
 import { authService } from '@/services/auth';
 import { userService } from '@/services/users';
 import { UserUpdate } from '@/services/users/types';
@@ -14,10 +16,8 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   user: UserResponse | null;
-  accessToken: string | null;
-  refreshToken: string | null;
   error: string | null;
-  tokenExpiry: number | null;
+  sessionExpiry: number | null;
 }
 
 export const updateProfileAsync = createAsyncThunk(
@@ -36,10 +36,8 @@ const initialState: AuthState = {
   isAuthenticated: false,
   isLoading: false,
   user: null,
-  accessToken: null,
-  refreshToken: null,
   error: null,
-  tokenExpiry: null,
+  sessionExpiry: null,
 };
 
 export const loginAsync = createAsyncThunk(
@@ -48,14 +46,12 @@ export const loginAsync = createAsyncThunk(
     try {
       const response = await authService.login(loginData);
       
-      const tokenExpiry = Date.now() + (response.expires_in * 1000);
+      // Calculate session expiry (30 minutes default)
+      const sessionExpiry = Date.now() + (30 * 60 * 1000); // 30 minutes
       
       return {
-        access_token: response.access_token,
-        refresh_token: response.refresh_token,
-        expires_in: response.expires_in,
-        tokenExpiry,
-        user: response.user
+        user: response.user,
+        sessionExpiry
       };
     } catch (error: any) {
       return rejectWithValue(error.message || 'Login failed');
@@ -75,35 +71,23 @@ export const logoutAsync = createAsyncThunk(
   }
 );
 
-export const refreshTokenAsync = createAsyncThunk(
-  'auth/refreshToken',
-  async (refreshToken: string, { rejectWithValue }) => {
+export const verifySessionAsync = createAsyncThunk(
+  'auth/verifySession',
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await authService.refreshToken(refreshToken);
-      const tokenExpiry = Date.now() + (response.expires_in * 1000);
+      const response = await authService.verifyToken();
+      const sessionExpiry = Date.now() + (30 * 60 * 1000); // Extend session by 30 minutes
       
       return {
-        access_token: response.access_token,
-        expires_in: response.expires_in,
-        tokenExpiry
+        valid: response.valid,
+        sessionExpiry
       };
     } catch (error: any) {
-      return rejectWithValue(error.message || 'Token refresh failed');
+      return rejectWithValue(error.message || 'Session verification failed');
     }
   }
 );
 
-export const verifyTokenAsync = createAsyncThunk(
-  'auth/verifyToken',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await authService.verifyToken();
-      return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || 'Token verification failed');
-    }
-  }
-);
 
 export const requestPasswordResetAsync = createAsyncThunk(
   'auth/requestPasswordReset',
@@ -160,29 +144,23 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
-    setTokens: (state, action: PayloadAction<{ accessToken: string; refreshToken?: string; expires_in: number }>) => {
-      state.accessToken = action.payload.accessToken;
-      if (action.payload.refreshToken) {
-        state.refreshToken = action.payload.refreshToken;
-      }
-      state.tokenExpiry = Date.now() + (action.payload.expires_in * 1000);
-      state.isAuthenticated = true;
-    },
     clearAuth: (state) => {
       state.isAuthenticated = false;
       state.user = null;
-      state.accessToken = null;
-      state.refreshToken = null;
-      state.tokenExpiry = null;
+      state.sessionExpiry = null;
       state.error = null;
     },
     setUser: (state, action: PayloadAction<UserResponse>) => {
       state.user = action.payload;
+      state.isAuthenticated = true;
     },
     updateUser: (state, action: PayloadAction<Partial<UserResponse>>) => {
       if (state.user) {
         state.user = { ...state.user, ...action.payload };
       }
+    },
+    extendSession: (state) => {
+      state.sessionExpiry = Date.now() + (30 * 60 * 1000); // Extend by 30 minutes
     },
   },
   extraReducers: (builder) => {
@@ -194,9 +172,7 @@ const authSlice = createSlice({
       .addCase(loginAsync.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = true;
-        state.accessToken = action.payload.access_token;
-        state.refreshToken = action.payload.refresh_token;
-        state.tokenExpiry = action.payload.tokenExpiry;
+        state.sessionExpiry = action.payload.sessionExpiry;
         
         if (action.payload.user) {
           state.user = action.payload.user;
@@ -215,56 +191,36 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.isAuthenticated = false;
         state.user = null;
-        state.accessToken = null;
-        state.refreshToken = null;
-        state.tokenExpiry = null;
+        state.sessionExpiry = null;
         state.error = null;
       })
       .addCase(logoutAsync.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       })
-      .addCase(refreshTokenAsync.pending, (state) => {
+      .addCase(verifySessionAsync.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(refreshTokenAsync.fulfilled, (state, action) => {
+      .addCase(verifySessionAsync.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.accessToken = action.payload.access_token;
-        state.tokenExpiry = action.payload.tokenExpiry;
-        // Keep user authenticated and preserve user data
-        state.isAuthenticated = true;
-        state.error = null;
-      })
-      .addCase(refreshTokenAsync.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload as string;
-        // Clear all auth data when refresh fails
-        state.isAuthenticated = false;
-        state.user = null;
-        state.accessToken = null;
-        state.refreshToken = null;
-        state.tokenExpiry = null;
-      })
-      .addCase(verifyTokenAsync.fulfilled, (state, action) => {
         if (action.payload.valid) {
-          // Token is valid - don't overwrite existing user data
+          state.sessionExpiry = action.payload.sessionExpiry;
           state.isAuthenticated = true;
         } else {
-          // Token is invalid - clear auth
           state.isAuthenticated = false;
           state.user = null;
-          state.accessToken = null;
-          state.refreshToken = null;
-          state.tokenExpiry = null;
+          state.sessionExpiry = null;
         }
+        state.error = null;
       })
-      .addCase(verifyTokenAsync.rejected, (state) => {
+      .addCase(verifySessionAsync.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+        // Clear all auth data when session verification fails
         state.isAuthenticated = false;
         state.user = null;
-        state.accessToken = null;
-        state.refreshToken = null;
-        state.tokenExpiry = null;
+        state.sessionExpiry = null;
       })
       .addCase(requestPasswordResetAsync.pending, (state) => {
         state.isLoading = true;
@@ -331,15 +287,21 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, setTokens, clearAuth, setUser, updateUser } = authSlice.actions;
+export const { clearError, clearAuth, setUser, updateUser, extendSession } = authSlice.actions;
 
 export const selectAuth = (state: { auth: AuthState }) => state.auth;
 export const selectIsAuthenticated = (state: { auth: AuthState }) => state.auth.isAuthenticated;
 export const selectUser = (state: { auth: AuthState }) => state.auth.user;
 export const selectAuthLoading = (state: { auth: AuthState }) => state.auth.isLoading;
 export const selectAuthError = (state: { auth: AuthState }) => state.auth.error;
-export const selectAccessToken = (state: { auth: AuthState }) => state.auth.accessToken;
-export const selectRefreshToken = (state: { auth: AuthState }) => state.auth.refreshToken;
-export const selectTokenExpiry = (state: { auth: AuthState }) => state.auth.tokenExpiry;
+export const selectSessionExpiry = (state: { auth: AuthState }) => state.auth.sessionExpiry;
 
-export default authSlice.reducer;
+// Persist config for auth - only persist user data, not session data
+const authPersistConfig = {
+  key: 'auth',
+  storage,
+  whitelist: ['user'], // Only persist user data
+  blacklist: ['isAuthenticated', 'sessionExpiry', 'isLoading', 'error'] // Don't persist sensitive session data
+};
+
+export default persistReducer(authPersistConfig, authSlice.reducer);
