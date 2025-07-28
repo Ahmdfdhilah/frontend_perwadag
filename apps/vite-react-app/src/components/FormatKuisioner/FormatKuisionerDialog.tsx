@@ -66,7 +66,7 @@ export const FormatKuisionerDialog: React.FC<FormatKuisionerDialogProps> = ({
       setExistingFiles(template.has_file ? [{
         name: template.file_metadata?.original_filename || template.file_metadata?.filename || template.nama_template,
         url: template.file_urls?.file_url,
-        viewUrl: template.file_urls?.view_url,
+        viewUrl: template.file_urls?.file_url,
         size: template.file_metadata?.size,
         filename: template.file_metadata?.original_filename || template.file_metadata?.filename || ''
       }] : []);
