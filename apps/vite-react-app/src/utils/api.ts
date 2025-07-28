@@ -31,8 +31,13 @@ const configureInterceptors = (api: AxiosInstance) => {
       if (error.response?.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
         
-        // Don't try to verify session if the original request was already a session verification
-        if (!originalRequest.url?.includes('/verify-token')) {
+        // Don't try to verify session for auth endpoints (login, logout, etc.)
+        const isAuthEndpoint = originalRequest.url?.includes('/auth/') || 
+                              originalRequest.url?.includes('/login') ||
+                              originalRequest.url?.includes('/logout') ||
+                              originalRequest.url?.includes('/verify-token');
+        
+        if (!isAuthEndpoint) {
           try {
             // Try to verify and refresh the session
             await store.dispatch(verifySessionAsync()).unwrap();
@@ -44,8 +49,11 @@ const configureInterceptors = (api: AxiosInstance) => {
             store.dispatch(clearAuth());
           }
         } else {
-          // If verify-token itself fails, clear auth
-          store.dispatch(clearAuth());
+          // For auth endpoints, just clear auth on 401
+          console.log('Auth endpoint failed with 401, clearing auth');
+          if (!originalRequest.url?.includes('/logout')) {
+            store.dispatch(clearAuth());
+          }
         }
       }
 

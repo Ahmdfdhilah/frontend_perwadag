@@ -101,11 +101,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (user && !isAuthenticated) {
           dispatch(setUser(user));
         }
-        
-        // Fetch current user data if not available
-        if (!user) {
-          await dispatch(getCurrentUserAsync()).unwrap();
-        }
+        // Note: Don't automatically fetch user data during checkAuth
+        // This should only be done on explicit request or initial login
       }
     } catch (error) {
       console.error('Auth check failed:', error);

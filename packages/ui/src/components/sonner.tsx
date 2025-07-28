@@ -26,12 +26,12 @@ const Toaster = ({ ...props }: ToasterProps) => {
           loader:
             "h-5 w-5 animate-spin rounded-full border-4 border-muted border-t-primary",
           success:
-            "!border-green-500 !bg-green-50 !text-green-600 dark:!border-green-800 dark:!bg-green-950 dark:!text-green-400",
-          info: "!border-blue-500 !bg-blue-50 !text-blue-600 dark:!border-blue-800 dark:!bg-blue-950 dark:!text-blue-400",
+            "!border-green-500 !bg-green-50 !text-green-600 [&[data-theme=dark]]:!border-green-800 [&[data-theme=dark]]:!bg-green-950 [&[data-theme=dark]]:!text-green-400",
+          info: "!border-blue-500 !bg-blue-50 !text-blue-600 [&[data-theme=dark]]:!border-blue-800 [&[data-theme=dark]]:!bg-blue-950 [&[data-theme=dark]]:!text-blue-400",
           warning:
-            "!border-yellow-500 !bg-yellow-50 !text-yellow-600 dark:!border-yellow-800 dark:!bg-yellow-950 dark:!text-yellow-400",
+            "!border-yellow-500 !bg-yellow-50 !text-yellow-600 [&[data-theme=dark]]:!border-yellow-800 [&[data-theme=dark]]:!bg-yellow-950 [&[data-theme=dark]]:!text-yellow-400",
           error:
-            "!border-red-500 !bg-red-50 !text-red-600 dark:!border-red-800 dark:!bg-red-950 dark:!text-red-400",
+            "!border-red-500 !bg-red-50 !text-red-600 [&[data-theme=dark]]:!border-red-800 [&[data-theme=dark]]:!bg-red-950 [&[data-theme=dark]]:!text-red-400",
           icon: "h-5 w-5 shrink-0",
         },
       }}
