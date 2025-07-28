@@ -13,7 +13,6 @@ interface MatriksCardsProps {
   onView?: (item: MatriksResponse) => void;
   onExport?: (item: MatriksResponse) => void;
   canEdit?: (item: MatriksResponse) => boolean;
-  canView?: (item: MatriksResponse) => boolean;
   userRole: 'admin' | 'inspektorat' | 'perwadag';
   currentPage?: number;
   itemsPerPage?: number;
@@ -26,7 +25,6 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
   onView,
   onExport,
   canEdit,
-  canView,
   userRole,
   currentPage = 1,
   itemsPerPage = 10,
@@ -105,110 +103,55 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
     );
   }
 
-  const renderAdminInspektoratCard = (item: MatriksResponse, index: number) => (
-    <Card key={item.id} className="w-full gap-0">
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-start">
-          <CardTitle className="text-lg font-semibold">
-            {item.nama_perwadag}
-          </CardTitle>
-          {(canEdit?.(item) || canView?.(item) || onExport) && (
-            <ActionDropdown
-              onEdit={() => onEdit?.(item)}
-              onView={() => onView?.(item)}
-              onExport={() => onExport?.(item)}
-              showView={!!onView && !!canView?.(item)}
-              showEdit={!!onEdit && !!canEdit?.(item)}
-              showExport={!!onExport}
-              showDelete={false}
-            />
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <div className="space-y-3 text-sm">
-          <div>
-            <span className="font-medium text-muted-foreground">No:</span>
-            <span className="ml-2">{(currentPage - 1) * itemsPerPage + index + 1}</span>
-          </div>
-
-          <div>
-            <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
-            <span className="ml-2">{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</span>
-          </div>
-
-          <div>
-            <span className="font-medium text-muted-foreground">Dokumen:</span>
-            <span className="ml-2">{renderDocumentLink(item)}</span>
-          </div>
-
-          <div>
-            <span className="font-medium text-muted-foreground">Status:</span>
-            <span className="ml-2">
-              {getStatusBadge(item)}
-            </span>
-          </div>
-
-          <div>
-            <span className="font-medium text-muted-foreground">Kelengkapan:</span>
-            <span className="ml-2 text-xs text-muted-foreground">
-              {item.completion_percentage || 0}% lengkap
-            </span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const renderPerwadagCard = (item: MatriksResponse, index: number) => (
-    <Card key={item.id} className="w-full gap-0">
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-start">
-          <CardTitle className="text-lg font-semibold">
-            Matriks #{(currentPage - 1) * itemsPerPage + index + 1}
-          </CardTitle>
-          {(canEdit?.(item) || canView?.(item) || onExport) && (
-            <ActionDropdown
-              onEdit={() => onEdit?.(item)}
-              onView={() => onView?.(item)}
-              onExport={() => onExport?.(item)}
-              showView={!!onView && !!canView?.(item)}
-              showEdit={!!onEdit && !!canEdit?.(item)}
-              showExport={!!onExport}
-              showDelete={false}
-            />
-          )}
-        </div>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <div className="space-y-3 text-sm">
-          <div>
-            <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
-            <span className="ml-2">{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</span>
-          </div>
-
-          <div>
-            <span className="font-medium text-muted-foreground">Dokumen:</span>
-            <span className="ml-2">{renderDocumentLink(item)}</span>
-          </div>
-
-          <div>
-            <span className="font-medium text-muted-foreground">Status:</span>
-            <span className="ml-2">
-              {getStatusBadge(item)}
-            </span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
 
   return (
     <div className="grid grid-cols-1 gap-4">
       {data.map((item, index) => (
-        userRole === 'perwadag'
-          ? renderPerwadagCard(item, index)
-          : renderAdminInspektoratCard(item, index)
+        <Card key={item.id} className="w-full gap-0">
+          <CardHeader className="pb-3">
+            <div className="flex justify-between items-start">
+              <CardTitle className="text-lg font-semibold">
+                {item.nama_perwadag}
+              </CardTitle>
+              <ActionDropdown
+                onView={() => onView?.(item)}
+                onEdit={canEdit?.(item) ? () => onEdit?.(item) : undefined}
+                onExport={() => onExport?.(item)}
+                showView={true}
+                showEdit={canEdit?.(item) && !!onEdit}
+                showExport={!!onExport}
+                showDelete={false}
+              />
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="space-y-3 text-sm">
+              {userRole !== 'perwadag' && (
+                <div>
+                  <span className="font-medium text-muted-foreground">No:</span>
+                  <span className="ml-2">{(currentPage - 1) * itemsPerPage + index + 1}</span>
+                </div>
+              )}
+
+              <div>
+                <span className="font-medium text-muted-foreground">Tanggal Evaluasi:</span>
+                <span className="ml-2">{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</span>
+              </div>
+
+              <div>
+                <span className="font-medium text-muted-foreground">Dokumen:</span>
+                <span className="ml-2">{renderDocumentLink(item)}</span>
+              </div>
+
+              <div>
+                <span className="font-medium text-muted-foreground">Status:</span>
+                <span className="ml-2">
+                  {getStatusBadge(item)}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       ))}
     </div>
   );

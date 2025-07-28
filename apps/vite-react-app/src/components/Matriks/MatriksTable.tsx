@@ -20,7 +20,6 @@ interface MatriksTableProps {
   onView?: (item: MatriksResponse) => void;
   onExport?: (item: MatriksResponse) => void;
   canEdit?: (item: MatriksResponse) => boolean;
-  canView?: (item: MatriksResponse) => boolean;
   userRole: 'admin' | 'inspektorat' | 'perwadag';
   currentPage?: number;
   itemsPerPage?: number;
@@ -33,7 +32,6 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
   onView,
   onExport,
   canEdit,
-  canView,
   userRole,
   currentPage = 1,
   itemsPerPage = 10,
@@ -62,151 +60,62 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
     );
   };
 
-  const renderAdminInspektoratColumns = (showActions = false) => {
-    return (
-      <>
-        <TableHead>No</TableHead>
-        <TableHead>Nama Perwadag</TableHead>
-        <TableHead>Tanggal Evaluasi</TableHead>
-        <TableHead>Dokumen</TableHead>
-        <TableHead>Status</TableHead>
-        {showActions && <TableHead className="w-[80px]">Aksi</TableHead>}
-      </>
-    );
-  };
 
-  const renderPerwadagColumns = (showActions = false) => {
-    return (
-      <>
-        <TableHead>No</TableHead>
-        <TableHead>Tanggal Evaluasi</TableHead>
-        <TableHead>Dokumen</TableHead>
-        <TableHead>Status</TableHead>
-        {showActions && <TableHead className="w-[80px]">Aksi</TableHead>}
-      </>
-    );
-  };
 
-  if (loading) {
-    const showActionsColumn = !!(onEdit || onView || onExport);
-
-    return (
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {userRole === 'perwadag' ? renderPerwadagColumns(showActionsColumn) : renderAdminInspektoratColumns(showActionsColumn)}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {Array.from({ length: 5 }).map((_, index) => (
-              <TableRow key={index}>
-                <TableCell><Skeleton className="h-4 w-8" /></TableCell>
-                {userRole !== 'perwadag' && <TableCell><Skeleton className="h-4 w-48" /></TableCell>}
-                <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-20" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                {showActionsColumn && <TableCell className="text-right"><Skeleton className="h-8 w-24 ml-auto" /></TableCell>}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    );
-  }
-
-  const renderAdminInspektoratRow = (item: MatriksResponse, index: number) => {
-    // Check if any item can be edited, viewed, or exported to determine if we need the Actions column
-    const hasActionableItems = data.some(item => canEdit?.(item) || canView?.(item) || onExport);
-    
-    return (
-      <TableRow key={item.id}>
-        <TableCell className="font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
-        <TableCell>{item.nama_perwadag}</TableCell>
-        <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
-        <TableCell>{renderDocumentLink(item)}</TableCell>
-        <TableCell>
-          {getStatusBadge(item)}
-        </TableCell>
-        {hasActionableItems && (
-          <TableCell>
-            {(canEdit?.(item) || canView?.(item) || onExport) ? (
-              <ActionDropdown
-                onEdit={() => onEdit?.(item)}
-                onView={() => onView?.(item)}
-                onExport={() => onExport?.(item)}
-                showView={!!onView && !!canView?.(item)}
-                showEdit={!!onEdit && !!canEdit?.(item)}
-                showExport={!!onExport}
-                showDelete={false}
-              />
-            ) : (
-              <span className="text-muted-foreground text-sm">-</span>
-            )}
-          </TableCell>
-        )}
-      </TableRow>
-    );
-  };
-
-  const renderPerwadagRow = (item: MatriksResponse, index: number) => {
-    // Check if any item can be edited, viewed, or exported to determine if we need the Actions column
-    const hasActionableItems = data.some(item => canEdit?.(item) || canView?.(item) || onExport);
-    
-    return (
-      <TableRow key={item.id}>
-        <TableCell className="font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
-        <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
-        <TableCell>{renderDocumentLink(item)}</TableCell>
-        <TableCell>
-          {getStatusBadge(item)}
-        </TableCell>
-        {hasActionableItems && (
-          <TableCell>
-            {(canEdit?.(item) || canView?.(item) || onExport) ? (
-              <ActionDropdown
-                onEdit={() => onEdit?.(item)}
-                onView={() => onView?.(item)}
-                onExport={() => onExport?.(item)}
-                showView={!!onView && !!canView?.(item)}
-                showEdit={!!onEdit && !!canEdit?.(item)}
-                showExport={!!onExport}
-                showDelete={false}
-              />
-            ) : (
-              <span className="text-muted-foreground text-sm">-</span>
-            )}
-          </TableCell>
-        )}
-      </TableRow>
-    );
-  };
-
-  const hasActionableItems = data.some(item => canEdit?.(item) || canView?.(item) || onExport);
-  const columnsCount = userRole === 'perwadag' 
-    ? (hasActionableItems ? 5 : 4) 
-    : (hasActionableItems ? 6 : 5);
 
   return (
     <div className="rounded-md border">
       <Table>
         <TableHeader>
           <TableRow>
-            {userRole === 'perwadag' ? renderPerwadagColumns(hasActionableItems) : renderAdminInspektoratColumns(hasActionableItems)}
+            <TableHead>No</TableHead>
+            <TableHead>Nama Perwadag</TableHead>
+            <TableHead>Tanggal Evaluasi</TableHead>
+            <TableHead>Dokumen</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data.length === 0 ? (
+          {loading ? (
+            Array.from({ length: 5 }).map((_, index) => (
+              <TableRow key={index}>
+                <TableCell><Skeleton className="h-4 w-8" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-48" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                <TableCell className="text-right"><Skeleton className="h-8 w-24 ml-auto" /></TableCell>
+              </TableRow>
+            ))
+          ) : data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={columnsCount} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={userRole === 'perwadag' ? 5 : 6} className="text-center py-8 text-muted-foreground">
                 Tidak ada data matriks yang ditemukan.
               </TableCell>
             </TableRow>
           ) : (
             data.map((item, index) => (
-              userRole === 'perwadag'
-                ? renderPerwadagRow(item, index)
-                : renderAdminInspektoratRow(item, index)
+              <TableRow key={item.id}>
+                <TableCell className="font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
+                <TableCell>{item.nama_perwadag}</TableCell>
+                <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
+                <TableCell>{renderDocumentLink(item)}</TableCell>
+                <TableCell>
+                  {getStatusBadge(item)}
+                </TableCell>
+                <TableCell>
+                  <ActionDropdown
+                    onView={() => onView?.(item)}
+                    onEdit={canEdit?.(item) ? () => onEdit?.(item) : undefined}
+                    onExport={() => onExport?.(item)}
+                    showView={true}
+                    showEdit={canEdit?.(item) && !!onEdit}
+                    showExport={!!onExport}
+                    showDelete={false}
+                  />
+                </TableCell>
+              </TableRow>
             ))
           )}
         </TableBody>

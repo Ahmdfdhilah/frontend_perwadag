@@ -17,7 +17,7 @@ export abstract class BaseService {
       return response.data;
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || error.message || "Terjadi kesalahan";
-      
+
       // Show error toast to user
       toast.error("Error", {
         description: errorMessage,
