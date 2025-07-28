@@ -6,7 +6,6 @@ import {
   logoutAsync,
   verifySessionAsync,
   changePasswordAsync,
-  getCurrentUserAsync,
   clearAuth,
   clearError,
   setUser,
