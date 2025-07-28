@@ -29,7 +29,21 @@ export default defineConfig({
               },
               cacheableResponse: {
                 statuses: [0, 200]
-              }
+              },
+              // Don't cache auth-related endpoints
+              plugins: [{
+                cacheKeyWillBeUsed: async ({ request }) => {
+                  const url = new URL(request.url);
+                  // Skip caching for auth endpoints
+                  if (url.pathname.includes('/auth/') || 
+                      url.pathname.includes('/verify-token') ||
+                      url.pathname.includes('/login') ||
+                      url.pathname.includes('/logout')) {
+                    return null; // Don't cache
+                  }
+                  return request.url;
+                }
+              }]
             }
           },
           {

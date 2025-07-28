@@ -141,8 +141,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Check auth on mount to restore session after refresh
   useEffect(() => {
-    // If we have user data persisted but not authenticated, try to restore session
-    if (user && !isAuthenticated) {
+    // If we have user data and authenticated state persisted, verify session is still valid
+    if (user && isAuthenticated) {
+      // Check if session is expired before making API call
+      if (sessionExpiry && sessionExpiry < Date.now()) {
+        // Session is expired, clear auth
+        dispatch(clearAuth());
+        return;
+      }
+      // Session looks valid, verify with server silently
+      dispatch(verifySessionAsync()).catch(() => {
+        // If verification fails, clear auth
+        dispatch(clearAuth());
+      });
+    } else if (user && !isAuthenticated) {
+      // If we have user data but not authenticated, try to restore session
       checkAuth();
     }
     // If no user data and not authenticated, no need to check

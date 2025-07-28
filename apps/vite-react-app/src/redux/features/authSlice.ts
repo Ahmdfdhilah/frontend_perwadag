@@ -296,12 +296,12 @@ export const selectAuthLoading = (state: { auth: AuthState }) => state.auth.isLo
 export const selectAuthError = (state: { auth: AuthState }) => state.auth.error;
 export const selectSessionExpiry = (state: { auth: AuthState }) => state.auth.sessionExpiry;
 
-// Persist config for auth - only persist user data, not session data
+// Persist config for auth - persist user data, session expiry, and auth state
 const authPersistConfig = {
   key: 'auth',
   storage,
-  whitelist: ['user'], // Only persist user data
-  blacklist: ['isAuthenticated', 'sessionExpiry', 'isLoading', 'error'] // Don't persist sensitive session data
+  whitelist: ['user', 'sessionExpiry', 'isAuthenticated'], // Persist essential auth data
+  blacklist: ['isLoading', 'error'] // Don't persist loading and error states
 };
 
 export default persistReducer(authPersistConfig, authSlice.reducer);
