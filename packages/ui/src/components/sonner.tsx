@@ -26,12 +26,12 @@ const Toaster = ({ ...props }: ToasterProps) => {
           loader:
             "h-5 w-5 animate-spin rounded-full border-4 border-muted border-t-primary",
           success:
-            "!border-green-500 !bg-green-50 !text-green-600 [&[data-theme=dark]]:!border-green-800 [&[data-theme=dark]]:!bg-green-950 [&[data-theme=dark]]:!text-green-400",
-          info: "!border-blue-500 !bg-blue-50 !text-blue-600 [&[data-theme=dark]]:!border-blue-800 [&[data-theme=dark]]:!bg-blue-950 [&[data-theme=dark]]:!text-blue-400",
+            "!border-green-500 !bg-green-50 !text-green-600 [&[data-theme=dark]]:!border-green-800 [&[data-theme=dark]]:!bg-green-950 [&[data-theme=dark]]:!text-green-400 [&_.text-muted-foreground]:!text-green-700 [&[data-theme=dark]_.text-muted-foreground]:!text-green-300",
+          info: "!border-blue-500 !bg-blue-50 !text-blue-600 [&[data-theme=dark]]:!border-blue-800 [&[data-theme=dark]]:!bg-blue-950 [&[data-theme=dark]]:!text-blue-400 [&_.text-muted-foreground]:!text-blue-700 [&[data-theme=dark]_.text-muted-foreground]:!text-blue-300",
           warning:
-            "!border-yellow-500 !bg-yellow-50 !text-yellow-600 [&[data-theme=dark]]:!border-yellow-800 [&[data-theme=dark]]:!bg-yellow-950 [&[data-theme=dark]]:!text-yellow-400",
+            "!border-yellow-500 !bg-yellow-50 !text-yellow-600 [&[data-theme=dark]]:!border-yellow-800 [&[data-theme=dark]]:!bg-yellow-950 [&[data-theme=dark]]:!text-yellow-400 [&_.text-muted-foreground]:!text-yellow-700 [&[data-theme=dark]_.text-muted-foreground]:!text-yellow-300",
           error:
-            "!border-red-500 !bg-red-50 !text-red-600 [&[data-theme=dark]]:!border-red-800 [&[data-theme=dark]]:!bg-red-950 [&[data-theme=dark]]:!text-red-400",
+            "!border-red-500 !bg-red-50 !text-red-600 [&[data-theme=dark]]:!border-red-800 [&[data-theme=dark]]:!bg-red-950 [&[data-theme=dark]]:!text-red-400 [&_.text-muted-foreground]:!text-red-700 [&[data-theme=dark]_.text-muted-foreground]:!text-red-300",
           icon: "h-5 w-5 shrink-0",
         },
       }}

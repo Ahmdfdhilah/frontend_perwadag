@@ -165,18 +165,24 @@ const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({
     return nameMap[stepKey] || stepKey.replace('_', ' ');
   };
 
-  // Chart config for completion status
+  // Chart config for completion status with dark mode support
   const chartConfig = {
     count: {
       label: "Jumlah",
     },
     completed: {
       label: "Selesai",
-      color: "#10b981", // green-500
+      theme: {
+        light: "hsl(142.1 76.2% 36.3%)", // green-600
+        dark: "hsl(142.1 70.6% 45.3%)",  // green-500
+      },
     },
     remaining: {
       label: "Tersisa",
-      color: "#e5e7eb", // gray-200
+      theme: {
+        light: "hsl(210 40% 92%)",       // gray-200
+        dark: "hsl(217.2 32.6% 17.5%)",  // gray-800
+      },
     },
   } satisfies ChartConfig;
 
@@ -185,12 +191,12 @@ const CompletionStatsChart: React.FC<CompletionStatsChartProps> = ({
     {
       status: "completed",
       count: stats.completed,
-      fill: "#10b981" // green-500 for completed
+      fill: "var(--color-completed)" // Uses theme-aware CSS variable
     },
     {
       status: "remaining",
       count: stats.remaining,
-      fill: "#e5e7eb" // gray-200 for remaining
+      fill: "var(--color-remaining)" // Uses theme-aware CSS variable
     }
   ];
 
