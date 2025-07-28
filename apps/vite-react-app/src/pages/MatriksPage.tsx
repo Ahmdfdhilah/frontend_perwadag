@@ -259,22 +259,7 @@ const MatriksPage: React.FC = () => {
     }
     return false;
   };
-
-  // Check if user can view this item 
-  const canView = (item: MatriksResponse) => {
-    // All roles can view
-    if (isAdmin()) return true;
-    if (isInspektorat()) {
-      // Check if user can view this matriks based on inspektorat
-      return user?.inspektorat === item.inspektorat;
-    }
-    if (isPerwadag()) {
-      // Check if user can view this matriks based on perwadag
-      return user?.id === item.surat_tugas_info?.id;
-    }
-    return false;
-  };
-
+  
   // Filter handlers
   const handleSearchChange = (search: string) => {
     updateURL({ search, page: 1 });
@@ -424,7 +409,6 @@ const MatriksPage: React.FC = () => {
                 onEdit={handleEdit}
                 onView={handleView}
                 canEdit={canEdit}
-                canView={canView}
                 userRole={isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : 'perwadag'}
                 currentPage={filters.page}
                 itemsPerPage={filters.size}
@@ -439,7 +423,6 @@ const MatriksPage: React.FC = () => {
                 onEdit={handleEdit}
                 onView={handleView}
                 canEdit={canEdit}
-                canView={canView}
                 userRole={isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : 'perwadag'}
                 currentPage={filters.page}
                 itemsPerPage={filters.size}
