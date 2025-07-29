@@ -1,6 +1,6 @@
 import { ReactNode, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Sheet, SheetContent } from '@workspace/ui/components/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@workspace/ui/components/sheet';
 
 interface GenericSidebarItem {
   title: string;
@@ -72,6 +72,10 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       {/* Mobile Sidebar */}
       <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
         <SheetContent side="left" className="p-0 w-[16rem] max-w-[80vw]">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Navigation Menu</SheetTitle>
+            <SheetDescription>Application navigation and menu options</SheetDescription>
+          </SheetHeader>
           <SidebarContent 
             collapsed={false}
             expandedMenus={expandedMenus}
