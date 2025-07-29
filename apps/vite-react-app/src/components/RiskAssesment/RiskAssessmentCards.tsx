@@ -116,7 +116,7 @@ const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
                       ? 'bg-green-100 text-green-800' 
                       : 'bg-red-100 text-red-800'
                   }`}>
-                    {item.total_nilai_risiko !== null ? 'Sudah Diisi' : 'Belum Diisi'}
+                    {item.total_nilai_risiko !== null ? 'Lengkap' : 'Belum Lengkap'}
                   </span>
                 </span>
               </div>
