@@ -51,11 +51,10 @@ export const FormatKuisionerTable: React.FC<FormatKuisionerTableProps> = ({
 }) => {
   const getStatusSpan = (template: FormatKuisionerResponse) => {
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-        template.is_active
-          ? 'bg-green-100 text-green-800' 
-          : 'bg-red-100 text-red-800'
-      }`}>
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${template.is_active
+          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+        }`}>
         {template.is_active ? 'Aktif' : 'Tidak Aktif'}
       </span>
     );

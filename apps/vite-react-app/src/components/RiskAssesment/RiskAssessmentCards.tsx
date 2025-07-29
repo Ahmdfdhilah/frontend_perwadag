@@ -111,11 +111,10 @@ const RiskAssessmentCards: React.FC<RiskAssessmentCardsProps> = ({
               <div>
                 <span className="font-medium text-muted-foreground">Status Penilaian Risiko:</span>
                 <span className="ml-2">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    item.total_nilai_risiko !== null
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-red-100 text-red-800'
-                  }`}>
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${item.total_nilai_risiko !== null
+                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+                      : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+                    }`}>
                     {item.total_nilai_risiko !== null ? 'Lengkap' : 'Belum Lengkap'}
                   </span>
                 </span>

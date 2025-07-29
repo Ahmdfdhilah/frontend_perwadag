@@ -29,11 +29,10 @@ export const EmailTemplateCards: React.FC<EmailTemplateCardsProps> = ({
 }) => {
   const getStatusBadge = (isActive: boolean) => {
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-        isActive
-          ? 'bg-green-100 text-green-800' 
-          : 'bg-red-100 text-red-800'
-      }`}>
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${isActive
+          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+        }`}>
         {isActive ? 'Aktif' : 'Tidak Aktif'}
       </span>
     );
