@@ -204,6 +204,7 @@ export function LoginPage() {
                             <Input
                               type="text"
                               placeholder="Masukkan username"
+                              autoComplete="username"
                               disabled={authLoading}
                               {...field}
                             />
@@ -220,30 +221,31 @@ export function LoginPage() {
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Password</FormLabel>
-                          <FormControl>
-                            <div className="relative">
+                          <div className="relative">
+                            <FormControl>
                               <Input
                                 type={showPassword ? 'text' : 'password'}
                                 placeholder="Masukkan password"
+                                autoComplete="current-password"
                                 disabled={authLoading}
                                 {...field}
                               />
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                                onClick={() => setShowPassword(!showPassword)}
-                                disabled={authLoading}
-                              >
-                                {showPassword ? (
-                                  <EyeOff className="h-4 w-4 text-muted-foreground" />
-                                ) : (
-                                  <Eye className="h-4 w-4 text-muted-foreground" />
-                                )}
-                              </Button>
-                            </div>
-                          </FormControl>
+                            </FormControl>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                              onClick={() => setShowPassword(!showPassword)}
+                              disabled={authLoading}
+                            >
+                              {showPassword ? (
+                                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                              ) : (
+                                <Eye className="h-4 w-4 text-muted-foreground" />
+                              )}
+                            </Button>
+                          </div>
                           <FormMessage />
                         </FormItem>
                       )}
@@ -359,6 +361,7 @@ export function LoginPage() {
                           <Input
                             type="text"
                             placeholder="Masukkan username"
+                            autoComplete="username"
                             disabled={authLoading}
                             {...field}
                           />
@@ -375,30 +378,31 @@ export function LoginPage() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <div className="relative">
+                        <div className="relative">
+                          <FormControl>
                             <Input
                               type={showPassword ? 'text' : 'password'}
                               placeholder="Masukkan password"
+                              autoComplete="current-password"
                               disabled={authLoading}
                               {...field}
                             />
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
-                              onClick={() => setShowPassword(!showPassword)}
-                              disabled={authLoading}
-                            >
-                              {showPassword ? (
-                                <EyeOff className="h-4 w-4 text-muted-foreground" />
-                              ) : (
-                                <Eye className="h-4 w-4 text-muted-foreground" />
-                              )}
-                            </Button>
-                          </div>
-                        </FormControl>
+                          </FormControl>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                            onClick={() => setShowPassword(!showPassword)}
+                            disabled={authLoading}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4 text-muted-foreground" />
+                            ) : (
+                              <Eye className="h-4 w-4 text-muted-foreground" />
+                            )}
+                          </Button>
+                        </div>
                         <FormMessage />
                       </FormItem>
                     )}

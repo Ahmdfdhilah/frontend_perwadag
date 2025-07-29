@@ -51,6 +51,13 @@ function DialogContent({
   children,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content>) {
+  const hasDescription = React.Children.toArray(children).some(
+    (child) => 
+      React.isValidElement(child) && 
+      (child.type === DialogDescription || 
+       (typeof child.type === 'object' && child.type && 'displayName' in child.type && (child.type as any).displayName === 'DialogDescription'))
+  );
+
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
@@ -63,6 +70,11 @@ function DialogContent({
         {...props}
       >
         {children}
+        {!hasDescription && (
+          <DialogDescription className="sr-only">
+            Dialog content
+          </DialogDescription>
+        )}
         <DialogPrimitive.Close className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 h-11 w-11 flex items-center justify-center">
           <XIcon />
           <span className="sr-only">Close</span>
