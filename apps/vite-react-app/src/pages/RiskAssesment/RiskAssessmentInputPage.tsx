@@ -16,7 +16,8 @@ import {
   SelectValue,
 } from '@workspace/ui/components/select';
 import { Separator } from '@workspace/ui/components/separator';
-import { ArrowLeft, Save, Calculator, Loader2, Edit } from 'lucide-react';
+import { Skeleton } from '@workspace/ui/components/skeleton';
+import { ArrowLeft, Save, Calculator, Edit } from 'lucide-react';
 import { formatNumber, handleNumberInput, parseFormattedNumber } from '@/utils/numberUtils';
 import {
   calculateTrendChoice,
@@ -40,6 +41,89 @@ type PageMode = 'view' | 'edit';
 interface RiskAssessmentPageProps {
   mode?: PageMode;
 }
+
+const RiskAssessmentSkeleton: React.FC = () => {
+  return (
+    <div className="space-y-6">
+      {/* Page Header Skeleton */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-2">
+            <Skeleton className="h-8 w-96" />
+            <Skeleton className="h-4 w-72" />
+          </div>
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-32" />
+            <Skeleton className="h-10 w-32" />
+          </div>
+        </div>
+      </div>
+
+      {/* Form Sections Skeleton */}
+      <div className="grid grid-cols-1 gap-6">
+        {Array.from({ length: 8 }).map((_, index) => (
+          <Card key={index}>
+            <CardHeader>
+              <Skeleton className="h-6 w-80" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Form fields skeleton */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-28" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-10 w-full" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Final Result Card Skeleton */}
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-48" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-4">
+            <Skeleton className="h-10 w-48" />
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-10 w-32" />
+            </div>
+          </div>
+          <Skeleton className="h-px w-full" />
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Action Buttons Skeleton */}
+      <div className="flex justify-end gap-4">
+        <Skeleton className="h-10 w-20" />
+        <Skeleton className="h-10 w-36" />
+      </div>
+    </div>
+  );
+};
 
 const RiskAssessmentPage: React.FC<RiskAssessmentPageProps> = ({ mode }) => {
   const { id } = useParams<{ id: string }>();
@@ -613,14 +697,7 @@ const RiskAssessmentPage: React.FC<RiskAssessmentPageProps> = ({ mode }) => {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Memuat data penilaian risiko...</p>
-        </div>
-      </div>
-    );
+    return <RiskAssessmentSkeleton />;
   }
 
   if (!penilaianData) {
