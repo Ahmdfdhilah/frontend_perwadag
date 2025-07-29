@@ -23,9 +23,8 @@ import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import MatriksTable from '@/components/Matriks/MatriksTable';
 import MatriksCards from '@/components/Matriks/MatriksCards';
 import MatriksDialog from '@/components/Matriks/MatriksDialog';
-import { getDefaultYearOptions, findPeriodeByYear } from '@/utils/yearUtils';
-import { periodeEvaluasiService } from '@/services/periodeEvaluasi';
-import { PeriodeEvaluasi } from '@/services/periodeEvaluasi/types';
+import { findPeriodeByYear } from '@/utils/yearUtils';
+import { useYearOptions } from '@/hooks/useYearOptions';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import { exportAllMatriksToExcel } from '@/utils/excelExportUtils';
 import { Download } from 'lucide-react';
@@ -73,30 +72,10 @@ const MatriksPage: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MatriksResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'edit' | 'view'>('edit');
-  const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
-  const [periodeEvaluasi, setPeriodeEvaluasi] = useState<PeriodeEvaluasi[]>([]);
+  
+  // Use optimized year options hook
+  const { yearOptions, periodeEvaluasi } = useYearOptions();
 
-  // Fetch year options function
-  const fetchYearOptions = async () => {
-    try {
-      const options = await getDefaultYearOptions();
-      setYearOptions(options);
-    } catch (error) {
-      console.error('Failed to fetch year options:', error);
-    }
-  };
-
-  // Fetch periode evaluasi data
-  const fetchPeriodeEvaluasi = async () => {
-    try {
-      const response = await periodeEvaluasiService.getPeriodeEvaluasi({
-        size: 100
-      });
-      setPeriodeEvaluasi(response.items);
-    } catch (error) {
-      console.error('Failed to fetch periode evaluasi:', error);
-    }
-  };
 
   // Calculate access control using useFormPermissions
   const hasAccess = hasPageAccess('matriks');
@@ -139,8 +118,6 @@ const MatriksPage: React.FC = () => {
   useEffect(() => {
     if (hasAccess) {
       fetchMatriks();
-      fetchYearOptions();
-      fetchPeriodeEvaluasi();
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, filters.has_file, filters.is_completed, hasAccess]);
 

@@ -5,9 +5,8 @@ import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import { MeetingResponse, MeetingFilterParams } from '@/services/meeting/types';
 import { meetingService } from '@/services/meeting';
-import { getDefaultYearOptions, findPeriodeByYear } from '@/utils/yearUtils';
-import { periodeEvaluasiService } from '@/services/periodeEvaluasi';
-import { PeriodeEvaluasi } from '@/services/periodeEvaluasi/types';
+import { findPeriodeByYear } from '@/utils/yearUtils';
+import { useYearOptions } from '@/hooks/useYearOptions';
 import Filtering from '@/components/common/Filtering';
 import Pagination from '@/components/common/Pagination';
 import { Card, CardContent } from '@workspace/ui/components/card';
@@ -64,30 +63,8 @@ const KonfirmasiMeetingPage: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MeetingResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
-  const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
-  const [periodeEvaluasi, setPeriodeEvaluasi] = useState<PeriodeEvaluasi[]>([]);
+  const { yearOptions, periodeEvaluasi } = useYearOptions();
 
-  // Fetch year options function
-  const fetchYearOptions = async () => {
-    try {
-      const options = await getDefaultYearOptions();
-      setYearOptions(options);
-    } catch (error) {
-      console.error('Failed to fetch year options:', error);
-    }
-  };
-
-  // Fetch periode evaluasi data
-  const fetchPeriodeEvaluasi = async () => {
-    try {
-      const response = await periodeEvaluasiService.getPeriodeEvaluasi({
-        size: 100
-      });
-      setPeriodeEvaluasi(response.items);
-    } catch (error) {
-      console.error('Failed to fetch periode evaluasi:', error);
-    }
-  };
 
   // Calculate access control using useFormPermissions
   const hasAccess = hasPageAccess('konfirmasi_meeting');
@@ -131,8 +108,6 @@ const KonfirmasiMeetingPage: React.FC = () => {
   useEffect(() => {
     if (hasAccess) {
       fetchMeetings();
-      fetchYearOptions();
-      fetchPeriodeEvaluasi();
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, filters.has_files, filters.has_date, filters.has_links, filters.is_completed, hasAccess]);
 

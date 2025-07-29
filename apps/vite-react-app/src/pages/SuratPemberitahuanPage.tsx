@@ -23,9 +23,8 @@ import SearchContainer from '@/components/common/SearchContainer';
 import SuratPemberitahuanTable from '@/components/SuratPemberitahuan/SuratPemberitahuanTable';
 import SuratPemberitahuanCards from '@/components/SuratPemberitahuan/SuratPemberitahuanCards';
 import SuratPemberitahuanDialog from '@/components/SuratPemberitahuan/SuratPemberitahuanDialog';
-import { getDefaultYearOptions, findPeriodeByYear } from '@/utils/yearUtils';
-import { periodeEvaluasiService } from '@/services/periodeEvaluasi';
-import { PeriodeEvaluasi } from '@/services/periodeEvaluasi/types';
+import { findPeriodeByYear } from '@/utils/yearUtils';
+import { useYearOptions } from '@/hooks/useYearOptions';
 
 interface SuratPemberitahuanPageFilters {
   search: string;
@@ -65,30 +64,8 @@ const SuratPemberitahuanPage: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<SuratPemberitahuanResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
-  const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
-  const [periodeEvaluasi, setPeriodeEvaluasi] = useState<PeriodeEvaluasi[]>([]);
-
-  // Fetch year options function
-  const fetchYearOptions = async () => {
-    try {
-      const options = await getDefaultYearOptions();
-      setYearOptions(options);
-    } catch (error) {
-      console.error('Failed to fetch year options:', error);
-    }
-  };
-
-  // Fetch periode evaluasi data
-  const fetchPeriodeEvaluasi = async () => {
-    try {
-      const response = await periodeEvaluasiService.getPeriodeEvaluasi({
-        size: 100
-      });
-      setPeriodeEvaluasi(response.items);
-    } catch (error) {
-      console.error('Failed to fetch periode evaluasi:', error);
-    }
-  };
+  // Use optimized year options hook
+  const { yearOptions, periodeEvaluasi } = useYearOptions();
 
   // Calculate access control using useFormPermissions
   const hasAccess = hasPageAccess('surat_pemberitahuan');
@@ -129,8 +106,6 @@ const SuratPemberitahuanPage: React.FC = () => {
   useEffect(() => {
     if (hasAccess) {
       fetchSuratPemberitahuan();
-      fetchYearOptions();
-      fetchPeriodeEvaluasi();
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun_evaluasi, hasAccess]);
 

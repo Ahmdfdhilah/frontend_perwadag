@@ -26,7 +26,8 @@ import {
   SelectValue
 } from "@workspace/ui/components/select";
 import { Label } from "@workspace/ui/components/label";
-import { getDefaultYearOptions, getCurrentYear } from "@/utils/yearUtils";
+import { getCurrentYear } from "@/utils/yearUtils";
+import { useYearOptions } from "@/hooks/useYearOptions";
 
 interface DashboardPageFilters {
   tahun_evaluasi: string;
@@ -53,19 +54,9 @@ const DashboardPage: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<SuratTugasDashboardSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([]);
-
-  // Fetch year options function
-  const fetchYearOptions = async () => {
-    try {
-      const options = await getDefaultYearOptions();
-      // Filter out 'all' option to only show specific years
-      const filteredOptions = options.filter(option => option.value !== 'all');
-      setYearOptions(filteredOptions);
-    } catch (error) {
-      console.error('Failed to fetch year options:', error);
-    }
-  };
+  // Use optimized year options hook and filter out 'all' option for dashboard
+  const { yearOptions: allYearOptions } = useYearOptions();
+  const yearOptions = allYearOptions.filter(option => option.value !== 'all');
 
   const fetchDashboardData = async (year?: number | null) => {
     try {
@@ -84,7 +75,6 @@ const DashboardPage: React.FC = () => {
   useEffect(() => {
     const year = parseInt(filters.tahun_evaluasi);
     fetchDashboardData(year);
-    fetchYearOptions();
   }, [filters.tahun_evaluasi]);
 
   const handleYearChange = (value: string) => {

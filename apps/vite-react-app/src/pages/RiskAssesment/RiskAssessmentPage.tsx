@@ -36,7 +36,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@workspace/ui/components/alert-dialog';
-import { getDefaultYearOptions } from '@/utils/yearUtils';
+import { useYearOptions } from '@/hooks/useYearOptions';
 import { riskAssessmentStateManager } from '@/utils/urlStateUtils';
 
 interface RiskAssessmentPageFilters {
@@ -78,18 +78,9 @@ const RiskAssessmentPage: React.FC = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [isPeriodeDialogOpen, setIsPeriodeDialogOpen] = useState(false);
-  const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
+  const { yearOptions } = useYearOptions();
   const [itemToDelete, setItemToDelete] = useState<PenilaianRisikoResponse | null>(null);
 
-  // Fetch year options function
-  const fetchYearOptions = async () => {
-    try {
-      const options = await getDefaultYearOptions();
-      setYearOptions(options);
-    } catch (error) {
-      console.error('Failed to fetch year options:', error);
-    }
-  };
 
   // Calculate access control based on permissions
   const hasAccess = hasPageAccess('risk_assessment');
@@ -144,7 +135,6 @@ const RiskAssessmentPage: React.FC = () => {
   useEffect(() => {
     if (hasAccess) {
       fetchRiskAssessments();
-      fetchYearOptions();
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.tahun, filters.sort_by, hasAccess]);
 

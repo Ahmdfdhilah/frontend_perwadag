@@ -35,9 +35,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@workspace/ui/components/alert-dialog';
-import { getDefaultYearOptions, findPeriodeByYear } from '@/utils/yearUtils';
-import { periodeEvaluasiService } from '@/services/periodeEvaluasi';
-import { PeriodeEvaluasi } from '@/services/periodeEvaluasi/types';
+import { findPeriodeByYear } from '@/utils/yearUtils';
+import { useYearOptions } from '@/hooks/useYearOptions';
 
 interface SuratTugasPageFilters {
   search: string;
@@ -78,30 +77,8 @@ const SuratTugasPage: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<SuratTugasResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit' | 'create'>('view');
   const [itemToDelete, setItemToDelete] = useState<SuratTugasResponse | null>(null);
-  const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
-  const [periodeEvaluasi, setPeriodeEvaluasi] = useState<PeriodeEvaluasi[]>([]);
-
-  // Fetch year options function
-  const fetchYearOptions = async () => {
-    try {
-      const options = await getDefaultYearOptions();
-      setYearOptions(options);
-    } catch (error) {
-      console.error('Failed to fetch year options:', error);
-    }
-  };
-
-  // Fetch periode evaluasi data
-  const fetchPeriodeEvaluasi = async () => {
-    try {
-      const response = await periodeEvaluasiService.getPeriodeEvaluasi({
-        size: 100
-      });
-      setPeriodeEvaluasi(response.items);
-    } catch (error) {
-      console.error('Failed to fetch periode evaluasi:', error);
-    }
-  };
+  // Use optimized year options hook
+  const { yearOptions, periodeEvaluasi } = useYearOptions();
 
   // Calculate access control based on permissions
   const hasAccess = hasPageAccess('surat_tugas');
@@ -203,8 +180,6 @@ const SuratTugasPage: React.FC = () => {
   useEffect(() => {
     if (hasAccess) {
       fetchSuratTugasList();
-      fetchYearOptions();
-      fetchPeriodeEvaluasi();
     }
   }, [filters.page, filters.size, filters.search, filters.inspektorat, filters.user_perwadag_id, filters.evaluation_status, filters.is_evaluation_active, filters.tahun_evaluasi, hasAccess]);
 

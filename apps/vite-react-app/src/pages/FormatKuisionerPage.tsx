@@ -33,7 +33,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@workspace/ui/components/select';
-import { getDefaultYearOptions } from '@/utils/yearUtils';
+import { useYearOptions } from '@/hooks/useYearOptions';
 
 interface FormatKuisionerPageFilters {
   search: string;
@@ -73,20 +73,11 @@ const FormatKuisionerPage: React.FC = () => {
   const [templateToDelete, setTemplateToDelete] = useState<FormatKuisionerResponse | null>(null);
   const [templateToActivate, setTemplateToActivate] = useState<FormatKuisionerResponse | null>(null);
   const [activatingTemplate, setActivatingTemplate] = useState<FormatKuisionerResponse | null>(null);
-  const [yearOptions, setYearOptions] = useState<{ value: string; label: string }[]>([{ value: 'all', label: 'Semua Tahun' }]);
+  // Use optimized year options hook
+  const { yearOptions } = useYearOptions();
 
   // Calculate access control
   const hasAccess = isAdmin();
-
-  // Fetch year options function
-  const fetchYearOptions = async () => {
-    try {
-      const options = await getDefaultYearOptions();
-      setYearOptions(options);
-    } catch (error) {
-      console.error('Failed to fetch year options:', error);
-    }
-  };
 
   // Fetch templates function
   const fetchTemplates = async () => {
@@ -114,7 +105,6 @@ const FormatKuisionerPage: React.FC = () => {
   useEffect(() => {
     if (hasAccess) {
       fetchTemplates();
-      fetchYearOptions();
     }
   }, [filters.page, filters.size, filters.search, filters.tahun, filters.has_file, hasAccess]);
 
