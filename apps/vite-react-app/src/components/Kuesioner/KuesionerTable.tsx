@@ -105,7 +105,7 @@ const KuesionerTable: React.FC<KuesionerTableProps> = ({
                       href={item.link_dokumen_data_dukung}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 underline"
+                      className="text-blue-600 hover:text-blue-800 underline dark:text-blue-300 dark:hover:text-blue-100"
                     >
                       Lihat Data Dukung
                     </a>

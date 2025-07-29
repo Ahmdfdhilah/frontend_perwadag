@@ -21,7 +21,7 @@ const FileViewLink: React.FC<FileViewLinkProps> = ({
   hasFile,
   fileUrls,
   fileName,
-  className = "text-blue-600 hover:text-blue-800 underline",
+  className="text-blue-600 hover:text-blue-800 underline dark:text-blue-300 dark:hover:text-blue-100",
   linkText = "Lihat Dokumen",
   showIcon = false,
 }) => {

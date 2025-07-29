@@ -134,7 +134,7 @@ const KonfirmasiMeetingCards: React.FC<KonfirmasiMeetingCardsProps> = ({
                       href={item.link_zoom}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-2 text-blue-600 hover:text-blue-800 underline"
+                      className="ml-2 text-blue-600 hover:text-blue-800 underline dark:text-blue-300 dark:hover:text-blue-100"
                     >
                       Join Meeting
                     </a>
@@ -149,7 +149,7 @@ const KonfirmasiMeetingCards: React.FC<KonfirmasiMeetingCardsProps> = ({
                       href={item.link_daftar_hadir}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-2 text-blue-600 hover:text-blue-800 underline"
+                      className="ml-2 text-blue-600 hover:text-blue-800 underline dark:text-blue-300 dark:hover:text-blue-100"
                     >
                       Lihat Daftar Hadir
                     </a>
