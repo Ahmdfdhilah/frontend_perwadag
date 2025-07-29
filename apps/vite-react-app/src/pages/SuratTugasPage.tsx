@@ -89,56 +89,36 @@ const SuratTugasPage: React.FC = () => {
   // Check if individual item can be edited based on periode status
   const canEditItem = (item: SuratTugasResponse) => {
     if (!canEdit) {
-      console.log('SuratTugas canEditItem: No edit permission');
       return false;
     }
 
     // Check if the periode is locked or status is "tutup"
     if (item.tahun_evaluasi) {
       const periode = findPeriodeByYear(periodeEvaluasi, item.tahun_evaluasi);
-      console.log('SuratTugas canEditItem check:', {
-        itemId: item.id,
-        tahunEvaluasi: item.tahun_evaluasi,
-        periode: periode,
-        isLocked: periode?.is_locked,
-        status: periode?.status
-      });
-
+      
       if (periode?.is_locked || periode?.status === 'tutup') {
-        console.log('SuratTugas canEditItem: DISABLED - periode locked or tutup');
         return false;
       }
     }
 
-    console.log('SuratTugas canEditItem: ENABLED');
     return true;
   };
 
   // Check if individual item can be deleted based on periode status
   const canDeleteItem = (item: SuratTugasResponse) => {
     if (!canDelete) {
-      console.log('SuratTugas canDeleteItem: No delete permission');
       return false;
     }
 
     // Check if the periode is locked or status is "tutup"
     if (item.tahun_evaluasi) {
       const periode = findPeriodeByYear(periodeEvaluasi, item.tahun_evaluasi);
-      console.log('SuratTugas canDeleteItem check:', {
-        itemId: item.id,
-        tahunEvaluasi: item.tahun_evaluasi,
-        periode: periode,
-        isLocked: periode?.is_locked,
-        status: periode?.status
-      });
-
+      
       if (periode?.is_locked || periode?.status === 'tutup') {
-        console.log('SuratTugas canDeleteItem: DISABLED - periode locked or tutup');
         return false;
       }
     }
 
-    console.log('SuratTugas canDeleteItem: ENABLED');
     return true;
   };
 

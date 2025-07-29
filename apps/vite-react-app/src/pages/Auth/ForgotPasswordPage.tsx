@@ -111,7 +111,7 @@ export function ForgotPasswordPage() {
             {/* Logo and Header */}
             <div className="text-center space-y-4">
               <div className="flex justify-center">
-                <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="OKOCE HRIS" className="h-12 w-auto" />
+                <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="Logo Kemendag" className="h-12 w-auto" width="144" height="48" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">Lupa Password</h1>
@@ -197,7 +197,7 @@ export function ForgotPasswordPage() {
           {/* Logo and Header */}
           <div className="text-center space-y-4">
             <div className="flex justify-center">
-              <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="OKOCE HRIS" className="h-12 w-auto" />
+              <img src={isDarkMode ? logoDarkMode : logoLightMode} alt="Logo Kemendag" className="h-12 w-auto" width="144" height="48" />
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight">Lupa Password</h1>

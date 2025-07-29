@@ -22,15 +22,17 @@ export function SidebarHeader({ collapsed, onToggleCollapse }: SidebarHeaderProp
         <Link to="/" className={cn("flex items-center min-w-0", collapsed ? "justify-center" : "space-x-2")}>
           <img 
             src={collapsed ? (isDarkMode ? logoMiniDarkMode : logoMiniLightMode) : (isDarkMode ? logoDarkMode : logoLightMode)} 
-            className={cn("transition-all duration-300 object-contain", collapsed ? "w-7 h-7 lg:w-8 lg:h-8" : "w-32 lg:w-35 h-auto")} 
-            alt="logo okoce" 
+            className={cn("transition-all duration-300 object-contain", collapsed ? "w-7 h-7 lg:w-8 lg:h-8" : "w-32 lg:w-36 h-12")} 
+            alt="logo kemendag" 
+            width={collapsed ? "32" : "144"}
+            height={collapsed ? "32" : "48"}
           />
         </Link>
         {!collapsed && (
           <Button
             variant="ghost"
             size="sm"
-            className="hidden lg:flex h-7 w-7 lg:h-8 lg:w-8 p-0 flex-shrink-0"
+            className="hidden lg:flex h-11 w-11 p-0 flex-shrink-0"
             onClick={onToggleCollapse}
             title="Collapse sidebar"
           >
@@ -44,7 +46,7 @@ export function SidebarHeader({ collapsed, onToggleCollapse }: SidebarHeaderProp
           <Button
             variant="ghost"
             size="sm"
-            className="h-7 w-7 lg:h-8 lg:w-8 p-0"
+            className="h-11 w-11 p-0"
             onClick={onToggleCollapse}
             title="Expand sidebar"
           >
