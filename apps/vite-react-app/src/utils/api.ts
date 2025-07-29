@@ -16,6 +16,11 @@ const configureInterceptors = (api: AxiosInstance) => {
   api.interceptors.request.use(
     (config) => {
       // Cookies will be automatically sent due to withCredentials: true
+      
+      // Add header to prevent Service Worker from caching this request
+      config.headers['X-No-Cache'] = '1';
+      config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+      
       return config;
     },
     (error) => Promise.reject(error)
