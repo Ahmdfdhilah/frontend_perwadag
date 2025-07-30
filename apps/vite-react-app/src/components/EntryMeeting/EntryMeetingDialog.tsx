@@ -295,7 +295,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
 
             {/* Link Daftar Hadir */}
             <div className="space-y-2">
-              <Label htmlFor="linkDaftarHadir">Link Daftar Hadir (Google Form)</Label>
+              <Label htmlFor="linkDaftarHadir">Link Daftar Hadir </Label>
               {canEditAllFields ? (
                 <div className="flex gap-2">
                   <Input

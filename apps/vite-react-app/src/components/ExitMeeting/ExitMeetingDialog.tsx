@@ -300,7 +300,7 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
 
             {/* Link Daftar Hadir */}
             <div className="space-y-2">
-              <Label htmlFor="link_daftar_hadir">Link Daftar Hadir (Google Form)</Label>
+              <Label htmlFor="link_daftar_hadir">Link Daftar Hadir </Label>
               {canEditAllFields ? (
                 <div className="flex gap-2">
                   <Input

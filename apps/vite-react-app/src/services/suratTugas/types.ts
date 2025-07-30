@@ -129,7 +129,7 @@ export interface SuratTugasDashboardSummary {
   year_filter: number | null;
   summary: {
     statistics: {
-      total_surat_tugas: number;        // Total filtered by year
+      total_perwadag?: number;          // Total perwadag (only for admin/inspektorat)
       average_progress: number;         // 0-100 percentage
       year_filter_applied: boolean;
       filtered_year: number | null;
@@ -154,7 +154,7 @@ export interface SuratTugasDashboardSummary {
   quick_actions: {
     can_create_surat_tugas: boolean;
     can_manage_templates: boolean;
-    total_evaluasi: number;
+    total_evaluasi?: number;            // Not shown for perwadag
   };
 }
 
