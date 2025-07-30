@@ -240,6 +240,16 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
 
   // Function to compose email using template API
   const handleComposeEmail = async (item: LaporanHasilResponse) => {
+    // Restrict email composition for perwadag role
+    if (isPerwadag()) {
+      toast({
+        title: 'Akses Ditolak',
+        description: 'Role perwadag tidak diizinkan mengirim email.',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     try {
       // Use template API to compose email
       const composedEmail = await emailTemplateService.composeEmailForLaporanHasil(item.id);
@@ -353,6 +363,7 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
                 onEdit={handleEdit}
                 onComposeEmail={handleComposeEmail}
                 canEdit={canEdit}
+                canComposeEmail={!isPerwadag()}
                 currentPage={filters.page}
                 itemsPerPage={filters.size}
               />
@@ -367,6 +378,7 @@ const LaporanHasilEvaluasiPage: React.FC = () => {
                 onEdit={handleEdit}
                 onComposeEmail={handleComposeEmail}
                 canEdit={canEdit}
+                canComposeEmail={!isPerwadag()}
                 currentPage={filters.page}
                 itemsPerPage={filters.size}
               />

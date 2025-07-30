@@ -138,7 +138,7 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
                     </span>
                   </div>
                 </div>
-                <ChevronDown className="h-4 w-4 flex-shrink-0" />
+                <ChevronDown className="h-4 w-4 flex-shrink-0 text-black" />
               </>
             )}
           </Button>

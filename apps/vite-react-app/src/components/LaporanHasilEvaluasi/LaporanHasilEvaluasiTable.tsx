@@ -20,6 +20,7 @@ interface LaporanHasilEvaluasiTableProps {
   onEdit?: (item: LaporanHasilResponse) => void;
   onComposeEmail?: (item: LaporanHasilResponse) => void;
   canEdit?: (item: LaporanHasilResponse) => boolean;
+  canComposeEmail?: boolean;
   currentPage?: number;
   itemsPerPage?: number;
 }
@@ -31,6 +32,7 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
   onEdit,
   onComposeEmail,
   canEdit,
+  canComposeEmail = true,
   currentPage = 1,
   itemsPerPage = 10,
 }) => {
@@ -113,7 +115,7 @@ const LaporanHasilEvaluasiTable: React.FC<LaporanHasilEvaluasiTableProps> = ({
                     showView={true}
                     showEdit={canEdit?.(item) && !!onEdit}
                     showDelete={false}
-                    showComposeEmail={!!onComposeEmail}
+                    showComposeEmail={canComposeEmail && !!onComposeEmail}
                   />
                 </TableCell>
               </TableRow>
