@@ -89,8 +89,8 @@ export const useFormPermissions = () => {
       // Laporan Hasil: Admin (RU), Inspektorat (X), Perwadag (X)
       laporan_hasil_evaluasi: {
         admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
-        inspektorat: { canView: false, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
-        perwadag: { canView: false, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
+        inspektorat: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        perwadag: { canView: true, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
       },
       
       // Default permissions for other forms
