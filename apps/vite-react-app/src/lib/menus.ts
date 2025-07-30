@@ -93,7 +93,7 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Laporan Hasil',
     href: '/laporan-hasil',
     icon: FileInput,
-    allowedRoles: ['ADMIN'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
   },
 
   // Template Kuesioner - All roles
