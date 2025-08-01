@@ -270,13 +270,14 @@ export const exportMatriksToExcel = async (item: any, formatIndonesianDateRange:
   const tanggalEvaluasi = formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai);
   
   const config: ExcelExportConfig = {
-    title: `Matriks Temuan Rekomendasi ${item.nama_perwadag} ${tanggalEvaluasi}`,
-    fileName: `Matriks_Temuan_Rekomendasi_${item.nama_perwadag.replace(/\s+/g, '_')}_${item.tahun_evaluasi}.xlsx`,
-    sheetName: 'Matriks Temuan Rekomendasi',
+    title: `Matriks Kondisi Kriteria Rekomendasi ${item.nama_perwadag} ${tanggalEvaluasi}`,
+    fileName: `Matriks_Kondisi_Kriteria_Rekomendasi_${item.nama_perwadag.replace(/\s+/g, '_')}_${item.tahun_evaluasi}.xlsx`,
+    sheetName: 'Matriks Kondisi Kriteria Rekomendasi',
     columns: [
       { width: 5, header: 'No' },
-      { width: 50, header: 'Temuan', key: 'temuan' },
-      { width: 50, header: 'Rekomendasi', key: 'rekomendasi' }
+      { width: 40, header: 'Kondisi', key: 'kondisi' },
+      { width: 40, header: 'Kriteria', key: 'kriteria' },
+      { width: 40, header: 'Rekomendasi', key: 'rekomendasi' }
     ],
     headerInfo: [
       { label: 'Nama Perwadag', value: item.nama_perwadag },
@@ -285,7 +286,7 @@ export const exportMatriksToExcel = async (item: any, formatIndonesianDateRange:
       { label: 'Tahun Evaluasi', value: item.tahun_evaluasi.toString() }
     ],
     data: temuanRekomendasi,
-    noDataMessage: 'Tidak ada temuan dan rekomendasi',
+    noDataMessage: 'Tidak ada kondisi, kriteria dan rekomendasi',
     successMessage: `Data matriks ${item.nama_perwadag} berhasil diekspor ke Excel.`,
     errorMessage: 'Gagal mengekspor data ke Excel. Silakan coba lagi.'
   };
@@ -335,17 +336,18 @@ export const exportAllMatriksToExcel = async (
         { width: 30 },  // Nama Perwadag
         { width: 20 },  // No Surat Tugas
         { width: 25 },  // Tanggal Evaluasi
-        { width: 50 },  // Temuan
-        { width: 50 }   // Rekomendasi
+        { width: 40 },  // Kondisi
+        { width: 40 },  // Kriteria
+        { width: 40 }   // Rekomendasi
       ];
 
       let currentRow = 1;
 
       // Add title
-      const titleRange = `A${currentRow}:G${currentRow}`;
+      const titleRange = `A${currentRow}:H${currentRow}`;
       worksheet.mergeCells(titleRange);
       const titleCell = worksheet.getCell(`A${currentRow}`);
-      titleCell.value = `Matriks Temuan Rekomendasi Tahun ${year}`;
+      titleCell.value = `Matriks Kondisi Kriteria Rekomendasi Tahun ${year}`;
       titleCell.font = { bold: true, size: 18, color: { argb: 'FF1565C0' } };
       titleCell.alignment = { horizontal: 'center', vertical: 'middle' };
       titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE3F2FD' } };
@@ -353,7 +355,7 @@ export const exportAllMatriksToExcel = async (
       currentRow += 2;
 
       // Add table headers
-      const headerRow = worksheet.addRow(['No', 'Inspektorat', 'Nama Perwadag', 'No Surat Tugas', 'Tanggal Evaluasi', 'Temuan', 'Rekomendasi']);
+      const headerRow = worksheet.addRow(['No', 'Inspektorat', 'Nama Perwadag', 'No Surat Tugas', 'Tanggal Evaluasi', 'Kondisi', 'Kriteria', 'Rekomendasi']);
       headerRow.height = 30;
       
       headerRow.eachCell((cell: any) => {
@@ -434,7 +436,8 @@ export const exportAllMatriksToExcel = async (
               item.nama_perwadag,
               item.surat_tugas_info?.no_surat || '-',
               formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai),
-              'Tidak ada temuan',
+              'Tidak ada kondisi',
+              'Tidak ada kriteria',
               'Tidak ada rekomendasi'
             ]);
             
@@ -472,7 +475,8 @@ export const exportAllMatriksToExcel = async (
                 i === 0 ? item.nama_perwadag : '', // Only show nama_perwadag on first row
                 i === 0 ? (item.surat_tugas_info?.no_surat || '-') : '', // Only show no_surat on first row
                 i === 0 ? formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai) : '', // Only show date on first row
-                tr.temuan || '',
+                tr.kondisi || '',
+                tr.kriteria || '',
                 tr.rekomendasi || ''
               ]);
               
@@ -533,7 +537,7 @@ export const exportAllMatriksToExcel = async (
 
     // Generate filename
     const yearSuffix = selectedYear !== 'all' ? `_${selectedYear}` : '_Semua_Tahun';
-    const fileName = `Matriks_Temuan_Rekomendasi${yearSuffix}_${new Date().toISOString().split('T')[0]}.xlsx`;
+    const fileName = `Matriks_Kondisi_Kriteria_Rekomendasi${yearSuffix}_${new Date().toISOString().split('T')[0]}.xlsx`;
 
     // Save file
     const buffer = await workbook.xlsx.writeBuffer();

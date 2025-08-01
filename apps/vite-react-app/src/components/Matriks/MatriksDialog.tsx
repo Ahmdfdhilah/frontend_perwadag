@@ -83,7 +83,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   const handleAddTemuanRekomendasi = () => {
     // Prevent adding during save operation
     if (isSaving || temuanRekomendasi.length >= 20) return;
-    setTemuanRekomendasi([...temuanRekomendasi, { temuan: '', rekomendasi: '' }]);
+    setTemuanRekomendasi([...temuanRekomendasi, { kondisi: '', kriteria: '', rekomendasi: '' }]);
   };
 
   const handleRemoveTemuanRekomendasi = (index: number) => {
@@ -92,7 +92,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     setTemuanRekomendasi(temuanRekomendasi.filter((_, i) => i !== index));
   };
 
-  const handleTemuanRekomendasiChange = (index: number, field: 'temuan' | 'rekomendasi', value: string) => {
+  const handleTemuanRekomendasiChange = (index: number, field: 'kondisi' | 'kriteria' | 'rekomendasi', value: string) => {
     // Prevent changes during save operation
     if (isSaving) return;
     const updated = [...temuanRekomendasi];
@@ -109,7 +109,8 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
       // Allow empty strings to be sent for clearing data
       const processedTemuanRekomendasi = temuanRekomendasi.map(tr => ({
         ...tr,
-        temuan: tr.temuan || '',
+        kondisi: tr.kondisi || '',
+        kriteria: tr.kriteria || '',
         rekomendasi: tr.rekomendasi || ''
       }));
 
@@ -234,7 +235,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg flex items-center justify-between">
-                  <span>Temuan dan Rekomendasi</span>
+                  <span>Kondisi, Kriteria dan Rekomendasi</span>
                   {canEdit && (
                     <Button
                       type="button"
@@ -253,12 +254,12 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
               <CardContent>
                 <div className="space-y-4">
                   {temuanRekomendasi.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">Belum ada temuan dan rekomendasi</p>
+                    <p className="text-muted-foreground text-sm">Belum ada kondisi, kriteria dan rekomendasi</p>
                   ) : (
                     temuanRekomendasi.map((tr, index) => (
                       <div key={index} className="border rounded-lg p-4 space-y-3">
                         <div className="flex justify-between items-center">
-                          <span className="font-medium text-sm">#{index + 1}</span>
+                          <span className="font-medium text-sm">Matriks {index + 1}</span>
                           {canEdit && (
                             <Button
                               type="button"
@@ -274,20 +275,38 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                         </div>
                         <div className="grid grid-cols-1 gap-4">
                           <div className="space-y-2">
-                            <Label htmlFor={`temuan-${index}`}>Temuan</Label>
+                            <Label htmlFor={`kondisi-${index}`}>Kondisi</Label>
                             {canEdit ? (
                               <Textarea
-                                id={`temuan-${index}`}
-                                value={tr.temuan}
-                                onChange={(e) => handleTemuanRekomendasiChange(index, 'temuan', e.target.value)}
-                                placeholder="Masukkan temuan..."
+                                id={`kondisi-${index}`}
+                                value={tr.kondisi}
+                                onChange={(e) => handleTemuanRekomendasiChange(index, 'kondisi', e.target.value)}
+                                placeholder="Masukkan kondisi yang ditemukan..."
                                 rows={3}
                                 disabled={isSaving}
                                 className={isSaving ? "bg-muted" : ""}
                               />
                             ) : (
                               <div className="p-3 bg-muted rounded-md text-sm">
-                                {tr.temuan || '-'}
+                                {tr.kondisi || '-'}
+                              </div>
+                            )}
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor={`kriteria-${index}`}>Kriteria</Label>
+                            {canEdit ? (
+                              <Textarea
+                                id={`kriteria-${index}`}
+                                value={tr.kriteria}
+                                onChange={(e) => handleTemuanRekomendasiChange(index, 'kriteria', e.target.value)}
+                                placeholder="Masukkan kriteria/standar yang harus dipenuhi..."
+                                rows={3}
+                                disabled={isSaving}
+                                className={isSaving ? "bg-muted" : ""}
+                              />
+                            ) : (
+                              <div className="p-3 bg-muted rounded-md text-sm">
+                                {tr.kriteria || '-'}
                               </div>
                             )}
                           </div>
@@ -298,7 +317,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                                 id={`rekomendasi-${index}`}
                                 value={tr.rekomendasi}
                                 onChange={(e) => handleTemuanRekomendasiChange(index, 'rekomendasi', e.target.value)}
-                                placeholder="Masukkan rekomendasi..."
+                                placeholder="Masukkan rekomendasi perbaikan..."
                                 rows={3}
                                 disabled={isSaving}
                                 className={isSaving ? "bg-muted" : ""}

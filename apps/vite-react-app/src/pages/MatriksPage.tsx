@@ -304,7 +304,7 @@ const MatriksPage: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Matriks"
-        description={isPerwadag() ? "Lihat temuan dan rekomendasi evaluasi" : "Kelola data matriks evaluasi"}
+        description={isPerwadag() ? "Lihat kondisi, kriteria dan rekomendasi evaluasi" : "Kelola data matriks evaluasi"}
         actions={
           isAdmin() && (
             <Button onClick={handleExportAllExcel} className="flex items-center gap-2">

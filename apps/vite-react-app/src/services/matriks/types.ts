@@ -51,10 +51,11 @@ export interface MatriksStatistics {
   last_updated: string;
 }
 
-// Temuan Rekomendasi Types
+// Temuan Rekomendasi Types - Updated to 3-field structure
 export interface TemuanRekomendasi {
   id?: number;
-  temuan: string;
+  kondisi: string;
+  kriteria: string;
   rekomendasi: string;
 }
 
