@@ -394,28 +394,30 @@ const UserDialog: React.FC<UserDialogProps> = ({
 
                 {/* Role and Status */}
                 <div className="grid grid-cols-1 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="role"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Role *</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading || !canEdit}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Pilih role" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value={USER_ROLES.ADMIN}>{ROLE_LABELS[USER_ROLES.ADMIN]}</SelectItem>
-                            <SelectItem value={USER_ROLES.INSPEKTORAT}>{ROLE_LABELS[USER_ROLES.INSPEKTORAT]}</SelectItem>
-                            <SelectItem value={USER_ROLES.PERWADAG}>{ROLE_LABELS[USER_ROLES.PERWADAG]}</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  {mode !== 'edit' && (
+                    <FormField
+                      control={form.control}
+                      name="role"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Role *</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loading || !canEdit}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Pilih role" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value={USER_ROLES.ADMIN}>{ROLE_LABELS[USER_ROLES.ADMIN]}</SelectItem>
+                              <SelectItem value={USER_ROLES.INSPEKTORAT}>{ROLE_LABELS[USER_ROLES.INSPEKTORAT]}</SelectItem>
+                              <SelectItem value={USER_ROLES.PERWADAG}>{ROLE_LABELS[USER_ROLES.PERWADAG]}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </div>
 
                 {/* Inspektorat Selection */}
