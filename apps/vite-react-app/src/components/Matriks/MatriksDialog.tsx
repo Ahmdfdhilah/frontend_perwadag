@@ -48,6 +48,9 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   // Loading states for different operations
   const [isSaving, setIsSaving] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  
+  // Validation states
+  const [validationErrors, setValidationErrors] = useState<Record<string, { kondisi?: string; kriteria?: string; rekomendasi?: string }>>({});
 
   useEffect(() => {
     if (item && open) {
@@ -67,6 +70,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
       setExistingFiles([]);
       setFileToDelete(null);
       setDeleteConfirmOpen(false);
+      setValidationErrors({});
     }
     
     // Reset loading states when dialog opens/closes
@@ -80,9 +84,51 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     setUploadFile(files[0] || null);
   };
 
+  const validateTemuanRekomendasi = () => {
+    const errors: Record<string, { kondisi?: string; kriteria?: string; rekomendasi?: string }> = {};
+    let hasErrors = false;
+    
+    temuanRekomendasi.forEach((tr, index) => {
+      const fieldErrors: { kondisi?: string; kriteria?: string; rekomendasi?: string } = {};
+      
+      if (!tr.kondisi?.trim()) {
+        fieldErrors.kondisi = 'Kondisi wajib diisi';
+        hasErrors = true;
+      }
+      
+      if (!tr.kriteria?.trim()) {
+        fieldErrors.kriteria = 'Kriteria wajib diisi';
+        hasErrors = true;
+      }
+      
+      if (!tr.rekomendasi?.trim()) {
+        fieldErrors.rekomendasi = 'Rekomendasi wajib diisi';
+        hasErrors = true;
+      }
+      
+      if (Object.keys(fieldErrors).length > 0) {
+        errors[index] = fieldErrors;
+      }
+    });
+    
+    setValidationErrors(errors);
+    return !hasErrors;
+  };
+  
   const handleAddTemuanRekomendasi = () => {
     // Prevent adding during save operation
     if (isSaving || temuanRekomendasi.length >= 20) return;
+    
+    // Validate existing entries before adding new one
+    if (temuanRekomendasi.length > 0 && !validateTemuanRekomendasi()) {
+      toast({
+        title: 'Validasi Gagal',
+        description: 'Harap lengkapi semua field yang sudah ada sebelum menambah matriks baru.',
+        variant: 'destructive'
+      });
+      return;
+    }
+    
     setTemuanRekomendasi([...temuanRekomendasi, { kondisi: '', kriteria: '', rekomendasi: '' }]);
   };
 
@@ -98,20 +144,41 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     const updated = [...temuanRekomendasi];
     updated[index] = { ...updated[index], [field]: value };
     setTemuanRekomendasi(updated);
+    
+    // Clear validation error for this field when user types
+    if (validationErrors[index]?.[field]) {
+      const updatedErrors = { ...validationErrors };
+      if (updatedErrors[index]) {
+        delete updatedErrors[index][field];
+        if (Object.keys(updatedErrors[index]).length === 0) {
+          delete updatedErrors[index];
+        }
+      }
+      setValidationErrors(updatedErrors);
+    }
   };
 
   const handleSave = async () => {
     if (!onSave || isSaving) return;
+    
+    // Validate all fields before saving
+    if (temuanRekomendasi.length > 0 && !validateTemuanRekomendasi()) {
+      toast({
+        title: 'Validasi Gagal',
+        description: 'Harap lengkapi semua field Kondisi, Kriteria, dan Rekomendasi.',
+        variant: 'destructive'
+      });
+      return;
+    }
 
     setIsSaving(true);
     try {
       // Send full JSON of temuan_rekomendasi, including existing IDs for updates
-      // Allow empty strings to be sent for clearing data
       const processedTemuanRekomendasi = temuanRekomendasi.map(tr => ({
         ...tr,
-        kondisi: tr.kondisi || '',
-        kriteria: tr.kriteria || '',
-        rekomendasi: tr.rekomendasi || ''
+        kondisi: tr.kondisi?.trim() || '',
+        kriteria: tr.kriteria?.trim() || '',
+        rekomendasi: tr.rekomendasi?.trim() || ''
       }));
 
       const dataToSave = {
@@ -275,17 +342,22 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                         </div>
                         <div className="grid grid-cols-1 gap-4">
                           <div className="space-y-2">
-                            <Label htmlFor={`kondisi-${index}`}>Kondisi</Label>
+                            <Label htmlFor={`kondisi-${index}`}>Kondisi <span className="text-red-500">*</span></Label>
                             {canEdit ? (
-                              <Textarea
-                                id={`kondisi-${index}`}
-                                value={tr.kondisi}
-                                onChange={(e) => handleTemuanRekomendasiChange(index, 'kondisi', e.target.value)}
-                                placeholder="Masukkan kondisi yang ditemukan..."
-                                rows={3}
-                                disabled={isSaving}
-                                className={isSaving ? "bg-muted" : ""}
-                              />
+                              <div className="space-y-1">
+                                <Textarea
+                                  id={`kondisi-${index}`}
+                                  value={tr.kondisi}
+                                  onChange={(e) => handleTemuanRekomendasiChange(index, 'kondisi', e.target.value)}
+                                  placeholder="Masukkan kondisi yang ditemukan..."
+                                  rows={3}
+                                  disabled={isSaving}
+                                  className={`${isSaving ? "bg-muted" : ""} ${validationErrors[index]?.kondisi ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                                />
+                                {validationErrors[index]?.kondisi && (
+                                  <p className="text-red-500 text-xs mt-1">{validationErrors[index].kondisi}</p>
+                                )}
+                              </div>
                             ) : (
                               <div className="p-3 bg-muted rounded-md text-sm">
                                 {tr.kondisi || '-'}
@@ -293,17 +365,22 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                             )}
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor={`kriteria-${index}`}>Kriteria</Label>
+                            <Label htmlFor={`kriteria-${index}`}>Kriteria <span className="text-red-500">*</span></Label>
                             {canEdit ? (
-                              <Textarea
-                                id={`kriteria-${index}`}
-                                value={tr.kriteria}
-                                onChange={(e) => handleTemuanRekomendasiChange(index, 'kriteria', e.target.value)}
-                                placeholder="Masukkan kriteria/standar yang harus dipenuhi..."
-                                rows={3}
-                                disabled={isSaving}
-                                className={isSaving ? "bg-muted" : ""}
-                              />
+                              <div className="space-y-1">
+                                <Textarea
+                                  id={`kriteria-${index}`}
+                                  value={tr.kriteria}
+                                  onChange={(e) => handleTemuanRekomendasiChange(index, 'kriteria', e.target.value)}
+                                  placeholder="Masukkan kriteria/standar yang harus dipenuhi..."
+                                  rows={3}
+                                  disabled={isSaving}
+                                  className={`${isSaving ? "bg-muted" : ""} ${validationErrors[index]?.kriteria ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                                />
+                                {validationErrors[index]?.kriteria && (
+                                  <p className="text-red-500 text-xs mt-1">{validationErrors[index].kriteria}</p>
+                                )}
+                              </div>
                             ) : (
                               <div className="p-3 bg-muted rounded-md text-sm">
                                 {tr.kriteria || '-'}
@@ -311,17 +388,22 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                             )}
                           </div>
                           <div className="space-y-2">
-                            <Label htmlFor={`rekomendasi-${index}`}>Rekomendasi</Label>
+                            <Label htmlFor={`rekomendasi-${index}`}>Rekomendasi <span className="text-red-500">*</span></Label>
                             {canEdit ? (
-                              <Textarea
-                                id={`rekomendasi-${index}`}
-                                value={tr.rekomendasi}
-                                onChange={(e) => handleTemuanRekomendasiChange(index, 'rekomendasi', e.target.value)}
-                                placeholder="Masukkan rekomendasi perbaikan..."
-                                rows={3}
-                                disabled={isSaving}
-                                className={isSaving ? "bg-muted" : ""}
-                              />
+                              <div className="space-y-1">
+                                <Textarea
+                                  id={`rekomendasi-${index}`}
+                                  value={tr.rekomendasi}
+                                  onChange={(e) => handleTemuanRekomendasiChange(index, 'rekomendasi', e.target.value)}
+                                  placeholder="Masukkan rekomendasi perbaikan..."
+                                  rows={3}
+                                  disabled={isSaving}
+                                  className={`${isSaving ? "bg-muted" : ""} ${validationErrors[index]?.rekomendasi ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+                                />
+                                {validationErrors[index]?.rekomendasi && (
+                                  <p className="text-red-500 text-xs mt-1">{validationErrors[index].rekomendasi}</p>
+                                )}
+                              </div>
                             ) : (
                               <div className="p-3 bg-muted rounded-md text-sm">
                                 {tr.rekomendasi || '-'}
@@ -367,7 +449,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
           {canEdit && onSave && mode === 'edit' && (
             <Button 
               onClick={handleSave}
-              disabled={isSaving}
+              disabled={isSaving || (temuanRekomendasi.length > 0 && Object.keys(validationErrors).length > 0)}
             >
               {isSaving ? (
                 <>
