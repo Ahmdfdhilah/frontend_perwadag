@@ -88,6 +88,25 @@ export const verifySessionAsync = createAsyncThunk(
   }
 );
 
+export const refreshTokenAsync = createAsyncThunk(
+  'auth/refreshToken',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await authService.refreshToken();
+      
+      // Calculate new session expiry (30 minutes from now)
+      const sessionExpiry = Date.now() + (30 * 60 * 1000);
+      
+      return {
+        user: response.user,
+        sessionExpiry
+      };
+    } catch (error: any) {
+      return rejectWithValue(error.message || 'Token refresh failed');
+    }
+  }
+);
+
 
 export const requestPasswordResetAsync = createAsyncThunk(
   'auth/requestPasswordReset',
@@ -218,6 +237,28 @@ const authSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload as string;
         // Clear all auth data when session verification fails
+        state.isAuthenticated = false;
+        state.user = null;
+        state.sessionExpiry = null;
+      })
+      .addCase(refreshTokenAsync.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(refreshTokenAsync.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isAuthenticated = true;
+        state.sessionExpiry = action.payload.sessionExpiry;
+        
+        if (action.payload.user) {
+          state.user = action.payload.user;
+        }
+        state.error = null;
+      })
+      .addCase(refreshTokenAsync.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+        // Clear all auth data when token refresh fails
         state.isAuthenticated = false;
         state.user = null;
         state.sessionExpiry = null;

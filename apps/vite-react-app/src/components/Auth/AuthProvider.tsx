@@ -5,6 +5,7 @@ import {
   loginAsync,
   logoutAsync,
   verifySessionAsync,
+  refreshTokenAsync,
   changePasswordAsync,
   clearAuth,
   clearError,
@@ -87,12 +88,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       // Check if session is expired
       if (sessionExpiry && sessionExpiry < Date.now()) {
-        // Session is expired, clear auth
-        dispatch(clearAuth());
-        return;
+        // Session is expired, try to refresh token
+        try {
+          await dispatch(refreshTokenAsync()).unwrap();
+          return;
+        } catch (refreshError) {
+          console.error('Token refresh failed during checkAuth:', refreshError);
+          dispatch(clearAuth());
+          return;
+        }
       }
 
-      // Verify session is still valid with the server
+      // If session is still valid, just verify without refresh
       const sessionResult = await dispatch(verifySessionAsync()).unwrap();
       
       if (sessionResult.valid) {
@@ -145,9 +152,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         dispatch(clearAuth());
         return;
       }
-      // Session looks valid, verify with server silently
-      dispatch(verifySessionAsync()).catch(() => {
-        // If verification fails, clear auth
+      // Session looks valid, try refresh first to ensure freshness
+      dispatch(refreshTokenAsync()).catch(() => {
+        // If refresh fails, clear auth
         dispatch(clearAuth());
       });
     } else if (user && !isAuthenticated) {
@@ -176,18 +183,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [sessionExpiry, isAuthenticated, dispatch]);
 
-  // Periodic session validation (every 10 minutes)
+  // Periodic session validation and refresh (every 10 minutes)
   useEffect(() => {
     if (isAuthenticated) {
       const interval = setInterval(() => {
         if (!isSessionValid()) {
-          checkAuth();
+          // Try to refresh token if session is close to expiry
+          dispatch(refreshTokenAsync()).catch(() => {
+            dispatch(clearAuth());
+          });
         }
       }, 10 * 60 * 1000); // Check every 10 minutes
 
       return () => clearInterval(interval);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, dispatch]);
 
   const value: AuthContextType = {
     // State

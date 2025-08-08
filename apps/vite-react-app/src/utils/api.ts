@@ -1,6 +1,6 @@
 // src/utils/api.ts
 import axios, { AxiosInstance } from 'axios';
-import { clearAuth, verifySessionAsync } from '@/redux/features/authSlice';
+import { clearAuth, refreshTokenAsync } from '@/redux/features/authSlice';
 import { store } from '@/redux/store';
 import { API_BASE_URL } from '@/config/api';
 
@@ -36,21 +36,22 @@ const configureInterceptors = (api: AxiosInstance) => {
       if (error.response?.status === 401 && !originalRequest._retry) {
         originalRequest._retry = true;
         
-        // Don't try to verify session for auth endpoints (login, logout, etc.)
+        // Don't try to refresh token for auth endpoints (login, logout, refresh, etc.)
         const isAuthEndpoint = originalRequest.url?.includes('/auth/') || 
                               originalRequest.url?.includes('/login') ||
                               originalRequest.url?.includes('/logout') ||
+                              originalRequest.url?.includes('/refresh') ||
                               originalRequest.url?.includes('/verify-token');
         
         if (!isAuthEndpoint) {
           try {
-            // Try to verify and refresh the session
-            await store.dispatch(verifySessionAsync()).unwrap();
+            // Try to refresh the token
+            await store.dispatch(refreshTokenAsync()).unwrap();
             
-            // If session verification succeeds, retry the original request
+            // If token refresh succeeds, retry the original request
             return api.request(originalRequest);
-          } catch (sessionError) {
-            console.error('Session verification failed:', sessionError);
+          } catch (refreshError) {
+            console.error('Token refresh failed:', refreshError);
             store.dispatch(clearAuth());
           }
         } else {

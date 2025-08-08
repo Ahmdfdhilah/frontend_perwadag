@@ -9,6 +9,7 @@ import {
   PasswordResetEligibilityResponse,
   DefaultPasswordInfoResponse,
   TokenVerificationResponse,
+  RefreshTokenResponse,
   MessageResponse,
 } from "./types";
 
@@ -33,6 +34,10 @@ class AuthService extends BaseService {
 
   async verifyToken(): Promise<TokenVerificationResponse> {
     return this.get("/verify-token");
+  }
+
+  async refreshToken(): Promise<RefreshTokenResponse> {
+    return this.post("/refresh", {});
   }
 
   async requestPasswordReset(

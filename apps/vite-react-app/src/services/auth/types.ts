@@ -76,3 +76,9 @@ export interface TokenVerificationResponse {
   message: string;
 }
 
+// Token refresh response (similar to LoginResponse for cookie-based auth)
+export interface RefreshTokenResponse {
+  user: UserResponse;
+  message: string;
+}
+
