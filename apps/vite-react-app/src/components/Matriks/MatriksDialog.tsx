@@ -160,16 +160,6 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
 
   const handleSave = async () => {
     if (!onSave || isSaving) return;
-    
-    // Validate all fields before saving
-    if (temuanRekomendasi.length > 0 && !validateTemuanRekomendasi()) {
-      toast({
-        title: 'Validasi Gagal',
-        description: 'Harap lengkapi semua field Kondisi, Kriteria, dan Rekomendasi.',
-        variant: 'destructive'
-      });
-      return;
-    }
 
     setIsSaving(true);
     try {
