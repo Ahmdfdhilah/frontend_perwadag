@@ -160,6 +160,11 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
 
   const handleSave = async () => {
     if (!onSave || isSaving) return;
+    
+    // Validate all fields before saving
+    if (temuanRekomendasi.length > 0 && !validateTemuanRekomendasi()) {
+      return;
+    }
 
     setIsSaving(true);
     try {
