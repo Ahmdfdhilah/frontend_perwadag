@@ -23,7 +23,7 @@ export abstract class BaseService {
         description: errorMessage,
       });
       
-      throw new Error(errorMessage);
+      throw error; // Throw original error to preserve status codes
     }
   }
 

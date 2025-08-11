@@ -23,14 +23,18 @@ class AuthService extends BaseService {
   }
 
   async logout(): Promise<MessageResponse> {
+    // Always try to refresh token first to ensure we have a valid token for logout
+    // This ensures proper token blacklisting on the backend
     try {
+      await this.refreshToken();
+      // After refresh, proceed with logout using fresh token
       return await this.post("/logout", {});
-    } catch (error: any) {
-      console.error("Logout error:", error);
-      return { message: "Logout failed" };
+    } catch (refreshError) {
+      // If refresh fails, token is truly invalid/expired
+      // In this case, logout is already successful since token can't be used
+      return { message: "Logout successful (token was expired)" };
     }
   }
-
 
   async verifyToken(): Promise<TokenVerificationResponse> {
     return this.get("/verify-token");

@@ -216,6 +216,17 @@ const authSlice = createSlice({
       .addCase(logoutAsync.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
+        // Only clear auth state for true logout failures, not token refresh failures
+        // The service layer now handles refresh retry logic for 401 errors
+        if (action.payload && typeof action.payload === 'string' && 
+            !action.payload.includes('token was expired')) {
+          // This is a real logout failure, keep user authenticated
+          return;
+        }
+        // For token expiry cases or other scenarios, clear auth state
+        state.isAuthenticated = false;
+        state.user = null;
+        state.sessionExpiry = null;
       })
       .addCase(verifySessionAsync.pending, (state) => {
         state.isLoading = true;

@@ -18,6 +18,7 @@ import {
   selectSessionExpiry
 } from '@/redux/features/authSlice';
 import type { User } from '@/services/users/types';
+import { useToast } from '@workspace/ui/components/sonner';
 
 interface LoginData {
   username: string;
@@ -62,6 +63,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const loading = useAppSelector(selectAuthLoading);
   const error = useAppSelector(selectAuthError);
   const sessionExpiry = useAppSelector(selectSessionExpiry);
+  const { toast } = useToast();
 
   // Note: Error toast handling removed to avoid duplication with BaseService
   // BaseService automatically shows toast errors for all auth API calls
@@ -69,6 +71,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (loginData: LoginData): Promise<void> => {
     try {
       await dispatch(loginAsync(loginData)).unwrap();
+
+      // Show success toast after login completes successfully
+      toast({
+        title: 'Login berhasil',
+        description: 'Selamat datang! Anda berhasil masuk ke sistem.'
+      });
     } catch (error: any) {
       // Error is already handled in the slice
       throw error;
@@ -102,7 +110,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       // If session is still valid, just verify without refresh
       const sessionResult = await dispatch(verifySessionAsync()).unwrap();
-      
+
       if (sessionResult.valid) {
         // If we have persisted user data but not authenticated state, restore it
         if (user && !isAuthenticated) {
