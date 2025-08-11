@@ -23,7 +23,7 @@ export const PerwadagCombobox: React.FC<PerwadagComboboxProps> = ({
   className,
   inspektoratFilter
 }) => {
-  const { isInspektorat, user } = useRole();
+  const { isInspektorat, isPimpinan, user } = useRole();
   const [availablePerwadag, setAvailablePerwadag] = useState<PerwadagSummary[]>([]);
   const [perwadagSearchValue, setPerwadagSearchValue] = useState('');
   const [loading, setLoading] = useState(false);
@@ -41,7 +41,7 @@ export const PerwadagCombobox: React.FC<PerwadagComboboxProps> = ({
       // 2. If current user is inspektorat, filter by their inspektorat
       if (inspektoratFilter && inspektoratFilter !== 'all') {
         params.inspektorat = inspektoratFilter;
-      } else if (isInspektorat() && user?.inspektorat) {
+      } else if ((isInspektorat() || isPimpinan()) && user?.inspektorat) {
         params.inspektorat = user.inspektorat;
       }
 

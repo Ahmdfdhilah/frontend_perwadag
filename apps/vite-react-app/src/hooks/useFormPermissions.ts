@@ -23,73 +23,82 @@ export interface FormPermission {
 }
 
 export const useFormPermissions = () => {
-  const { isAdmin, isInspektorat, isPerwadag } = useRole();
+  const { isAdmin, isInspektorat, isPimpinan, isPerwadag } = useRole();
 
   const getFormPermission = useCallback((formType: FormType): FormPermission => {
-    const role = isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : 'perwadag';
+    const role = isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : isPimpinan() ? 'pimpinan' : 'perwadag';
     
     // Define permissions based on mapping requirements
     const permissions: Record<FormType, Record<string, FormPermission>> = {
-      // Risk Assessment: Admin (R,U), Inspektorat (X), Perwadag (X)
+      // Risk Assessment: Admin (R,U), Inspektorat (X), Pimpinan (X), Perwadag (X)
       risk_assessment: {
         admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
         inspektorat: { canView: false, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
+        pimpinan: { canView: false, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
         perwadag: { canView: false, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
       },
       
-      // Surat Tugas: Admin (CRUD), Inspektorat (CRUD), Perwadag (R)
+      // Surat Tugas: Admin (CRUD), Inspektorat (CRUD), Pimpinan (CRUD), Perwadag (R)
       surat_tugas: {
         admin: { canView: true, canEdit: true, canCreate: true, canDelete: true, excludeReadonlyFields: true },
         inspektorat: { canView: true, canEdit: true, canCreate: true, canDelete: true, excludeReadonlyFields: true },
+        pimpinan: { canView: true, canEdit: true, canCreate: true, canDelete: true, excludeReadonlyFields: true },
         perwadag: { canView: true, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
       },
       
-      // Surat Pemberitahuan: Admin (RU), Inspektorat (RU), Perwadag (R)
+      // Surat Pemberitahuan: Admin (RU), Inspektorat (RU), Pimpinan (RU), Perwadag (R)
       surat_pemberitahuan: {
         admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
         inspektorat: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        pimpinan: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
         perwadag: { canView: true, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
       },
       
-      // Kuesioner: Admin (RU), Inspektorat (RU), Perwadag (RU)
+      // Kuesioner: Admin (RU), Inspektorat (RU), Pimpinan (RU), Perwadag (RU)
       kuesioner: {
         admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
         inspektorat: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        pimpinan: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
         perwadag: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
       },
       
-      // Entry Meeting: Admin (RU), Inspektorat (RU), Perwadag (RU)
+      // Entry Meeting: Admin (RU), Inspektorat (RU), Pimpinan (RU), Perwadag (RU)
       entry_meeting: {
         admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
         inspektorat: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        pimpinan: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
         perwadag: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
       },
       
-      // Exit Meeting: Admin (RU), Inspektorat (RU), Perwadag (RU)
+      // Exit Meeting: Admin (RU), Inspektorat (RU), Pimpinan (RU), Perwadag (RU)
       exit_meeting: {
         admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
         inspektorat: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        pimpinan: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
         perwadag: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
       },
       
-      // Konfirmasi Meeting: Admin (RU), Inspektorat (RU), Perwadag (RU)
+      // Konfirmasi Meeting: Admin (RU), Inspektorat (RU), Pimpinan (RU), Perwadag (RU)
       konfirmasi_meeting: {
         admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
         inspektorat: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        pimpinan: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
         perwadag: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
       },
       
-      // Matriks: Admin (RU), Inspektorat (RU), Perwadag (R)
+      // Matriks: Admin (RU), Inspektorat (RU), Pimpinan (RU), Perwadag (R)
       matriks: {
         admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
         inspektorat: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        pimpinan: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
         perwadag: { canView: true, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
       },
       
-      // Laporan Hasil: Admin (RU), Inspektorat (X), Perwadag (X)
+      // Laporan Hasil: Admin (RU), Inspektorat (RU), Pimpinan (RU), Perwadag (R)
       laporan_hasil_evaluasi: {
         admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
         inspektorat: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        pimpinan: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
         perwadag: { canView: true, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
       },
       
@@ -97,12 +106,14 @@ export const useFormPermissions = () => {
       questionnaire_template: {
         admin: { canView: true, canEdit: true, canCreate: true, canDelete: true, excludeReadonlyFields: true },
         inspektorat: { canView: true, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
+        pimpinan: { canView: true, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
         perwadag: { canView: true, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
       },
       
       user_management: {
         admin: { canView: true, canEdit: true, canCreate: true, canDelete: true, excludeReadonlyFields: true },
         inspektorat: { canView: false, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
+        pimpinan: { canView: false, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
         perwadag: { canView: false, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
       },
     };
@@ -114,7 +125,7 @@ export const useFormPermissions = () => {
       canDelete: false,
       excludeReadonlyFields: false,
     };
-  }, [isAdmin, isInspektorat, isPerwadag]);
+  }, [isAdmin, isInspektorat, isPimpinan, isPerwadag]);
 
   const canViewForm = useCallback((formType: FormType): boolean => {
     return getFormPermission(formType).canView;

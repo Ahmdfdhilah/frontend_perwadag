@@ -4,6 +4,7 @@ import { AlertTriangle, FileInput, Grid2X2, Mail, MailWarningIcon, PhoneIncoming
 export type UserRole =
   | 'ADMIN'
   | 'INSPEKTORAT'
+  | 'PIMPINAN'
   | 'PERWADAG';
 
 export interface SidebarItem {
@@ -23,10 +24,10 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Dashboard',
     href: '/dashboard',
     icon: BarChart3,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG'],
   },
 
-  // Risk Assessment - Only ADMIN and INSPEKTORAT
+  // Risk Assessment - Only ADMIN
   {
     title: 'Penilaian Risiko',
     href: '/penilaian-resiko',
@@ -38,21 +39,21 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Surat Tugas',
     href: '/surat-tugas',
     icon: Mail,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG'],
   },
   // Surat Pemberitahuan - All roles
   {
     title: 'Surat Pemberitahuan',
     href: '/surat-pemberitahuan',
     icon: MailWarningIcon,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG'],
   },
   // Kuesioner - All roles
   {
     title: 'Kuesioner',
     href: '/kuesioner',
     icon: ClipboardList,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG'],
   },
 
   // Entry Meeting - All roles
@@ -60,7 +61,7 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Entry Meeting',
     href: '/entry-meeting',
     icon: PhoneIncoming,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG'],
   },
 
   // Konfirmasi Meeting - All roles
@@ -68,14 +69,14 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Konfirmasi Meeting',
     href: '/konfirmasi-meeting',
     icon: CheckSquare,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG'],
   },
   // Matriks - All roles
   {
     title: 'Matriks',
     href: '/matriks',
     icon: Grid2X2,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG'],
   },
 
   // Exit Meeting - All roles
@@ -83,7 +84,7 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Exit Meeting',
     href: '/exit-meeting',
     icon: PhoneOutgoing,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG'],
   },
 
 
@@ -93,7 +94,7 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Laporan Hasil',
     href: '/laporan-hasil',
     icon: FileInput,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PERWADAG'],
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG'],
   },
 
   // Template Kuesioner - All roles

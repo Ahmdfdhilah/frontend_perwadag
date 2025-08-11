@@ -82,7 +82,7 @@ const UsersPage: React.FC = () => {
         page: filters.page,
         size: filters.size,
         search: filters.search || undefined,
-        role: filters.role !== 'all' ? filters.role as 'ADMIN' | 'INSPEKTORAT' | 'PERWADAG' : undefined,
+        role: filters.role !== 'all' ? filters.role as 'ADMIN' | 'INSPEKTORAT' | 'PIMPINAN' | 'PERWADAG' : undefined,
         is_active: filters.status !== 'all' ? filters.status === 'active' : undefined,
       };
 
@@ -196,6 +196,7 @@ const UsersPage: React.FC = () => {
   // Role options
   const roleOptions = [
     { value: 'ADMIN', label: 'Admin' },
+    { value: 'PIMPINAN', label: 'Pimpinan' },
     { value: 'INSPEKTORAT', label: 'Inspektorat' },
     { value: 'PERWADAG', label: 'Perwadag' },
   ];

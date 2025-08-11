@@ -133,6 +133,7 @@ export function useRoleAccess() {
 
   const isAdmin = userRole === 'ADMIN';
   const isInspektorat = userRole === 'INSPEKTORAT';
+  const isPimpinan = userRole === 'PIMPINAN';
   const isPerwadag = userRole === 'PERWADAG';
 
   return {
@@ -142,6 +143,7 @@ export function useRoleAccess() {
     hasAnyRole,
     isAdmin,
     isInspektorat,
+    isPimpinan,
     isPerwadag,
   };
 }

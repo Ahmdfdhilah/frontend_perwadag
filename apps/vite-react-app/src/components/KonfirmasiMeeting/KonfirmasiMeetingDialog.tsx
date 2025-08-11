@@ -38,7 +38,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
   onSave,
 }) => {
   const { canEditForm } = useFormPermissions();
-  const { isAdmin, isInspektorat } = useRole();
+  const { isAdmin, isInspektorat, isPimpinan } = useRole();
   const { toast } = useToast();
   const [formData, setFormData] = useState<any>({});
   const [selectedKonfirmasiDate, setSelectedKonfirmasiDate] = useState<Date>();
@@ -206,7 +206,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
 
   const isEditable = mode === 'edit';
   const canEdit = canEditForm('konfirmasi_meeting') && isEditable;
-  const canEditAllFields = canEdit && (isAdmin() || isInspektorat());
+  const canEditAllFields = canEdit && (isAdmin() || isInspektorat() || isPimpinan());
   const canEditBuktiHadir = canEdit; // All roles can edit bukti hadir
   
   // Determine if any operation is in progress

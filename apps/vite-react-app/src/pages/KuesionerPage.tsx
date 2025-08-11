@@ -40,7 +40,7 @@ interface KuesionerPageFilters {
 }
 
 const KuesionerPage: React.FC = () => {
-  const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
+  const { isAdmin, isInspektorat, isPimpinan, isPerwadag, user } = useRole();
   const { hasPageAccess, canEditForm } = useFormPermissions();
   const { toast } = useToast();
 
@@ -91,7 +91,7 @@ const KuesionerPage: React.FC = () => {
       };
 
       // Auto-apply role-based filtering
-      if (isInspektorat() && user?.inspektorat && !params.inspektorat) {
+      if ((isInspektorat() || isPimpinan()) && user?.inspektorat && !params.inspektorat) {
         params.inspektorat = user.inspektorat;
       } else if (isPerwadag() && user?.id && !params.user_perwadag_id) {
         params.user_perwadag_id = user.id;
@@ -220,7 +220,7 @@ const KuesionerPage: React.FC = () => {
     }
 
     if (isAdmin()) return true;
-    if (isInspektorat()) {
+    if (isInspektorat() || isPimpinan()) {
       // Check if user can edit this kuisioner based on inspektorat
       return user?.inspektorat === item.inspektorat;
     }
@@ -298,7 +298,7 @@ const KuesionerPage: React.FC = () => {
         )}
 
         {/* Show perwadag filter for admin and inspektorat */}
-        {(isAdmin() || isInspektorat()) && (
+        {(isAdmin() || isInspektorat() || isPimpinan()) && (
           <div className="space-y-2">
             <Label htmlFor="perwadag-filter">Perwadag</Label>
             <PerwadagCombobox

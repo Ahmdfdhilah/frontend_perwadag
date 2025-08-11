@@ -36,7 +36,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
   onSave,
 }) => {
   const { canEditForm } = useFormPermissions();
-  const { isAdmin, isInspektorat } = useRole();
+  const { isAdmin, isInspektorat, isPimpinan } = useRole();
   const { toast } = useToast();
   const [formData, setFormData] = useState<any>({});
   const [selectedEntryDate, setSelectedEntryDate] = useState<Date>();
@@ -198,7 +198,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
 
   const isEditable = mode === 'edit';
   const canEdit = canEditForm('entry_meeting') && isEditable;
-  const canEditAllFields = canEdit && (isAdmin() || isInspektorat());
+  const canEditAllFields = canEdit && (isAdmin() || isInspektorat() || isPimpinan());
   const canEditBuktiHadir = canEdit; // All roles can edit bukti hadir
   
   // Determine if any operation is in progress

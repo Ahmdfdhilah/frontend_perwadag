@@ -238,7 +238,7 @@ const DashboardPage: React.FC = () => {
       )}
 
       {/* Log Activity Section - Only for Admin */}
-      {isAdmin() && (
+      {(isAdmin()) && (
         <LogActivitySection
           searchQuery={filters.search}
           onSearchChange={handleSearchChange}

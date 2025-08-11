@@ -44,7 +44,7 @@ export interface UserResponse {
   jabatan: string;
   email?: string;
   is_active: boolean;
-  role: "ADMIN" | "INSPEKTORAT" | "PERWADAG";
+  role: "ADMIN" | "INSPEKTORAT" | "PIMPINAN" | "PERWADAG";
   inspektorat?: string;
   display_name: string;
   has_email: boolean;

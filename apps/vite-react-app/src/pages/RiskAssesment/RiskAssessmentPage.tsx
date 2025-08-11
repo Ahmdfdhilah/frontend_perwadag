@@ -52,7 +52,7 @@ interface RiskAssessmentPageFilters {
 
 const RiskAssessmentPage: React.FC = () => {
   const navigate = useNavigate();
-  const { isAdmin, isInspektorat, isPerwadag, user } = useRole();
+  const { isAdmin, isInspektorat, isPimpinan, isPerwadag, user } = useRole();
   const { hasPageAccess, canEditForm } = useFormPermissions();
   const { toast } = useToast();
 
@@ -100,7 +100,7 @@ const RiskAssessmentPage: React.FC = () => {
       };
 
       // Auto-apply role-based filtering
-      if (isInspektorat() && user?.inspektorat && !params.inspektorat) {
+      if ((isInspektorat() || isPimpinan()) && user?.inspektorat && !params.inspektorat) {
         // If inspektorat user and no specific inspektorat filter, apply their inspektorat
         params.inspektorat = user.inspektorat;
       } else if (isPerwadag() && user?.id && !params.user_perwadag_id) {
@@ -361,7 +361,7 @@ const RiskAssessmentPage: React.FC = () => {
         )}
 
         {/* Show perwadag filter for admin and inspektorat */}
-        {(isAdmin() || isInspektorat()) && (
+        {(isAdmin() || isInspektorat() || isPimpinan()) && (
           <div className="space-y-2">
             <Label htmlFor="perwadag-filter">Perwadag</Label>
             <PerwadagCombobox

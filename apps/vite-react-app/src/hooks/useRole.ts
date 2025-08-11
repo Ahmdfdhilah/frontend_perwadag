@@ -18,6 +18,10 @@ export const useRole = () => {
     return currentRole === 'INSPEKTORAT';
   }, [currentRole]);
 
+  const isPimpinan = useCallback(() => {
+    return currentRole === 'PIMPINAN';
+  }, [currentRole]);
+
   const isPerwadag = useCallback(() => {
     return currentRole === 'PERWADAG';
   }, [currentRole]);
@@ -32,6 +36,7 @@ export const useRole = () => {
     isRole,
     isAdmin,
     isInspektorat,
+    isPimpinan,
     isPerwadag,
     hasPermission,
   };

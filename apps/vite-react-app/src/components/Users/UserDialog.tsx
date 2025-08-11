@@ -34,9 +34,9 @@ import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { USER_ROLES, ROLE_LABELS, INSPEKTORAT_OPTIONS } from '@/lib/constants';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { 
-  Mail, 
-  Calendar, 
+import {
+  Mail,
+  Calendar,
   CreditCard,
   Building,
   Shield,
@@ -50,7 +50,7 @@ const createUserSchema = z.object({
     message: 'Please enter a valid email address',
   }),
   is_active: z.boolean().optional(),
-  role: z.enum([USER_ROLES.ADMIN, USER_ROLES.INSPEKTORAT, USER_ROLES.PERWADAG], {
+  role: z.enum([USER_ROLES.ADMIN, USER_ROLES.INSPEKTORAT, USER_ROLES.PIMPINAN, USER_ROLES.PERWADAG], {
     required_error: 'Please select a role',
   }),
   inspektorat: z.string().optional(),
@@ -71,7 +71,7 @@ const editUserSchema = z.object({
     message: 'Please enter a valid email address',
   }),
   is_active: z.boolean().optional(),
-  role: z.enum([USER_ROLES.ADMIN, USER_ROLES.INSPEKTORAT, USER_ROLES.PERWADAG], {
+  role: z.enum([USER_ROLES.ADMIN, USER_ROLES.INSPEKTORAT, USER_ROLES.PIMPINAN, USER_ROLES.PERWADAG], {
     required_error: 'Please select a role',
   }),
   inspektorat: z.string().optional(),
@@ -107,12 +107,14 @@ const UserDialog: React.FC<UserDialogProps> = ({
   const canEdit = canEditForm('user_management') && isEditable;
   const [loading, setLoading] = useState(false);
   const [showInspektoratSelect, setShowInspektoratSelect] = useState(
-    user?.role === USER_ROLES.INSPEKTORAT || user?.role === USER_ROLES.PERWADAG || false
+    user?.role === USER_ROLES.PIMPINAN ||
+    user?.role === USER_ROLES.INSPEKTORAT ||
+    user?.role === USER_ROLES.PERWADAG || false
   );
 
   const isEditMode = mode === 'edit' && user;
   const schema = isEditMode ? editUserSchema : createUserSchema;
-  
+
   const form = useForm<UserFormData>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -149,7 +151,7 @@ const UserDialog: React.FC<UserDialogProps> = ({
 
   useEffect(() => {
     const role = form.watch('role');
-    setShowInspektoratSelect(role === USER_ROLES.INSPEKTORAT || role === USER_ROLES.PERWADAG);
+    setShowInspektoratSelect(role === USER_ROLES.INSPEKTORAT || role === USER_ROLES.PERWADAG ||  role ===  USER_ROLES.PIMPINAN);
     if (role === USER_ROLES.ADMIN) {
       form.setValue('inspektorat', '');
     }
@@ -157,7 +159,7 @@ const UserDialog: React.FC<UserDialogProps> = ({
 
   const handleSubmit = async (data: UserFormData) => {
     if (!onSave) return;
-    
+
     setLoading(true);
     try {
       const transformedData = {
@@ -247,7 +249,7 @@ const UserDialog: React.FC<UserDialogProps> = ({
                     <UserIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                     Informasi Dasar
                   </h3>
-                  
+
                   <div className="space-y-3">
                     <div className="flex items-center space-x-3">
                       <CreditCard className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -301,7 +303,7 @@ const UserDialog: React.FC<UserDialogProps> = ({
                     <Shield className="w-4 h-4 sm:w-5 sm:h-5" />
                     Informasi Sistem
                   </h3>
-                  
+
                   <div className="space-y-3">
                     <div>
                       <p className="text-xs sm:text-sm font-medium mb-1">Peran</p>
@@ -409,6 +411,7 @@ const UserDialog: React.FC<UserDialogProps> = ({
                             </FormControl>
                             <SelectContent>
                               <SelectItem value={USER_ROLES.ADMIN}>{ROLE_LABELS[USER_ROLES.ADMIN]}</SelectItem>
+                              <SelectItem value={USER_ROLES.PIMPINAN}>{ROLE_LABELS[USER_ROLES.PIMPINAN]}</SelectItem>
                               <SelectItem value={USER_ROLES.INSPEKTORAT}>{ROLE_LABELS[USER_ROLES.INSPEKTORAT]}</SelectItem>
                               <SelectItem value={USER_ROLES.PERWADAG}>{ROLE_LABELS[USER_ROLES.PERWADAG]}</SelectItem>
                             </SelectContent>

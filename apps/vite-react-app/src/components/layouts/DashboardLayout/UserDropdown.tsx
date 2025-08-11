@@ -62,6 +62,9 @@ export function UserDropdown({ collapsed = false, className }: UserDropdownProps
       case 'INSPEKTORAT':
         role = 'Inspektorat';
         break;
+      case 'PIMPINAN':
+        role = 'Pimpinan';
+        break;
       case 'PERWADAG':
         role = 'Perwadag';
         break;

@@ -4,6 +4,7 @@
 export const USER_ROLES = {
   ADMIN: 'ADMIN',
   INSPEKTORAT: 'INSPEKTORAT',
+  PIMPINAN: 'PIMPINAN',
   PERWADAG: 'PERWADAG'
 } as const;
 
@@ -13,6 +14,7 @@ export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES];
 export const ROLE_LABELS = {
   [USER_ROLES.ADMIN]: 'Admin',
   [USER_ROLES.INSPEKTORAT]: 'Inspektorat',
+  [USER_ROLES.PIMPINAN]: 'Pimpinan',
   [USER_ROLES.PERWADAG]: 'Perwadag'
 } as const;
 
