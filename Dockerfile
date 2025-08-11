@@ -19,4 +19,4 @@ COPY . .
 RUN pnpm install 
 
 # Build the application and keep it running for volume mount
-CMD ["sh", "-c", "pnpm build && tail -f /dev/null"]
+CMD ["sh", "-c", "pnpm build"]

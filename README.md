@@ -84,6 +84,29 @@ pnpm --filter vite-react-app dev
 | `pnpm check-types` | Jalankan TypeScript type checking |
 | `pnpm clean` | Bersihkan build artifacts dan dependencies |
 
+## 🐳 Docker
+
+Proyek ini dilengkapi dengan konfigurasi Docker untuk kemudahan deployment dan development.
+
+### Docker Commands
+
+| Command | Description |
+|---------|-------------|
+| `docker-compose up --build` | Build dan jalankan container frontend |
+| `docker-compose up` | Jalankan container frontend |
+| `docker-compose down` | Stop dan hapus container |
+
+### Docker Configuration
+
+Frontend menggunakan Docker dengan konfigurasi berikut:
+- **Base Image**: Node.js 20 Alpine
+- **Package Manager**: pnpm 9.15.4+
+- **Build Process**: Turborepo build
+- **Volume Mount**: `./apps/vite-react-app/dist` untuk akses hasil build
+- **Environment**: Load dari `./apps/vite-react-app/.env`
+
+File build hasil akan tersedia di direktori lokal `./apps/vite-react-app/dist` setelah container selesai build.
+
 ## 🛠️ Tech Stack
 
 ### Core Framework
