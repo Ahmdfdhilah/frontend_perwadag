@@ -4,6 +4,7 @@
 export interface LoginRequest {
   username: string; // username field as per backend
   password: string;
+  captcha_token?: string; // Optional Google reCAPTCHA token
 }
 
 

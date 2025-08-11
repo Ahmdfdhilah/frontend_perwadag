@@ -30,6 +30,7 @@
     "node": ">=20"
   },
   "dependencies": {
+    "react-google-recaptcha-v3": "^1.11.0",
     "recharts": "^2.15.1"
   }
 }

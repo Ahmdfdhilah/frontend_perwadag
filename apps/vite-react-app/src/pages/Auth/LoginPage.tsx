@@ -17,6 +17,7 @@ import { useToast } from '@workspace/ui/components/sonner';
 
 import { useTheme } from '@/hooks/useTheme';
 import { useAuth } from '@/components/Auth/AuthProvider';
+import { useCaptcha } from '@/hooks/useCaptcha';
 import logoLightMode from '@/assets/logoLightMode.png';
 import logoDarkMode from '@/assets/logoDarkMode.png';
 import bgImage from '@/assets/bg.webp';
@@ -33,6 +34,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export function LoginPage() {
   const { isDarkMode } = useTheme();
   const { login, isAuthenticated, loading: authLoading, error, clearAuthError } = useAuth();
+  const { executeRecaptcha, isLoading: captchaLoading, isEnabled: captchaEnabled, error: captchaError } = useCaptcha();
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
@@ -51,12 +53,14 @@ export function LoginPage() {
     }
   }, [isAuthenticated, navigate, from]);
 
-  // Update local error state when auth error changes
+  // Update local error state when auth or captcha error changes
   useEffect(() => {
     if (error) {
       setLoginError(error);
+    } else if (captchaError) {
+      setLoginError(`CAPTCHA Error: ${captchaError}`);
     }
-  }, [error]);
+  }, [error, captchaError]);
 
   // Set success message if provided
   useEffect(() => {
@@ -90,9 +94,20 @@ export function LoginPage() {
     clearAuthError();
 
     try {
+      // Generate CAPTCHA token if enabled
+      let captchaToken: string | null = null;
+      if (captchaEnabled) {
+        captchaToken = await executeRecaptcha('login');
+        if (!captchaToken) {
+          setLoginError('Gagal menggenerate token keamanan. Silakan refresh halaman dan coba lagi.');
+          return;
+        }
+      }
+
       await login({
         username: data.username,
-        password: data.password
+        password: data.password,
+        captcha_token: captchaToken || undefined
       });
 
       if (data.rememberMe) {
@@ -291,11 +306,18 @@ export function LoginPage() {
                     <LoadingButton
                       type="submit"
                       className="w-full"
-                      loading={authLoading}
-                      loadingText="Masuk..."
+                      loading={authLoading || captchaLoading}
+                      loadingText={captchaLoading ? "Memverifikasi keamanan..." : "Masuk..."}
                     >
                       Masuk
                     </LoadingButton>
+                    
+                    {/* CAPTCHA Status Indicator */}
+                    {captchaEnabled && (
+                      <div className="text-xs text-muted-foreground text-center">
+                        🛡️ Dilindungi dengan reCAPTCHA
+                      </div>
+                    )}
                   </CardFooter>
                 </form>
               </Form>
@@ -448,11 +470,18 @@ export function LoginPage() {
                   <LoadingButton
                     type="submit"
                     className="w-full"
-                    loading={authLoading}
-                    loadingText="Masuk..."
+                    loading={authLoading || captchaLoading}
+                    loadingText={captchaLoading ? "Memverifikasi keamanan..." : "Masuk..."}
                   >
                     Masuk
                   </LoadingButton>
+                  
+                  {/* CAPTCHA Status Indicator */}
+                  {captchaEnabled && (
+                    <div className="text-xs text-muted-foreground text-center">
+                      🛡️ Dilindungi dengan reCAPTCHA
+                    </div>
+                  )}
                 </CardFooter>
               </form>
             </Form>

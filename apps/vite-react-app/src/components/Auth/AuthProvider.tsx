@@ -22,6 +22,7 @@ import type { User } from '@/services/users/types';
 interface LoginData {
   username: string;
   password: string;
+  captcha_token?: string;
 }
 
 interface PasswordChangeData {
