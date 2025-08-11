@@ -10,11 +10,13 @@ export interface LoginRequest {
 
 export interface PasswordResetRequest {
   email: string;
+  captcha_token?: string; // Optional CAPTCHA token for security
 }
 
 export interface PasswordResetConfirmRequest {
   token: string;
   new_password: string;
+  captcha_token?: string; // Optional CAPTCHA token for security
 }
 
 export interface ChangePasswordRequest {

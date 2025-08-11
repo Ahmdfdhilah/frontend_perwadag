@@ -17,6 +17,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@workspace/ui/components/sonner';
 
 import { useTheme } from '@/hooks/useTheme';
+import { useCaptcha } from '@/hooks/useCaptcha';
 import logoLightMode from '@/assets/logoLightMode.png';
 import logoDarkMode from '@/assets/logoDarkMode.png';
 import bgImage from '@/assets/bg.webp';
@@ -36,6 +37,7 @@ type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
 export function ResetPasswordPage() {
   const { isDarkMode } = useTheme();
+  const { executeRecaptcha, isLoading: captchaLoading, isEnabled: captchaEnabled, error: captchaError } = useCaptcha();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
@@ -64,8 +66,10 @@ export function ResetPasswordPage() {
   React.useEffect(() => {
     if (error) {
       setError('');
+    } else if (captchaError) {
+      setError(`CAPTCHA Error: ${captchaError}`);
     }
-  }, [form.watch()]);
+  }, [form.watch(), error, captchaError]);
 
   const onSubmit = async (data: ResetPasswordFormData) => {
     if (!token) {
@@ -77,9 +81,21 @@ export function ResetPasswordPage() {
     setError('');
 
     try {
+      // Generate CAPTCHA token if enabled
+      let captchaToken: string | null = null;
+      if (captchaEnabled) {
+        captchaToken = await executeRecaptcha('reset_password');
+        if (!captchaToken) {
+          setError('Gagal menggenerate token keamanan. Silakan refresh halaman dan coba lagi.');
+          setLoading(false);
+          return;
+        }
+      }
+
       await dispatch(confirmPasswordResetAsync({ 
         token, 
-        new_password: data.new_password 
+        new_password: data.new_password,
+        captcha_token: captchaToken || undefined
       })).unwrap();
       
       toast({
@@ -184,7 +200,7 @@ export function ResetPasswordPage() {
                               <Input
                                 type={showPassword ? "text" : "password"}
                                 placeholder="Masukkan password baru"
-                                disabled={loading}
+                                disabled={loading || captchaLoading}
                                 {...field}
                               />
                               <Button
@@ -193,7 +209,7 @@ export function ResetPasswordPage() {
                                 size="sm"
                                 className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                                 onClick={() => setShowPassword(!showPassword)}
-                                disabled={loading}
+                                disabled={loading || captchaLoading}
                               >
                                 {showPassword ? (
                                   <EyeOff className="h-4 w-4" />
@@ -220,7 +236,7 @@ export function ResetPasswordPage() {
                               <Input
                                 type={showConfirmPassword ? "text" : "password"}
                                 placeholder="Konfirmasi password baru"
-                                disabled={loading}
+                                disabled={loading || captchaLoading}
                                 {...field}
                               />
                               <Button
@@ -229,7 +245,7 @@ export function ResetPasswordPage() {
                                 size="sm"
                                 className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                disabled={loading}
+                                disabled={loading || captchaLoading}
                               >
                                 {showConfirmPassword ? (
                                   <EyeOff className="h-4 w-4" />
@@ -249,18 +265,25 @@ export function ResetPasswordPage() {
                     <LoadingButton
                       type="submit"
                       className="w-full"
-                      loading={loading}
-                      loadingText="Menyimpan..."
+                      loading={loading || captchaLoading}
+                      loadingText={captchaLoading ? "Memverifikasi keamanan..." : "Menyimpan..."}
                     >
                       Reset Password
                     </LoadingButton>
+                    
+                    {/* CAPTCHA Status Indicator */}
+                    {captchaEnabled && (
+                      <div className="text-xs text-muted-foreground text-center">
+                        🛡️ Dilindungi dengan reCAPTCHA
+                      </div>
+                    )}
                     
                     <Button
                       type="button"
                       variant="outline"
                       className="w-full"
                       onClick={handleBackToLogin}
-                      disabled={loading}
+                      disabled={loading || captchaLoading}
                     >
                       <ArrowLeft className="mr-2 h-4 w-4" />
                       Kembali ke Login
@@ -322,7 +345,7 @@ export function ResetPasswordPage() {
                             <Input
                               type={showPassword ? "text" : "password"}
                               placeholder="Masukkan password baru"
-                              disabled={loading}
+                              disabled={loading || captchaLoading}
                               {...field}
                             />
                             <Button
@@ -331,7 +354,7 @@ export function ResetPasswordPage() {
                               size="sm"
                               className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                               onClick={() => setShowPassword(!showPassword)}
-                              disabled={loading}
+                              disabled={loading || captchaLoading}
                             >
                               {showPassword ? (
                                 <EyeOff className="h-4 w-4" />
@@ -358,7 +381,7 @@ export function ResetPasswordPage() {
                             <Input
                               type={showConfirmPassword ? "text" : "password"}
                               placeholder="Konfirmasi password baru"
-                              disabled={loading}
+                              disabled={loading || captchaLoading}
                               {...field}
                             />
                             <Button
@@ -367,7 +390,7 @@ export function ResetPasswordPage() {
                               size="sm"
                               className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                              disabled={loading}
+                              disabled={loading || captchaLoading}
                             >
                               {showConfirmPassword ? (
                                 <EyeOff className="h-4 w-4" />
@@ -387,11 +410,18 @@ export function ResetPasswordPage() {
                   <LoadingButton
                     type="submit"
                     className="w-full"
-                    loading={loading}
-                    loadingText="Menyimpan..."
+                    loading={loading || captchaLoading}
+                    loadingText={captchaLoading ? "Memverifikasi keamanan..." : "Menyimpan..."}
                   >
                     Reset Password
                   </LoadingButton>
+                  
+                  {/* CAPTCHA Status Indicator */}
+                  {captchaEnabled && (
+                    <div className="text-xs text-muted-foreground text-center">
+                      🛡️ Dilindungi dengan reCAPTCHA
+                    </div>
+                  )}
                   
                   <Button
                     type="button"

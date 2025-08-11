@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@workspace/ui/components/alert';
 
 import { useTheme } from '@/hooks/useTheme';
+import { useCaptcha } from '@/hooks/useCaptcha';
 import logoLightMode from '@/assets/logoLightMode.png';
 import logoDarkMode from '@/assets/logoDarkMode.png';
 import bgImage from '@/assets/bg.webp';
@@ -17,6 +18,7 @@ import logoSielang from '@/assets/logo-sielang.png';
 
 export function EmailSentSuccessPage() {
   const { isDarkMode } = useTheme();
+  const { executeRecaptcha, isLoading: captchaLoading, isEnabled: captchaEnabled, error: captchaError } = useCaptcha();
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
@@ -41,7 +43,21 @@ export function EmailSentSuccessPage() {
     setSuccess('');
 
     try {
-      await dispatch(requestPasswordResetAsync({ email })).unwrap();
+      // Generate CAPTCHA token if enabled
+      let captchaToken: string | null = null;
+      if (captchaEnabled) {
+        captchaToken = await executeRecaptcha('forgot_password');
+        if (!captchaToken) {
+          setError('Gagal menggenerate token keamanan. Silakan refresh halaman dan coba lagi.');
+          setResending(false);
+          return;
+        }
+      }
+
+      await dispatch(requestPasswordResetAsync({ 
+        email,
+        captcha_token: captchaToken || undefined 
+      })).unwrap();
       setSuccess('Email telah dikirim ulang!');
     } catch (error: any) {
       setError(error || 'Terjadi kesalahan saat mengirim ulang email');
@@ -120,9 +136,11 @@ export function EmailSentSuccessPage() {
                 </Alert>
 
                 {/* Error Alert */}
-                {error && (
+                {(error || captchaError) && (
                   <Alert variant="destructive">
-                    <AlertDescription>{error}</AlertDescription>
+                    <AlertDescription>
+                      {error || (captchaError ? `CAPTCHA Error: ${captchaError}` : '')}
+                    </AlertDescription>
                   </Alert>
                 )}
 
@@ -155,17 +173,24 @@ export function EmailSentSuccessPage() {
                   variant="outline"
                   className="w-full"
                   onClick={handleResendEmail}
-                  disabled={resending}
+                  disabled={resending || captchaLoading}
                 >
-                  {resending ? (
+                  {resending || captchaLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Mengirim...
+                      {captchaLoading ? "Memverifikasi keamanan..." : "Mengirim..."}
                     </>
                   ) : (
                     'Kirim Ulang Email'
                   )}
                 </Button>
+                
+                {/* CAPTCHA Status Indicator */}
+                {captchaEnabled && (
+                  <div className="text-xs text-muted-foreground text-center">
+                    🛡️ Dilindungi dengan reCAPTCHA
+                  </div>
+                )}
               </CardFooter>
             </Card>
           </div>
@@ -213,9 +238,11 @@ export function EmailSentSuccessPage() {
               </Alert>
 
               {/* Error Alert */}
-              {error && (
+              {(error || captchaError) && (
                 <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription>
+                    {error || (captchaError ? `CAPTCHA Error: ${captchaError}` : '')}
+                  </AlertDescription>
                 </Alert>
               )}
 
@@ -248,17 +275,24 @@ export function EmailSentSuccessPage() {
                 variant="outline"
                 className="w-full"
                 onClick={handleResendEmail}
-                disabled={resending}
+                disabled={resending || captchaLoading}
               >
-                {resending ? (
+                {resending || captchaLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Mengirim...
+                    {captchaLoading ? "Memverifikasi keamanan..." : "Mengirim..."}
                   </>
                 ) : (
                   'Kirim Ulang Email'
                 )}
               </Button>
+              
+              {/* CAPTCHA Status Indicator */}
+              {captchaEnabled && (
+                <div className="text-xs text-muted-foreground text-center">
+                  🛡️ Dilindungi dengan reCAPTCHA
+                </div>
+              )}
             </CardFooter>
           </Card>
         </div>

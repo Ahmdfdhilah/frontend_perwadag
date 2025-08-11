@@ -17,6 +17,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@workspace/ui/components/sonner';
 
 import { useTheme } from '@/hooks/useTheme';
+import { useCaptcha } from '@/hooks/useCaptcha';
 import logoLightMode from '@/assets/logoLightMode.png';
 import logoDarkMode from '@/assets/logoDarkMode.png';
 import bgImage from '@/assets/bg.webp';
@@ -30,6 +31,7 @@ type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 export function ForgotPasswordPage() {
   const { isDarkMode } = useTheme();
+  const { executeRecaptcha, isLoading: captchaLoading, isEnabled: captchaEnabled, error: captchaError } = useCaptcha();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const dispatch = useDispatch<AppDispatch>();
@@ -48,15 +50,31 @@ export function ForgotPasswordPage() {
   React.useEffect(() => {
     if (error) {
       setError('');
+    } else if (captchaError) {
+      setError(`CAPTCHA Error: ${captchaError}`);
     }
-  }, [form.watch()]);
+  }, [form.watch(), error, captchaError]);
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
     setLoading(true);
     setError('');
 
     try {
-      await dispatch(requestPasswordResetAsync({ email: data.email })).unwrap();
+      // Generate CAPTCHA token if enabled
+      let captchaToken: string | null = null;
+      if (captchaEnabled) {
+        captchaToken = await executeRecaptcha('forgot_password');
+        if (!captchaToken) {
+          setError('Gagal menggenerate token keamanan. Silakan refresh halaman dan coba lagi.');
+          setLoading(false);
+          return;
+        }
+      }
+
+      await dispatch(requestPasswordResetAsync({ 
+        email: data.email,
+        captcha_token: captchaToken || undefined 
+      })).unwrap();
       toast({
         title: 'Email reset password terkirim',
         description: 'Silakan cek email Anda untuk mendapatkan link reset password.',
@@ -153,7 +171,7 @@ export function ForgotPasswordPage() {
                             <Input
                               type="email"
                               placeholder="Enter your email address"
-                              disabled={loading}
+                              disabled={loading || captchaLoading}
                               {...field}
                             />
                           </FormControl>
@@ -167,22 +185,31 @@ export function ForgotPasswordPage() {
                     <LoadingButton
                       type="submit"
                       className="w-full"
-                      loading={loading}
-                      loadingText="Mengirim..."
+                      loading={loading || captchaLoading}
+                      loadingText={captchaLoading ? "Memverifikasi keamanan..." : "Mengirim..."}
                     >
                       Kirim Link Reset Password
                     </LoadingButton>
                     
+                
                     <Button
                       type="button"
                       variant="outline"
                       className="w-full"
                       onClick={handleBackToLogin}
-                      disabled={loading}
+                      disabled={loading || captchaLoading}
                     >
                       <ArrowLeft className="mr-2 h-4 w-4" />
                       Kembali ke Login
                     </Button>
+
+                        {/* CAPTCHA Status Indicator */}
+                        {captchaEnabled && (
+                      <div className="text-xs text-muted-foreground text-center">
+                        🛡️ Dilindungi dengan reCAPTCHA
+                      </div>
+                    )}
+                    
                   </CardFooter>
                 </form>
               </Form>
@@ -239,7 +266,7 @@ export function ForgotPasswordPage() {
                           <Input
                             type="email"
                             placeholder="Enter your email address"
-                            disabled={loading}
+                            disabled={loading || captchaLoading}
                             {...field}
                           />
                         </FormControl>
@@ -253,11 +280,18 @@ export function ForgotPasswordPage() {
                   <LoadingButton
                     type="submit"
                     className="w-full"
-                    loading={loading}
-                    loadingText="Mengirim..."
+                    loading={loading || captchaLoading}
+                    loadingText={captchaLoading ? "Memverifikasi keamanan..." : "Mengirim..."}
                   >
                     Kirim Link Reset Password
                   </LoadingButton>
+                  
+                  {/* CAPTCHA Status Indicator */}
+                  {captchaEnabled && (
+                    <div className="text-xs text-muted-foreground text-center">
+                      🛡️ Dilindungi dengan reCAPTCHA
+                    </div>
+                  )}
                   
                   <Button
                     type="button"
