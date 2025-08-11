@@ -1,0 +1,20 @@
+services:
+  # Frontend Application
+  frontend:
+    build: .
+    container_name: perwadag-frontend
+    ports:
+      - '3000:3000'
+    volumes:
+      # Mount dist directory for volume access
+      - ./apps/vite-react-app/dist:/app/apps/vite-react-app/dist
+    env_file:
+      - ./apps/vite-react-app/.env
+    restart: unless-stopped
+    networks:
+      - frontend-network
+
+# Custom network
+networks:
+  frontend-network:
+    driver: bridge
