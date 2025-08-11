@@ -65,6 +65,10 @@ class AuthService extends BaseService {
   ): Promise<MessageResponse> {
     return this.post("/change-password", changePasswordData);
   }
+
+  async getCaptchaConfig(): Promise<{enabled: boolean, site_key: string | null, version: string}> {
+    return this.get("/captcha-config");
+  }
 }
 
 export const authService = new AuthService();

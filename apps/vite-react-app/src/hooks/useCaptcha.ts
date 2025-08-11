@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { authService } from '@/services/auth';
 
 interface CaptchaConfig {
   enabled: boolean;
@@ -37,68 +38,52 @@ export const useCaptcha = (): UseCaptchaReturn => {
     site_key: null,
     version: 'v3'
   });
-  
+
   const configFetched = useRef(false);
   const scriptLoaded = useRef(false);
 
   // Fetch CAPTCHA configuration from backend or environment
   const fetchCaptchaConfig = useCallback(async () => {
     if (configFetched.current) return;
-    
+
+    // First try environment variable fallback
+    const envSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
+    const hasValidEnvKey = envSiteKey && envSiteKey !== 'your_site_key_here' && envSiteKey.trim() !== '';
+
     try {
-      // First try to get config from backend
-      const response = await fetch('/api/v1/auth/captcha-config');
-      if (response.ok) {
-        const captchaConfig = await response.json();
-        setConfig(captchaConfig);
-        configFetched.current = true;
-        
-        // If CAPTCHA is enabled and we have a site key, load the script
-        if (captchaConfig.enabled && captchaConfig.site_key) {
-          await loadRecaptchaScript(captchaConfig.site_key);
-        }
-      } else {
-        // Fallback to environment variable if backend fails
-        const envSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
-        if (envSiteKey && envSiteKey !== 'your_site_key_here') {
-          const fallbackConfig = { 
-            enabled: true, 
-            site_key: envSiteKey, 
-            version: 'v3' 
-          };
-          setConfig(fallbackConfig);
-          configFetched.current = true;
-          await loadRecaptchaScript(envSiteKey);
-        } else {
-          console.warn('Failed to fetch CAPTCHA config and no valid env key, assuming disabled');
-          setConfig({ enabled: false, site_key: null, version: 'v3' });
-          configFetched.current = true;
-        }
+      // Try to get config from backend using service layer
+
+      const captchaConfig = await authService.getCaptchaConfig();
+      setConfig(captchaConfig);
+      configFetched.current = true;
+
+      // If CAPTCHA is enabled and we have a site key, load the script
+      if (captchaConfig.enabled && captchaConfig.site_key) {
+        await loadRecaptchaScript(captchaConfig.site_key);
       }
+      return;
     } catch (err) {
-      console.error('Error fetching CAPTCHA config:', err);
-      
-      // Fallback to environment variable on error
-      const envSiteKey = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
-      if (envSiteKey && envSiteKey !== 'your_site_key_here') {
-        const fallbackConfig = { 
-          enabled: true, 
-          site_key: envSiteKey, 
-          version: 'v3' 
-        };
-        setConfig(fallbackConfig);
-        configFetched.current = true;
-        try {
-          await loadRecaptchaScript(envSiteKey);
-        } catch (scriptErr) {
-          console.error('Failed to load reCAPTCHA script:', scriptErr);
-          setError('Failed to load CAPTCHA script');
-        }
-      } else {
-        setError('Failed to load CAPTCHA configuration');
-        setConfig({ enabled: false, site_key: null, version: 'v3' });
-        configFetched.current = true;
+      // Silent fallback to environment variable
+    }
+
+    // Fallback to environment variable
+    if (hasValidEnvKey) {
+      const fallbackConfig = {
+        enabled: true,
+        site_key: envSiteKey,
+        version: 'v3'
+      };
+      setConfig(fallbackConfig);
+      configFetched.current = true;
+
+      try {
+        await loadRecaptchaScript(envSiteKey);
+      } catch (scriptErr) {
+        setError('Failed to load CAPTCHA script');
       }
+    } else {
+      setConfig({ enabled: false, site_key: null, version: 'v3' });
+      configFetched.current = true;
     }
   }, []);
 
@@ -162,23 +147,18 @@ export const useCaptcha = (): UseCaptchaReturn => {
   const executeRecaptcha = useCallback(async (action: string = 'login'): Promise<string | null> => {
     // If CAPTCHA is not enabled, return null
     if (!config.enabled || !config.site_key) {
-      console.log('reCAPTCHA is disabled, skipping token generation');
       return null;
     }
 
     // If script is not loaded, return null
     if (!isLoaded || !window.grecaptcha) {
-      console.warn('reCAPTCHA script not loaded yet');
       return null;
     }
 
     try {
-      console.log(`Executing reCAPTCHA with site key: ${config.site_key} and action: ${action}`);
       const token = await window.grecaptcha.execute(config.site_key, { action });
-      console.log(`reCAPTCHA token generated successfully: ${token.substring(0, 20)}...`);
       return token;
     } catch (err) {
-      console.error('Error executing reCAPTCHA:', err);
       setError('Failed to generate CAPTCHA token');
       return null;
     }

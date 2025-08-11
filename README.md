@@ -1,56 +1,20 @@
 # 🏛️ SIELANGMERAH Frontend - Sistem Evaluasi Kinerja Perwakilan Perdagangan
 
-Aplikasi web frontend modern untuk **SIELANGMERAH (Sistem Evaluasi Kinerja Perwakilan Perdagangan Metode Jarak Jauh)** yang dibangun dengan React, TypeScript, dan arsitektur monorepo Turborepo. Platform digital untuk evaluasi kinerja perwakilan perdagangan Indonesia di luar negeri menggunakan metode jarak jauh, dikembangkan oleh Kementerian Perdagangan Republik Indonesia.
-
-## 🏗️ Arsitektur Sistem
-
-Proyek ini menggunakan struktur monorepo yang diperkuat oleh Turborepo, memungkinkan berbagi kode yang efisien dan pengembangan terkoordinasi di seluruh aplikasi evaluasi kinerja perwakilan perdagangan.
-
-### 📱 Aplikasi
-- **vite-react-app** - Aplikasi utama sistem evaluasi SIELANGMERAH dengan dashboard, manajemen user, dan workflow evaluasi
-
-### 📦 Shared Packages
-- **@workspace/ui** - Komponen UI yang dapat digunakan ulang dengan Tailwind CSS dan Shadcn UI
-- **@workspace/eslint** - Konfigurasi ESLint terpusat untuk kualitas kode yang konsisten
-- **@workspace/prettier** - Aturan formatting kode bersama
-- **@workspace/tailwind** - Konfigurasi Tailwind CSS dan design tokens umum
-- **@workspace/typescript** - Konfigurasi TypeScript terpadu
+Frontend aplikasi **SIELANGMERAH (Sistem Evaluasi Kinerja Perwakilan Perdagangan Metode Jarak Jauh)** yang dibangun dengan React 19, TypeScript, dan Vite. Platform digital untuk evaluasi kinerja perwakilan perdagangan Indonesia di luar negeri, dikembangkan oleh Kementerian Perdagangan Republik Indonesia.
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-Pastikan Anda memiliki yang berikut terinstal di sistem:
-
-- **Node.js** >= 20.0.0
-- **pnpm** >= 9.15.4
-
-> ⚠️ **WAJIB MENGGUNAKAN PNPM** - Proyek ini mengharuskan penggunaan pnpm sebagai package manager untuk memastikan lockfile yang konsisten, workspace management yang tepat, dan dependency resolution yang akurat. Menggunakan npm atau yarn dapat menyebabkan konflik dependency dan masalah dalam monorepo structure.
-
-### Instalasi pnpm
-
-Jika belum memiliki pnpm, install secara global:
-
-```bash
-# Menggunakan npm
-npm install -g pnpm
-
-# Atau menggunakan Node.js Corepack (direkomendasikan)
-corepack enable
-corepack prepare pnpm@latest --activate
-
-# Atau menggunakan script installer
-curl -fsSL https://get.pnpm.io/install.sh | sh -
-
-# Verifikasi instalasi
-pnpm --version
-```
+Pastikan Anda memiliki yang berikut terinstal:
+- **Node.js** >= 20.0.0  
+- **pnpm** >= 9.15.4 (package manager)
 
 ### Installation
 
 1. **Clone repository:**
 ```bash
-git clone https://github.com/Ahmdfdhilah/frontend_perwadag.git frontend
+git clone https://github.com/DaffaJatmiko/frontend-perwadag.git frontend
 cd sielangmerah/frontend
 ```
 
@@ -59,331 +23,358 @@ cd sielangmerah/frontend
 pnpm install
 ```
 
-### Development
+3. **Setup environment variables:**
+```bash
+# Copy dan edit file environment
+cp apps/vite-react-app/.env.example apps/vite-react-app/.env
+```
 
-**Start aplikasi dalam mode development:**
-
+4. **Start development server:**
 ```bash
 pnpm dev
 ```
 
-**Start aplikasi tertentu:**
-```bash
-# Aplikasi SIELANGMERAH utama
-pnpm --filter vite-react-app dev
-```
-
-## 📜 Available Scripts
-
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start aplikasi dalam mode development |
-| `pnpm build` | Build aplikasi untuk production |
-| `pnpm lint` | Jalankan ESLint di semua packages |
-| `pnpm format` | Format kode dengan Prettier |
-| `pnpm check-types` | Jalankan TypeScript type checking |
-| `pnpm clean` | Bersihkan build artifacts dan dependencies |
-
-## 🐳 Docker
-
-Proyek ini dilengkapi dengan konfigurasi Docker untuk kemudahan deployment dan development.
-
-### Docker Commands
-
-| Command | Description |
-|---------|-------------|
-| `docker-compose up --build` | Build dan jalankan container frontend |
-| `docker-compose up` | Jalankan container frontend |
-| `docker-compose down` | Stop dan hapus container |
-
-### Docker Configuration
-
-Frontend menggunakan Docker dengan konfigurasi berikut:
-- **Base Image**: Node.js 20 Alpine
-- **Package Manager**: pnpm 9.15.4+
-- **Build Process**: Turborepo build
-- **Volume Mount**: `./apps/vite-react-app/dist` untuk akses hasil build
-- **Environment**: Load dari `./apps/vite-react-app/.env`
-
-File build hasil akan tersedia di direktori lokal `./apps/vite-react-app/dist` setelah container selesai build.
+Aplikasi akan berjalan di `http://localhost:5173`
 
 ## 🛠️ Tech Stack
 
 ### Core Framework
-- **React 19** - React terbaru dengan fitur concurrent
-- **TypeScript** - Pengembangan JavaScript yang type-safe
-- **Vite** - Build tool dan dev server yang sangat cepat
+- **React 19** - Library UI dengan concurrent features
+- **TypeScript** - Static type checking untuk JavaScript
+- **Vite** - Fast build tool dan development server
 
 ### State Management
-- **Redux Toolkit** - Redux modern dengan boilerplate minimal
-- **Redux Persist** - Persistensi state otomatis
+- **Redux Toolkit** - Modern Redux dengan less boilerplate
+- **Redux Persist** - Persist state ke localStorage
 
-### Styling & UI
-- **Tailwind CSS 4** - Framework CSS utility-first
-- **Radix UI** - UI primitives yang accessible dan unstyled
-- **Framer Motion** - Library motion siap produksi
+### UI & Styling  
+- **Tailwind CSS 4** - Utility-first CSS framework
+- **Radix UI** - Headless, accessible UI components
+- **Lucide React** - Beautiful & consistent icon library
+- **Framer Motion** - Production-ready motion library
+
+### Authentication & Security
+- **JWT Decode** - JWT token parsing di client
+- **🆕 Google reCAPTCHA v3** - Invisible bot protection untuk login
 
 ### Forms & Validation
-- **React Hook Form** - Forms performa tinggi dengan minimal re-renders
-- **Zod** - Validasi schema TypeScript-first
+- **React Hook Form** - Performant forms dengan minimal re-renders
+- **Zod** - TypeScript-first schema validation
 
-### Rich Text Editing
-- **TipTap** - Rich text editor headless untuk dokumen evaluasi
-- **React Quill** - WYSIWYG editor alternatif
+### Routing
+- **React Router DOM v7** - Client-side routing
 
-### Data Visualization
-- **Recharts** - Library charting untuk dashboard dan laporan
-
-### HTTP & API
-- **Axios** - HTTP client berbasis Promise dengan interceptors
-
-### Internationalization
-- **i18next** - Framework internasionalisasi
-- **react-i18next** - Integrasi React untuk i18next
-
-### Development Tools
-- **Turborepo** - Build system performa tinggi untuk monorepos
-- **ESLint** - JavaScript linter yang pluggable
-- **Prettier** - Code formatter yang opinionated
+### Rich Text & Data
+- **TipTap** - Headless rich text editor
+- **ExcelJS** - Excel file generation dan parsing
+- **Recharts** - Composable charting library
 
 ## 📁 Struktur Proyek
 
 ```
 frontend/
-├── apps/                              # Aplikasi
-│   └── vite-react-app/               # Aplikasi utama Perwadag
+├── apps/
+│   └── vite-react-app/           # Main React application
 │       ├── src/
-│       │   ├── components/           # Komponen React
-│       │   │   ├── Auth/             # Komponen autentikasi (AuthGuard, AuthProvider, RoleProtectedRoute)
-│       │   │   ├── Dashboard/        # Komponen dashboard (Charts, Cards, Activity)
-│       │   │   ├── Users/            # Manajemen user (UserCards, UserDialog, UserTable)
-│       │   │   ├── SuratTugas/       # Surat tugas evaluasi
-│       │   │   ├── SuratPemberitahuan/ # Surat pemberitahuan
-│       │   │   ├── EntryMeeting/     # Entry meeting
-│       │   │   ├── ExitMeeting/      # Exit meeting
-│       │   │   ├── KonfirmasiMeeting/ # Konfirmasi meeting
-│       │   │   ├── Kuesioner/        # Kuisioner evaluasi
-│       │   │   ├── FormatKuisioner/  # Format kuisioner
-│       │   │   ├── Matriks/          # Matriks evaluasi
-│       │   │   ├── LaporanHasilEvaluasi/ # Laporan hasil evaluasi
-│       │   │   ├── RiskAssesment/    # Risk assessment
-│       │   │   ├── EmailTemplate/    # Template email
-│       │   │   ├── Profile/          # Manajemen profil user
-│       │   │   ├── common/           # Komponen umum (Pagination, FileUpload, DatePicker, dll)
-│       │   │   └── layouts/          # Layout komponen (Dashboard, Default)
-│       │   ├── pages/                # Halaman aplikasi
-│       │   │   ├── Auth/             # Halaman autentikasi (Login, ForgotPassword, ResetPassword)
-│       │   │   ├── Dashboard/        # Dashboard utama
-│       │   │   ├── Profile/          # Halaman profil
-│       │   │   ├── Users/            # Halaman manajemen user
-│       │   │   └── RiskAssesment/    # Halaman risk assessment
-│       │   ├── services/             # API services layer
-│       │   │   ├── auth/             # Service autentikasi
-│       │   │   ├── users/            # Service manajemen user
-│       │   │   ├── meeting/          # Service meeting
-│       │   │   ├── kuisioner/        # Service kuisioner
-│       │   │   ├── formatKuisioner/  # Service format kuisioner
-│       │   │   ├── matriks/          # Service matriks
-│       │   │   ├── suratTugas/       # Service surat tugas
-│       │   │   ├── suratPemberitahuan/ # Service surat pemberitahuan
-│       │   │   ├── laporanHasil/     # Service laporan hasil
-│       │   │   ├── penilaianRisiko/  # Service penilaian risiko
-│       │   │   ├── emailTemplate/    # Service template email
-│       │   │   ├── periodeEvaluasi/  # Service periode evaluasi
-│       │   │   ├── log-activity/     # Service log aktivitas
-│       │   │   └── base/             # Base service configurations
-│       │   ├── redux/                # State management
-│       │   │   ├── features/         # Redux slices (auth, theme, role)
-│       │   │   ├── store.ts          # Store configuration
-│       │   │   ├── hooks.ts          # Typed Redux hooks
-│       │   │   └── reducers.ts       # Root reducer
-│       │   ├── hooks/                # Custom React hooks
-│       │   │   ├── useDebounce.ts    # Debounce hook
-│       │   │   ├── useFormPermissions.ts # Form permissions hook
-│       │   │   ├── useInfiniteSearch.ts  # Infinite search hook
-│       │   │   ├── useRole.ts        # Role management hook
-│       │   │   ├── useTheme.ts       # Theme management hook
-│       │   │   └── useURLFilters.ts  # URL filters hook
-│       │   ├── utils/                # Utility functions
-│       │   │   ├── api.ts            # API utilities
-│       │   │   ├── excelExportUtils.ts # Excel export utilities
-│       │   │   ├── imageUtils.ts     # Image processing utilities
-│       │   │   ├── numberUtils.ts    # Number formatting utilities
-│       │   │   ├── riskCalculationUtils.ts # Risk calculation utilities
-│       │   │   ├── textUtils.ts      # Text processing utilities
-│       │   │   ├── timeFormat.ts     # Time formatting utilities
-│       │   │   ├── urlStateUtils.ts  # URL state utilities
-│       │   │   └── yearUtils.ts      # Year utilities
-│       │   ├── config/               # Konfigurasi aplikasi
-│       │   │   └── api.ts            # Konfigurasi API
-│       │   ├── lib/                  # Library utilities
-│       │   │   ├── constants.ts      # Application constants
-│       │   │   └── menus.ts          # Menu configurations
-│       │   ├── types/                # TypeScript type definitions
-│       │   └── assets/               # Static assets (images, icons)
-│       ├── public/                   # Public assets (favicons, PWA assets)
-│       └── package.json
-├── packages/                          # Shared packages
-│   ├── ui/                           # Shared UI components
-│   │   ├── src/
-│   │   │   ├── components/           # Komponen yang dapat digunakan ulang
-│   │   │   │   ├── ui/               # Custom UI components (carousel, loading, news-card, dll)
-│   │   │   │   └── [radix-components] # Radix UI components (button, dialog, form, dll)
-│   │   │   ├── lib/
-│   │   │   │   └── utils.ts          # Utility functions
-│   │   │   └── globals.css           # Global CSS styles
-│   │   └── package.json
-│   ├── eslint/                       # Konfigurasi ESLint
-│   │   ├── src/
-│   │   │   └── index.ts              # ESLint rules configuration
-│   │   └── package.json
-│   ├── prettier/                     # Konfigurasi Prettier
-│   │   ├── base.js                   # Base Prettier configuration
-│   │   └── package.json
-│   ├── tailwind/                     # Konfigurasi Tailwind CSS
-│   │   ├── tailwind.config.ts        # Tailwind configuration
-│   │   ├── globals.css               # Global Tailwind styles
-│   │   └── package.json
-│   └── typescript/                   # Konfigurasi TypeScript
-│       ├── base.json                 # Base TypeScript config
-│       ├── react.json                # React TypeScript config
-│       ├── next.json                 # Next.js TypeScript config
-│       └── package.json
-├── turbo.json                        # Konfigurasi Turborepo
-├── package.json                      # Root package.json
-├── pnpm-workspace.yaml              # Konfigurasi PNPM workspace
-├── CLAUDE.md                         # Claude Code project instructions
-└── README.md                         # File ini
+│       │   ├── components/       # React components
+│       │   │   ├── Auth/        # Authentication components
+│       │   │   │   ├── AuthProvider.tsx    # Auth context
+│       │   │   │   ├── AuthGuard.tsx       # Route protection
+│       │   │   │   └── RoleProtectedRoute.tsx
+│       │   │   ├── common/      # Reusable components
+│       │   │   └── layouts/     # Layout components
+│       │   ├── hooks/          # Custom React hooks
+│       │   │   ├── useAuth.ts  # Authentication hook
+│       │   │   ├── useCaptcha.ts  # 🆕 reCAPTCHA hook
+│       │   │   └── useTheme.ts # Theme management
+│       │   ├── pages/          # Page components
+│       │   │   ├── Auth/       # Login, reset password
+│       │   │   ├── Dashboard/  # Dashboard pages
+│       │   │   └── Users/      # User management
+│       │   ├── redux/          # Redux store & slices
+│       │   │   ├── features/   # Redux slices
+│       │   │   └── store.ts    # Store configuration
+│       │   ├── services/       # API service layers
+│       │   │   ├── auth/       # Authentication API
+│       │   │   ├── users/      # User management API
+│       │   │   └── base/       # Base HTTP client
+│       │   ├── utils/          # Utility functions
+│       │   └── types/          # TypeScript type definitions
+│       ├── public/             # Static assets
+│       ├── .env               # Environment variables
+│       └── package.json       # App dependencies
+├── packages/                   # Shared packages
+│   ├── ui/                    # Shared UI components
+│   ├── eslint/               # ESLint configuration
+│   ├── prettier/             # Prettier configuration
+│   ├── tailwind/             # Tailwind configuration
+│   └── typescript/           # TypeScript configuration
+└── package.json              # Monorepo dependencies
 ```
 
-## 🌟 Fitur Sistem SIELANGMERAH
+## 🌟 Fitur Aplikasi
 
-### 🔐 Autentikasi & Otorisasi
-- **Login dengan Nama Lengkap** - Sistem login menggunakan nama lengkap sebagai username
-- **Role-based Access Control** - Tiga level akses: Admin, Inspektorat, Perwadag
-- **JWT Authentication** - Token-based authentication dengan refresh token
-- **Password Reset** - Fitur reset password via email
+### 🔐 Authentication & Security
+- **JWT-based Authentication** - Secure login dengan access/refresh tokens
+- **Role-based Authorization** - Admin, Inspektorat, Perwadag roles
+- **Password Management** - Change password, reset via email
+- **🆕 Invisible CAPTCHA Protection** - Google reCAPTCHA v3 untuk login security
+- **Session Management** - Automatic token refresh dan session handling
 
-### 👥 Manajemen User
-- **Multi-role User Management** - Kelola user dengan role berbeda
-- **Profile Management** - User dapat mengelola profil sendiri
-- **User Statistics** - Dashboard statistik user untuk admin
+### 👥 User Management
+- **User CRUD Operations** - Create, read, update, delete users
+- **Role Assignment** - Manage user roles dan permissions
+- **Profile Management** - User dapat update profil sendiri
+- **User Statistics** - Dashboard dengan statistik user
 
 ### 📋 Workflow Evaluasi
-- **Surat Tugas** - Pembuatan dan pengelolaan surat tugas evaluasi
-- **Surat Pemberitahuan** - Notifikasi evaluasi ke perwadag
-- **Entry Meeting** - Manajemen meeting pembukaan evaluasi
-- **Konfirmasi Meeting** - Konfirmasi jadwal dan agenda meeting
-- **Exit Meeting** - Meeting penutupan evaluasi
+- **Surat Tugas Management** - CRUD surat tugas evaluasi
+- **Meeting Management** - Entry, exit, dan konfirmasi meeting
+- **Kuisioner System** - Template dan pengisian kuisioner
 - **Matriks Evaluasi** - Input dan kelola matriks penilaian
-- **Kuisioner** - Template dan pengisian kuisioner evaluasi
-- **Format Kuisioner** - Manajemen format dan template kuisioner
-- **Risk Assessment** - Penilaian risiko dan analisis
-- **Email Template** - Template email untuk komunikasi otomatis
-- **Periode Evaluasi** - Manajemen periode dan jadwal evaluasi
-- **Laporan Hasil** - Generate dan kelola laporan hasil evaluasi
+- **Laporan Hasil** - Generate dan view laporan evaluasi
 
-### 📊 Dashboard & Reporting
-- **Dashboard Overview** - Ringkasan status evaluasi dan progress
-- **Progress Tracking** - Pelacakan kemajuan setiap tahap evaluasi
-- **Data Visualization** - Charts dan grafik untuk analisis data
-- **Completion Statistics** - Statistik penyelesaian evaluasi per periode
-- **Activity Logging** - Log aktivitas pengguna untuk audit trail
-- **Export Functionality** - Export data ke Excel dan PDF
+### 🎨 User Experience
+- **Responsive Design** - Optimal di desktop, tablet, dan mobile
+- **Dark/Light Mode** - Theme switching dengan persist preference
+- **Loading States** - Beautiful loading indicators dan skeletons
+- **Error Handling** - Comprehensive error messages dan recovery
+- **Progressive Web App** - PWA capabilities untuk offline usage
 
 ### 📁 File Management
-- **Document Upload** - Upload dokumen pendukung evaluasi
-- **File Preview** - Preview file dalam aplikasi
-- **Download Center** - Pusat download dokumen dan template
+- **File Upload** - Drag & drop file upload dengan progress
+- **File Preview** - Preview documents dan images
+- **Export Functionality** - Export data ke Excel format
 
-### 🔍 Search & Filter
-- **Advanced Search** - Pencarian lanjutan di semua modul
-- **URL-based Filters** - Filter yang tersimpan di URL untuk bookmarking
-- **Real-time Filtering** - Filter real-time dengan debouncing
+## 🔧 Development Commands
 
-## 🎯 Pola Pengembangan
+```bash
+# Start development server
+pnpm dev
 
-### Services Layer
-- **API Integration** - Layer service terstruktur untuk komunikasi dengan backend
-- **Error Handling** - Penanganan error terpusat dengan toast notifications
-- **Request/Response Types** - Type safety penuh untuk semua API calls
+# Build for production
+pnpm build
 
-### Component Architecture
-- **Reusable Components** - Komponen yang dapat digunakan ulang di seluruh aplikasi
-- **Compound Components** - Pola compound untuk komponen kompleks
-- **Custom Hooks** - Hooks kustom untuk logic yang dapat digunakan ulang
-  - `useDebounce` - Debouncing untuk input search
-  - `useFormPermissions` - Manajemen permission form berdasarkan role
-  - `useInfiniteSearch` - Infinite scrolling untuk list data
-  - `useRole` - Manajemen role dan permission user
-  - `useTheme` - Theme switching (dark/light mode)
-  - `useURLFilters` - Sinkronisasi filter dengan URL state
+# Preview production build
+pnpm preview
 
-### State Management
-- **Redux Toolkit** - State management modern dengan RTK
-- **Persistent State** - State yang persisten untuk user preferences
-- **Optimistic Updates** - Update optimistik untuk UX yang lebih baik
+# Run linting
+pnpm lint
 
-### Utility Functions
-- **Excel Export** - Utils untuk export data ke format Excel
-- **Image Processing** - Utilities untuk kompresi dan manipulasi gambar
-- **Risk Calculation** - Kalkulasi dan analisis penilaian risiko
-- **Time Formatting** - Formatting tanggal dan waktu yang konsisten
-- **Number Formatting** - Format angka dan currency
-- **Text Processing** - Utilities untuk manipulasi teks dan string
-- **URL State Management** - Manajemen state melalui URL parameters
+# Run type checking
+pnpm check-types
 
-## 🔧 Konfigurasi Environment
+# Format code
+pnpm format
 
-Buat file `.env.local` di `apps/vite-react-app/`:
+# Clean build artifacts
+pnpm clean
+```
+
+## 📜 Environment Variables
+
+Buat file `.env` di `apps/vite-react-app/`:
 
 ```env
+# API Configuration
 VITE_API_BASE_URL=http://localhost:8000/api/v1
-VITE_APP_NAME=SIELANGMERAH
-VITE_APP_VERSION=1.0.0
+
+# Google reCAPTCHA Configuration (Bot Protection)
+VITE_RECAPTCHA_SITE_KEY=your_site_key_from_google_console
+
+# Application Settings
+VITE_APP_NAME="Sistem Evaluasi Perwadag"
+VITE_APP_VERSION="1.0.0"
+```
+
+## 🛡️ Security Features
+
+### Google reCAPTCHA v3 Integration
+- **Invisible Protection** - Bot detection tanpa mengganggu user experience
+- **Score-based Validation** - Real-time human vs bot scoring
+- **Smart Fallback** - Graceful degradation jika CAPTCHA disabled
+- **Privacy Focused** - Minimal data collection, GDPR compliant
+
+### Authentication Security
+- **HTTP-Only Cookies** - Secure token storage
+- **CSRF Protection** - Cross-site request forgery protection
+- **XSS Prevention** - Content Security Policy headers
+- **Session Management** - Automatic session cleanup dan expiry
+
+## 📱 Progressive Web App (PWA)
+
+Aplikasi ini dikonfigurasi sebagai PWA dengan fitur:
+
+- **Offline Support** - Caching strategy untuk offline usage
+- **Install Prompt** - User dapat install sebagai native app
+- **Background Sync** - Sync data ketika connection restored
+- **Push Notifications** - (Coming soon) Real-time notifications
+
+## 🎨 UI Components
+
+### Design System
+- **Consistent Colors** - Unified color palette dengan dark mode support
+- **Typography** - Hierarchical text styles
+- **Spacing** - Consistent margin dan padding scale
+- **Animations** - Smooth transitions dengan Framer Motion
+
+### Component Library (@workspace/ui)
+- **Form Components** - Input, Select, Checkbox, Radio
+- **Data Display** - Table, Card, Badge, Avatar
+- **Navigation** - Breadcrumb, Pagination, Menu
+- **Feedback** - Toast, Alert, Loading, Progress
+
+## 🔍 State Management
+
+### Redux Store Structure
+```typescript
+{
+  auth: {
+    user: User | null,
+    isAuthenticated: boolean,
+    loading: boolean,
+    error: string | null
+  },
+  theme: {
+    mode: 'light' | 'dark',
+    primaryColor: string
+  }
+  // ... other slices
+}
+```
+
+### Data Persistence
+- **Auth State** - Persisted untuk automatic login
+- **Theme Preferences** - Persisted user theme choice
+- **Form Drafts** - Auto-save form data (coming soon)
+
+## 🧪 Testing
+
+```bash
+# Run unit tests (coming soon)
+pnpm test
+
+# Run component tests (coming soon)  
+pnpm test:components
+
+# Run e2e tests (coming soon)
+pnpm test:e2e
 ```
 
 ## 🚀 Deployment
 
-### Build untuk Production
+### Production Build
 
 ```bash
+# Build optimized production bundle
 pnpm build
-```
 
-### Preview Production Build
-
-```bash
+# Preview production build locally
 pnpm preview
 ```
 
-## 📖 Dokumentasi Tambahan
+### Environment Configuration
 
-- [Guide Logic Pages](./guide-logic-pages.md) - Panduan implementasi halaman
-- [Form Data Mapping](./form-data-mapping.md) - Mapping data forms
-- [Data Structure Mapping](./data-structure-mapping.md) - Struktur data
-- [File Upload Components](./file-upload-components-list.md) - Komponen upload file
+**Development:**
+```env
+VITE_API_BASE_URL=http://localhost:8000/api/v1
+VITE_RECAPTCHA_SITE_KEY=test_site_key
+```
+
+**Production:**
+```env
+VITE_API_BASE_URL=https://api.yourdomain.com/api/v1
+VITE_RECAPTCHA_SITE_KEY=prod_site_key_from_google
+```
+
+### Deployment Platforms
+
+**Vercel (Recommended):**
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy to Vercel
+vercel --prod
+```
+
+**Netlify:**
+```bash
+# Build command: pnpm build
+# Publish directory: apps/vite-react-app/dist
+```
+
+**Docker:**
+```dockerfile
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN pnpm install
+COPY . .
+RUN pnpm build
+EXPOSE 5173
+CMD ["pnpm", "preview", "--host", "0.0.0.0"]
+```
+
+## 📊 Performance
+
+### Bundle Analysis
+```bash
+# Analyze bundle size
+pnpm build --analyze
+```
+
+### Performance Optimizations
+- **Code Splitting** - Lazy loading untuk routes dan components
+- **Tree Shaking** - Remove unused code
+- **Asset Optimization** - Image compression dan lazy loading
+- **Service Worker** - Caching strategies untuk fast loading
 
 ## 🤝 Contributing
 
 1. Fork repository
-2. Buat feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit perubahan (`git commit -m 'Add some amazing feature'`)
-4. Push ke branch (`git push origin feature/amazing-feature`)
-5. Buka Pull Request
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
+
+### Code Standards
+
+```bash
+# Lint code
+pnpm lint
+
+# Format code
+pnpm format
+
+# Type check
+pnpm check-types
+```
+
+### Component Guidelines
+- Use TypeScript untuk semua components
+- Follow Compound Component pattern untuk complex UI
+- Implement proper error boundaries
+- Write meaningful prop documentation
 
 ## 📄 License
 
-Proyek ini dilisensikan di bawah MIT License - lihat file [LICENSE](LICENSE) untuk detail.
+Proyek ini dilisensikan di bawah MIT License - lihat file [LICENSE](../../../LICENSE) untuk detail.
 
 ## 🆘 Support
 
 Jika Anda mengalami masalah atau memiliki pertanyaan:
 
-1. Periksa [dokumentasi](#)
+1. Periksa [CAPTCHA Setup Guide](../../../CAPTCHA_SETUP.md) untuk CAPTCHA troubleshooting
 2. Cari [issues](../../issues) yang sudah ada
 3. Buat [issue baru](../../issues/new) jika diperlukan
 
 ---
 
-Dibangun dengan ❤️ oleh Kementerian Perdagangan Republik Indonesia
+**✨ New Features:**
+- 🛡️ **Google reCAPTCHA v3** - Invisible bot protection dengan score-based validation
+- 🔒 **Enhanced Security** - Multi-layer authentication protection
+- 📱 **PWA Support** - Progressive Web App capabilities
+- 🎨 **Modern UI** - React 19 dengan Tailwind CSS 4
+
+Dibangun dengan ❤️ oleh Kementerian Perdagangan Republik Indonesia untuk Sistem Evaluasi Kinerja Perwakilan Perdagangan Indonesia
