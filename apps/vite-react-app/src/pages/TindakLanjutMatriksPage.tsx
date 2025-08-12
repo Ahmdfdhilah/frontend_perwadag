@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useRole } from '@/hooks/useRole';
-import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import Filtering from '@/components/common/Filtering';
@@ -23,7 +22,6 @@ import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import TindakLanjutMatriksTable from '@/components/TindakLanjutMatriks/TindakLanjutMatriksTable';
 import TindakLanjutMatriksCards from '@/components/TindakLanjutMatriks/TindakLanjutMatriksCards';
 import TindakLanjutMatriksDialog from '@/components/TindakLanjutMatriks/TindakLanjutMatriksDialog';
-import { findPeriodeByYear } from '@/utils/yearUtils';
 import { useYearOptions } from '@/hooks/useYearOptions';
 
 interface TindakLanjutMatriksPageFilters {
@@ -39,7 +37,6 @@ interface TindakLanjutMatriksPageFilters {
 
 const TindakLanjutMatriksPage: React.FC = () => {
   const { isAdmin, isInspektorat, isPimpinan, isPerwadag, user } = useRole();
-  const { hasPageAccess, canEditForm } = useFormPermissions();
   const { toast } = useToast();
 
   // URL Filters configuration
@@ -68,10 +65,10 @@ const TindakLanjutMatriksPage: React.FC = () => {
   const [dialogMode, setDialogMode] = useState<'edit' | 'view'>('edit');
   
   // Use optimized year options hook
-  const { yearOptions, periodeEvaluasi } = useYearOptions();
+  const { yearOptions } = useYearOptions();
 
-  // Calculate access control using useFormPermissions
-  const hasAccess = hasPageAccess('tindak_lanjut_matriks');
+  // Calculate access control - all authenticated users can view tindak lanjut matriks
+  const hasAccess = true;
 
   // Fetch tindak lanjut matriks function - only finished matriks with tindak lanjut data
   const fetchTindakLanjutMatriks = async () => {
@@ -144,7 +141,7 @@ const TindakLanjutMatriksPage: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSave = async (data: any) => {
+  const handleSave = async () => {
     if (!selectedItem) return;
 
     try {
@@ -159,11 +156,11 @@ const TindakLanjutMatriksPage: React.FC = () => {
     }
   };
 
-  const handleTindakLanjutStatusChange = async (itemId: number, newStatus: TindakLanjutStatus) => {
+  const handleTindakLanjutStatusChange = async (newStatus: TindakLanjutStatus) => {
     if (!selectedItem) return;
 
     try {
-      await matriksService.updateTindakLanjutStatus(selectedItem.id, itemId, { status: newStatus });
+      await matriksService.updateTindakLanjutStatus(selectedItem.id, { status: newStatus });
       
       // Refresh data and update selected item
       await fetchTindakLanjutMatriks();
@@ -194,26 +191,9 @@ const TindakLanjutMatriksPage: React.FC = () => {
     }
   };
 
-  // Check if user can edit this item based on role and permissions
+  // Check if user can edit this item using is_editable field from backend
   const canEdit = (item: MatriksResponse) => {
-    if (!canEditForm('tindak_lanjut_matriks')) return false;
-
-    // Check if the periode is locked or status is "tutup"
-    const periode = findPeriodeByYear(periodeEvaluasi, item.tahun_evaluasi);
-    if (periode?.is_locked || periode?.status === 'tutup') {
-      return false;
-    }
-
-    if (isAdmin()) return true;
-    if (isInspektorat() || isPimpinan()) {
-      // Check if user can edit this tindak lanjut based on inspektorat
-      return user?.inspektorat === item.inspektorat;
-    }
-    if (isPerwadag()) {
-      // Perwadag can edit their own tindak lanjut
-      return user?.id === item.user_perwadag_id;
-    }
-    return false;
+    return item.is_editable;
   };
   
   // Filter handlers

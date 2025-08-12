@@ -19,7 +19,7 @@ import {
   TableRow,
 } from '@workspace/ui/components/table';
 import { Loader2, ExternalLink } from 'lucide-react';
-import { MatriksResponse, TemuanRekomendasi, TindakLanjutStatus } from '@/services/matriks/types';
+import { MatriksResponse, TindakLanjutStatus } from '@/services/matriks/types';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import { matriksService } from '@/services/matriks';
 import { useToast } from '@workspace/ui/components/sonner';
@@ -30,7 +30,7 @@ interface TindakLanjutMatriksDialogProps {
   item: MatriksResponse | null;
   mode: 'edit' | 'view';
   onSave?: (data: any) => void;
-  onStatusChange?: (itemId: number, status: TindakLanjutStatus) => void;
+  onStatusChange?: (status: TindakLanjutStatus) => void;
 }
 
 const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
@@ -176,12 +176,12 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
     setFormDialogOpen(false);
   };
 
-  const handleStatusChange = async (itemId: number, newStatus: TindakLanjutStatus) => {
+  const handleStatusChange = async (newStatus: TindakLanjutStatus) => {
     if (!onStatusChange || isChangingStatus) return;
 
     setIsChangingStatus(true);
     try {
-      await onStatusChange(itemId, newStatus);
+      await onStatusChange(newStatus);
     } catch (error) {
       console.error('Error changing tindak lanjut status:', error);
     } finally {
@@ -189,9 +189,9 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
     }
   };
 
-  const handleRollback = async (itemId: number) => {
+  const handleRollback = async () => {
     const rollbackStatus: TindakLanjutStatus = 'DRAFTING';
-    await handleStatusChange(itemId, rollbackStatus);
+    await handleStatusChange(rollbackStatus);
   };
 
   const handleCancel = () => {
@@ -350,7 +350,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                               <Button
                                 variant="destructive"
                                 size="sm"
-                                onClick={() => tr.id && handleRollback(tr.id)}
+                                onClick={() => handleRollback()}
                                 disabled={isChangingStatus}
                               >
                                 {isChangingStatus ? 'Loading...' : 'Kembalikan ke Draft'}
@@ -361,7 +361,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                             {nextAction && (
                               <Button
                                 size="sm"
-                                onClick={() => tr.id && handleStatusChange(tr.id, nextAction.next)}
+                                onClick={() => handleStatusChange(nextAction.next)}
                                 disabled={isChangingStatus}
                               >
                                 {isChangingStatus ? 'Loading...' : nextAction.label}

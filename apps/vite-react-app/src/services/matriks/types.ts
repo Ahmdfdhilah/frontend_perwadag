@@ -61,6 +61,8 @@ export interface UserPermissions {
   can_change_matrix_status: boolean;
   can_edit_tindak_lanjut: boolean;
   can_change_tindak_lanjut_status: boolean;
+  allowed_matrix_status_changes: MatriksStatus[];
+  allowed_tindak_lanjut_status_changes: TindakLanjutStatus[];
 }
 
 // Temuan Rekomendasi Types - Updated with tindak lanjut fields
@@ -84,6 +86,7 @@ export interface MatriksUpdate {
   temuan_rekomendasi?: {
     items: TemuanRekomendasi[];
   };
+  expected_temuan_version?: number;
 }
 
 // Status update requests
@@ -126,10 +129,12 @@ export interface MatriksResponse {
   evaluation_status: string;
   temuan_rekomendasi_summary: TemuanRekomendasiSummary | null;
   has_temuan_rekomendasi: boolean;
+  temuan_version: number;
+  status_tindak_lanjut?: TindakLanjutStatus;
   // New fields from backend update
-  status?: MatriksStatus;
-  is_editable?: boolean;
-  user_permissions?: UserPermissions;
+  status: MatriksStatus;
+  is_editable: boolean;
+  user_permissions: UserPermissions;
   user_perwadag_id?: string;
   created_at: string;
   updated_at?: string;

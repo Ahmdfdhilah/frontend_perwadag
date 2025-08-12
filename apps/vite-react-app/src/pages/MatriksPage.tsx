@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useRole } from '@/hooks/useRole';
-import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useURLFilters } from '@/hooks/useURLFilters';
 import { useToast } from '@workspace/ui/components/sonner';
 import Filtering from '@/components/common/Filtering';
@@ -23,7 +22,6 @@ import ListHeaderComposite from '@/components/common/ListHeaderComposite';
 import MatriksTable from '@/components/Matriks/MatriksTable';
 import MatriksCards from '@/components/Matriks/MatriksCards';
 import MatriksDialog from '@/components/Matriks/MatriksDialog';
-import { findPeriodeByYear } from '@/utils/yearUtils';
 import { useYearOptions } from '@/hooks/useYearOptions';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import { exportAllMatriksToExcel } from '@/utils/excelExportUtils';
@@ -44,7 +42,6 @@ interface MatriksPageFilters {
 
 const MatriksPage: React.FC = () => {
   const { isAdmin, isInspektorat, isPimpinan, isPerwadag, user } = useRole();
-  const { hasPageAccess, canEditForm } = useFormPermissions();
   const { toast } = useToast();
 
   // URL Filters configuration
@@ -74,11 +71,11 @@ const MatriksPage: React.FC = () => {
   const [dialogMode, setDialogMode] = useState<'edit' | 'view'>('edit');
   
   // Use optimized year options hook
-  const { yearOptions, periodeEvaluasi } = useYearOptions();
+  const { yearOptions } = useYearOptions();
 
 
-  // Calculate access control using useFormPermissions
-  const hasAccess = hasPageAccess('matriks');
+  // Calculate access control - all authenticated users can view matriks
+  const hasAccess = true;
 
   // Fetch matriks function
   const fetchMatriks = async () => {
@@ -251,22 +248,9 @@ const MatriksPage: React.FC = () => {
     }
   };
 
-  // Check if user can edit this item based on role and permissions
+  // Check if user can edit this item using is_editable field from backend
   const canEdit = (item: MatriksResponse) => {
-    if (!canEditForm('matriks')) return false;
-
-    // Check if the periode is locked or status is "tutup"
-    const periode = findPeriodeByYear(periodeEvaluasi, item.tahun_evaluasi);
-    if (periode?.is_locked || periode?.status === 'tutup') {
-      return false;
-    }
-
-    if (isAdmin()) return true;
-    if (isInspektorat() || isPimpinan()) {
-      // Check if user can edit this matriks based on inspektorat
-      return user?.inspektorat === item.inspektorat;
-    }
-    return false;
+    return item.is_editable;
   };
   
   // Filter handlers
