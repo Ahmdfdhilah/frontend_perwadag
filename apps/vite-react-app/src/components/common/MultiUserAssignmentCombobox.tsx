@@ -34,25 +34,39 @@ export const MultiUserAssignmentCombobox: React.FC<MultiUserAssignmentComboboxPr
         return;
       }
 
+      if (!inspektorat) {
+        setSelectedUsers([]);
+        return;
+      }
+
       try {
-        // Fetch user details for each selected ID
-        const userPromises = value.map(async (userId) => {
-          const response = await userService.getUsers({
-            size: 1,
-            search: '', // We'll search by other means if needed
-          });
-          return response.items?.find(user => user.id === userId);
+        // Fetch all users from the inspektorat and filter by selected IDs
+        const response = await userService.getUsers({
+          inspektorat: inspektorat,
+          is_active: true,
+          size: 100 // Get enough users to find the selected ones
         });
 
-        const users = await Promise.all(userPromises);
-        setSelectedUsers(users.filter(Boolean) as UserSummary[]);
+        // Filter by selected IDs and roles if specified
+        let filteredUsers = (response.items || []).filter(user => 
+          value.includes(user.id)
+        );
+
+        if (roles && roles.length > 0) {
+          filteredUsers = filteredUsers.filter(user => 
+            roles.includes(user.role)
+          );
+        }
+
+        setSelectedUsers(filteredUsers);
       } catch (error) {
         console.error('Failed to fetch selected users:', error);
+        setSelectedUsers([]);
       }
     };
 
     fetchSelectedUsers();
-  }, [value]);
+  }, [value, inspektorat, roles]);
 
   // Remove user from selection
   const handleRemoveUser = (userId: string) => {
@@ -103,6 +117,7 @@ export const MultiUserAssignmentCombobox: React.FC<MultiUserAssignmentComboboxPr
         inspektorat={inspektorat}
         roles={roles}
         disabled={disabled}
+        excludeIds={value} // Exclude already selected users
       />
 
       {/* Helper text */}

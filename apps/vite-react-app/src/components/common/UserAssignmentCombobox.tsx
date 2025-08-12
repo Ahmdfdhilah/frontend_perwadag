@@ -14,6 +14,7 @@ interface UserAssignmentComboboxProps {
   inspektorat?: string; // Inspektorat to filter users
   roles?: string[]; // Roles to include (default: INSPEKTORAT,PIMPINAN)
   disabled?: boolean;
+  excludeIds?: string[]; // User IDs to exclude from selection
 }
 
 export const UserAssignmentCombobox: React.FC<UserAssignmentComboboxProps> = ({
@@ -25,7 +26,8 @@ export const UserAssignmentCombobox: React.FC<UserAssignmentComboboxProps> = ({
   className,
   inspektorat,
   roles = ['INSPEKTORAT', 'PIMPINAN'],
-  disabled = false
+  disabled = false,
+  excludeIds = []
 }) => {
   // Removed unused user destructuring
   const [availableUsers, setAvailableUsers] = useState<UserSummary[]>([]);
@@ -68,6 +70,11 @@ export const UserAssignmentCombobox: React.FC<UserAssignmentComboboxProps> = ({
             roles.includes(user.role)
           );
         }
+
+        // Exclude users that are already selected
+        filteredUsers = filteredUsers.filter(user => 
+          !excludeIds.includes(user.id)
+        );
         
         allUsersRef.current = filteredUsers;
         setAllUsers(filteredUsers);
@@ -82,7 +89,7 @@ export const UserAssignmentCombobox: React.FC<UserAssignmentComboboxProps> = ({
     };
 
     fetchInitialUsers();
-  }, [inspektorat, roles.join(',')]);
+  }, [inspektorat, roles.join(','), excludeIds.join(',')]);
 
   // Handle debounced search value changes
   useEffect(() => {
@@ -112,15 +119,21 @@ export const UserAssignmentCombobox: React.FC<UserAssignmentComboboxProps> = ({
             roles.includes(user.role)
           );
         }
+
+        // Exclude users that are already selected
+        filteredUsers = filteredUsers.filter(user => 
+          !excludeIds.includes(user.id)
+        );
         
         setAvailableUsers(filteredUsers);
       } catch (error) {
         console.error('Failed to search users:', error);
         // Fallback to local filtering if API search fails
         const localFiltered = allUsersRef.current.filter(user =>
-          user.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (user.nama.toLowerCase().includes(searchTerm.toLowerCase()) ||
           user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          user.jabatan.toLowerCase().includes(searchTerm.toLowerCase())
+          user.jabatan.toLowerCase().includes(searchTerm.toLowerCase())) &&
+          !excludeIds.includes(user.id)
         );
         setAvailableUsers(localFiltered);
       } finally {
@@ -131,10 +144,13 @@ export const UserAssignmentCombobox: React.FC<UserAssignmentComboboxProps> = ({
     if (debouncedSearchValue.trim()) {
       fetchSearchResults(debouncedSearchValue);
     } else {
-      // If search is cleared, show all cached users
-      setAvailableUsers(allUsersRef.current);
+      // If search is cleared, show all cached users (excluding already selected)
+      const filteredUsers = allUsersRef.current.filter(user => 
+        !excludeIds.includes(user.id)
+      );
+      setAvailableUsers(filteredUsers);
     }
-  }, [debouncedSearchValue, inspektorat, roles.join(',')]);
+  }, [debouncedSearchValue, inspektorat, roles.join(','), excludeIds.join(',')]);
 
   // Auto-fill pimpinan if this is for pimpinan role and only one pimpinan exists
   useEffect(() => {
