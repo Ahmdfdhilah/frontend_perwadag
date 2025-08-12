@@ -9,7 +9,7 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
-import { CalendarIcon, Clock } from 'lucide-react';
+import { Calendar1, CalendarIcon, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { cn } from '@workspace/ui/lib/utils';
@@ -65,10 +65,10 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
   const handleTimeChange = (newHours?: string, newMinutes?: string) => {
     const h = newHours ?? hours;
     const m = newMinutes ?? minutes;
-    
+
     setHours(h);
     setMinutes(m);
-    
+
     if (selectedDate) {
       const newDateTime = new Date(selectedDate);
       newDateTime.setHours(parseInt(h), parseInt(m), 0, 0);
@@ -117,13 +117,18 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
           )}
         </Button>
       </DialogTrigger>
-      <DialogContent 
-        className="[&>button]:hidden w-auto max-w-[90vw] max-h-[80vh] flex flex-col p-0 border-0 bg-popover shadow-md rounded-md"
+      <DialogContent
+        className="[&>button]:hidden w-[95vw] max-w-md max-h-[80vh] flex flex-col"
         onOpenAutoFocus={(e) => e.preventDefault()}
         onCloseAutoFocus={(e) => e.preventDefault()}
       >
         <div className="flex-1 overflow-y-auto p-3">
+          <div className="flex items-center space-x-2 mb-2">
+            <Calendar1 className="h-4 w-4" />
+            <Label className="text-sm font-medium">Tanggal</Label>
+          </div>
           <div className="flex justify-center w-full mb-4">
+
             <Calendar
               mode="single"
               selected={selectedDate}
@@ -132,22 +137,23 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
               initialFocus
               fixedWeeks={false}
               defaultMonth={selectedDate || new Date()}
+              className="w-fit"
               classNames={{
                 months: "flex flex-col space-y-4",
-                month: "space-y-4 w-full",
-                table: "w-full border-collapse space-y-1",
-                head_row: "flex w-full",
-                head_cell: "text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem] flex items-center justify-center",
-                row: "flex w-full mt-2",
-                cell: "text-center text-sm p-0 relative flex-1 h-9 flex items-center justify-center",
-                day: "h-9 w-full p-0 font-normal flex items-center justify-center",
+                month: "space-y-4 w-fit",
+                table: "w-fit border-collapse space-y-1",
+                head_row: "flex",
+                head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] flex items-center justify-center",
+                row: "flex w-fit mt-2",
+                cell: "text-center text-sm p-0 relative w-9 h-9",
+                day: "h-9 w-9 p-0 font-normal flex items-center justify-center",
               }}
             />
           </div>
           <div className="border-t pt-3">
             <div className="flex items-center space-x-2 mb-2">
               <Clock className="h-4 w-4" />
-              <Label className="text-sm font-medium">Waktu</Label>
+              <Label className="text-sm font-medium">Jam</Label>
             </div>
             <div className="flex items-center space-x-2 mb-3">
               <div className="flex-1">
@@ -176,21 +182,6 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
                 <Label className="text-xs text-muted-foreground mt-1 block text-center">Menit</Label>
               </div>
             </div>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                const now = new Date();
-                handleTimeChange(
-                  String(now.getHours()).padStart(2, '0'),
-                  String(now.getMinutes()).padStart(2, '0')
-                );
-              }}
-              disabled={disabled}
-              className="w-full text-xs h-7"
-            >
-              Gunakan Waktu Sekarang
-            </Button>
           </div>
         </div>
 
