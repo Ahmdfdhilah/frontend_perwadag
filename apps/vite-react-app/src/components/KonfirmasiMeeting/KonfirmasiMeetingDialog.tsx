@@ -10,11 +10,11 @@ import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { ExternalLink, Loader2 } from 'lucide-react';
-import DatePicker from '@/components/common/DatePicker';
+import DateTimePicker from '@/components/common/DateTimePicker';
 import { MeetingResponse } from '@/services/meeting/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useRole } from '@/hooks/useRole';
-import { formatIndonesianDateRange, formatDateForAPI } from '@/utils/timeFormat';
+import { formatIndonesianDateRange, formatDateTimeForAPI, formatMeetingDate } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { meetingService } from '@/services/meeting';
@@ -98,7 +98,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
       
       // Only include fields that the user can edit
       if (canEditAllFields) {
-        dataToSave.tanggal_meeting = selectedKonfirmasiDate ? formatDateForAPI(selectedKonfirmasiDate) : formData.tanggal_meeting;
+        dataToSave.tanggal_meeting = selectedKonfirmasiDate ? formatDateTimeForAPI(selectedKonfirmasiDate) : formData.tanggal_meeting;
         dataToSave.link_zoom = formData.link_zoom || '';
         dataToSave.link_daftar_hadir = formData.link_daftar_hadir || '';
       }
@@ -244,15 +244,15 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
             <div className="space-y-2">
               <Label>Tanggal Konfirmasi Meeting</Label>
               {canEditAllFields ? (
-                <DatePicker
+                <DateTimePicker
                   value={selectedKonfirmasiDate}
                   onChange={setSelectedKonfirmasiDate}
-                  placeholder="Pilih tanggal"
+                  placeholder="Pilih tanggal dan waktu"
                   disabled={isSaving}
                 />
               ) : (
                 <div className="p-3 bg-muted rounded-md">
-                  {item?.tanggal_meeting ? format(new Date(item.tanggal_meeting), "dd MMMM yyyy", { locale: id }) : '-'}
+                  {item?.tanggal_meeting ? formatMeetingDate(item.tanggal_meeting) : '-'}
                 </div>
               )}
             </div>

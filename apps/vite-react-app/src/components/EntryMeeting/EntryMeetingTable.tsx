@@ -10,7 +10,7 @@ import {
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import { MeetingResponse } from '@/services/meeting/types';
-import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
+import { formatIndonesianDateRange, formatMeetingDate } from '@/utils/timeFormat';
 
 interface EntryMeetingTableProps {
   data: MeetingResponse[];
@@ -90,7 +90,7 @@ const EntryMeetingTable: React.FC<EntryMeetingTableProps> = ({
                   <TableCell className="font-medium">{(currentPage - 1) * itemsPerPage + index + 1}</TableCell>
                   <TableCell>{item.nama_perwadag}</TableCell>
                   <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
-                  <TableCell>{item.tanggal_meeting ? formatIndonesianDate(item.tanggal_meeting) : '-'}</TableCell>
+                  <TableCell>{item.tanggal_meeting ? formatMeetingDate(item.tanggal_meeting) : '-'}</TableCell>
                   <TableCell>
                     {item.link_zoom ? (
                       <a

@@ -10,11 +10,11 @@ import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { ExternalLink, Loader2 } from 'lucide-react';
-import DatePicker from '@/components/common/DatePicker';
+import DateTimePicker from '@/components/common/DateTimePicker';
 import { MeetingResponse } from '@/services/meeting/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useRole } from '@/hooks/useRole';
-import { formatIndonesianDate, formatIndonesianDateRange, formatDateForAPI } from '@/utils/timeFormat';
+import { formatIndonesianDate, formatIndonesianDateRange, formatDateTimeForAPI, formatMeetingDate } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { meetingService } from '@/services/meeting';
@@ -96,7 +96,7 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
       
       // Only include fields that the user can edit
       if (canEditAllFields) {
-        dataToSave.tanggal_meeting = selectedExitDate ? formatDateForAPI(selectedExitDate) : formData.tanggal_meeting;
+        dataToSave.tanggal_meeting = selectedExitDate ? formatDateTimeForAPI(selectedExitDate) : formData.tanggal_meeting;
         dataToSave.link_zoom = formData.link_zoom || '';
         dataToSave.link_daftar_hadir = formData.link_daftar_hadir || '';
       }
@@ -240,15 +240,15 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
               <div className="space-y-2">
                 <Label>Tanggal Exit Meeting</Label>
                 {canEditAllFields ? (
-                  <DatePicker
+                  <DateTimePicker
                     value={selectedExitDate}
                     onChange={setSelectedExitDate}
-                    placeholder="Pilih tanggal"
+                    placeholder="Pilih tanggal dan waktu"
                     disabled={isSaving}
                   />
                 ) : (
                   <div className="p-3 bg-muted rounded-md">
-                    {item?.tanggal_meeting ? formatIndonesianDate(item.tanggal_meeting) : '-'}
+                    {item?.tanggal_meeting ? formatMeetingDate(item.tanggal_meeting) : '-'}
                   </div>
                 )}
               </div>

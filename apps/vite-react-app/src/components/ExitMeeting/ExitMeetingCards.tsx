@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/componen
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { MeetingResponse } from '@/services/meeting/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { formatIndonesianDateRange, formatIndonesianDate } from '@/utils/timeFormat';
+import { formatIndonesianDateRange, formatMeetingDate } from '@/utils/timeFormat';
 
 interface ExitMeetingCardsProps {
   data: MeetingResponse[];
@@ -125,7 +125,7 @@ const ExitMeetingCards: React.FC<ExitMeetingCardsProps> = ({
                 </div>
                 <div>
                   <span className="font-medium text-muted-foreground">Tanggal Exit Meeting:</span>
-                  <span className="ml-2">{item.tanggal_meeting ? formatIndonesianDate(item.tanggal_meeting) : '-'}</span>
+                  <span className="ml-2">{item.tanggal_meeting ? formatMeetingDate(item.tanggal_meeting) : '-'}</span>
                 </div>
                 <div>
                   <span className="font-medium text-muted-foreground">Link Zoom:</span>
