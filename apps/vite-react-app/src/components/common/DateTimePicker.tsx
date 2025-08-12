@@ -137,17 +137,6 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
               initialFocus
               fixedWeeks={false}
               defaultMonth={selectedDate || new Date()}
-              className="w-fit"
-              classNames={{
-                months: "flex flex-col space-y-4",
-                month: "space-y-4 w-fit",
-                table: "w-fit border-collapse space-y-1",
-                head_row: "flex",
-                head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] flex items-center justify-center",
-                row: "flex w-fit mt-2",
-                cell: "text-center text-sm p-0 relative w-9 h-9",
-                day: "h-9 w-9 p-0 font-normal flex items-center justify-center",
-              }}
             />
           </div>
           <div className="border-t pt-3">

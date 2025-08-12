@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
+import type { RootState } from '../store';
 import { authService } from '@/services/auth';
 import { userService } from '@/services/users';
 import { UserUpdate } from '@/services/users/types';
@@ -341,12 +342,12 @@ const authSlice = createSlice({
 
 export const { clearError, clearAuth, setUser, updateUser, extendSession } = authSlice.actions;
 
-export const selectAuth = (state: { auth: AuthState }) => state.auth;
-export const selectIsAuthenticated = (state: { auth: AuthState }) => state.auth.isAuthenticated;
-export const selectUser = (state: { auth: AuthState }) => state.auth.user;
-export const selectAuthLoading = (state: { auth: AuthState }) => state.auth.isLoading;
-export const selectAuthError = (state: { auth: AuthState }) => state.auth.error;
-export const selectSessionExpiry = (state: { auth: AuthState }) => state.auth.sessionExpiry;
+export const selectAuth = (state: RootState) => state.auth;
+export const selectIsAuthenticated = (state: RootState) => state.auth?.isAuthenticated || false;
+export const selectUser = (state: RootState) => state.auth?.user || null;
+export const selectAuthLoading = (state: RootState) => state.auth?.isLoading || false;
+export const selectAuthError = (state: RootState) => state.auth?.error || null;
+export const selectSessionExpiry = (state: RootState) => state.auth?.sessionExpiry || null;
 
 // Persist config for auth - persist user data, session expiry, and auth state
 const authPersistConfig = {
