@@ -122,7 +122,7 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
         sideOffset={4}
       >
         <div className="flex flex-col sm:flex-row">
-          <div className="p-2 sm:p-3">
+          <div className="p-2 sm:p-3 flex justify-center sm:justify-start">
             <Calendar
               mode="single"
               selected={selectedDate}
@@ -131,10 +131,16 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
               initialFocus
               fixedWeeks={false}
               defaultMonth={selectedDate || new Date()}
-              className="w-full"
+              className="w-fit sm:w-full"
               classNames={{
-                head_cell: "text-muted-foreground rounded-md w-8 sm:w-9 font-normal text-[0.8rem]",
-                day: "h-8 w-8 sm:h-9 sm:w-9 p-0 font-normal",
+                months: "flex flex-col space-y-4",
+                month: "space-y-4 w-fit",
+                table: "w-fit border-collapse space-y-1",
+                head_row: "flex",
+                head_cell: "text-muted-foreground rounded-md w-8 sm:w-9 font-normal text-[0.8rem] flex items-center justify-center",
+                row: "flex w-fit mt-2",
+                cell: "text-center text-sm p-0 relative w-8 sm:w-9 h-8 sm:h-9",
+                day: "h-8 w-8 sm:h-9 sm:w-9 p-0 font-normal flex items-center justify-center",
               }}
             />
           </div>
