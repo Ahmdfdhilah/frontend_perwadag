@@ -59,6 +59,8 @@ class SuratTugasService extends BaseService {
     } else {
       // Send as JSON without file
       const { file, ...createData } = data;
+      
+      
       return this.post("/", createData);
     }
   }
@@ -90,9 +92,59 @@ class SuratTugasService extends BaseService {
   // Update surat tugas
   async updateSuratTugas(
     suratTugasId: string,
-    data: SuratTugasUpdate
+    data: SuratTugasUpdate & { file?: File | null }
   ): Promise<SuratTugasResponse> {
-    return this.put(`/${suratTugasId}`, data);
+    // If file is provided, send as FormData
+    if (data.file) {
+      const formData = new FormData();
+      
+      // Add all the regular fields
+      if (data.tanggal_evaluasi_mulai) {
+        formData.append("tanggal_evaluasi_mulai", data.tanggal_evaluasi_mulai);
+      }
+      if (data.tanggal_evaluasi_selesai) {
+        formData.append("tanggal_evaluasi_selesai", data.tanggal_evaluasi_selesai);
+      }
+      if (data.no_surat) {
+        formData.append("no_surat", data.no_surat);
+      }
+      
+      // Add assignment fields if provided
+      if (data.pengedali_mutu_id) {
+        formData.append("pengedali_mutu_id", data.pengedali_mutu_id);
+      }
+      if (data.pengendali_teknis_id) {
+        formData.append("pengendali_teknis_id", data.pengendali_teknis_id);
+      }
+      if (data.ketua_tim_id) {
+        formData.append("ketua_tim_id", data.ketua_tim_id);
+      }
+      if (data.pimpinan_inspektorat_id) {
+        formData.append("pimpinan_inspektorat_id", data.pimpinan_inspektorat_id);
+      }
+      if (data.anggota_tim_ids && data.anggota_tim_ids.length > 0) {
+        data.anggota_tim_ids.forEach(id => {
+          formData.append("anggota_tim_ids", id);
+        });
+      }
+      
+      // Add the file
+      formData.append("file", data.file);
+      
+      return this.put(`/${suratTugasId}`, formData);
+    } else {
+      // Send as JSON without file
+      const { file, ...updateData } = data;
+      
+      // Filter out only undefined and null values, keep arrays as arrays
+      const cleanData = Object.entries(updateData).reduce((acc, [key, value]) => {
+        if (value !== undefined && value !== null) {
+          acc[key] = value;
+        }
+        return acc;
+      }, {} as any);
+      return this.put(`/${suratTugasId}`, cleanData);
+    }
   }
 
   // Upload file for surat tugas  

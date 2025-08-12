@@ -212,6 +212,12 @@ const SuratTugasPage: React.FC = () => {
           tanggal_evaluasi_mulai: data.tanggal_evaluasi_mulai !== undefined ? data.tanggal_evaluasi_mulai : undefined,
           tanggal_evaluasi_selesai: data.tanggal_evaluasi_selesai !== undefined ? data.tanggal_evaluasi_selesai : undefined,
           no_surat: data.no_surat !== undefined ? data.no_surat : undefined,
+          // Assignment fields
+          pengedali_mutu_id: data.pengedali_mutu_id !== undefined ? data.pengedali_mutu_id : undefined,
+          pengendali_teknis_id: data.pengendali_teknis_id !== undefined ? data.pengendali_teknis_id : undefined,
+          ketua_tim_id: data.ketua_tim_id !== undefined ? data.ketua_tim_id : undefined,
+          anggota_tim_ids: data.anggota_tim_ids !== undefined ? data.anggota_tim_ids : undefined,
+          pimpinan_inspektorat_id: data.pimpinan_inspektorat_id !== undefined ? data.pimpinan_inspektorat_id : undefined,
         };
 
         await suratTugasService.updateSuratTugas(selectedItem.id, updateData);
@@ -233,6 +239,12 @@ const SuratTugasPage: React.FC = () => {
           tanggal_evaluasi_mulai: data.tanggal_evaluasi_mulai,
           tanggal_evaluasi_selesai: data.tanggal_evaluasi_selesai,
           no_surat: data.no_surat,
+          // Assignment fields
+          pengedali_mutu_id: data.pengedali_mutu_id,
+          pengendali_teknis_id: data.pengendali_teknis_id,
+          ketua_tim_id: data.ketua_tim_id,
+          anggota_tim_ids: data.anggota_tim_ids,
+          pimpinan_inspektorat_id: data.pimpinan_inspektorat_id,
           file: data.file, // Include file in create request
         };
 

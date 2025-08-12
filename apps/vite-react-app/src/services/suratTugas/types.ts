@@ -150,7 +150,7 @@ export interface CompletionStat {
 export interface SuratTugasDashboardSummary {
   user_info: {
     nama: string;
-    role: "ADMIN" | "INSPEKTORAT" | "PIMPINAN" | "PERWADAG";
+    role: UserRole;
     inspektorat: string | null;
   };
   year_filter: number | null;
@@ -299,7 +299,7 @@ export interface DashboardSummaryData {
 
 export interface UserInfo {
   nama: string;
-  role: string;
+  role: UserRole;
   inspektorat?: string;
 }
 
