@@ -10,9 +10,8 @@ import {
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import FileViewLink from '@/components/common/FileViewLink';
-import { MatriksResponse, MatriksStatus } from '@/services/matriks/types';
+import { MatriksResponse } from '@/services/matriks/types';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
-import { Badge } from '@workspace/ui/components/badge';
 
 interface MatriksTableProps {
   data: MatriksResponse[];
@@ -38,34 +37,40 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
   itemsPerPage = 10,
 }) => {
 
-  // Get status badge variant
-  const getStatusVariant = (status?: MatriksStatus) => {
-    switch (status) {
-      case 'DRAFTING': return 'secondary';
-      case 'CHECKING': return 'outline';
-      case 'VALIDATING': return 'default';
-      case 'FINISHED': return 'default';
-      default: return 'secondary';
-    }
-  };
-
-  // Get status label
-  const getStatusLabel = (status?: MatriksStatus) => {
-    switch (status) {
-      case 'DRAFTING': return 'Draft';
-      case 'CHECKING': return 'Review Ketua Tim';
-      case 'VALIDATING': return 'Review Pengendali';
-      case 'FINISHED': return 'Selesai';
-      default: return 'Draft';
-    }
-  };
-
   const getStatusBadge = (matriks: MatriksResponse) => {
-    return (
-      <Badge variant={getStatusVariant(matriks.status)}>
-        {getStatusLabel(matriks.status)}
-      </Badge>
-    );
+    const status = matriks.status;
+    switch (status) {
+      case 'DRAFTING':
+        return (
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
+            Draft
+          </span>
+        );
+      case 'CHECKING':
+        return (
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+            Review Ketua Tim
+          </span>
+        );
+      case 'VALIDATING':
+        return (
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100">
+            Review Pengendali
+          </span>
+        );
+      case 'FINISHED':
+        return (
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+            Selesai
+          </span>
+        );
+      default:
+        return (
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
+            Draft
+          </span>
+        );
+    }
   };
 
   const renderDocumentLink = (matriks: MatriksResponse) => {

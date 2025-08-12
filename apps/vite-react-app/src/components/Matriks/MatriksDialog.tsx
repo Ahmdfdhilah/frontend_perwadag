@@ -66,6 +66,42 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [formData, setFormData] = useState({ kondisi: '', kriteria: '', rekomendasi: '' });
 
+  // Get status badge with background colors
+  const getStatusBadge = (status?: MatriksStatus) => {
+    switch (status) {
+      case 'DRAFTING':
+        return (
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
+            Draft
+          </span>
+        );
+      case 'CHECKING':
+        return (
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
+            Review Ketua Tim
+          </span>
+        );
+      case 'VALIDATING':
+        return (
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100">
+            Review Pengendali
+          </span>
+        );
+      case 'FINISHED':
+        return (
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
+            Selesai
+          </span>
+        );
+      default:
+        return (
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
+            Draft
+          </span>
+        );
+    }
+  };
+
   // Get next status and button label
   const getNextStatusAction = (currentStatus?: MatriksStatus) => {
     switch (currentStatus) {
@@ -468,72 +504,100 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                 description="Format yang didukung: PDF, DOC, DOCX, XLS, XLSX (Max 10MB)"
               />
             )}
+
+            {/* Status Action Buttons */}
+            {(canChangeStatus && (nextAction || (item?.status === 'CHECKING' || item?.status === 'VALIDATING'))) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Aksi</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Current Status Display */}
+                  <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-medium text-muted-foreground">Status saat ini:</span>
+                      {getStatusBadge(item?.status)}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap gap-2">
+                    {/* Rollback button - show for CHECKING and VALIDATING status */}
+                    {canChangeStatus && (item?.status === 'CHECKING' || item?.status === 'VALIDATING') && (
+                      <Button
+                        variant="destructive"
+                        onClick={handleRollback}
+                        disabled={isChangingStatus}
+                      >
+                        {isChangingStatus ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Mengembalikan...
+                          </>
+                        ) : (
+                          'Kembalikan ke Draft'
+                        )}
+                      </Button>
+                    )}
+
+                    {/* Status change button */}
+                    {canChangeStatus && nextAction && (
+                      <Button
+                        onClick={() => handleStatusChange(nextAction.next)}
+                        disabled={isChangingStatus || (temuanRekomendasi.length === 0)}
+                      >
+                        {isChangingStatus ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Memproses...
+                          </>
+                        ) : (
+                          nextAction.label
+                        )}
+                      </Button>
+                    )}
+                  </div>
+
+                  {/* Helper Text */}
+                  {canChangeStatus && nextAction && temuanRekomendasi.length === 0 && (
+                    <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                      <div className="w-4 h-4 rounded-full bg-amber-400 flex-shrink-0 mt-0.5"></div>
+                      <p className="text-sm text-amber-800">
+                        Tambahkan minimal satu temuan rekomendasi untuk melanjutkan ke tahap berikutnya.
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
-          <div className="flex flex-wrap gap-2 w-full">
+          <Button
+            variant="outline"
+            onClick={handleCancel}
+            disabled={isOperationInProgress}
+          >
+            {mode === 'view' ? 'Tutup' : 'Batal'}
+          </Button>
+
+          {/* Save button */}
+          {canEdit && onSave && mode === 'edit' && (
             <Button
-              variant="outline"
-              onClick={handleCancel}
-              disabled={isOperationInProgress}
+              onClick={handleSave}
+              disabled={isSaving || (temuanRekomendasi.length > 0 && Object.keys(validationErrors).length > 0)}
             >
-              {mode === 'view' ? 'Tutup' : 'Batal'}
+              {isSaving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Menyimpan...
+                </>
+              ) : (
+                'Simpan'
+              )}
             </Button>
-
-            {/* Rollback button - show for CHECKING and VALIDATING status */}
-            {canChangeStatus && (item?.status === 'CHECKING' || item?.status === 'VALIDATING') && (
-              <Button
-                variant="destructive"
-                onClick={handleRollback}
-                disabled={isChangingStatus}
-              >
-                {isChangingStatus ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Mengembalikan...
-                  </>
-                ) : (
-                  'Kembalikan ke Draft'
-                )}
-              </Button>
-            )}
-
-            {/* Save button */}
-            {canEdit && onSave && mode === 'edit' && (
-              <Button
-                onClick={handleSave}
-                disabled={isSaving || (temuanRekomendasi.length > 0 && Object.keys(validationErrors).length > 0)}
-              >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Menyimpan...
-                  </>
-                ) : (
-                  'Simpan'
-                )}
-              </Button>
-            )}
-
-            {/* Status change button */}
-            {canChangeStatus && nextAction && (
-              <Button
-                onClick={() => handleStatusChange(nextAction.next)}
-                disabled={isChangingStatus || (temuanRekomendasi.length === 0)}
-                className="ml-auto"
-              >
-                {isChangingStatus ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Memproses...
-                  </>
-                ) : (
-                  nextAction.label
-                )}
-              </Button>
-            )}
-          </div>
+          )}
         </DialogFooter>
       </DialogContent>
 
