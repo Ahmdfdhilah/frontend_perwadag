@@ -150,7 +150,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
         pengedali_mutu_id: formData.pengedali_mutu_id && formData.pengedali_mutu_id.trim() ? formData.pengedali_mutu_id : undefined,
         pengendali_teknis_id: formData.pengendali_teknis_id && formData.pengendali_teknis_id.trim() ? formData.pengendali_teknis_id : undefined,
         ketua_tim_id: formData.ketua_tim_id && formData.ketua_tim_id.trim() ? formData.ketua_tim_id : undefined,
-        anggota_tim_ids: formData.anggota_tim_ids && formData.anggota_tim_ids.length > 0 ? formData.anggota_tim_ids : undefined,
+        anggota_tim_ids: formData.anggota_tim_ids || [],
         pimpinan_inspektorat_id: formData.pimpinan_inspektorat_id && formData.pimpinan_inspektorat_id.trim() ? formData.pimpinan_inspektorat_id : undefined,
         file: uploadFiles.length > 0 ? uploadFiles[0] : null,
       };
