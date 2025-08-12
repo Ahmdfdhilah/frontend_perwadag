@@ -18,11 +18,18 @@ import {
   TableHeader,
   TableRow,
 } from '@workspace/ui/components/table';
-import { Loader2, ExternalLink } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@workspace/ui/components/dropdown-menu';
+import { Loader2, ExternalLink, MoreVertical, ArrowRight, RotateCcw } from 'lucide-react';
 import { MatriksResponse, TindakLanjutStatus } from '@/services/matriks/types';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import { matriksService } from '@/services/matriks';
 import { useToast } from '@workspace/ui/components/sonner';
+import ActionDropdown from '@/components/common/ActionDropdown';
 
 interface TindakLanjutMatriksDialogProps {
   open: boolean;
@@ -43,18 +50,18 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
 }) => {
   const { toast } = useToast();
   const isEditable = mode === 'edit';
-  
+
   // Loading states for different operations
   const [isSaving, setIsSaving] = useState(false);
   const [isChangingStatus, setIsChangingStatus] = useState(false);
-  
+
   // Form dialog states
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [formData, setFormData] = useState({ 
-    tindak_lanjut: '', 
-    dokumen_pendukung_tindak_lanjut: '', 
-    catatan_evaluator: '' 
+  const [formData, setFormData] = useState({
+    tindak_lanjut: '',
+    dokumen_pendukung_tindak_lanjut: '',
+    catatan_evaluator: ''
   });
 
   // Get status badge with background colors
@@ -105,7 +112,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
 
   // Check if user can edit tindak lanjut based on permissions
   const canEditTindakLanjut = item?.user_permissions?.can_edit_tindak_lanjut && item?.is_editable && isEditable;
-  
+
   // Check if user can change tindak lanjut status
   const canChangeTindakLanjutStatus = item?.user_permissions?.can_change_tindak_lanjut_status && item?.is_editable;
 
@@ -115,7 +122,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
       setFormData({ tindak_lanjut: '', dokumen_pendukung_tindak_lanjut: '', catatan_evaluator: '' });
       setFormDialogOpen(false);
     }
-    
+
     // Reset loading states when dialog opens/closes
     setIsSaving(false);
     setIsChangingStatus(false);
@@ -123,7 +130,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
 
   const handleEditTindakLanjut = (index: number) => {
     if (!item?.temuan_rekomendasi_summary?.data || isSaving) return;
-    
+
     const temuanItem = item.temuan_rekomendasi_summary.data[index];
     setEditingIndex(index);
     setFormData({
@@ -140,7 +147,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
     setIsSaving(true);
     try {
       const temuanItem = item.temuan_rekomendasi_summary.data[editingIndex];
-      
+
       if (temuanItem.id) {
         await matriksService.updateTindakLanjut(item.id, temuanItem.id, {
           tindak_lanjut: formData.tindak_lanjut,
@@ -151,7 +158,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
         setFormDialogOpen(false);
         setEditingIndex(null);
         setFormData({ tindak_lanjut: '', dokumen_pendukung_tindak_lanjut: '', catatan_evaluator: '' });
-        
+
         // Refresh parent data without closing main dialog
         if (onSave) {
           onSave({});
@@ -280,9 +287,9 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                                 </div>
                                 {tr.dokumen_pendukung_tindak_lanjut && (
                                   <div className="mt-1">
-                                    <a 
-                                      href={tr.dokumen_pendukung_tindak_lanjut} 
-                                      target="_blank" 
+                                    <a
+                                      href={tr.dokumen_pendukung_tindak_lanjut}
+                                      target="_blank"
                                       rel="noopener noreferrer"
                                       className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1"
                                     >
@@ -297,14 +304,12 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                               </TableCell>
                               {canEditTindakLanjut && (
                                 <TableCell>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => handleEditTindakLanjut(index)}
-                                    disabled={isOperationInProgress}
-                                  >
-                                    Edit
-                                  </Button>
+                                  <ActionDropdown
+                                    onEdit={() => handleEditTindakLanjut(index)}
+                                    showEdit={!isOperationInProgress}
+                                    showView={false}
+                                    showDelete={false}
+                                  />
                                 </TableCell>
                               )}
                             </TableRow>
@@ -343,29 +348,49 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                             <span className="font-medium text-sm">Temuan {index + 1}</span>
                             {getTindakLanjutStatusBadge(tr.status_tindak_lanjut)}
                           </div>
-                          
-                          <div className="flex gap-2">
-                            {/* Rollback button */}
-                            {(tr.status_tindak_lanjut === 'CHECKING' || tr.status_tindak_lanjut === 'VALIDATING') && (
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => handleRollback()}
-                                disabled={isChangingStatus}
-                              >
-                                {isChangingStatus ? 'Loading...' : 'Kembalikan ke Draft'}
-                              </Button>
-                            )}
-                            
-                            {/* Next status button */}
-                            {nextAction && (
-                              <Button
-                                size="sm"
-                                onClick={() => handleStatusChange(nextAction.next)}
-                                disabled={isChangingStatus}
-                              >
-                                {isChangingStatus ? 'Loading...' : nextAction.label}
-                              </Button>
+
+                          <div className="flex justify-end">
+                            {/* Status Actions Dropdown */}
+                            {(canChangeTindakLanjutStatus && (nextAction || (tr.status_tindak_lanjut === 'CHECKING' || tr.status_tindak_lanjut === 'VALIDATING'))) && (
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    className="h-8 w-8 p-0"
+                                    disabled={isChangingStatus}
+                                  >
+                                    {isChangingStatus ? (
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                      <MoreVertical className="h-4 w-4" />
+                                    )}
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end">
+                                  {/* Next status action */}
+                                  {nextAction && (
+                                    <DropdownMenuItem
+                                      onClick={() => handleStatusChange(nextAction.next)}
+                                      disabled={isChangingStatus}
+                                    >
+                                      <ArrowRight className="mr-2 h-4 w-4" />
+                                      {nextAction.label}
+                                    </DropdownMenuItem>
+                                  )}
+
+                                  {/* Rollback action */}
+                                  {(tr.status_tindak_lanjut === 'CHECKING' || tr.status_tindak_lanjut === 'VALIDATING') && (
+                                    <DropdownMenuItem
+                                      onClick={() => handleRollback()}
+                                      disabled={isChangingStatus}
+                                      className="text-destructive focus:text-destructive"
+                                    >
+                                      <RotateCcw className="mr-2 h-4 w-4" />
+                                      Kembalikan ke Draft
+                                    </DropdownMenuItem>
+                                  )}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             )}
                           </div>
                         </div>
@@ -391,13 +416,13 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
 
       {/* Form Input Dialog */}
       <Dialog open={formDialogOpen} onOpenChange={setFormDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
           <DialogHeader>
             <DialogTitle>
               Edit Tindak Lanjut {editingIndex !== null ? `Temuan ${editingIndex + 1}` : ''}
             </DialogTitle>
           </DialogHeader>
-          
+
           <div className="grid grid-cols-1 gap-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="form-tindak-lanjut">Tindak Lanjut</Label>
@@ -410,7 +435,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                 disabled={isSaving}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="form-dokumen">Dokumen Pendukung (URL)</Label>
               <Textarea
@@ -422,7 +447,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                 disabled={isSaving}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="form-catatan">Catatan Evaluator</Label>
               <Textarea
@@ -435,7 +460,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
               />
             </div>
           </div>
-          
+
           <DialogFooter>
             <Button
               variant="outline"
