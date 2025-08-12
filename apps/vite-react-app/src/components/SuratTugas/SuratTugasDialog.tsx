@@ -62,7 +62,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   // Loading states for different operations
   const [isSaving, setIsSaving] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [selectedPerwadagInspektorat] = useState<string>(''); // Currently not used, but kept for future enhancement
+  const [selectedPerwadagInspektorat, setSelectedPerwadagInspektorat] = useState<string>(''); // Track inspektorat from selected perwadag
 
   useEffect(() => {
     if (editingItem) {
@@ -94,6 +94,11 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       // Reset file to delete when opening dialog
       setFileToDelete(null);
       setDeleteConfirmOpen(false);
+      
+      // Set inspektorat for assignment fields
+      if (editingItem.inspektorat) {
+        setSelectedPerwadagInspektorat(editingItem.inspektorat);
+      }
     } else {
       setFormData({
         no_surat: '',
@@ -110,6 +115,9 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       setExistingFiles([]);
       setFileToDelete(null);
       setDeleteConfirmOpen(false);
+      
+      // Reset inspektorat for create mode
+      setSelectedPerwadagInspektorat('');
     }
     
     
@@ -285,9 +293,12 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
               ) : (
                 <PerwadagCombobox
                   value={formData.user_perwadag_id}
-                  onChange={(value) => {
+                  onChange={(value, selectedItem) => {
                     setFormData(prev => ({ ...prev, user_perwadag_id: value }));
-                    // TODO: Get inspektorat from selected perwadag - for now, assignment will be based on editingItem inspektorat
+                    // Get inspektorat from selected perwadag
+                    if (selectedItem && selectedItem.inspektorat) {
+                      setSelectedPerwadagInspektorat(selectedItem.inspektorat);
+                    }
                   }}
                   includeAllOption={false}
                 />
@@ -337,7 +348,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                     onChange={(value) => setFormData(prev => ({ ...prev, pengedali_mutu_id: value as string }))}
                     placeholder="Pilih pengedali mutu"
                     inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
-                    disabled={!canEdit || isSaving}
+                    disabled={!canEdit || isSaving || (mode === 'create' && !selectedPerwadagInspektorat)}
                   />
                 </div>
 
@@ -348,7 +359,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                     onChange={(value) => setFormData(prev => ({ ...prev, pengendali_teknis_id: value as string }))}
                     placeholder="Pilih pengendali teknis"
                     inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
-                    disabled={!canEdit || isSaving}
+                    disabled={!canEdit || isSaving || (mode === 'create' && !selectedPerwadagInspektorat)}
                   />
                 </div>
 
@@ -359,7 +370,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                     onChange={(value) => setFormData(prev => ({ ...prev, ketua_tim_id: value as string }))}
                     placeholder="Pilih ketua tim"
                     inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
-                    disabled={!canEdit || isSaving}
+                    disabled={!canEdit || isSaving || (mode === 'create' && !selectedPerwadagInspektorat)}
                   />
                 </div>
 
@@ -370,7 +381,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                     onChange={(value) => setFormData(prev => ({ ...prev, anggota_tim_ids: value }))}
                     placeholder="Pilih anggota tim"
                     inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
-                    disabled={!canEdit || isSaving}
+                    disabled={!canEdit || isSaving || (mode === 'create' && !selectedPerwadagInspektorat)}
                   />
                 </div>
 

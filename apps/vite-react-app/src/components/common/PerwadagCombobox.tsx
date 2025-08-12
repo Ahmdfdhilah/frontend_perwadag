@@ -6,7 +6,7 @@ import { PerwadagSummary, PerwadagSearchParams } from '@/services/users/types';
 
 interface PerwadagComboboxProps {
   value: string;
-  onChange: (value: string) => void;
+  onChange: (value: string, selectedItem?: PerwadagSummary) => void;
   placeholder?: string;
   includeAllOption?: boolean;
   allOptionLabel?: string;
@@ -78,7 +78,10 @@ export const PerwadagCombobox: React.FC<PerwadagComboboxProps> = ({
     <Combobox
       options={options}
       value={value}
-      onChange={(selectedValue) => onChange(selectedValue.toString())}
+      onChange={(selectedValue) => {
+        const selectedItem = availablePerwadag.find(p => p.id === selectedValue.toString());
+        onChange(selectedValue.toString(), selectedItem);
+      }}
       placeholder={placeholder}
       searchPlaceholder="Cari perwadag..."
       searchValue={perwadagSearchValue}
