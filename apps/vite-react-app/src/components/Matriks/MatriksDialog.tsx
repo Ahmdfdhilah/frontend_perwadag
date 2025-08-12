@@ -578,8 +578,6 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                       </Button>
                     )}
                   </div>
-
-
                 </CardContent>
               </Card>
             )}
@@ -630,7 +628,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
 
       {/* Form Input Dialog */}
       <Dialog open={formDialogOpen} onOpenChange={setFormDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="w-[45vw] h-[90vh] !max-w-none !max-h-none flex flex-col">
           <DialogHeader>
             <DialogTitle>
               {editingIndex !== null ? `Edit Temuan ${editingIndex + 1}` : 'Tambah Temuan Rekomendasi'}

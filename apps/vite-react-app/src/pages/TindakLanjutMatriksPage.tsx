@@ -148,15 +148,12 @@ const TindakLanjutMatriksPage: React.FC = () => {
     if (!selectedItem) return;
 
     try {
-      setIsDialogOpen(false);
-      setSelectedItem(null);
-      fetchTindakLanjutMatriks(); // Refresh the list
-
-      toast({
-        title: 'Berhasil diperbarui',
-        description: `Data tindak lanjut ${selectedItem.nama_perwadag} telah diperbarui.`,
-        variant: 'default'
-      });
+      // Refresh data and update selected item
+      await fetchTindakLanjutMatriks();
+      
+      // Update the selected item with fresh data from backend
+      const updatedItem = await matriksService.getMatriksById(selectedItem.id);
+      setSelectedItem(updatedItem);
     } catch (error) {
       console.error('Failed to save tindak lanjut:', error);
     }
@@ -168,7 +165,12 @@ const TindakLanjutMatriksPage: React.FC = () => {
     try {
       await matriksService.updateTindakLanjutStatus(selectedItem.id, itemId, { status: newStatus });
       
-      fetchTindakLanjutMatriks(); // Refresh the list
+      // Refresh data and update selected item
+      await fetchTindakLanjutMatriks();
+      
+      // Update the selected item with fresh data from backend
+      const updatedItem = await matriksService.getMatriksById(selectedItem.id);
+      setSelectedItem(updatedItem);
 
       const statusLabels = {
         'DRAFTING': 'Draft TL',

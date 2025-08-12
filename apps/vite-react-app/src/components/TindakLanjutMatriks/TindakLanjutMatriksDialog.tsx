@@ -152,7 +152,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
         setEditingIndex(null);
         setFormData({ tindak_lanjut: '', dokumen_pendukung_tindak_lanjut: '', catatan_evaluator: '' });
         
-        // Refresh parent data
+        // Refresh parent data without closing main dialog
         if (onSave) {
           onSave({});
         }
