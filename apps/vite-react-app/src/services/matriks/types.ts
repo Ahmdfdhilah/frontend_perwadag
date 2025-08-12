@@ -99,7 +99,7 @@ export interface TindakLanjutUpdate {
 }
 
 export interface TindakLanjutStatusUpdate {
-  status_tindak_lanjut: TindakLanjutStatus;
+  status: TindakLanjutStatus;
 }
 
 // Temuan Rekomendasi Response Types
@@ -130,6 +130,7 @@ export interface MatriksResponse {
   status?: MatriksStatus;
   is_editable?: boolean;
   user_permissions?: UserPermissions;
+  user_perwadag_id?: string;
   created_at: string;
   updated_at?: string;
   created_by?: string;
@@ -159,6 +160,7 @@ export interface MatriksFilterParams {
   has_file?: boolean;
   is_completed?: boolean;
   tahun_evaluasi?: number;
+  status?: MatriksStatus;
 }
 
 // Message Response

@@ -9,6 +9,7 @@ export type FormType =
   | 'surat_pemberitahuan'
   | 'kuesioner'
   | 'matriks'
+  | 'tindak_lanjut_matriks'
   | 'laporan_hasil_evaluasi'
   | 'risk_assessment'
   | 'questionnaire_template'
@@ -92,6 +93,14 @@ export const useFormPermissions = () => {
         inspektorat: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
         pimpinan: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
         perwadag: { canView: true, canEdit: false, canCreate: false, canDelete: false, excludeReadonlyFields: false },
+      },
+      
+      // Tindak Lanjut Matriks: Admin (RU), Inspektorat (RU), Pimpinan (RU), Perwadag (RU)
+      tindak_lanjut_matriks: {
+        admin: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        inspektorat: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        pimpinan: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
+        perwadag: { canView: true, canEdit: true, canCreate: false, canDelete: false, excludeReadonlyFields: true },
       },
       
       // Laporan Hasil: Admin (RU), Inspektorat (RU), Pimpinan (RU), Perwadag (R)

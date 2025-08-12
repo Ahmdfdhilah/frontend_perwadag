@@ -18,6 +18,7 @@ import ExitMeetingPage from './pages/ExitMeetingPage';
 import LaporanHasilEvaluasiPage from './pages/LaporanHasilEvaluasiPage';
 import KuesionerPage from './pages/KuesionerPage';
 import MatriksPage from './pages/MatriksPage';
+import TindakLanjutMatriksPage from './pages/TindakLanjutMatriksPage';
 import QuestionnaireTemplatePage from './pages/FormatKuisionerPage';
 import KonfirmasiMeetingPage from './pages/KonfirmasiMeetingPage';
 import EmailTemplatesPage from './pages/EmailTemplatesPage';
@@ -113,6 +114,11 @@ function App() {
                     <Route path="matriks" element={
                       <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG']}>
                         <MatriksPage />
+                      </RoleProtectedRoute>
+                    } />
+                    <Route path="tindak-lanjut-matriks" element={
+                      <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG']}>
+                        <TindakLanjutMatriksPage />
                       </RoleProtectedRoute>
                     } />
                     <Route path="entry-meeting" element={

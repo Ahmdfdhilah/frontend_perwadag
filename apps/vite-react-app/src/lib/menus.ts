@@ -1,4 +1,4 @@
-import { AlertTriangle, FileInput, Grid2X2, Mail, MailWarningIcon, PhoneIncoming, PhoneOutgoing, Users, ClipboardList, ClipboardCopyIcon, CheckSquare, BarChart3 } from "lucide-react";
+import { AlertTriangle, FileInput, Grid2X2, Mail, MailWarningIcon, PhoneIncoming, PhoneOutgoing, Users, ClipboardList, ClipboardCopyIcon, CheckSquare, BarChart3, ListTodo } from "lucide-react";
 
 // Role definitions - UPPERCASE to match backend
 export type UserRole =
@@ -76,6 +76,14 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Matriks',
     href: '/matriks',
     icon: Grid2X2,
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG'],
+  },
+
+  // Tindak Lanjut Matriks - All roles
+  {
+    title: 'Tindak Lanjut Matriks',
+    href: '/tindak-lanjut-matriks',
+    icon: ListTodo,
     allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG'],
   },
 
