@@ -191,9 +191,9 @@ const TindakLanjutMatriksPage: React.FC = () => {
     }
   };
 
-  // Check if user can edit this item using is_editable field from backend
+  // Check if user can edit tindak lanjut content
   const canEdit = (item: MatriksResponse) => {
-    return item.is_editable;
+    return item.user_permissions?.can_edit_tindak_lanjut && item.is_editable;
   };
   
   // Filter handlers
