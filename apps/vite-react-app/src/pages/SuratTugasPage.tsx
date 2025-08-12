@@ -217,7 +217,6 @@ const SuratTugasPage: React.FC = () => {
           pengendali_teknis_id: data.pengendali_teknis_id !== undefined ? data.pengendali_teknis_id : undefined,
           ketua_tim_id: data.ketua_tim_id !== undefined ? data.ketua_tim_id : undefined,
           anggota_tim_ids: data.anggota_tim_ids !== undefined ? data.anggota_tim_ids : undefined,
-          pimpinan_inspektorat_id: data.pimpinan_inspektorat_id !== undefined ? data.pimpinan_inspektorat_id : undefined,
         };
 
         await suratTugasService.updateSuratTugas(selectedItem.id, updateData);
@@ -244,7 +243,6 @@ const SuratTugasPage: React.FC = () => {
           pengendali_teknis_id: data.pengendali_teknis_id,
           ketua_tim_id: data.ketua_tim_id,
           anggota_tim_ids: data.anggota_tim_ids,
-          pimpinan_inspektorat_id: data.pimpinan_inspektorat_id,
           file: data.file, // Include file in create request
         };
 

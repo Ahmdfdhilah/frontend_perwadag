@@ -303,7 +303,6 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                         pengendali_teknis_id: '',
                         ketua_tim_id: '',
                         anggota_tim_ids: [],
-                        pimpinan_inspektorat_id: '',
                       }));
                     } else {
                       setFormData(prev => ({ ...prev, user_perwadag_id: value }));
@@ -348,73 +347,64 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
               </div>
             </div>
 
-            {/* Assignment Section */}
-            <div className="space-y-4 border-t pt-4">
-              <div className="space-y-2">
-                <Label className="text-base font-semibold">Tim Evaluasi (Opsional)</Label>
-                <div className="text-sm text-muted-foreground">
-                  Pilih anggota tim evaluasi untuk surat tugas ini.
+            {/* Assignment Section - Only show in edit/create mode */}
+            {mode !== 'view' && (
+              <div className="space-y-4 border-t pt-4">
+                <div className="space-y-2">
+                  <Label className="text-base font-semibold">Tim Evaluasi (Opsional)</Label>
+                  <div className="text-sm text-muted-foreground">
+                    Pilih anggota tim evaluasi untuk surat tugas ini.
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  <div className="space-y-2">
+                    <Label>Pengedali Mutu</Label>
+                    <UserAssignmentCombobox
+                      value={formData.pengedali_mutu_id}
+                      onChange={(value) => setFormData(prev => ({ ...prev, pengedali_mutu_id: value as string }))}
+                      placeholder="Pilih pengedali mutu"
+                      inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
+                      disabled={!canEdit || isSaving || (mode === 'create' && !selectedPerwadagInspektorat)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Pengendali Teknis</Label>
+                    <UserAssignmentCombobox
+                      value={formData.pengendali_teknis_id}
+                      onChange={(value) => setFormData(prev => ({ ...prev, pengendali_teknis_id: value as string }))}
+                      placeholder="Pilih pengendali teknis"
+                      inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
+                      disabled={!canEdit || isSaving || (mode === 'create' && !selectedPerwadagInspektorat)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Ketua Tim</Label>
+                    <UserAssignmentCombobox
+                      value={formData.ketua_tim_id}
+                      onChange={(value) => setFormData(prev => ({ ...prev, ketua_tim_id: value as string }))}
+                      placeholder="Pilih ketua tim"
+                      inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
+                      disabled={!canEdit || isSaving || (mode === 'create' && !selectedPerwadagInspektorat)}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Anggota Tim</Label>
+                    <MultiUserAssignmentCombobox
+                      value={formData.anggota_tim_ids}
+                      onChange={(value) => setFormData(prev => ({ ...prev, anggota_tim_ids: value }))}
+                      placeholder="Pilih anggota tim"
+                      inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
+                      disabled={!canEdit || isSaving || (mode === 'create' && !selectedPerwadagInspektorat)}
+                    />
+                  </div>
+
                 </div>
               </div>
-
-              <div className="grid grid-cols-1 gap-4">
-                <div className="space-y-2">
-                  <Label>Pengedali Mutu</Label>
-                  <UserAssignmentCombobox
-                    value={formData.pengedali_mutu_id}
-                    onChange={(value) => setFormData(prev => ({ ...prev, pengedali_mutu_id: value as string }))}
-                    placeholder="Pilih pengedali mutu"
-                    inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
-                    disabled={!canEdit || isSaving || (mode === 'create' && !selectedPerwadagInspektorat)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Pengendali Teknis</Label>
-                  <UserAssignmentCombobox
-                    value={formData.pengendali_teknis_id}
-                    onChange={(value) => setFormData(prev => ({ ...prev, pengendali_teknis_id: value as string }))}
-                    placeholder="Pilih pengendali teknis"
-                    inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
-                    disabled={!canEdit || isSaving || (mode === 'create' && !selectedPerwadagInspektorat)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Ketua Tim</Label>
-                  <UserAssignmentCombobox
-                    value={formData.ketua_tim_id}
-                    onChange={(value) => setFormData(prev => ({ ...prev, ketua_tim_id: value as string }))}
-                    placeholder="Pilih ketua tim"
-                    inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
-                    disabled={!canEdit || isSaving || (mode === 'create' && !selectedPerwadagInspektorat)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Anggota Tim</Label>
-                  <MultiUserAssignmentCombobox
-                    value={formData.anggota_tim_ids}
-                    onChange={(value) => setFormData(prev => ({ ...prev, anggota_tim_ids: value }))}
-                    placeholder="Pilih anggota tim"
-                    inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
-                    disabled={!canEdit || isSaving || (mode === 'create' && !selectedPerwadagInspektorat)}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Pimpinan Inspektorat</Label>
-                  <UserAssignmentCombobox
-                    value={formData.pimpinan_inspektorat_id}
-                    onChange={(value) => setFormData(prev => ({ ...prev, pimpinan_inspektorat_id: value as string }))}
-                    placeholder="Pilih pimpinan inspektorat"
-                    inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
-                    roles={['PIMPINAN']}
-                    disabled={!canEdit || isSaving || (mode === 'create' && !selectedPerwadagInspektorat)}
-                  />
-                </div>
-              </div>
-            </div>
+            )}
 
             <div className="space-y-2">
               <Label>Informasi Upload Surat Tugas</Label>

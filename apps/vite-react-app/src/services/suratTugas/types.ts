@@ -89,7 +89,6 @@ export interface SuratTugasCreate {
   pengendali_teknis_id?: string;
   ketua_tim_id?: string;
   anggota_tim_ids?: string[];
-  pimpinan_inspektorat_id?: string;
 }
 
 export interface SuratTugasUpdate {
@@ -100,7 +99,6 @@ export interface SuratTugasUpdate {
   pengendali_teknis_id?: string;
   ketua_tim_id?: string;
   anggota_tim_ids?: string[];
-  pimpinan_inspektorat_id?: string;
 }
 
 // Response Types

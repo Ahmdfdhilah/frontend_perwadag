@@ -43,9 +43,6 @@ class SuratTugasService extends BaseService {
       if (data.ketua_tim_id) {
         formData.append("ketua_tim_id", data.ketua_tim_id);
       }
-      if (data.pimpinan_inspektorat_id) {
-        formData.append("pimpinan_inspektorat_id", data.pimpinan_inspektorat_id);
-      }
       if (data.anggota_tim_ids && data.anggota_tim_ids.length > 0) {
         data.anggota_tim_ids.forEach(id => {
           formData.append("anggota_tim_ids", id);
@@ -118,9 +115,6 @@ class SuratTugasService extends BaseService {
       }
       if (data.ketua_tim_id) {
         formData.append("ketua_tim_id", data.ketua_tim_id);
-      }
-      if (data.pimpinan_inspektorat_id) {
-        formData.append("pimpinan_inspektorat_id", data.pimpinan_inspektorat_id);
       }
       if (data.anggota_tim_ids && data.anggota_tim_ids.length > 0) {
         data.anggota_tim_ids.forEach(id => {
