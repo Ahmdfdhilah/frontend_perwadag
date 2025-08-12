@@ -173,7 +173,7 @@ export const UserAssignmentCombobox: React.FC<UserAssignmentComboboxProps> = ({
     ...availableUsers.map(user => ({
       value: user.id,
       label: user.nama,
-      description: `${user.jabatan} - ${user.role_display}`
+      description: user.inspektorat
     }))
   ];
 

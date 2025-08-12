@@ -294,10 +294,27 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                 <PerwadagCombobox
                   value={formData.user_perwadag_id}
                   onChange={(value, selectedItem) => {
-                    setFormData(prev => ({ ...prev, user_perwadag_id: value }));
+                    // Clear all assignment fields when perwadag changes in create mode
+                    if (mode === 'create') {
+                      setFormData(prev => ({
+                        ...prev,
+                        user_perwadag_id: value,
+                        pengedali_mutu_id: '',
+                        pengendali_teknis_id: '',
+                        ketua_tim_id: '',
+                        anggota_tim_ids: [],
+                        pimpinan_inspektorat_id: '',
+                      }));
+                    } else {
+                      setFormData(prev => ({ ...prev, user_perwadag_id: value }));
+                    }
+                    
                     // Get inspektorat from selected perwadag
                     if (selectedItem && selectedItem.inspektorat) {
                       setSelectedPerwadagInspektorat(selectedItem.inspektorat);
+                    } else {
+                      // Clear inspektorat if no perwadag selected
+                      setSelectedPerwadagInspektorat('');
                     }
                   }}
                   includeAllOption={false}
@@ -393,7 +410,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
                     placeholder="Pilih pimpinan inspektorat"
                     inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
                     roles={['PIMPINAN']}
-                    disabled={!canEdit || isSaving}
+                    disabled={!canEdit || isSaving || (mode === 'create' && !selectedPerwadagInspektorat)}
                   />
                 </div>
               </div>

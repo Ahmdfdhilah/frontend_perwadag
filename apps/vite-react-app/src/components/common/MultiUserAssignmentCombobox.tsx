@@ -97,7 +97,7 @@ export const MultiUserAssignmentCombobox: React.FC<MultiUserAssignmentComboboxPr
               className="flex items-center gap-1 pr-1"
             >
               <span className="text-xs">
-                {user.nama} - {user.role_display}
+                {user.nama} - {user.inspektorat}
               </span>
               {!disabled && (
                 <button
