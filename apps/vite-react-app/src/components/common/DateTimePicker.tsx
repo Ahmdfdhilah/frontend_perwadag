@@ -1,10 +1,10 @@
 import React from 'react';
 import { Calendar } from '@workspace/ui/components/calendar';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@workspace/ui/components/popover';
+  Dialog,
+  DialogContent,
+  DialogTrigger,
+} from '@workspace/ui/components/dialog';
 import { Button } from '@workspace/ui/components/button';
 import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
@@ -46,6 +46,8 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
       setMinutes(String(value.getMinutes()).padStart(2, '0'));
     }
   }, [value]);
+
+
 
   const handleDateSelect = (date: Date | undefined) => {
     setSelectedDate(date);
@@ -95,8 +97,8 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
   };
 
   return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
         <Button
           variant="outline"
           className={cn(
@@ -113,16 +115,14 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
             <span>{placeholder}</span>
           )}
         </Button>
-      </PopoverTrigger>
-      <PopoverContent 
-        className="w-auto max-w-[90vw] p-0" 
-        align="start"
-        side="bottom"
-        avoidCollisions={true}
-        sideOffset={4}
+      </DialogTrigger>
+      <DialogContent 
+        className="w-fit max-w-[90vw] p-0 border-0 bg-popover shadow-md rounded-md"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        onCloseAutoFocus={(e) => e.preventDefault()}
       >
-        <div className="flex flex-col sm:flex-row">
-          <div className="p-2 sm:p-3 flex justify-center sm:justify-start">
+        <div className="flex flex-col w-fit">
+          <div className="p-3 flex justify-center w-fit">
             <Calendar
               mode="single"
               selected={selectedDate}
@@ -131,20 +131,20 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
               initialFocus
               fixedWeeks={false}
               defaultMonth={selectedDate || new Date()}
-              className="w-fit sm:w-full"
+              className="w-fit"
               classNames={{
                 months: "flex flex-col space-y-4",
                 month: "space-y-4 w-fit",
                 table: "w-fit border-collapse space-y-1",
                 head_row: "flex",
-                head_cell: "text-muted-foreground rounded-md w-8 sm:w-9 font-normal text-[0.8rem] flex items-center justify-center",
+                head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] flex items-center justify-center",
                 row: "flex w-fit mt-2",
-                cell: "text-center text-sm p-0 relative w-8 sm:w-9 h-8 sm:h-9",
-                day: "h-8 w-8 sm:h-9 sm:w-9 p-0 font-normal flex items-center justify-center",
+                cell: "text-center text-sm p-0 relative w-9 h-9",
+                day: "h-9 w-9 p-0 font-normal flex items-center justify-center",
               }}
             />
           </div>
-          <div className="border-t sm:border-t-0 sm:border-l p-2 sm:p-3 flex flex-col justify-center">
+          <div className="border-t p-3 flex flex-col justify-center">
             <div className="flex items-center space-x-2 mb-2">
               <Clock className="h-4 w-4" />
               <Label className="text-sm font-medium">Waktu</Label>
@@ -193,8 +193,8 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
             </Button>
           </div>
         </div>
-      </PopoverContent>
-    </Popover>
+      </DialogContent>
+    </Dialog>
   );
 };
 

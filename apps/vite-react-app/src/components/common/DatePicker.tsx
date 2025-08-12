@@ -71,7 +71,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
         align="start"
         side="bottom"
         avoidCollisions={false}
-        sideOffset={4}
+        sideOffset={6}
       >
         <Calendar
           mode="single"
