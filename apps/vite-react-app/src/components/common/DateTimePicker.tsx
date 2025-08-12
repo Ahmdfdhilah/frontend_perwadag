@@ -3,6 +3,7 @@ import { Calendar } from '@workspace/ui/components/calendar';
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogTrigger,
 } from '@workspace/ui/components/dialog';
 import { Button } from '@workspace/ui/components/button';
@@ -117,12 +118,12 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
         </Button>
       </DialogTrigger>
       <DialogContent 
-        className="[&>button]:hidden w-auto max-w-[90vw] p-0 border-0 bg-popover shadow-md rounded-md"
+        className="[&>button]:hidden w-auto max-w-[90vw] max-h-[80vh] flex flex-col p-0 border-0 bg-popover shadow-md rounded-md"
         onOpenAutoFocus={(e) => e.preventDefault()}
         onCloseAutoFocus={(e) => e.preventDefault()}
       >
-        <div className="flex flex-col w-full">
-          <div className="p-2 flex justify-center w-full">
+        <div className="flex-1 overflow-y-auto p-3">
+          <div className="flex justify-center w-full mb-4">
             <Calendar
               mode="single"
               selected={selectedDate}
@@ -143,12 +144,12 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
               }}
             />
           </div>
-          <div className="border-t p-3 flex flex-col justify-center">
+          <div className="border-t pt-3">
             <div className="flex items-center space-x-2 mb-2">
               <Clock className="h-4 w-4" />
               <Label className="text-sm font-medium">Waktu</Label>
             </div>
-            <div className="flex items-center space-x-2 mb-2">
+            <div className="flex items-center space-x-2 mb-3">
               <div className="flex-1">
                 <Input
                   type="text"
@@ -188,10 +189,38 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
               disabled={disabled}
               className="w-full text-xs h-7"
             >
-              Sekarang
+              Gunakan Waktu Sekarang
             </Button>
           </div>
         </div>
+
+        <DialogFooter className="flex-shrink-0 border-t p-3">
+          <div className="grid grid-cols-2 gap-2 w-full">
+            <Button
+              variant="outline"
+              onClick={() => setIsOpen(false)}
+              disabled={disabled}
+              className="text-sm"
+            >
+              Batal
+            </Button>
+            <Button
+              variant="default"
+              onClick={() => {
+                if (selectedDate) {
+                  const finalDateTime = new Date(selectedDate);
+                  finalDateTime.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+                  onChange(finalDateTime);
+                }
+                setIsOpen(false);
+              }}
+              disabled={disabled || !selectedDate}
+              className="text-sm"
+            >
+              Simpan
+            </Button>
+          </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
