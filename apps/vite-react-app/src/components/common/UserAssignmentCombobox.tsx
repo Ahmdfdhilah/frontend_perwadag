@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useDebounce } from '@/hooks/useDebounce';
 import { Combobox } from '@workspace/ui/components/combobox';
 import { userService } from '@/services/users';
@@ -38,6 +38,10 @@ export const UserAssignmentCombobox: React.FC<UserAssignmentComboboxProps> = ({
   
   // Debounced search value
   const debouncedSearchValue = useDebounce(userSearchValue, 500);
+
+  // Memoize dependency strings to prevent infinite re-renders
+  const rolesString = useMemo(() => roles.join(','), [roles]);
+  const excludeIdsString = useMemo(() => excludeIds.join(','), [excludeIds]);
 
   // Fetch users when inspektorat or roles change (initial load)
   useEffect(() => {
@@ -89,7 +93,7 @@ export const UserAssignmentCombobox: React.FC<UserAssignmentComboboxProps> = ({
     };
 
     fetchInitialUsers();
-  }, [inspektorat, roles.join(','), excludeIds.join(',')]);
+  }, [inspektorat, rolesString, excludeIdsString]);
 
   // Handle debounced search value changes
   useEffect(() => {
@@ -150,7 +154,7 @@ export const UserAssignmentCombobox: React.FC<UserAssignmentComboboxProps> = ({
       );
       setAvailableUsers(filteredUsers);
     }
-  }, [debouncedSearchValue, inspektorat, roles.join(','), excludeIds.join(',')]);
+  }, [debouncedSearchValue, inspektorat, rolesString, excludeIdsString]);
 
   // Auto-fill pimpinan if this is for pimpinan role and only one pimpinan exists
   useEffect(() => {
@@ -161,7 +165,7 @@ export const UserAssignmentCombobox: React.FC<UserAssignmentComboboxProps> = ({
       // Auto-select the only pimpinan available
       onChange(allUsers[0].id);
     }
-  }, [allUsers, value, roles, onChange, userSearchValue]);
+  }, [allUsers, value, rolesString, onChange, userSearchValue]);
 
   // Prepare options (no client-side filtering since we do it in API/debounced search)
   const options = [

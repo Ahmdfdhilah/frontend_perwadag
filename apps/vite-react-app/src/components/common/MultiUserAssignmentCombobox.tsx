@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { userService } from '@/services/users';
 import { UserSummary } from '@/services/users/types';
 import { X } from 'lucide-react';
@@ -25,6 +25,10 @@ export const MultiUserAssignmentCombobox: React.FC<MultiUserAssignmentComboboxPr
   disabled = false
 }) => {
   const [selectedUsers, setSelectedUsers] = useState<UserSummary[]>([]);
+
+  // Memoize dependency strings to prevent infinite re-renders
+  const rolesString = useMemo(() => roles?.join(',') || '', [roles]);
+  const valueString = useMemo(() => value.join(','), [value]);
 
   // Fetch user details for selected IDs
   useEffect(() => {
@@ -66,20 +70,20 @@ export const MultiUserAssignmentCombobox: React.FC<MultiUserAssignmentComboboxPr
     };
 
     fetchSelectedUsers();
-  }, [value, inspektorat, roles]);
+  }, [valueString, inspektorat, rolesString]);
 
   // Remove user from selection
-  const handleRemoveUser = (userId: string) => {
+  const handleRemoveUser = useCallback((userId: string) => {
     const newValue = value.filter(id => id !== userId);
     onChange(newValue);
-  };
+  }, [value, onChange]);
 
   // Add user to selection
-  const handleAddUser = (userId: string) => {
+  const handleAddUser = useCallback((userId: string) => {
     if (!value.includes(userId)) {
       onChange([...value, userId]);
     }
-  };
+  }, [value, onChange]);
 
   return (
     <div className={className}>
