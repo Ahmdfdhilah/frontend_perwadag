@@ -10,8 +10,9 @@ import {
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import ActionDropdown from '@/components/common/ActionDropdown';
 import FileViewLink from '@/components/common/FileViewLink';
-import { MatriksResponse } from '@/services/matriks/types';
+import { MatriksResponse, MatriksStatus } from '@/services/matriks/types';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
+import { Badge } from '@workspace/ui/components/badge';
 
 interface MatriksTableProps {
   data: MatriksResponse[];
@@ -37,15 +38,33 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
   itemsPerPage = 10,
 }) => {
 
+  // Get status badge variant
+  const getStatusVariant = (status?: MatriksStatus) => {
+    switch (status) {
+      case 'DRAFTING': return 'secondary';
+      case 'CHECKING': return 'outline';
+      case 'VALIDATING': return 'default';
+      case 'FINISHED': return 'default';
+      default: return 'secondary';
+    }
+  };
+
+  // Get status label
+  const getStatusLabel = (status?: MatriksStatus) => {
+    switch (status) {
+      case 'DRAFTING': return 'Draft';
+      case 'CHECKING': return 'Review Ketua Tim';
+      case 'VALIDATING': return 'Review Pengendali';
+      case 'FINISHED': return 'Selesai';
+      default: return 'Draft';
+    }
+  };
+
   const getStatusBadge = (matriks: MatriksResponse) => {
-    const isCompleted = matriks.is_completed;
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium ${isCompleted
-        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-        : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
-        }`}>
-        {isCompleted ? 'Lengkap' : 'Belum Lengkap'}
-      </span>
+      <Badge variant={getStatusVariant(matriks.status)}>
+        {getStatusLabel(matriks.status)}
+      </Badge>
     );
   };
 

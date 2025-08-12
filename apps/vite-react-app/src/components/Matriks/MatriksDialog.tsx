@@ -11,13 +11,14 @@ import { Label } from '@workspace/ui/components/label';
 import { Textarea } from '@workspace/ui/components/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import { Trash2, Plus, Loader2 } from 'lucide-react';
-import { MatriksResponse, TemuanRekomendasi } from '@/services/matriks/types';
+import { MatriksResponse, TemuanRekomendasi, MatriksStatus } from '@/services/matriks/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { matriksService } from '@/services/matriks';
 import { useToast } from '@workspace/ui/components/sonner';
+import { Badge } from '@workspace/ui/components/badge';
 
 interface MatriksDialogProps {
   open: boolean;
@@ -25,6 +26,7 @@ interface MatriksDialogProps {
   item: MatriksResponse | null;
   mode: 'edit' | 'view';
   onSave?: (data: any) => void;
+  onStatusChange?: (status: MatriksStatus) => void;
 }
 
 const MatriksDialog: React.FC<MatriksDialogProps> = ({
@@ -33,11 +35,10 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   item,
   mode,
   onSave,
+  onStatusChange,
 }) => {
-  const { canEditForm } = useFormPermissions();
   const { toast } = useToast();
   const isEditable = mode === 'edit';
-  const canEdit = canEditForm('matriks') && isEditable;
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [temuanRekomendasi, setTemuanRekomendasi] = useState<TemuanRekomendasi[]>([]);
   const [existingFiles, setExistingFiles] = useState<Array<{ name: string; url?: string; viewUrl?: string; size?: number; filename?: string }>>([]);
@@ -48,9 +49,51 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   // Loading states for different operations
   const [isSaving, setIsSaving] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isChangingStatus, setIsChangingStatus] = useState(false);
   
   // Validation states
   const [validationErrors, setValidationErrors] = useState<Record<string, { kondisi?: string; kriteria?: string; rekomendasi?: string }>>({});
+
+  // Get status badge variant
+  const getStatusVariant = (status?: MatriksStatus) => {
+    switch (status) {
+      case 'DRAFTING': return 'secondary';
+      case 'CHECKING': return 'outline';
+      case 'VALIDATING': return 'default';
+      case 'FINISHED': return 'default';
+      default: return 'secondary';
+    }
+  };
+
+  // Get status label
+  const getStatusLabel = (status?: MatriksStatus) => {
+    switch (status) {
+      case 'DRAFTING': return 'Draft';
+      case 'CHECKING': return 'Review Ketua Tim';
+      case 'VALIDATING': return 'Review Pengendali';
+      case 'FINISHED': return 'Selesai';
+      default: return 'Draft';
+    }
+  };
+
+  // Get next status and button label
+  const getNextStatusAction = (currentStatus?: MatriksStatus) => {
+    switch (currentStatus) {
+      case 'DRAFTING': return { next: 'CHECKING' as MatriksStatus, label: 'Kirim ke Review' };
+      case 'CHECKING': return { next: 'VALIDATING' as MatriksStatus, label: 'Setujui & Lanjutkan' };
+      case 'VALIDATING': return { next: 'FINISHED' as MatriksStatus, label: 'Finalisasi' };
+      default: return null;
+    }
+  };
+
+  // Check if user can edit temuan based on permissions
+  const canEditTemuan = item?.user_permissions?.can_edit_temuan && item?.is_editable && isEditable;
+  
+  // Check if user can change status
+  const canChangeStatus = item?.user_permissions?.can_change_matrix_status && item?.is_editable;
+
+  // Use backend permissions instead of role-based check
+  const canEdit = canEditTemuan;
 
   useEffect(() => {
     if (item && open) {
@@ -76,6 +119,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     // Reset loading states when dialog opens/closes
     setIsSaving(false);
     setIsDownloading(false);
+    setIsChangingStatus(false);
   }, [item, open]);
 
   const handleUploadFileChange = (files: File[]) => {
@@ -191,10 +235,31 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
 
   const handleCancel = () => {
     // Prevent closing if operations are in progress
-    if (isSaving || isDownloading || deletingFile) {
+    if (isSaving || isDownloading || deletingFile || isChangingStatus) {
       return;
     }
     onOpenChange(false);
+  };
+
+  const handleStatusChange = async (newStatus: MatriksStatus) => {
+    if (!onStatusChange || !item?.id || isChangingStatus) return;
+
+    setIsChangingStatus(true);
+    try {
+      await onStatusChange(newStatus);
+    } catch (error) {
+      console.error('Error changing status:', error);
+      // Error toast is handled by parent component
+    } finally {
+      setIsChangingStatus(false);
+    }
+  };
+
+  const handleRollback = async () => {
+    if (!item?.status) return;
+    
+    const rollbackStatus: MatriksStatus = 'DRAFTING';
+    await handleStatusChange(rollbackStatus);
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
@@ -263,15 +328,25 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   };
 
   // Determine if any operation is in progress
-  const isOperationInProgress = isSaving || isDownloading || deletingFile;
+  const isOperationInProgress = isSaving || isDownloading || deletingFile || isChangingStatus;
+
+  // Get next status action
+  const nextAction = getNextStatusAction(item?.status);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
         <DialogHeader className="flex-shrink-0 border-b pb-4">
-          <DialogTitle>
-            {mode === 'view' ? 'Detail Matriks' : 'Edit Matriks'}
-          </DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle>
+              {mode === 'view' ? 'Detail Matriks' : 'Edit Matriks'}
+            </DialogTitle>
+            {item?.status && (
+              <Badge variant={getStatusVariant(item.status)}>
+                {getStatusLabel(item.status)}
+              </Badge>
+            )}
+          </div>
         </DialogHeader>
 
         <div className="flex-1 overflow-y-auto py-4">
@@ -434,28 +509,68 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
         </div>
 
         <DialogFooter className="flex-shrink-0 border-t pt-4">
-          <Button 
-            variant="outline" 
-            onClick={handleCancel}
-            disabled={isOperationInProgress}
-          >
-            {mode === 'view' ? 'Tutup' : 'Batal'}
-          </Button>
-          {canEdit && onSave && mode === 'edit' && (
+          <div className="flex flex-wrap gap-2 w-full">
             <Button 
-              onClick={handleSave}
-              disabled={isSaving || (temuanRekomendasi.length > 0 && Object.keys(validationErrors).length > 0)}
+              variant="outline" 
+              onClick={handleCancel}
+              disabled={isOperationInProgress}
             >
-              {isSaving ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Menyimpan...
-                </>
-              ) : (
-                'Simpan'
-              )}
+              {mode === 'view' ? 'Tutup' : 'Batal'}
             </Button>
-          )}
+            
+            {/* Rollback button - show for CHECKING and VALIDATING status */}
+            {canChangeStatus && (item?.status === 'CHECKING' || item?.status === 'VALIDATING') && (
+              <Button 
+                variant="destructive"
+                onClick={handleRollback}
+                disabled={isChangingStatus}
+              >
+                {isChangingStatus ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Mengembalikan...
+                  </>
+                ) : (
+                  'Kembalikan ke Draft'
+                )}
+              </Button>
+            )}
+            
+            {/* Save button */}
+            {canEdit && onSave && mode === 'edit' && (
+              <Button 
+                onClick={handleSave}
+                disabled={isSaving || (temuanRekomendasi.length > 0 && Object.keys(validationErrors).length > 0)}
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Menyimpan...
+                  </>
+                ) : (
+                  'Simpan'
+                )}
+              </Button>
+            )}
+            
+            {/* Status change button */}
+            {canChangeStatus && nextAction && (
+              <Button 
+                onClick={() => handleStatusChange(nextAction.next)}
+                disabled={isChangingStatus || (temuanRekomendasi.length === 0)}
+                className="ml-auto"
+              >
+                {isChangingStatus ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Memproses...
+                  </>
+                ) : (
+                  nextAction.label
+                )}
+              </Button>
+            )}
+          </div>
         </DialogFooter>
       </DialogContent>
 

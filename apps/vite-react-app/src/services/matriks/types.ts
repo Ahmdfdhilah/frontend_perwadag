@@ -51,12 +51,28 @@ export interface MatriksStatistics {
   last_updated: string;
 }
 
-// Temuan Rekomendasi Types - Updated to 3-field structure
+// Status enums
+export type MatriksStatus = 'DRAFTING' | 'CHECKING' | 'VALIDATING' | 'FINISHED';
+export type TindakLanjutStatus = 'DRAFTING' | 'CHECKING' | 'VALIDATING' | 'FINISHED';
+
+// User permissions
+export interface UserPermissions {
+  can_edit_temuan: boolean;
+  can_change_matrix_status: boolean;
+  can_edit_tindak_lanjut: boolean;
+  can_change_tindak_lanjut_status: boolean;
+}
+
+// Temuan Rekomendasi Types - Updated with tindak lanjut fields
 export interface TemuanRekomendasi {
   id?: number;
   kondisi: string;
   kriteria: string;
   rekomendasi: string;
+  tindak_lanjut?: string;
+  dokumen_pendukung_tindak_lanjut?: string;
+  catatan_evaluator?: string;
+  status_tindak_lanjut?: TindakLanjutStatus;
 }
 
 // Request Types
@@ -68,6 +84,22 @@ export interface MatriksUpdate {
   temuan_rekomendasi?: {
     items: TemuanRekomendasi[];
   };
+}
+
+// Status update requests
+export interface MatriksStatusUpdate {
+  status: MatriksStatus;
+}
+
+// Tindak lanjut update requests
+export interface TindakLanjutUpdate {
+  tindak_lanjut?: string;
+  dokumen_pendukung_tindak_lanjut?: string;
+  catatan_evaluator?: string;
+}
+
+export interface TindakLanjutStatusUpdate {
+  status_tindak_lanjut: TindakLanjutStatus;
 }
 
 // Temuan Rekomendasi Response Types
@@ -94,6 +126,10 @@ export interface MatriksResponse {
   evaluation_status: string;
   temuan_rekomendasi_summary: TemuanRekomendasiSummary | null;
   has_temuan_rekomendasi: boolean;
+  // New fields from backend update
+  status?: MatriksStatus;
+  is_editable?: boolean;
+  user_permissions?: UserPermissions;
   created_at: string;
   updated_at?: string;
   created_by?: string;

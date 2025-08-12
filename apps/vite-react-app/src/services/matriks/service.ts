@@ -5,6 +5,9 @@ import {
   MatriksListResponse,
   MatriksFilterParams,
   MatriksFileUploadResponse,
+  MatriksStatusUpdate,
+  TindakLanjutUpdate,
+  TindakLanjutStatusUpdate,
 } from "./types";
 
 class MatriksService extends BaseService {
@@ -82,6 +85,32 @@ class MatriksService extends BaseService {
     filename: string
   ): Promise<{ success: boolean; message: string; deleted_file?: string }> {
     return this.delete(`/${matriksId}/files/${encodeURIComponent(filename)}`);
+  }
+
+  // Update matriks status
+  async updateMatriksStatus(
+    matriksId: string,
+    data: MatriksStatusUpdate
+  ): Promise<MatriksResponse> {
+    return this.put(`/${matriksId}/status`, data);
+  }
+
+  // Update tindak lanjut content
+  async updateTindakLanjut(
+    matriksId: string,
+    itemId: number,
+    data: TindakLanjutUpdate
+  ): Promise<MatriksResponse> {
+    return this.put(`/${matriksId}/tindak-lanjut/${itemId}`, data);
+  }
+
+  // Update tindak lanjut status
+  async updateTindakLanjutStatus(
+    matriksId: string,
+    itemId: number,
+    data: TindakLanjutStatusUpdate
+  ): Promise<MatriksResponse> {
+    return this.put(`/${matriksId}/tindak-lanjut/${itemId}/status`, data);
   }
 }
 

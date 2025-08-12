@@ -16,7 +16,7 @@ import {
 } from '@workspace/ui/components/select';
 import { PerwadagCombobox } from '@/components/common/PerwadagCombobox';
 import { Label } from '@workspace/ui/components/label';
-import { MatriksResponse, MatriksFilterParams } from '@/services/matriks/types';
+import { MatriksResponse, MatriksFilterParams, MatriksStatus } from '@/services/matriks/types';
 import { matriksService } from '@/services/matriks';
 import { PageHeader } from '@/components/common/PageHeader';
 import ListHeaderComposite from '@/components/common/ListHeaderComposite';
@@ -216,6 +216,38 @@ const MatriksPage: React.FC = () => {
       });
     } catch (error) {
       console.error('Failed to save matriks:', error);
+    }
+  };
+
+  const handleStatusChange = async (newStatus: MatriksStatus) => {
+    if (!selectedItem) return;
+
+    try {
+      await matriksService.updateMatriksStatus(selectedItem.id, { status: newStatus });
+      
+      setIsDialogOpen(false);
+      setSelectedItem(null);
+      fetchMatriks(); // Refresh the list
+
+      const statusLabels = {
+        'DRAFTING': 'Draft',
+        'CHECKING': 'Review Ketua Tim', 
+        'VALIDATING': 'Review Pengendali',
+        'FINISHED': 'Selesai'
+      };
+
+      toast({
+        title: 'Status berhasil diubah',
+        description: `Status matriks ${selectedItem.nama_perwadag} telah diubah ke ${statusLabels[newStatus]}.`,
+        variant: 'default'
+      });
+    } catch (error) {
+      console.error('Failed to change status:', error);
+      toast({
+        title: 'Gagal mengubah status',
+        description: 'Terjadi kesalahan saat mengubah status matriks.',
+        variant: 'destructive'
+      });
     }
   };
 
@@ -427,6 +459,7 @@ const MatriksPage: React.FC = () => {
         onOpenChange={setIsDialogOpen}
         item={selectedItem}
         onSave={dialogMode === 'edit' ? handleSave : undefined}
+        onStatusChange={handleStatusChange}
         mode={dialogMode}
       />
     </div>
