@@ -349,7 +349,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-7xl w-[95vw] max-h-[90vh] flex flex-col">
+      <DialogContent className="w-[95vw] h-[90vh] !max-w-none !max-h-none flex flex-col">
         <DialogHeader className="flex-shrink-0 border-b pb-4">
           <DialogTitle>
             {mode === 'view' ? 'Detail Matriks' : 'Edit Matriks'}
@@ -379,24 +379,21 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
             {/* Temuan Rekomendasi */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Kondisi, Kriteria dan Rekomendasi</CardTitle>
+                <CardTitle className="text-lg">Daftar Kondisi, Kriteria dan Rekomendasi</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-4">
                 {/* Add Button Section */}
                 {canEdit && (
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-medium">Daftar Temuan Rekomendasi</h4>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={handleAddTemuanRekomendasi}
-                      disabled={temuanRekomendasi.length >= 20 || isSaving}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Tambah
-                    </Button>
-                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAddTemuanRekomendasi}
+                    disabled={temuanRekomendasi.length >= 20 || isSaving}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Tambah
+                  </Button>
                 )}
 
                 {/* Data Table Section */}
