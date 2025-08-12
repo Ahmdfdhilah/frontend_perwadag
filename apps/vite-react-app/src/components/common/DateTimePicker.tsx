@@ -117,12 +117,12 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
         </Button>
       </DialogTrigger>
       <DialogContent 
-        className="w-fit max-w-[90vw] p-0 border-0 bg-popover shadow-md rounded-md"
+        className="[&>button]:hidden w-auto max-w-[90vw] p-0 border-0 bg-popover shadow-md rounded-md"
         onOpenAutoFocus={(e) => e.preventDefault()}
         onCloseAutoFocus={(e) => e.preventDefault()}
       >
-        <div className="flex flex-col w-fit">
-          <div className="p-3 flex justify-center w-fit">
+        <div className="flex flex-col w-full">
+          <div className="p-2 flex justify-center w-full">
             <Calendar
               mode="single"
               selected={selectedDate}
@@ -131,16 +131,15 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
               initialFocus
               fixedWeeks={false}
               defaultMonth={selectedDate || new Date()}
-              className="w-fit"
               classNames={{
                 months: "flex flex-col space-y-4",
-                month: "space-y-4 w-fit",
-                table: "w-fit border-collapse space-y-1",
-                head_row: "flex",
-                head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] flex items-center justify-center",
-                row: "flex w-fit mt-2",
-                cell: "text-center text-sm p-0 relative w-9 h-9",
-                day: "h-9 w-9 p-0 font-normal flex items-center justify-center",
+                month: "space-y-4 w-full",
+                table: "w-full border-collapse space-y-1",
+                head_row: "flex w-full",
+                head_cell: "text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem] flex items-center justify-center",
+                row: "flex w-full mt-2",
+                cell: "text-center text-sm p-0 relative flex-1 h-9 flex items-center justify-center",
+                day: "h-9 w-full p-0 font-normal flex items-center justify-center",
               }}
             />
           </div>
