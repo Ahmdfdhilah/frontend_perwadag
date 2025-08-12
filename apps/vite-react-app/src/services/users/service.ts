@@ -130,6 +130,8 @@ class UserService extends BaseService {
     const endpoint = queryParams.toString() ? `/perwadag?${queryParams.toString()}` : "/perwadag";
     return this.get(endpoint);
   }
+
+  // Note: Removed getUsersByInspektorat - now using general getUsers() with filtering
 }
 
 export const userService = new UserService();

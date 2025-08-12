@@ -11,9 +11,12 @@ import { Input } from '@workspace/ui/components/input';
 import { Label } from '@workspace/ui/components/label';
 import { Loader2 } from 'lucide-react';
 import { PerwadagCombobox } from '@/components/common/PerwadagCombobox';
+import UserAssignmentCombobox from '@/components/common/UserAssignmentCombobox';
+import MultiUserAssignmentCombobox from '@/components/common/MultiUserAssignmentCombobox';
 import DatePicker from '@/components/common/DatePicker';
 import { SuratTugasResponse } from '@/services/suratTugas/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
+import { useRole } from '@/hooks/useRole';
 import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { formatDateForAPI } from '@/utils/timeFormat';
@@ -36,12 +39,18 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   onSave,
 }) => {
   const { canEditForm } = useFormPermissions();
+  const { user } = useRole();
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     no_surat: '',
     user_perwadag_id: '',
     tanggal_evaluasi_mulai: undefined as Date | undefined,
     tanggal_evaluasi_selesai: undefined as Date | undefined,
+    pengedali_mutu_id: '',
+    pengendali_teknis_id: '',
+    ketua_tim_id: '',
+    anggota_tim_ids: [] as string[],
+    pimpinan_inspektorat_id: '',
   });
 
   const [uploadFiles, setUploadFiles] = useState<File[]>([]);
@@ -53,6 +62,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   // Loading states for different operations
   const [isSaving, setIsSaving] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [selectedPerwadagInspektorat] = useState<string>(''); // Currently not used, but kept for future enhancement
 
   useEffect(() => {
     if (editingItem) {
@@ -61,6 +71,11 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
         user_perwadag_id: editingItem.user_perwadag_id,
         tanggal_evaluasi_mulai: new Date(editingItem.tanggal_evaluasi_mulai),
         tanggal_evaluasi_selesai: editingItem.tanggal_evaluasi_selesai ? new Date(editingItem.tanggal_evaluasi_selesai) : undefined,
+        pengedali_mutu_id: editingItem.assignment_info?.pengedali_mutu?.id || '',
+        pengendali_teknis_id: editingItem.assignment_info?.pengendali_teknis?.id || '',
+        ketua_tim_id: editingItem.assignment_info?.ketua_tim?.id || '',
+        anggota_tim_ids: editingItem.assignment_info?.anggota_tim?.map(user => user.id) || [],
+        pimpinan_inspektorat_id: editingItem.assignment_info?.pimpinan_inspektorat?.id || '',
       });
       
       // Set existing files for display
@@ -85,6 +100,11 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
         user_perwadag_id: '',
         tanggal_evaluasi_mulai: undefined,
         tanggal_evaluasi_selesai: undefined,
+        pengedali_mutu_id: '',
+        pengendali_teknis_id: '',
+        ketua_tim_id: '',
+        anggota_tim_ids: [],
+        pimpinan_inspektorat_id: '',
       });
       setUploadFiles([]);
       setExistingFiles([]);
@@ -119,7 +139,12 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
         tanggal_evaluasi_mulai: formatDateForAPI(formData.tanggal_evaluasi_mulai),
         tanggal_evaluasi_selesai: formData.tanggal_evaluasi_selesai ? formatDateForAPI(formData.tanggal_evaluasi_selesai) : undefined,
         no_surat: formData.no_surat || '',
-        file: uploadFiles.length > 0 ? uploadFiles[0] : null, // Send null instead of undefined
+        pengedali_mutu_id: formData.pengedali_mutu_id || undefined,
+        pengendali_teknis_id: formData.pengendali_teknis_id || undefined,
+        ketua_tim_id: formData.ketua_tim_id || undefined,
+        anggota_tim_ids: formData.anggota_tim_ids.length > 0 ? formData.anggota_tim_ids : undefined,
+        pimpinan_inspektorat_id: formData.pimpinan_inspektorat_id || undefined,
+        file: uploadFiles.length > 0 ? uploadFiles[0] : null,
       };
 
       await onSave(saveData);
@@ -259,7 +284,10 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
               ) : (
                 <PerwadagCombobox
                   value={formData.user_perwadag_id}
-                  onChange={(value) => setFormData(prev => ({ ...prev, user_perwadag_id: value }))}
+                  onChange={(value) => {
+                    setFormData(prev => ({ ...prev, user_perwadag_id: value }));
+                    // TODO: Get inspektorat from selected perwadag - for now, assignment will be based on editingItem inspektorat
+                  }}
                   includeAllOption={false}
                 />
               )}
@@ -291,12 +319,165 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
               </div>
             </div>
 
+            {/* Assignment Section */}
+            <div className="space-y-4 border-t pt-4">
+              <div className="space-y-2">
+                <Label className="text-base font-semibold">Tim Evaluasi (Opsional)</Label>
+                <div className="text-sm text-muted-foreground">
+                  Pilih anggota tim evaluasi untuk surat tugas ini.
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                <div className="space-y-2">
+                  <Label>Pengedali Mutu</Label>
+                  <UserAssignmentCombobox
+                    value={formData.pengedali_mutu_id}
+                    onChange={(value) => setFormData(prev => ({ ...prev, pengedali_mutu_id: value as string }))}
+                    placeholder="Pilih pengedali mutu"
+                    inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
+                    disabled={!canEdit || isSaving}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Pengendali Teknis</Label>
+                  <UserAssignmentCombobox
+                    value={formData.pengendali_teknis_id}
+                    onChange={(value) => setFormData(prev => ({ ...prev, pengendali_teknis_id: value as string }))}
+                    placeholder="Pilih pengendali teknis"
+                    inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
+                    disabled={!canEdit || isSaving}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Ketua Tim</Label>
+                  <UserAssignmentCombobox
+                    value={formData.ketua_tim_id}
+                    onChange={(value) => setFormData(prev => ({ ...prev, ketua_tim_id: value as string }))}
+                    placeholder="Pilih ketua tim"
+                    inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
+                    disabled={!canEdit || isSaving}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Anggota Tim</Label>
+                  <MultiUserAssignmentCombobox
+                    value={formData.anggota_tim_ids}
+                    onChange={(value) => setFormData(prev => ({ ...prev, anggota_tim_ids: value }))}
+                    placeholder="Pilih anggota tim"
+                    inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
+                    disabled={!canEdit || isSaving}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Pimpinan Inspektorat</Label>
+                  <UserAssignmentCombobox
+                    value={formData.pimpinan_inspektorat_id}
+                    onChange={(value) => setFormData(prev => ({ ...prev, pimpinan_inspektorat_id: value as string }))}
+                    placeholder="Pilih pimpinan inspektorat"
+                    inspektorat={selectedPerwadagInspektorat || editingItem?.inspektorat || user?.inspektorat}
+                    roles={['PIMPINAN']}
+                    disabled={!canEdit || isSaving}
+                  />
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label>Informasi Upload Surat Tugas</Label>
               <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
                 Silakan upload file surat tugas. File yang didukung: PDF, DOC, DOCX.
               </div>
             </div>
+
+            {/* Assignment Info Display for View Mode */}
+            {mode === 'view' && editingItem && (
+              <div className="space-y-4 border-t pt-4">
+                <div className="space-y-2">
+                  <Label className="text-base font-semibold">Tim Evaluasi</Label>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  {editingItem.assignment_info?.pengedali_mutu && (
+                    <div className="space-y-2">
+                      <Label>Pengedali Mutu</Label>
+                      <div className="p-3 bg-muted rounded-md text-sm">
+                        <div className="font-medium">{editingItem.assignment_info.pengedali_mutu.nama}</div>
+                        <div className="text-muted-foreground">
+                          {editingItem.assignment_info.pengedali_mutu.jabatan} - {editingItem.assignment_info.pengedali_mutu.role_display}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {editingItem.assignment_info?.pengendali_teknis && (
+                    <div className="space-y-2">
+                      <Label>Pengendali Teknis</Label>
+                      <div className="p-3 bg-muted rounded-md text-sm">
+                        <div className="font-medium">{editingItem.assignment_info.pengendali_teknis.nama}</div>
+                        <div className="text-muted-foreground">
+                          {editingItem.assignment_info.pengendali_teknis.jabatan} - {editingItem.assignment_info.pengendali_teknis.role_display}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {editingItem.assignment_info?.ketua_tim && (
+                    <div className="space-y-2">
+                      <Label>Ketua Tim</Label>
+                      <div className="p-3 bg-muted rounded-md text-sm">
+                        <div className="font-medium">{editingItem.assignment_info.ketua_tim.nama}</div>
+                        <div className="text-muted-foreground">
+                          {editingItem.assignment_info.ketua_tim.jabatan} - {editingItem.assignment_info.ketua_tim.role_display}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {editingItem.assignment_info?.anggota_tim && editingItem.assignment_info.anggota_tim.length > 0 && (
+                    <div className="space-y-2">
+                      <Label>Anggota Tim</Label>
+                      <div className="space-y-2">
+                        {editingItem.assignment_info.anggota_tim.map((anggota) => (
+                          <div key={anggota.id} className="p-3 bg-muted rounded-md text-sm">
+                            <div className="font-medium">{anggota.nama}</div>
+                            <div className="text-muted-foreground">
+                              {anggota.jabatan} - {anggota.role_display}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {editingItem.assignment_info?.pimpinan_inspektorat && (
+                    <div className="space-y-2">
+                      <Label>Pimpinan Inspektorat</Label>
+                      <div className="p-3 bg-muted rounded-md text-sm">
+                        <div className="font-medium">{editingItem.assignment_info.pimpinan_inspektorat.nama}</div>
+                        <div className="text-muted-foreground">
+                          {editingItem.assignment_info.pimpinan_inspektorat.jabatan} - {editingItem.assignment_info.pimpinan_inspektorat.role_display}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {!editingItem.assignment_info?.pengedali_mutu && 
+                   !editingItem.assignment_info?.pengendali_teknis && 
+                   !editingItem.assignment_info?.ketua_tim && 
+                   !editingItem.assignment_info?.pimpinan_inspektorat && 
+                   (!editingItem.assignment_info?.anggota_tim || editingItem.assignment_info.anggota_tim.length === 0) && (
+                    <div className="p-3 bg-muted rounded-md text-sm text-muted-foreground text-center">
+                      Belum ada tim evaluasi yang ditugaskan
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             <FileUpload
               label="File Surat Tugas *"

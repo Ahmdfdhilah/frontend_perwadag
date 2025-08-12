@@ -27,9 +27,9 @@ export abstract class BaseService {
     }
   }
 
-  protected async get<T>(endpoint: string): Promise<T> {
+  protected async get<T>(endpoint: string, config?: any): Promise<T> {
     return this.handleRequest(
-      () => api.get(`${this.baseEndpoint}${endpoint}`)
+      () => api.get(`${this.baseEndpoint}${endpoint}`, config)
     );
   }
 

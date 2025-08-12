@@ -1,4 +1,46 @@
 import { PaginatedResponse } from "../base/types";
+import { UserRole } from "../../lib/constants";
+
+// User Summary Interface
+export interface UserSummary {
+  id: string;
+  nama: string;
+  username: string;
+  jabatan: string;
+  role: UserRole;
+  role_display: string;
+  inspektorat?: string;
+  has_email: boolean;
+  is_active: boolean;
+}
+
+// File Types
+export interface FileMetadata {
+  filename: string;
+  original_filename?: string;
+  size: number;
+  size_mb: number;
+  content_type: string;
+  extension: string;
+  uploaded_at: string;
+  uploaded_by?: string;
+  is_viewable: boolean;
+}
+
+export interface FileUrls {
+  file_url: string;
+  download_url: string;
+  view_url: string;
+}
+
+// Assignment Information
+export interface AssignmentInfo {
+  pengedali_mutu?: UserSummary;
+  pengendali_teknis?: UserSummary;
+  ketua_tim?: UserSummary;
+  anggota_tim: UserSummary[];
+  pimpinan_inspektorat?: UserSummary;
+}
 
 // Base Types
 export interface SuratTugas {
@@ -31,7 +73,7 @@ export interface SuratTugasProgress {
   overall_percentage: number;
 }
 
-export interface PerwadagInfo {
+export interface PerwardagSummary {
   id: string;
   nama: string;
   inspektorat: string;
@@ -43,12 +85,22 @@ export interface SuratTugasCreate {
   tanggal_evaluasi_mulai: string;
   tanggal_evaluasi_selesai: string;
   no_surat: string;
+  pengedali_mutu_id?: string;
+  pengendali_teknis_id?: string;
+  ketua_tim_id?: string;
+  anggota_tim_ids?: string[];
+  pimpinan_inspektorat_id?: string;
 }
 
 export interface SuratTugasUpdate {
   tanggal_evaluasi_mulai?: string;
   tanggal_evaluasi_selesai?: string;
   no_surat?: string;
+  pengedali_mutu_id?: string;
+  pengendali_teknis_id?: string;
+  ketua_tim_id?: string;
+  anggota_tim_ids?: string[];
+  pimpinan_inspektorat_id?: string;
 }
 
 // Response Types
@@ -60,33 +112,17 @@ export interface SuratTugasResponse {
   tanggal_evaluasi_mulai: string;
   tanggal_evaluasi_selesai: string;
   no_surat: string;
-  file_surat_tugas?: string;
-  nama_pengedali_mutu?: string;
-  nama_pengendali_teknis?: string;
-  nama_ketua_tim?: string;
-  file_urls?: {
-    file_url?: string;
-    download_url?: string;
-    view_url?: string;
-  };
-  file_metadata?: {
-    filename: string;
-    original_filename?: string;
-    size: number;
-    size_mb: number;
-    content_type: string;
-    extension: string;
-    uploaded_at: string;
-    uploaded_by?: string;
-    is_viewable: boolean;
-  };
+  assignment_info: AssignmentInfo;
+  file_surat_tugas: string;
+  file_urls?: FileUrls;
+  file_metadata?: FileMetadata;
   tahun_evaluasi?: number;
   durasi_evaluasi?: number;
   is_evaluation_active?: boolean;
   evaluation_status?: string;
   progress: SuratTugasProgress;
-  perwadag_info: PerwadagInfo;
-  file_surat_tugas_url?: string;
+  perwadag_info: PerwardagSummary;
+  file_surat_tugas_url: string;
   created_at: string;
   updated_at?: string;
   created_by?: string;
@@ -96,17 +132,8 @@ export interface SuratTugasResponse {
 export interface SuratTugasCreateResponse {
   success: boolean;
   message: string;
-  data: SuratTugasResponse;
   surat_tugas: SuratTugasResponse;
-  auto_generated_records: {
-    surat_pemberitahuan_id: string;
-    entry_meeting_id: string;
-    konfirmasi_meeting_id: string;
-    exit_meeting_id: string;
-    matriks_id: string;
-    laporan_hasil_id: string;
-    kuisioner_id: string;
-  };
+  auto_generated_records: Record<string, string>;
 }
 
 export interface SuratTugasListResponse extends PaginatedResponse<SuratTugasResponse> { }
@@ -189,4 +216,111 @@ export interface SuratTugasFileUploadResponse {
 export interface MessageResponse {
   message: string;
   success?: boolean;
+}
+
+// Additional Types from Backend Schema
+
+export interface EvaluasiProgress extends SuratTugasProgress {
+  completed_count: number;
+  total_stages: number;
+  get_next_stage(): string | null;
+}
+
+export interface SuratTugasOverview {
+  surat_tugas: SuratTugasResponse;
+  surat_pemberitahuan?: Record<string, any>;
+  meetings: Record<string, any>[];
+  matriks?: Record<string, any>;
+  laporan_hasil?: Record<string, any>;
+  kuisioner?: Record<string, any>;
+}
+
+// Statistics Types
+export interface SuratTugasStats {
+  total_surat_tugas: number;
+  total_by_tahun: Record<number, number>;
+  total_by_inspektorat: Record<string, number>;
+  completed_evaluations: number;
+  in_progress_evaluations: number;
+  upcoming_evaluations: number;
+  completion_rate: number; // 0-100 percentage
+}
+
+// Bulk Operations
+export interface BulkDeleteRequest {
+  surat_tugas_ids: string[];
+  force_delete?: boolean;
+}
+
+export interface BulkDeleteResponse {
+  success: boolean;
+  message: string;
+  deleted_count: number;
+  failed_count: number;
+  failed_ids: string[];
+  details: Array<Record<string, string>>;
+}
+
+// Dashboard Types Enhancement
+export interface DashboardStatistics {
+  total_perwadag?: number;
+  average_progress: number;
+  year_filter_applied: boolean;
+  filtered_year?: number;
+}
+
+export interface RelationshipCompletionStats {
+  surat_pemberitahuan: CompletionStat;
+  entry_meeting: CompletionStat;
+  konfirmasi_meeting: CompletionStat;
+  exit_meeting: CompletionStat;
+  matriks: CompletionStat;
+  laporan_hasil: CompletionStat;
+  kuisioner: CompletionStat;
+}
+
+export interface RelationshipSummary {
+  most_completed?: string;
+  least_completed?: string;
+  total_relationships: number;
+  fully_completed_relationships: number;
+}
+
+export interface RecentSuratTugasItem extends SuratTugasResponse {
+  progress_percentage: number;
+}
+
+export interface DashboardSummaryData {
+  statistics: DashboardStatistics;
+  completion_stats: RelationshipCompletionStats;
+  recent_surat_tugas: RecentSuratTugasItem[];
+  summary_by_relationship: RelationshipSummary;
+}
+
+export interface UserInfo {
+  nama: string;
+  role: string;
+  inspektorat?: string;
+}
+
+export interface QuickActions {
+  can_create_surat_tugas: boolean;
+  can_manage_templates: boolean;
+  total_evaluasi?: number;
+}
+
+// Updated Dashboard Summary Response
+export interface DashboardSummaryResponse {
+  user_info: UserInfo;
+  year_filter?: number;
+  summary: DashboardSummaryData;
+  quick_actions: QuickActions;
+}
+
+// Progress Response
+export interface SuratTugasProgressResponse {
+  surat_tugas_id: string;
+  progress: EvaluasiProgress;
+  last_updated: string;
+  next_stage?: string;
 }

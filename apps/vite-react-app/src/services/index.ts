@@ -45,7 +45,7 @@ export type {
 export type {
   SuratTugas,
   SuratTugasProgress,
-  PerwadagInfo,
+  PerwardagSummary,
   SuratTugasCreate,
   SuratTugasUpdate,
   SuratTugasResponse,
@@ -55,6 +55,14 @@ export type {
   PerwadagListResponse,
   SuratTugasFilterParams,
   SuratTugasFileUploadResponse,
+  AssignmentInfo,
+  FileMetadata,
+  FileUrls,
+  SuratTugasStats,
+  SuratTugasOverview,
+  DashboardSummaryResponse,
+  BulkDeleteRequest,
+  BulkDeleteResponse
 } from "./suratTugas";
 
 export type {

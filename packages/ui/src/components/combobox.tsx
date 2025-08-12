@@ -156,6 +156,7 @@ interface ComboboxProps {
   onSearchChange?: (value: string) => void
   emptyMessage?: string
   className?: string
+  disabled?: boolean
   isLoading?: boolean
   // Infinite scrolling props
   enableInfiniteScroll?: boolean
@@ -175,6 +176,7 @@ export function Combobox({
   onSearchChange,
   emptyMessage = "No results found.",
   className,
+  disabled = false,
   isLoading = false,
   enableInfiniteScroll = false,
   onLoadMore,
@@ -221,7 +223,7 @@ export function Combobox({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <ComboboxButton className={className}>
+        <ComboboxButton className={className} disabled={disabled}>
           {selectedOption ? selectedOption.label : placeholder}
         </ComboboxButton>
       </PopoverTrigger>
