@@ -111,6 +111,15 @@ class MatriksService extends BaseService {
   ): Promise<MatriksResponse> {
     return this.put(`/${matriksId}/tindak-lanjut/status`, data);
   }
+
+  // Generate PDF matriks evaluasi
+  async generatePdf(
+    matriksId: string
+  ): Promise<Blob> {
+    return this.get(`/${matriksId}/pdf`, {
+      responseType: 'blob'
+    });
+  }
 }
 
 export const matriksService = new MatriksService();

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Edit, Eye, Trash2, Mail, Download, Power, Loader2 } from 'lucide-react';
+import { Edit, Eye, Trash2, Mail, Download, Power, Loader2, FileText } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,12 +15,14 @@ interface ActionDropdownProps {
   onDelete?: () => void;
   onComposeEmail?: () => void;
   onExport?: () => void;
+  onDownloadPdf?: () => void;
   showView?: boolean;
   showEdit?: boolean;
   showActivate?: boolean;
   showDelete?: boolean;
   showComposeEmail?: boolean;
   showExport?: boolean;
+  showDownloadPdf?: boolean;
   isActivating?: boolean;
   deleteDisabled?: boolean;
   deleteTooltip?: string;
@@ -33,12 +35,14 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
   onDelete,
   onComposeEmail,
   onExport,
+  onDownloadPdf,
   showView = true,
   showEdit = true,
   showActivate = false,
   showDelete = true,
   showComposeEmail = false,
   showExport = false,
+  showDownloadPdf = false,
   isActivating = false,
   deleteDisabled = false,
   deleteTooltip,
@@ -86,6 +90,12 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
           <DropdownMenuItem onClick={onExport}>
             <Download className="mr-2 h-4 w-4" />
             Export Excel
+          </DropdownMenuItem>
+        )}
+        {showDownloadPdf && onDownloadPdf && (
+          <DropdownMenuItem onClick={onDownloadPdf}>
+            <FileText className="mr-2 h-4 w-4" />
+            Download PDF
           </DropdownMenuItem>
         )}
         {showDelete && onDelete && (

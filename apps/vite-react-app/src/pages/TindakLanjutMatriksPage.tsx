@@ -160,7 +160,7 @@ const TindakLanjutMatriksPage: React.FC = () => {
     if (!selectedItem) return;
 
     try {
-      await matriksService.updateTindakLanjutStatus(selectedItem.id, { status: newStatus });
+      await matriksService.updateTindakLanjutStatus(selectedItem.id, { status_tindak_lanjut: newStatus });
 
       // Refresh data and update selected item
       await fetchTindakLanjutMatriks();
@@ -170,7 +170,7 @@ const TindakLanjutMatriksPage: React.FC = () => {
       setSelectedItem(updatedItem);
 
       const statusLabels = {
-        'DRAFTING': 'Draft TL',
+        'DRAFTING': 'Draft Tindak Lanjut',
         'CHECKING': 'Review Ketua Tim',
         'VALIDATING': 'Review Pengendali',
         'FINISHED': 'Selesai'
@@ -244,7 +244,7 @@ const TindakLanjutMatriksPage: React.FC = () => {
 
     if (filters.status_tindak_lanjut !== 'all') {
       const statusLabels = {
-        'DRAFTING': 'Draft TL',
+        'DRAFTING': 'Draft Tindak Lanjut',
         'CHECKING': 'Review Ketua Tim',
         'VALIDATING': 'Review Pengendali',
         'FINISHED': 'Selesai'
@@ -305,7 +305,7 @@ const TindakLanjutMatriksPage: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Status</SelectItem>
-              <SelectItem value="DRAFTING">Draft TL</SelectItem>
+              <SelectItem value="DRAFTING">Draft Tindak Lanjut</SelectItem>
               <SelectItem value="CHECKING">Review Ketua Tim</SelectItem>
               <SelectItem value="VALIDATING">Review Pengendali</SelectItem>
               <SelectItem value="FINISHED">Selesai</SelectItem>

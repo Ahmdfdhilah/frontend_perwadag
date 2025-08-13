@@ -102,7 +102,7 @@ export interface TindakLanjutUpdate {
 }
 
 export interface TindakLanjutStatusUpdate {
-  status: TindakLanjutStatus;
+  status_tindak_lanjut: TindakLanjutStatus;
 }
 
 // Temuan Rekomendasi Response Types

@@ -40,7 +40,7 @@ const TindakLanjutMatriksTable: React.FC<TindakLanjutMatriksTableProps> = ({
       case 'DRAFTING':
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
-            Draft TL
+            Draft Tindak Lanjut
           </span>
         );
       case 'CHECKING':
@@ -64,7 +64,7 @@ const TindakLanjutMatriksTable: React.FC<TindakLanjutMatriksTableProps> = ({
       default:
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
-            Belum Ada TL
+            Belum Ada Tindak Lanjut
           </span>
         );
     }
@@ -81,17 +81,6 @@ const TindakLanjutMatriksTable: React.FC<TindakLanjutMatriksTableProps> = ({
     );
   };
 
-  // Get tindak lanjut progress
-  const getTindakLanjutProgress = (matriks: MatriksResponse) => {
-    if (!matriks.temuan_rekomendasi_summary?.data) return '0/0';
-    
-    const totalItems = matriks.temuan_rekomendasi_summary.data.length;
-    const completedItems = matriks.temuan_rekomendasi_summary.data.filter(
-      item => item.status_tindak_lanjut === 'FINISHED'
-    ).length;
-    
-    return `${completedItems}/${totalItems}`;
-  };
 
   return (
     <div className="rounded-md border">
@@ -101,8 +90,7 @@ const TindakLanjutMatriksTable: React.FC<TindakLanjutMatriksTableProps> = ({
             <TableHead>No</TableHead>
             <TableHead>Nama Perwadag</TableHead>
             <TableHead>Tanggal Evaluasi</TableHead>
-            <TableHead>Progress TL</TableHead>
-            <TableHead>Status TL</TableHead>
+            <TableHead>Status Tindak Lanjut</TableHead>
             <TableHead>Dokumen</TableHead>
             <TableHead className="w-[80px]">Aksi</TableHead>
           </TableRow>
@@ -114,7 +102,6 @@ const TindakLanjutMatriksTable: React.FC<TindakLanjutMatriksTableProps> = ({
                 <TableCell><Skeleton className="h-4 w-8" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-48" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-32" /></TableCell>
-                <TableCell><Skeleton className="h-4 w-16" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                 <TableCell className="text-right"><Skeleton className="h-8 w-24 ml-auto" /></TableCell>
@@ -122,7 +109,7 @@ const TindakLanjutMatriksTable: React.FC<TindakLanjutMatriksTableProps> = ({
             ))
           ) : data.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+              <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                 Tidak ada data tindak lanjut matriks yang ditemukan.
               </TableCell>
             </TableRow>
@@ -133,12 +120,7 @@ const TindakLanjutMatriksTable: React.FC<TindakLanjutMatriksTableProps> = ({
                 <TableCell>{item.nama_perwadag}</TableCell>
                 <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
                 <TableCell>
-                  <span className="text-sm font-medium">
-                    {getTindakLanjutProgress(item)}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  {getTindakLanjutStatusBadge(item.temuan_rekomendasi_summary?.data?.[0]?.status_tindak_lanjut)}
+                  {getTindakLanjutStatusBadge(item.status_tindak_lanjut)}
                 </TableCell>
                 <TableCell>{renderDocumentLink(item)}</TableCell>
                 <TableCell>

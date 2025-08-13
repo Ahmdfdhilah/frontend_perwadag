@@ -12,6 +12,7 @@ interface MatriksCardsProps {
   onEdit?: (item: MatriksResponse) => void;
   onView?: (item: MatriksResponse) => void;
   onExport?: (item: MatriksResponse) => void;
+  onDownloadPdf?: (item: MatriksResponse) => void;
   canEdit?: (item: MatriksResponse) => boolean;
   userRole: 'admin' | 'inspektorat' | 'perwadag';
   currentPage?: number;
@@ -24,6 +25,7 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
   onEdit,
   onView,
   onExport,
+  onDownloadPdf,
   canEdit,
   userRole,
   currentPage = 1,
@@ -141,9 +143,11 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
                 onView={() => onView?.(item)}
                 onEdit={canEdit?.(item) ? () => onEdit?.(item) : undefined}
                 onExport={() => onExport?.(item)}
+                onDownloadPdf={item.status === 'FINISHED' && userRole != 'perwadag' ? () => onDownloadPdf?.(item) : undefined}
                 showView={true}
                 showEdit={canEdit?.(item) && !!onEdit}
                 showExport={!!onExport}
+                showDownloadPdf={item.status === 'FINISHED' && userRole != 'perwadag' && !!onDownloadPdf}
                 showDelete={false}
               />
             </div>

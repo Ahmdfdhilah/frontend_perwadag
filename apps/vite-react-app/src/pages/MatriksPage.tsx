@@ -132,6 +132,40 @@ const MatriksPage: React.FC = () => {
     setIsDialogOpen(true);
   };
 
+  const handleDownloadPdf = async (item: MatriksResponse) => {
+    try {
+      const pdfBlob = await matriksService.generatePdf(item.id);
+      
+      // Create filename
+      const namaPerwadag = item.nama_perwadag.replace(/\s+/g, '_').replace(/[/\\?%*:|"<>]/g, '_');
+      const tahun = item.tahun_evaluasi;
+      const filename = `matriks_evaluasi_${namaPerwadag}_${tahun}.pdf`;
+      
+      // Create download link
+      const url = window.URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast({
+        title: 'PDF berhasil diunduh',
+        description: `PDF matriks evaluasi ${item.nama_perwadag} telah diunduh.`,
+        variant: 'default'
+      });
+    } catch (error) {
+      console.error('Failed to download PDF:', error);
+      toast({
+        title: 'Gagal mengunduh PDF',
+        description: 'Terjadi kesalahan saat mengunduh PDF matriks.',
+        variant: 'destructive'
+      });
+    }
+  };
+
 
   // Function to fetch all matriks data for export (admin only)
   const fetchAllMatriksForExport = async () => {
@@ -401,6 +435,7 @@ const MatriksPage: React.FC = () => {
                 loading={loading}
                 onEdit={handleEdit}
                 onView={handleView}
+                onDownloadPdf={handleDownloadPdf}
                 canEdit={canEdit}
                 userRole={isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : 'perwadag'}
                 currentPage={filters.page}
@@ -415,6 +450,7 @@ const MatriksPage: React.FC = () => {
                 loading={loading}
                 onEdit={handleEdit}
                 onView={handleView}
+                onDownloadPdf={handleDownloadPdf}
                 canEdit={canEdit}
                 userRole={isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : 'perwadag'}
                 currentPage={filters.page}

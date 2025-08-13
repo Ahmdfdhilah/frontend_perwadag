@@ -35,7 +35,7 @@ const TindakLanjutMatriksCards: React.FC<TindakLanjutMatriksCardsProps> = ({
       case 'DRAFTING':
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
-            Draft TL
+            Draft Tindak Lanjut
           </span>
         );
       case 'CHECKING':
@@ -59,7 +59,7 @@ const TindakLanjutMatriksCards: React.FC<TindakLanjutMatriksCardsProps> = ({
       default:
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
-            Belum Ada TL
+            Belum Ada Tindak Lanjut
           </span>
         );
     }
@@ -77,16 +77,6 @@ const TindakLanjutMatriksCards: React.FC<TindakLanjutMatriksCardsProps> = ({
   };
 
   // Get tindak lanjut progress
-  const getTindakLanjutProgress = (matriks: MatriksResponse) => {
-    if (!matriks.temuan_rekomendasi_summary?.data) return '0/0';
-    
-    const totalItems = matriks.temuan_rekomendasi_summary.data.length;
-    const completedItems = matriks.temuan_rekomendasi_summary.data.filter(
-      item => item.status_tindak_lanjut === 'FINISHED'
-    ).length;
-    
-    return `${completedItems}/${totalItems}`;
-  };
 
   if (loading) {
     return (
@@ -108,10 +98,6 @@ const TindakLanjutMatriksCards: React.FC<TindakLanjutMatriksCardsProps> = ({
                 <div>
                   <Skeleton className="h-4 w-20" />
                   <Skeleton className="h-4 w-32 mt-1" />
-                </div>
-                <div>
-                  <Skeleton className="h-4 w-16" />
-                  <Skeleton className="h-4 w-16 mt-1" />
                 </div>
                 <div>
                   <Skeleton className="h-4 w-12" />
@@ -172,14 +158,9 @@ const TindakLanjutMatriksCards: React.FC<TindakLanjutMatriksCardsProps> = ({
               </div>
 
               <div>
-                <span className="font-medium text-muted-foreground">Progress TL:</span>
-                <span className="ml-2 font-semibold">{getTindakLanjutProgress(item)}</span>
-              </div>
-
-              <div>
-                <span className="font-medium text-muted-foreground">Status TL:</span>
+                <span className="font-medium text-muted-foreground">Status Tindak Lanjut:</span>
                 <span className="ml-2">
-                  {getTindakLanjutStatusBadge(item.temuan_rekomendasi_summary?.data?.[0]?.status_tindak_lanjut)}
+                  {getTindakLanjutStatusBadge(item.status_tindak_lanjut)}
                 </span>
               </div>
 

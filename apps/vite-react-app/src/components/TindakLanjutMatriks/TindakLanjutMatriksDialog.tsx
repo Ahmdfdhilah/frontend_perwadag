@@ -71,7 +71,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
       case 'DRAFTING':
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
-            Draft TL
+            Draft Tindak Lanjut
           </span>
         );
       case 'CHECKING':
@@ -95,7 +95,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
       default:
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
-            Belum Ada TL
+            Belum Ada Tindak Lanjut
           </span>
         );
     }
@@ -106,7 +106,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
     switch (currentStatus) {
       case 'DRAFTING': return { next: 'CHECKING' as TindakLanjutStatus, label: 'Kirim ke Review' };
       case 'CHECKING': return { next: 'VALIDATING' as TindakLanjutStatus, label: 'Setujui & Lanjutkan' };
-      case 'VALIDATING': return { next: 'FINISHED' as TindakLanjutStatus, label: 'Finalisasi TL' };
+      case 'VALIDATING': return { next: 'FINISHED' as TindakLanjutStatus, label: 'Finalisasi Tindak Lanjut' };
       default: return null;
     }
   };
@@ -375,10 +375,10 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                     <div className="p-3 bg-green-50 border border-green-200 rounded-lg dark:bg-green-950 dark:border-green-800">
                       <h4 className="text-sm font-medium text-green-800 dark:text-green-200 mb-2">Alur Kerja Tindak Lanjut:</h4>
                       <ul className="text-xs text-green-700 dark:text-green-300 space-y-1 list-disc list-inside">
-                        <li><strong>Draft TL:</strong> Perwadag isi tindak lanjut + dokumen → kirim ke Review</li>
-                        <li><strong>Review Ketua Tim TL:</strong> Ketua Tim isi catatan evaluator → setujui atau kembalikan</li>
-                        <li><strong>Review Pengendali TL:</strong> Pengendali Teknis review → finalisasi atau kembalikan</li>
-                        <li><strong>Selesai TL:</strong> Tindak lanjut selesai, matriks terkunci</li>
+                        <li><strong>Draft Tindak Lanjut:</strong> Perwadag isi tindak lanjut + dokumen → kirim ke Review</li>
+                        <li><strong>Review Ketua Tim Tindak Lanjut:</strong> Ketua Tim isi catatan evaluator → setujui atau kembalikan</li>
+                        <li><strong>Review Pengendali Tindak Lanjut:</strong> Pengendali Teknis review → finalisasi atau kembalikan</li>
+                        <li><strong>Selesai Tindak Lanjut:</strong> Tindak lanjut selesai, matriks terkunci</li>
                       </ul>
                     </div>
 
