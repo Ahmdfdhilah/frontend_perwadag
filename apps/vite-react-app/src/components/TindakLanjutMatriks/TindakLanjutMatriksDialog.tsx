@@ -30,6 +30,7 @@ import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import { matriksService } from '@/services/matriks';
 import { useToast } from '@workspace/ui/components/sonner';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import { useRole } from '@/hooks/useRole';
 
 interface TindakLanjutMatriksDialogProps {
   open: boolean;
@@ -49,6 +50,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
   onStatusChange,
 }) => {
   const { toast } = useToast();
+  const { isAdmin, isPerwadag, isInspektorat, isPimpinan } = useRole();
   const isEditable = mode === 'edit';
 
   // Loading states for different operations
@@ -116,6 +118,29 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
   // Check if user can change tindak lanjut status
   const canChangeTindakLanjutStatus = item?.user_permissions?.can_change_tindak_lanjut_status && item?.is_editable;
 
+  // Field-specific permissions based on role and context
+  const getFieldPermissions = (temuanItem: any) => {
+    const currentStatus = temuanItem?.status_tindak_lanjut;
+
+    // Admin can edit everything
+    if (isAdmin()) {
+      return {
+        canEditTindakLanjut: true,
+        canEditDokumen: true,
+        canEditCatatan: true,
+      };
+    }
+
+    return {
+      // Perwadag can edit tindak_lanjut and dokumen when status allows
+      canEditTindakLanjut: isPerwadag() && (currentStatus === 'DRAFTING' || currentStatus === 'CHECKING'),
+      canEditDokumen: isPerwadag() && (currentStatus === 'DRAFTING' || currentStatus === 'CHECKING'),
+
+      // Evaluator (Inspektorat/Pimpinan) can edit catatan when status allows
+      canEditCatatan: (isInspektorat() || isPimpinan()) && (currentStatus === 'CHECKING' || currentStatus === 'VALIDATING'),
+    };
+  };
+
   useEffect(() => {
     if (!item || !open) {
       setEditingIndex(null);
@@ -147,13 +172,18 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
     setIsSaving(true);
     try {
       const temuanItem = item.temuan_rekomendasi_summary.data[editingIndex];
+      const fieldPermissions = getFieldPermissions(temuanItem);
 
       if (temuanItem.id) {
-        await matriksService.updateTindakLanjut(item.id, temuanItem.id, {
-          tindak_lanjut: formData.tindak_lanjut,
-          dokumen_pendukung_tindak_lanjut: formData.dokumen_pendukung_tindak_lanjut,
-          catatan_evaluator: formData.catatan_evaluator
-        });
+        // Prepare data based on field permissions
+        // Send empty string for locked fields to ensure they don't get updated
+        const updateData = {
+          tindak_lanjut: fieldPermissions.canEditTindakLanjut ? formData.tindak_lanjut : '',
+          dokumen_pendukung_tindak_lanjut: fieldPermissions.canEditDokumen ? formData.dokumen_pendukung_tindak_lanjut : '',
+          catatan_evaluator: fieldPermissions.canEditCatatan ? formData.catatan_evaluator : ''
+        };
+
+        await matriksService.updateTindakLanjut(item.id, temuanItem.id, updateData);
 
         setFormDialogOpen(false);
         setEditingIndex(null);
@@ -423,43 +453,62 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
             </DialogTitle>
           </DialogHeader>
 
-          <div className="grid grid-cols-1 gap-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="form-tindak-lanjut">Tindak Lanjut</Label>
-              <Textarea
-                id="form-tindak-lanjut"
-                value={formData.tindak_lanjut}
-                onChange={(e) => setFormData({ ...formData, tindak_lanjut: e.target.value })}
-                placeholder="Masukkan tindak lanjut yang akan dilakukan..."
-                rows={4}
-                disabled={isSaving}
-              />
-            </div>
+          {(() => {
+            if (editingIndex === null) return null;
 
-            <div className="space-y-2">
-              <Label htmlFor="form-dokumen">Dokumen Pendukung (URL)</Label>
-              <Textarea
-                id="form-dokumen"
-                value={formData.dokumen_pendukung_tindak_lanjut}
-                onChange={(e) => setFormData({ ...formData, dokumen_pendukung_tindak_lanjut: e.target.value })}
-                placeholder="Masukkan URL dokumen pendukung..."
-                rows={2}
-                disabled={isSaving}
-              />
-            </div>
+            const currentTemuanItem = item?.temuan_rekomendasi_summary?.data?.[editingIndex];
+            const fieldPermissions = currentTemuanItem ? getFieldPermissions(currentTemuanItem) : null;
 
-            <div className="space-y-2">
-              <Label htmlFor="form-catatan">Catatan Evaluator</Label>
-              <Textarea
-                id="form-catatan"
-                value={formData.catatan_evaluator}
-                onChange={(e) => setFormData({ ...formData, catatan_evaluator: e.target.value })}
-                placeholder="Masukkan catatan evaluator..."
-                rows={3}
-                disabled={isSaving}
-              />
-            </div>
-          </div>
+            return (
+              <div className="grid grid-cols-1 gap-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="form-tindak-lanjut">
+                    Tindak Lanjut
+                  </Label>
+                  <Textarea
+                    id="form-tindak-lanjut"
+                    value={formData.tindak_lanjut}
+                    onChange={(e) => setFormData({ ...formData, tindak_lanjut: e.target.value })}
+                    placeholder="Masukkan tindak lanjut yang akan dilakukan..."
+                    rows={4}
+                    disabled={isSaving || (fieldPermissions ? !fieldPermissions.canEditTindakLanjut : false)}
+                    className={fieldPermissions && !fieldPermissions.canEditTindakLanjut ? "bg-muted" : ""}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="form-dokumen">
+                    Dokumen Pendukung (URL)
+
+                  </Label>
+                  <Textarea
+                    id="form-dokumen"
+                    value={formData.dokumen_pendukung_tindak_lanjut}
+                    onChange={(e) => setFormData({ ...formData, dokumen_pendukung_tindak_lanjut: e.target.value })}
+                    placeholder="Masukkan URL dokumen pendukung..."
+                    rows={2}
+                    disabled={isSaving || (fieldPermissions ? !fieldPermissions.canEditDokumen : false)}
+                    className={fieldPermissions && !fieldPermissions.canEditDokumen ? "bg-muted" : ""}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="form-catatan">
+                    Catatan Evaluator
+                  </Label>
+                  <Textarea
+                    id="form-catatan"
+                    value={formData.catatan_evaluator}
+                    onChange={(e) => setFormData({ ...formData, catatan_evaluator: e.target.value })}
+                    placeholder="Masukkan catatan evaluator..."
+                    rows={3}
+                    disabled={isSaving || (fieldPermissions ? !fieldPermissions.canEditCatatan : false)}
+                    className={fieldPermissions && !fieldPermissions.canEditCatatan ? "bg-muted" : ""}
+                  />
+                </div>
+              </div>
+            );
+          })()}
 
           <DialogFooter>
             <Button
