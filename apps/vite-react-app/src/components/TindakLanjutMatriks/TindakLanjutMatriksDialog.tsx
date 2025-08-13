@@ -359,13 +359,13 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {/* Workflow Instructions */}
-                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                      <h4 className="text-sm font-medium text-green-800 mb-2">Alur Kerja Tindak Lanjut:</h4>
-                      <ul className="text-xs text-green-700 space-y-1 list-disc list-inside">
-                        <li><strong>DRAFTING:</strong> Perwadag isi tindak lanjut + dokumen → kirim ke Review</li>
-                        <li><strong>CHECKING:</strong> Ketua Tim isi catatan evaluator → setujui atau kembalikan</li>
-                        <li><strong>VALIDATING:</strong> Pengendali Teknis review → finalisasi atau kembalikan</li>
-                        <li><strong>FINISHED:</strong> Tindak lanjut selesai, matriks terkunci</li>
+                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg dark:bg-green-950 dark:border-green-800">
+                      <h4 className="text-sm font-medium text-green-800 dark:text-green-200 mb-2">Alur Kerja Tindak Lanjut:</h4>
+                      <ul className="text-xs text-green-700 dark:text-green-300 space-y-1 list-disc list-inside">
+                        <li><strong>Draft TL:</strong> Perwadag isi tindak lanjut + dokumen → kirim ke Review</li>
+                        <li><strong>Review Ketua Tim TL:</strong> Ketua Tim isi catatan evaluator → setujui atau kembalikan</li>
+                        <li><strong>Review Pengendali TL:</strong> Pengendali Teknis review → finalisasi atau kembalikan</li>
+                        <li><strong>Selesai TL:</strong> Tindak lanjut selesai, matriks terkunci</li>
                       </ul>
                     </div>
 

@@ -521,21 +521,21 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                   </div>
 
                   {/* Workflow Instructions */}
-                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <h4 className="text-sm font-medium text-blue-800 mb-2">Alur Kerja Matriks:</h4>
-                    <ul className="text-xs text-blue-700 space-y-1 list-disc list-inside">
-                      <li><strong>DRAFTING:</strong> Anggota Tim input temuan → kirim ke Review Ketua Tim</li>
-                      <li><strong>CHECKING:</strong> Ketua Tim review → setujui atau kembalikan ke Draft</li>
-                      <li><strong>VALIDATING:</strong> Pengendali Teknis review → finalisasi atau kembalikan ke Draft</li>
-                      <li><strong>FINISHED:</strong> Matriks selesai, dapat diakses untuk tindak lanjut</li>
+                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg dark:bg-blue-950 dark:border-blue-800">
+                    <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">Alur Kerja Matriks:</h4>
+                    <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1 list-disc list-inside">
+                      <li><strong>Draft:</strong> Anggota Tim input temuan → kirim ke Review Ketua Tim</li>
+                      <li><strong>Review Ketua Tim:</strong> Ketua Tim review → setujui atau kembalikan ke Draft</li>
+                      <li><strong>Review Pengendali:</strong> Pengendali Teknis review → finalisasi atau kembalikan ke Draft</li>
+                      <li><strong>Selesai:</strong> Matriks selesai, dapat diakses untuk tindak lanjut</li>
                     </ul>
                   </div>
 
                   {/* Helper Text */}
                   {canChangeStatus && nextAction && temuanRekomendasi.length === 0 && (
-                    <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                      <div className="w-4 h-4 rounded-full bg-amber-400 flex-shrink-0 mt-0.5"></div>
-                      <p className="text-sm text-amber-800">
+                    <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg dark:bg-amber-950 dark:border-amber-800">
+                      <div className="w-4 h-4 rounded-full bg-amber-400 dark:bg-amber-500 flex-shrink-0 mt-0.5"></div>
+                      <p className="text-sm text-amber-800 dark:text-amber-200">
                         Tambahkan minimal satu temuan rekomendasi untuk melanjutkan ke tahap berikutnya.
                       </p>
                     </div>
