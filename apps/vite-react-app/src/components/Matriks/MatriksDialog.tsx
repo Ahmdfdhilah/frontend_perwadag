@@ -24,6 +24,7 @@ import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 import { matriksService } from '@/services/matriks';
 import { useToast } from '@workspace/ui/components/sonner';
 
@@ -52,6 +53,14 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<{ name: string; filename: string } | null>(null);
   const [deletingFile, setDeletingFile] = useState(false);
+  
+  // Temuan deletion confirmation state
+  const [deleteTemuanConfirmOpen, setDeleteTemuanConfirmOpen] = useState(false);
+  const [temuanIndexToDelete, setTemuanIndexToDelete] = useState<number | null>(null);
+  
+  // Status change confirmation state
+  const [statusChangeConfirmOpen, setStatusChangeConfirmOpen] = useState(false);
+  const [newStatusToSet, setNewStatusToSet] = useState<MatriksStatus | null>(null);
 
   // Loading states for different operations
   const [isSaving, setIsSaving] = useState(false);
@@ -143,6 +152,10 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
       setEditingIndex(null);
       setFormData({ kondisi: '', kriteria: '', rekomendasi: '' });
       setFormDialogOpen(false);
+      setDeleteTemuanConfirmOpen(false);
+      setTemuanIndexToDelete(null);
+      setStatusChangeConfirmOpen(false);
+      setNewStatusToSet(null);
     }
 
     // Reset loading states when dialog opens/closes
@@ -249,7 +262,16 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   const handleRemoveTemuanRekomendasi = (index: number) => {
     // Prevent removing during save operation
     if (isSaving) return;
-    setTemuanRekomendasi(temuanRekomendasi.filter((_, i) => i !== index));
+    setTemuanIndexToDelete(index);
+    setDeleteTemuanConfirmOpen(true);
+  };
+
+  const confirmDeleteTemuan = () => {
+    if (temuanIndexToDelete !== null) {
+      setTemuanRekomendasi(temuanRekomendasi.filter((_, i) => i !== temuanIndexToDelete));
+      setTemuanIndexToDelete(null);
+      setDeleteTemuanConfirmOpen(false);
+    }
   };
 
   const handleSave = async () => {
@@ -291,12 +313,20 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     onOpenChange(false);
   };
 
-  const handleStatusChange = async (newStatus: MatriksStatus) => {
+  const handleStatusChangeClick = (newStatus: MatriksStatus) => {
     if (!onStatusChange || !item?.id || isChangingStatus) return;
+    setNewStatusToSet(newStatus);
+    setStatusChangeConfirmOpen(true);
+  };
+
+  const confirmStatusChange = async () => {
+    if (!onStatusChange || !newStatusToSet || isChangingStatus) return;
 
     setIsChangingStatus(true);
     try {
-      await onStatusChange(newStatus);
+      await onStatusChange(newStatusToSet);
+      setStatusChangeConfirmOpen(false);
+      setNewStatusToSet(null);
     } catch (error) {
       console.error('Error changing status:', error);
       // Error toast is handled by parent component
@@ -309,7 +339,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     if (!item?.status) return;
 
     const rollbackStatus: MatriksStatus = 'DRAFTING';
-    await handleStatusChange(rollbackStatus);
+    handleStatusChangeClick(rollbackStatus);
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
@@ -564,7 +594,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                     {/* Status change button */}
                     {canChangeStatus && nextAction && (
                       <Button
-                        onClick={() => handleStatusChange(nextAction.next)}
+                        onClick={() => handleStatusChangeClick(nextAction.next)}
                         disabled={isChangingStatus || (temuanRekomendasi.length === 0)}
                       >
                         {isChangingStatus ? (
@@ -624,6 +654,31 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
         fileName={fileToDelete?.name || ''}
         onConfirm={handleConfirmDelete}
         loading={deletingFile}
+      />
+
+      {/* Temuan Delete Confirmation Dialog */}
+      <ConfirmationDialog
+        open={deleteTemuanConfirmOpen}
+        onOpenChange={setDeleteTemuanConfirmOpen}
+        title="Hapus Temuan Rekomendasi"
+        description={`Apakah Anda yakin ingin menghapus temuan rekomendasi nomor ${(temuanIndexToDelete ?? 0) + 1}? Tindakan ini tidak dapat dibatalkan.`}
+        confirmText="Hapus"
+        cancelText="Batal"
+        onConfirm={confirmDeleteTemuan}
+        variant="destructive"
+      />
+
+      {/* Status Change Confirmation Dialog */}
+      <ConfirmationDialog
+        open={statusChangeConfirmOpen}
+        onOpenChange={setStatusChangeConfirmOpen}
+        title="Konfirmasi Perubahan Status"
+        description={`Apakah Anda yakin ingin mengubah status matriks ini${newStatusToSet === 'DRAFTING' ? ' kembali ke Draft' : ''}? Tindakan ini akan mempengaruhi alur kerja matriks.`}
+        confirmText="Ya, Ubah Status"
+        cancelText="Batal"
+        onConfirm={confirmStatusChange}
+        loading={isChangingStatus}
+        variant={newStatusToSet === 'DRAFTING' ? 'destructive' : 'default'}
       />
 
       {/* Form Input Dialog */}

@@ -24,6 +24,7 @@ import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import { matriksService } from '@/services/matriks';
 import { useToast } from '@workspace/ui/components/sonner';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 import { useRole } from '@/hooks/useRole';
 
 interface TindakLanjutMatriksDialogProps {
@@ -59,6 +60,10 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
     dokumen_pendukung_tindak_lanjut: '',
     catatan_evaluator: ''
   });
+  
+  // Status change confirmation state
+  const [statusChangeConfirmOpen, setStatusChangeConfirmOpen] = useState(false);
+  const [newStatusToSet, setNewStatusToSet] = useState<TindakLanjutStatus | null>(null);
 
   // Get status badge with background colors (now uses matriks-level status)
   const getTindakLanjutStatusBadge = (status?: TindakLanjutStatus) => {
@@ -140,6 +145,8 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
       setEditingIndex(null);
       setFormData({ tindak_lanjut: '', dokumen_pendukung_tindak_lanjut: '', catatan_evaluator: '' });
       setFormDialogOpen(false);
+      setStatusChangeConfirmOpen(false);
+      setNewStatusToSet(null);
     }
 
     // Reset loading states when dialog opens/closes
@@ -207,12 +214,20 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
     setFormDialogOpen(false);
   };
 
-  const handleStatusChange = async (newStatus: TindakLanjutStatus) => {
+  const handleStatusChangeClick = (newStatus: TindakLanjutStatus) => {
     if (!onStatusChange || isChangingStatus) return;
+    setNewStatusToSet(newStatus);
+    setStatusChangeConfirmOpen(true);
+  };
+
+  const confirmStatusChange = async () => {
+    if (!onStatusChange || !newStatusToSet || isChangingStatus) return;
 
     setIsChangingStatus(true);
     try {
-      await onStatusChange(newStatus);
+      await onStatusChange(newStatusToSet);
+      setStatusChangeConfirmOpen(false);
+      setNewStatusToSet(null);
     } catch (error) {
       console.error('Error changing tindak lanjut status:', error);
     } finally {
@@ -222,7 +237,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
 
   const handleRollback = async () => {
     const rollbackStatus: TindakLanjutStatus = 'DRAFTING';
-    await handleStatusChange(rollbackStatus);
+    handleStatusChangeClick(rollbackStatus);
   };
 
   const handleCancel = () => {
@@ -393,7 +408,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                           {/* Status change button */}
                           {canChangeTindakLanjutStatus && nextAction && (
                             <Button
-                              onClick={() => handleStatusChange(nextAction.next)}
+                              onClick={() => handleStatusChangeClick(nextAction.next)}
                               disabled={isChangingStatus}
                             >
                               {isChangingStatus ? (
@@ -426,6 +441,19 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Status Change Confirmation Dialog */}
+      <ConfirmationDialog
+        open={statusChangeConfirmOpen}
+        onOpenChange={setStatusChangeConfirmOpen}
+        title="Konfirmasi Perubahan Status Tindak Lanjut"
+        description={`Apakah Anda yakin ingin mengubah status tindak lanjut ini${newStatusToSet === 'DRAFTING' ? ' kembali ke Draft' : ''}? Tindakan ini akan mempengaruhi alur kerja tindak lanjut.`}
+        confirmText="Ya, Ubah Status"
+        cancelText="Batal"
+        onConfirm={confirmStatusChange}
+        loading={isChangingStatus}
+        variant={newStatusToSet === 'DRAFTING' ? 'destructive' : 'default'}
+      />
 
       {/* Form Input Dialog */}
       <Dialog open={formDialogOpen} onOpenChange={setFormDialogOpen}>
