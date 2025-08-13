@@ -7,10 +7,10 @@ import {
   TrendingUp,
   FileText
 } from "lucide-react";
-import { SuratTugasDashboardSummary } from "../../services/suratTugas/types";
+import { DashboardSummaryResponse } from "../../services/suratTugas/types";
 
 interface DashboardCardsProps {
-  dashboardData: SuratTugasDashboardSummary | null;
+  dashboardData: DashboardSummaryResponse | null;
   loading?: boolean;
 }
 

@@ -7,7 +7,7 @@ import LogActivitySection from "@/components/Dashboard/LogActivitySection";
 import SuratTugasTable from "@/components/SuratTugas/SuratTugasTable";
 import SuratTugasCards from "@/components/SuratTugas/SuratTugasCards";
 import { suratTugasService } from "../../services/suratTugas/service";
-import { SuratTugasDashboardSummary } from "../../services/suratTugas/types";
+import { DashboardSummaryResponse } from "../../services/suratTugas/types";
 import { useRole } from "@/hooks/useRole";
 import { useURLFilters } from "@/hooks/useURLFilters";
 import {
@@ -51,7 +51,7 @@ const DashboardPage: React.FC = () => {
   // Get current filters from URL
   const filters = getCurrentFilters();
 
-  const [dashboardData, setDashboardData] = useState<SuratTugasDashboardSummary | null>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardSummaryResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   // Use optimized year options hook and filter out 'all' option for dashboard

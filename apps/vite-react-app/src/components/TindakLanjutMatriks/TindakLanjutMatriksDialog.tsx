@@ -18,13 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from '@workspace/ui/components/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@workspace/ui/components/dropdown-menu';
-import { Loader2, ExternalLink, MoreVertical, ArrowRight, RotateCcw } from 'lucide-react';
+import { Loader2, ExternalLink } from 'lucide-react';
 import { MatriksResponse, TindakLanjutStatus } from '@/services/matriks/types';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import { matriksService } from '@/services/matriks';
@@ -66,7 +60,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
     catatan_evaluator: ''
   });
 
-  // Get status badge with background colors
+  // Get status badge with background colors (now uses matriks-level status)
   const getTindakLanjutStatusBadge = (status?: TindakLanjutStatus) => {
     switch (status) {
       case 'DRAFTING':
@@ -102,7 +96,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
     }
   };
 
-  // Get next status and button label for tindak lanjut
+  // Get next status and button label for tindak lanjut (matriks-level)
   const getNextTindakLanjutAction = (currentStatus?: TindakLanjutStatus) => {
     switch (currentStatus) {
       case 'DRAFTING': return { next: 'CHECKING' as TindakLanjutStatus, label: 'Kirim ke Review' };
@@ -118,9 +112,9 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
   // Check if user can change tindak lanjut status
   const canChangeTindakLanjutStatus = item?.user_permissions?.can_change_tindak_lanjut_status && item?.is_editable;
 
-  // Field-specific permissions based on role and context
-  const getFieldPermissions = (temuanItem: any) => {
-    const currentStatus = temuanItem?.status_tindak_lanjut;
+  // Field-specific permissions based on role and context (uses matriks-level status)
+  const getFieldPermissions = () => {
+    const currentStatus = item?.status_tindak_lanjut;
 
     // Admin can edit everything
     if (isAdmin()) {
@@ -172,7 +166,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
     setIsSaving(true);
     try {
       const temuanItem = item.temuan_rekomendasi_summary.data[editingIndex];
-      const fieldPermissions = getFieldPermissions(temuanItem);
+      const fieldPermissions = getFieldPermissions();
 
       if (temuanItem.id) {
         // Prepare data based on field permissions
@@ -288,7 +282,6 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                             <TableHead>Kriteria</TableHead>
                             <TableHead>Rekomendasi</TableHead>
                             <TableHead>Tindak Lanjut</TableHead>
-                            <TableHead>Status TL</TableHead>
                             {canEditTindakLanjut && <TableHead className="w-[80px]">Aksi</TableHead>}
                           </TableRow>
                         </TableHeader>
@@ -329,9 +322,6 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                                   </div>
                                 )}
                               </TableCell>
-                              <TableCell>
-                                {getTindakLanjutStatusBadge(tr.status_tindak_lanjut)}
-                              </TableCell>
                               {canEditTindakLanjut && (
                                 <TableCell>
                                   <ActionDropdown
@@ -358,6 +348,14 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                     <CardTitle className="text-lg">Aksi Tindak Lanjut</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
+                    {/* Current Status Display */}
+                    <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium text-muted-foreground">Status Tindak Lanjut saat ini:</span>
+                        {getTindakLanjutStatusBadge(item?.status_tindak_lanjut)}
+                      </div>
+                    </div>
+
                     {/* Workflow Instructions */}
                     <div className="p-3 bg-green-50 border border-green-200 rounded-lg dark:bg-green-950 dark:border-green-800">
                       <h4 className="text-sm font-medium text-green-800 dark:text-green-200 mb-2">Alur Kerja Tindak Lanjut:</h4>
@@ -369,63 +367,48 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                       </ul>
                     </div>
 
-                    {/* Status Action Buttons for each item */}
-                    {item.temuan_rekomendasi_summary.data.map((tr, index) => {
-                      const nextAction = getNextTindakLanjutAction(tr.status_tindak_lanjut);
+                    {/* Action Buttons */}
+                    {(() => {
+                      const nextAction = getNextTindakLanjutAction(item?.status_tindak_lanjut);
                       return (
-                        <div key={index} className="p-3 border rounded-lg">
-                          <div className="flex items-center justify-between mb-2">
-                            <span className="font-medium text-sm">Temuan {index + 1}</span>
-                            {getTindakLanjutStatusBadge(tr.status_tindak_lanjut)}
-                          </div>
+                        <div className="flex flex-wrap gap-2">
+                          {/* Rollback button - show for CHECKING and VALIDATING status */}
+                          {canChangeTindakLanjutStatus && (item?.status_tindak_lanjut === 'CHECKING' || item?.status_tindak_lanjut === 'VALIDATING') && (
+                            <Button
+                              variant="destructive"
+                              onClick={handleRollback}
+                              disabled={isChangingStatus}
+                            >
+                              {isChangingStatus ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                  Mengembalikan...
+                                </>
+                              ) : (
+                                'Kembalikan ke Draft'
+                              )}
+                            </Button>
+                          )}
 
-                          <div className="flex justify-end">
-                            {/* Status Actions Dropdown */}
-                            {(canChangeTindakLanjutStatus && (nextAction || (tr.status_tindak_lanjut === 'CHECKING' || tr.status_tindak_lanjut === 'VALIDATING'))) && (
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    className="h-8 w-8 p-0"
-                                    disabled={isChangingStatus}
-                                  >
-                                    {isChangingStatus ? (
-                                      <Loader2 className="h-4 w-4 animate-spin" />
-                                    ) : (
-                                      <MoreVertical className="h-4 w-4" />
-                                    )}
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  {/* Next status action */}
-                                  {nextAction && (
-                                    <DropdownMenuItem
-                                      onClick={() => handleStatusChange(nextAction.next)}
-                                      disabled={isChangingStatus}
-                                    >
-                                      <ArrowRight className="mr-2 h-4 w-4" />
-                                      {nextAction.label}
-                                    </DropdownMenuItem>
-                                  )}
-
-                                  {/* Rollback action */}
-                                  {(tr.status_tindak_lanjut === 'CHECKING' || tr.status_tindak_lanjut === 'VALIDATING') && (
-                                    <DropdownMenuItem
-                                      onClick={() => handleRollback()}
-                                      disabled={isChangingStatus}
-                                      className="text-destructive focus:text-destructive"
-                                    >
-                                      <RotateCcw className="mr-2 h-4 w-4" />
-                                      Kembalikan ke Draft
-                                    </DropdownMenuItem>
-                                  )}
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            )}
-                          </div>
+                          {/* Status change button */}
+                          {canChangeTindakLanjutStatus && nextAction && (
+                            <Button
+                              onClick={() => handleStatusChange(nextAction.next)}
+                              disabled={isChangingStatus}
+                            >
+                              {isChangingStatus ? (
+                                <>
+                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                  Memproses...
+                                </>
+                              ) : (
+                                nextAction.label
+                              )}
+                            </Button>
+                          )}
                         </div>
                       );
-                    })}
+                    })()}
                   </CardContent>
                 </Card>
               )}
@@ -456,8 +439,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
           {(() => {
             if (editingIndex === null) return null;
 
-            const currentTemuanItem = item?.temuan_rekomendasi_summary?.data?.[editingIndex];
-            const fieldPermissions = currentTemuanItem ? getFieldPermissions(currentTemuanItem) : null;
+            const fieldPermissions = getFieldPermissions();
 
             return (
               <div className="grid grid-cols-1 gap-4 py-4">

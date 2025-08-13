@@ -63,7 +63,7 @@ const TindakLanjutMatriksPage: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<MatriksResponse | null>(null);
   const [dialogMode, setDialogMode] = useState<'edit' | 'view'>('edit');
-  
+
   // Use optimized year options hook
   const { yearOptions } = useYearOptions();
 
@@ -92,17 +92,17 @@ const TindakLanjutMatriksPage: React.FC = () => {
       }
 
       const response = await matriksService.getMatriksList(params);
-      
+
       // Filter results to only show matriks with tindak lanjut data
-      const matriksWithTindakLanjut = response.items.filter(item => 
-        item.temuan_rekomendasi_summary?.data && 
+      const matriksWithTindakLanjut = response.items.filter(item =>
+        item.temuan_rekomendasi_summary?.data &&
         item.temuan_rekomendasi_summary.data.length > 0
       );
 
       // Apply additional tindak lanjut status filter if specified
       if (filters.status_tindak_lanjut !== 'all') {
         const filteredMatriks = matriksWithTindakLanjut.filter(item => {
-          const hasStatus = item.temuan_rekomendasi_summary?.data?.some(tr => 
+          const hasStatus = item.temuan_rekomendasi_summary?.data?.some(tr =>
             tr.status_tindak_lanjut === filters.status_tindak_lanjut
           );
           return hasStatus;
@@ -147,7 +147,7 @@ const TindakLanjutMatriksPage: React.FC = () => {
     try {
       // Refresh data and update selected item
       await fetchTindakLanjutMatriks();
-      
+
       // Update the selected item with fresh data from backend
       const updatedItem = await matriksService.getMatriksById(selectedItem.id);
       setSelectedItem(updatedItem);
@@ -161,17 +161,17 @@ const TindakLanjutMatriksPage: React.FC = () => {
 
     try {
       await matriksService.updateTindakLanjutStatus(selectedItem.id, { status: newStatus });
-      
+
       // Refresh data and update selected item
       await fetchTindakLanjutMatriks();
-      
+
       // Update the selected item with fresh data from backend
       const updatedItem = await matriksService.getMatriksById(selectedItem.id);
       setSelectedItem(updatedItem);
 
       const statusLabels = {
         'DRAFTING': 'Draft TL',
-        'CHECKING': 'Review Ketua Tim', 
+        'CHECKING': 'Review Ketua Tim',
         'VALIDATING': 'Review Pengendali',
         'FINISHED': 'Selesai'
       };
@@ -195,7 +195,7 @@ const TindakLanjutMatriksPage: React.FC = () => {
   const canEdit = (item: MatriksResponse) => {
     return item.user_permissions?.can_edit_tindak_lanjut && item.is_editable;
   };
-  
+
   // Filter handlers
   const handleSearchChange = (search: string) => {
     updateURL({ search, page: 1 });
@@ -245,7 +245,7 @@ const TindakLanjutMatriksPage: React.FC = () => {
     if (filters.status_tindak_lanjut !== 'all') {
       const statusLabels = {
         'DRAFTING': 'Draft TL',
-        'CHECKING': 'Review Ketua Tim', 
+        'CHECKING': 'Review Ketua Tim',
         'VALIDATING': 'Review Pengendali',
         'FINISHED': 'Selesai'
       };
@@ -367,7 +367,6 @@ const TindakLanjutMatriksPage: React.FC = () => {
                 onEdit={handleEdit}
                 onView={handleView}
                 canEdit={canEdit}
-                userRole={isAdmin() ? 'admin' : isInspektorat() ? 'inspektorat' : 'perwadag'}
                 currentPage={filters.page}
                 itemsPerPage={filters.size}
               />

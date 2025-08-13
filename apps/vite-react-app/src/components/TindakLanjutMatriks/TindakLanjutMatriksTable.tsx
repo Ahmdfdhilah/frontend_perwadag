@@ -20,7 +20,6 @@ interface TindakLanjutMatriksTableProps {
   onView?: (item: MatriksResponse) => void;
   onExport?: (item: MatriksResponse) => void;
   canEdit?: (item: MatriksResponse) => boolean;
-  userRole: 'admin' | 'inspektorat' | 'perwadag';
   currentPage?: number;
   itemsPerPage?: number;
 }
@@ -32,7 +31,6 @@ const TindakLanjutMatriksTable: React.FC<TindakLanjutMatriksTableProps> = ({
   onView,
   onExport,
   canEdit,
-  userRole,
   currentPage = 1,
   itemsPerPage = 10,
 }) => {
