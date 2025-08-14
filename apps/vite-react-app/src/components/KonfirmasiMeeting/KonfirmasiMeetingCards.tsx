@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/componen
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { MeetingResponse } from '@/services/meeting/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import { formatIndonesianDateRange, formatMeetingDate } from '@/utils/timeFormat';
+import { formatIndonesianDateRange, formatDateWithHoursFromAPI } from '@/utils/timeFormat';
 
 interface KonfirmasiMeetingCardsProps {
   data: MeetingResponse[];
@@ -125,7 +125,7 @@ const KonfirmasiMeetingCards: React.FC<KonfirmasiMeetingCardsProps> = ({
                 </div>
                 <div>
                   <span className="font-medium text-muted-foreground">Tanggal Konfirmasi Meeting:</span>
-                  <span className="ml-2">{item.tanggal_meeting ? formatMeetingDate(item.tanggal_meeting) : '-'}</span>
+                  <span className="ml-2">{item.tanggal_meeting ? formatDateWithHoursFromAPI(item.tanggal_meeting) : '-'}</span>
                 </div>
                 <div>
                   <span className="font-medium text-muted-foreground">Link Zoom:</span>

@@ -14,7 +14,7 @@ import DateTimePicker from '@/components/common/DateTimePicker';
 import { MeetingResponse } from '@/services/meeting/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useRole } from '@/hooks/useRole';
-import {  formatIndonesianDateRange, formatDateTimeForAPI, formatMeetingDate, parseUTCDateTimeToLocal } from '@/utils/timeFormat';
+import {  formatIndonesianDateRange, formatDateTimeForAPI, formatDateWithHoursFromAPI, parseUTCDateTimeToLocal } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { meetingService } from '@/services/meeting';
@@ -243,7 +243,7 @@ const EntryMeetingDialog: React.FC<EntryMeetingDialogProps> = ({
                   />
                 ) : (
                   <div className="p-3 bg-muted rounded-md">
-                    {item?.tanggal_meeting ? formatMeetingDate(item.tanggal_meeting) : '-'}
+                    {item?.tanggal_meeting ? formatDateWithHoursFromAPI(item.tanggal_meeting) : '-'}
                   </div>
                 )}
               </div>

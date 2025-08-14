@@ -1,44 +1,3 @@
-import { formatDistanceToNow } from 'date-fns';
-import { enUS } from 'date-fns/locale';
-
-export const formatRelativeTime = (dateString: string) => {
-    try {
-        const inputDate = new Date(dateString);
-
-        // Offset untuk WIB (UTC+7) dalam milidetik
-        const indonesiaOffset = 7 * 60 * 60 * 1000;
-
-        // Konversi input date ke waktu Indonesia
-        const indonesiaInputDate = new Date(inputDate.getTime() + indonesiaOffset);
-
-        return formatDistanceToNow(indonesiaInputDate, {
-            addSuffix: true,
-            locale: enUS
-        });
-    } catch {
-        return 'Unknown time';
-    }
-};
-
-// Alternatif jika tidak menggunakan date-fns-tz
-export const formatRelativeTimeSimple = (dateString: string) => {
-    try {
-        const inputDate = new Date(dateString);
-
-        // Offset untuk WIB (UTC+7) dalam milidetik
-        const indonesiaOffset = 7 * 60 * 60 * 1000;
-
-        // Konversi input date ke waktu Indonesia
-        const indonesiaInputDate = new Date(inputDate.getTime() + indonesiaOffset);
-
-        return formatDistanceToNow(indonesiaInputDate, {
-            addSuffix: true,
-            locale: enUS
-        });
-    } catch {
-        return 'Waktu tidak diketahui';
-    }
-};
 
 // Format tanggal ke bahasa Indonesia
 export const formatIndonesianDate = (dateString: string): string => {
@@ -60,9 +19,9 @@ export const formatIndonesianDate = (dateString: string): string => {
     }
 };
 
-// Format tanggal meeting (datetime) ke bahasa Indonesia dengan waktu  
+// Format tanggal (datetime) ke bahasa Indonesia dengan waktu  
 // Displays time in the viewer's local timezone
-export const formatMeetingDate = (dateString: string): string => {
+export const formatDateWithHoursFromAPI = (dateString: string): string => {
     try {
         const utcDate = new Date(dateString);
         
@@ -84,29 +43,6 @@ export const formatMeetingDate = (dateString: string): string => {
     }
 };
 
-// Format tanggal meeting showing the original time (UTC time as saved)
-// Use this if you want to show the exact time that was saved, regardless of viewer's timezone
-export const formatMeetingDateOriginal = (dateString: string): string => {
-    try {
-        const utcDate = new Date(dateString);
-        
-        const months = [
-            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-        ];
-        
-        // Show UTC time as-is (the original saved time)
-        const day = utcDate.getUTCDate();
-        const month = months[utcDate.getUTCMonth()];
-        const year = utcDate.getUTCFullYear();
-        const hours = String(utcDate.getUTCHours()).padStart(2, '0');
-        const minutes = String(utcDate.getUTCMinutes()).padStart(2, '0');
-        
-        return `${day} ${month} ${year}, ${hours}:${minutes}`;
-    } catch {
-        return 'Tanggal tidak valid';
-    }
-};
 
 // Format range tanggal ke bahasa Indonesia
 export const formatIndonesianDateRange = (startDate: string, endDate: string): string => {
@@ -229,28 +165,3 @@ export const formatIndonesianDateTime = (dateString: string): string => {
     }
 };
 
-// Alternative manual conversion for debugging
-export const formatIndonesianDateTimeManual = (dateString: string): string => {
-    try {
-        let utcDate: Date;
-        if (dateString.endsWith('Z')) {
-            utcDate = new Date(dateString);
-        } else {
-            utcDate = new Date(dateString + 'Z');
-        }
-        
-        // Manual offset calculation (UTC+7)
-        const indonesiaOffset = 7 * 60 * 60 * 1000;
-        const indonesiaDate = new Date(utcDate.getTime() + indonesiaOffset);
-        
-        const day = String(indonesiaDate.getUTCDate()).padStart(2, '0');
-        const month = String(indonesiaDate.getUTCMonth() + 1).padStart(2, '0');
-        const year = indonesiaDate.getUTCFullYear();
-        const hours = String(indonesiaDate.getUTCHours()).padStart(2, '0');
-        const minutes = String(indonesiaDate.getUTCMinutes()).padStart(2, '0');
-        
-        return `${day}/${month}/${year} ${hours}:${minutes}`;
-    } catch {
-        return 'Waktu tidak valid';
-    }
-};
