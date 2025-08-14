@@ -54,13 +54,14 @@ const TemuanFormDialog: React.FC<TemuanFormDialogProps> = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
-        <DialogHeader>
+        <DialogHeader className="flex-shrink-0 border-b pb-4">
           <DialogTitle>
             {editingIndex !== null ? `Edit Temuan ${editingIndex + 1}` : 'Tambah Temuan Rekomendasi'}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 gap-4 py-4">
+        <div className="flex-1 overflow-y-auto py-4">
+          <div className="grid grid-cols-1 gap-4">
           <div className="space-y-2">
             <Label htmlFor="form-kondisi">Kondisi <span className="text-red-500">*</span></Label>
             <Textarea
@@ -108,9 +109,10 @@ const TemuanFormDialog: React.FC<TemuanFormDialogProps> = ({
               <p className="text-red-500 text-xs mt-1">{validationErrors.rekomendasi}</p>
             )}
           </div>
+          </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="flex-shrink-0 border-t pt-4">
           <Button
             variant="outline"
             onClick={onCancel}

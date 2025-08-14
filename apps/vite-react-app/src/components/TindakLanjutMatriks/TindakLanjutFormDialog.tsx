@@ -56,13 +56,14 @@ const TindakLanjutFormDialog: React.FC<TindakLanjutFormDialogProps> = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
-        <DialogHeader>
+        <DialogHeader className="flex-shrink-0 border-b pb-4">
           <DialogTitle>
             Edit Tindak Lanjut Item {editingIndex !== null ? editingIndex + 1 : ''}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 gap-4 py-4">
+        <div className="flex-1 overflow-y-auto py-4">
+          <div className="grid grid-cols-1 gap-4">
           {/* Tindak Lanjut Field */}
           <div className="space-y-2">
             <Label htmlFor="form-tindak-lanjut">
@@ -129,9 +130,10 @@ const TindakLanjutFormDialog: React.FC<TindakLanjutFormDialogProps> = ({
               <li>• <strong>Admin:</strong> Dapat edit semua field</li>
             </ul>
           </div>
+          </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="flex-shrink-0 border-t pt-4">
           <Button
             variant="outline"
             onClick={onCancel}
