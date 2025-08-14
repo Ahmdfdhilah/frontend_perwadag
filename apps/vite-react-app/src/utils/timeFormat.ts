@@ -20,7 +20,7 @@ export const formatIndonesianDate = (dateString: string): string => {
 };
 
 // Format tanggal (datetime) ke bahasa Indonesia dengan waktu  
-// Displays time in the viewer's local timezone
+// Displays time in the viewer's local timezone with timezone indicator
 export const formatDateWithHoursFromAPI = (dateString: string): string => {
     try {
         const utcDate = new Date(dateString);
@@ -37,7 +37,22 @@ export const formatDateWithHoursFromAPI = (dateString: string): string => {
         const hours = String(utcDate.getHours()).padStart(2, '0');
         const minutes = String(utcDate.getMinutes()).padStart(2, '0');
         
-        return `${day} ${month} ${year}, ${hours}:${minutes}`;
+        // Get timezone info
+        const timezoneOffset = -utcDate.getTimezoneOffset();
+        const offsetHours = Math.floor(timezoneOffset / 60);
+        const offsetMinutes = Math.abs(timezoneOffset % 60);
+        
+        // Format timezone - only show minutes if not zero
+        let timezoneStr;
+        if (offsetMinutes === 0) {
+            // Most common case: +7, -5, +0
+            timezoneStr = offsetHours >= 0 ? `+${offsetHours}` : `${offsetHours}`;
+        } else {
+            // Rare case with minutes: +5:30, +9:30
+            timezoneStr = `${offsetHours >= 0 ? '+' : ''}${offsetHours}:${String(offsetMinutes).padStart(2, '0')}`;
+        }
+        
+        return `${day} ${month} ${year}, ${hours}:${minutes} (GMT${timezoneStr})`;
     } catch {
         return 'Tanggal tidak valid';
     }
