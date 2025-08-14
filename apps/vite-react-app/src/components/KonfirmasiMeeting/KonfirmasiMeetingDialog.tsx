@@ -14,7 +14,7 @@ import DateTimePicker from '@/components/common/DateTimePicker';
 import { MeetingResponse } from '@/services/meeting/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useRole } from '@/hooks/useRole';
-import { formatIndonesianDateRange, formatDateTimeForAPI, formatMeetingDate } from '@/utils/timeFormat';
+import { formatIndonesianDateRange, formatDateTimeForAPI, formatMeetingDate, parseUTCDateTimeToLocal } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { meetingService } from '@/services/meeting';
@@ -57,7 +57,7 @@ const KonfirmasiMeetingDialog: React.FC<KonfirmasiMeetingDialogProps> = ({
         link_zoom: item.link_zoom || '',
         link_daftar_hadir: item.link_daftar_hadir || '',
       });
-      setSelectedKonfirmasiDate(item.tanggal_meeting ? new Date(item.tanggal_meeting) : undefined);
+      setSelectedKonfirmasiDate(parseUTCDateTimeToLocal(item.tanggal_meeting));
       
       // Set existing files for display
       setExistingFiles(item.files_info?.files ? item.files_info.files.map((file, index) => ({ 
