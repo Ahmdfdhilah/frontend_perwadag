@@ -79,14 +79,20 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
   const handleHoursChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newHours = e.target.value;
     if (/^\d{0,2}$/.test(newHours) && (newHours === '' || (parseInt(newHours) >= 0 && parseInt(newHours) <= 23))) {
-      handleTimeChange(newHours.padStart(2, '0'));
+      setHours(newHours);
+      if (newHours.length === 2) {
+        handleTimeChange(newHours);
+      }
     }
   };
 
   const handleMinutesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newMinutes = e.target.value;
     if (/^\d{0,2}$/.test(newMinutes) && (newMinutes === '' || (parseInt(newMinutes) >= 0 && parseInt(newMinutes) <= 59))) {
-      handleTimeChange(undefined, newMinutes.padStart(2, '0'));
+      setMinutes(newMinutes);
+      if (newMinutes.length === 2) {
+        handleTimeChange(undefined, newMinutes);
+      }
     }
   };
 
