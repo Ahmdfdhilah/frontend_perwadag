@@ -35,6 +35,7 @@ interface MatriksDialogProps {
   mode: 'edit' | 'view';
   onSave?: (data: any) => void;
   onStatusChange?: (status: MatriksStatus) => void;
+  onRefetch?: (id: string) => Promise<MatriksResponse>;
 }
 
 const MatriksDialog: React.FC<MatriksDialogProps> = ({
@@ -44,6 +45,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   mode,
   onSave,
   onStatusChange,
+  onRefetch,
 }) => {
   const { toast } = useToast();
   const isEditable = mode === 'edit';
@@ -62,10 +64,17 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   const [statusChangeConfirmOpen, setStatusChangeConfirmOpen] = useState(false);
   const [newStatusToSet, setNewStatusToSet] = useState<MatriksStatus | null>(null);
 
+
   // Loading states for different operations
   const [isSaving, setIsSaving] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [isChangingStatus, setIsChangingStatus] = useState(false);
+
+  // Store current temuan_version for conflict detection
+  const [currentTemuanVersion, setCurrentTemuanVersion] = useState<number>(0);
+
+  // Store current item to allow updates without closing dialog
+  const [currentItem, setCurrentItem] = useState<MatriksResponse | null>(null);
 
   // Validation states
   const [validationErrors, setValidationErrors] = useState<Record<string, { kondisi?: string; kriteria?: string; rekomendasi?: string }>>({});
@@ -121,30 +130,42 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     }
   };
 
+  // Use currentItem or fallback to item prop
+  const activeItem = currentItem || item;
+
   // Check if user can edit temuan based on permissions
-  const canEditTemuan = item?.user_permissions?.can_edit_temuan && item?.is_editable && isEditable;
+  const canEditTemuan = activeItem?.user_permissions?.can_edit_temuan && activeItem?.is_editable && isEditable;
 
   // Check if user can change status
-  const canChangeStatus = item?.user_permissions?.can_change_matrix_status && item?.is_editable;
+  const canChangeStatus = activeItem?.user_permissions?.can_change_matrix_status && activeItem?.is_editable;
 
   // Use backend permissions instead of role-based check
   const canEdit = canEditTemuan;
 
+  // Function to update dialog with fresh data
+  const updateDialogWithFreshData = (freshItem: MatriksResponse) => {
+    setCurrentItem(freshItem);
+    setTemuanRekomendasi(freshItem.temuan_rekomendasi_summary?.data || []);
+    setCurrentTemuanVersion(freshItem.temuan_version || 0);
+
+    // Set existing files for display
+    setExistingFiles(freshItem.has_file ? [{
+      name: freshItem.file_metadata?.original_filename || freshItem.file_metadata?.filename || 'Matriks',
+      url: freshItem.file_urls?.download_url,
+      viewUrl: freshItem.file_urls?.file_url,
+      size: freshItem.file_metadata?.size,
+      filename: freshItem.file_metadata?.original_filename || freshItem.file_metadata?.filename
+    }] : []);
+  };
+
   useEffect(() => {
     if (item && open) {
-      setTemuanRekomendasi(item.temuan_rekomendasi_summary?.data || []);
-
-      // Set existing files for display
-      setExistingFiles(item.has_file ? [{
-        name: item.file_metadata?.original_filename || item.file_metadata?.filename || 'Matriks',
-        url: item.file_urls?.download_url,
-        viewUrl: item.file_urls?.file_url,
-        size: item.file_metadata?.size,
-        filename: item.file_metadata?.original_filename || item.file_metadata?.filename
-      }] : []);
+      updateDialogWithFreshData(item);
     } else {
       setUploadFile(null);
       setTemuanRekomendasi([]);
+      setCurrentTemuanVersion(0);
+      setCurrentItem(null);
       setExistingFiles([]);
       setFileToDelete(null);
       setDeleteConfirmOpen(false);
@@ -284,7 +305,50 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
 
     setIsSaving(true);
     try {
-      // Send full JSON of temuan_rekomendasi, including existing IDs for updates
+      // Step 1: Check version before submitting (preventive check)
+      if (onRefetch && activeItem?.id) {
+        const latestData = await onRefetch(activeItem.id);
+        
+        // Check if version has changed
+        if (latestData.temuan_version !== currentTemuanVersion) {
+          // Save user's current changes before any updates
+          const userTemuan = [...temuanRekomendasi];
+          const userFile = uploadFile;
+          
+          // Merge server data with user's additional changes based on ID
+          const serverTemuan = latestData.temuan_rekomendasi_summary?.data || [];
+          
+          // Find user additions (items without ID - these are new items user created locally)
+          const userAdditions = userTemuan.filter(item => !item.id);
+          
+          // Final merged data: All server items + user's new additions (without ID)
+          const finalMergedTemuan = [...serverTemuan, ...userAdditions];
+          
+          // Create modified latestData with merged temuan for updateDialog
+          const modifiedLatestData = {
+            ...latestData,
+            temuan_rekomendasi_summary: {
+              ...latestData.temuan_rekomendasi_summary,
+              data: finalMergedTemuan
+            }
+          };
+          
+          // Update dialog with merged data (this will update version, metadata, etc)
+          updateDialogWithFreshData(modifiedLatestData);
+          setUploadFile(userFile);
+          
+          toast({
+            title: 'Data diperbarui',
+            description: 'Data telah diubah oleh user lain. Sistem telah memuat versi terbaru dan perubahan Anda tetap dipertahankan. Silakan simpan kembali.',
+            variant: 'warning'
+          });
+          
+          setIsSaving(false);
+          return; // Don't proceed with save, let user save again
+        }
+      }
+
+      // Step 2: Proceed with normal save if version is same
       const processedTemuanRekomendasi = temuanRekomendasi.map(tr => ({
         ...tr,
         kondisi: tr.kondisi?.trim() || '',
@@ -294,16 +358,42 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
 
       const dataToSave = {
         temuan_rekomendasi: processedTemuanRekomendasi,
+        expected_temuan_version: currentTemuanVersion,
         file: uploadFile,
       };
       await onSave(dataToSave);
-    } catch (error) {
+
+      // Success - refetch fresh data and update dialog
+      if (onRefetch && activeItem?.id) {
+        try {
+          const freshData = await onRefetch(activeItem.id);
+          updateDialogWithFreshData(freshData);
+          
+          // Clear upload file after successful save
+          setUploadFile(null);
+          
+          toast({
+            title: 'Berhasil disimpan',
+            description: 'Data matriks telah diperbarui dengan versi terbaru.',
+            variant: 'default'
+          });
+        } catch (error) {
+          console.error('Error refetching data:', error);
+          toast({
+            title: 'Berhasil disimpan',
+            description: 'Data telah disimpan. Silakan refresh halaman untuk melihat perubahan terbaru.',
+            variant: 'default'
+          });
+        }
+      }
+    } catch (error: any) {
       console.error('Error saving:', error);
       // Error toast is handled by base service
     } finally {
       setIsSaving(false);
     }
   };
+
 
   const handleCancel = () => {
     // Prevent closing if operations are in progress
@@ -314,7 +404,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   };
 
   const handleStatusChangeClick = (newStatus: MatriksStatus) => {
-    if (!onStatusChange || !item?.id || isChangingStatus) return;
+    if (!onStatusChange || !activeItem?.id || isChangingStatus) return;
     setNewStatusToSet(newStatus);
     setStatusChangeConfirmOpen(true);
   };
@@ -336,18 +426,18 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   };
 
   const handleRollback = async () => {
-    if (!item?.status) return;
+    if (!activeItem?.status) return;
 
     const rollbackStatus: MatriksStatus = 'DRAFTING';
     handleStatusChangeClick(rollbackStatus);
   };
 
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
-    if (!item?.id || isDownloading) return;
+    if (!activeItem?.id || isDownloading) return;
 
     setIsDownloading(true);
     try {
-      const blob = await matriksService.downloadFile(item.id);
+      const blob = await matriksService.downloadFile(activeItem.id);
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -383,11 +473,11 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   };
 
   const handleConfirmDelete = async () => {
-    if (!fileToDelete || !item?.id || deletingFile) return;
+    if (!fileToDelete || !activeItem?.id || deletingFile) return;
 
     setDeletingFile(true);
     try {
-      await matriksService.deleteFile(item.id, fileToDelete.filename);
+      await matriksService.deleteFile(activeItem.id, fileToDelete.filename);
 
       // Remove from UI
       setExistingFiles([]);
@@ -411,7 +501,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   const isOperationInProgress = isSaving || isDownloading || deletingFile || isChangingStatus;
 
   // Get next status action
-  const nextAction = getNextStatusAction(item?.status);
+  const nextAction = getNextStatusAction(activeItem?.status);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -430,7 +520,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
               <div className="space-y-2">
                 <Label>Nama Perwadag</Label>
                 <div className="p-3 bg-muted rounded-md">
-                  {item?.nama_perwadag}
+                  {activeItem?.nama_perwadag}
                 </div>
               </div>
             </div>
@@ -438,7 +528,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
             <div className="space-y-2">
               <Label>Periode Evaluasi</Label>
               <div className="p-3 bg-muted rounded-md">
-                {item ? formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai) : '-'}
+                {activeItem ? formatIndonesianDateRange(activeItem.tanggal_evaluasi_mulai, activeItem.tanggal_evaluasi_selesai) : '-'}
               </div>
             </div>
 
@@ -536,7 +626,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
             )}
 
             {/* Status Action Buttons */}
-            {(canChangeStatus && (nextAction || (item?.status === 'CHECKING' || item?.status === 'VALIDATING'))) && (
+            {(canChangeStatus && (nextAction || (activeItem?.status === 'CHECKING' || activeItem?.status === 'VALIDATING'))) && (
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Aksi</CardTitle>
@@ -546,7 +636,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                   <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                     <div className="flex items-center gap-3">
                       <span className="text-sm font-medium text-muted-foreground">Status saat ini:</span>
-                      {getStatusBadge(item?.status)}
+                      {getStatusBadge(activeItem?.status)}
                     </div>
                   </div>
 
@@ -574,7 +664,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                   {/* Action Buttons */}
                   <div className="flex flex-wrap gap-2">
                     {/* Rollback button - show for CHECKING and VALIDATING status */}
-                    {canChangeStatus && (item?.status === 'CHECKING' || item?.status === 'VALIDATING') && (
+                    {canChangeStatus && (activeItem?.status === 'CHECKING' || activeItem?.status === 'VALIDATING') && (
                       <Button
                         variant="destructive"
                         onClick={handleRollback}
@@ -680,6 +770,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
         loading={isChangingStatus}
         variant={newStatusToSet === 'DRAFTING' ? 'destructive' : 'default'}
       />
+
 
       {/* Form Input Dialog */}
       <Dialog open={formDialogOpen} onOpenChange={setFormDialogOpen}>

@@ -227,6 +227,7 @@ const MatriksPage: React.FC = () => {
         temuan_rekomendasi: data.temuan_rekomendasi !== undefined ? {
           items: data.temuan_rekomendasi
         } : undefined,
+        expected_temuan_version: data.expected_temuan_version,
       };
 
       await matriksService.updateMatriks(selectedItem.id, updateData);
@@ -236,18 +237,19 @@ const MatriksPage: React.FC = () => {
         await matriksService.uploadFile(selectedItem.id, data.file);
       }
 
-      setIsDialogOpen(false);
-      setSelectedItem(null);
-      fetchMatriks(); // Refresh the list
-
-      toast({
-        title: 'Berhasil diperbarui',
-        description: `Data matriks ${selectedItem.nama_perwadag} telah diperbarui.`,
-        variant: 'default'
-      });
+      // Refresh the list in background
+      fetchMatriks();
+      
+      // Don't close dialog or show toast - let dialog handle it with refetch
     } catch (error) {
       console.error('Failed to save matriks:', error);
+      throw error; // Re-throw to let dialog handle error
     }
+  };
+
+  // Function to refetch single matriks data
+  const handleRefetchMatriks = async (id: string): Promise<MatriksResponse> => {
+    return await matriksService.getMatriksById(id);
   };
 
   const handleStatusChange = async (newStatus: MatriksStatus) => {
@@ -480,6 +482,7 @@ const MatriksPage: React.FC = () => {
         item={selectedItem}
         onSave={dialogMode === 'edit' ? handleSave : undefined}
         onStatusChange={handleStatusChange}
+        onRefetch={handleRefetchMatriks}
         mode={dialogMode}
       />
     </div>

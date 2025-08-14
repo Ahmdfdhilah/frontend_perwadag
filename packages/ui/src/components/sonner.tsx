@@ -76,19 +76,30 @@ const defaultToastOptions = {
 type ToastProps = {
   title?: string
   description?: string
-  variant?: "default" | "destructive"
+  variant?: "default" | "destructive" | "success" | "info" | "warning"
 }
 
 export function useToast() {
   const toast = ({ title, description, variant = "default", ...props }: ToastProps) => {
-    const toastFn = variant === "destructive" ? sonnerToast.error : sonnerToast
-
-    return toastFn(title || "", {
+    const toastOptions = {
       description,
       ...defaultToastOptions,
       position: defaultToastOptions.position as "bottom-right",
       ...props,
-    })
+    }
+
+    switch (variant) {
+      case "destructive":
+        return sonnerToast.error(title || "", toastOptions)
+      case "success":
+        return sonnerToast.success(title || "", toastOptions)
+      case "info":
+        return sonnerToast.info(title || "", toastOptions)
+      case "warning":
+        return sonnerToast.warning(title || "", toastOptions)
+      default:
+        return sonnerToast(title || "", toastOptions)
+    }
   }
 
   return {
@@ -97,6 +108,10 @@ export function useToast() {
     error: (props: Omit<ToastProps, "variant">) =>
       toast({ ...props, variant: "destructive" }),
     success: (props: Omit<ToastProps, "variant">) =>
-      toast({ ...props, variant: "default" }),
+      toast({ ...props, variant: "success" }),
+    info: (props: Omit<ToastProps, "variant">) =>
+      toast({ ...props, variant: "info" }),
+    warning: (props: Omit<ToastProps, "variant">) =>
+      toast({ ...props, variant: "warning" }),
   }
 }
