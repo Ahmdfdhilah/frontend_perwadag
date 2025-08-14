@@ -7,8 +7,6 @@ import {
   DialogTitle,
 } from '@workspace/ui/components/dialog';
 import { Button } from '@workspace/ui/components/button';
-import { Label } from '@workspace/ui/components/label';
-import { Textarea } from '@workspace/ui/components/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import {
   Table,
@@ -24,8 +22,13 @@ import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import { matriksService } from '@/services/matriks';
 import { useToast } from '@workspace/ui/components/sonner';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 import { useRole } from '@/hooks/useRole';
+import TindakLanjutFormDialog, { 
+  type TindakLanjutFormData, 
+  type TindakLanjutFieldPermissions 
+} from './TindakLanjutFormDialog';
+import TindakLanjutStatusChangeConfirmDialog from './TindakLanjutStatusChangeConfirmDialog';
+import { Label } from '@workspace/ui/components/label';
 
 interface TindakLanjutMatriksDialogProps {
   open: boolean;
@@ -55,7 +58,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
   // Form dialog states
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<TindakLanjutFormData>({
     tindak_lanjut: '',
     dokumen_pendukung_tindak_lanjut: '',
     catatan_evaluator: ''
@@ -118,7 +121,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
   const canChangeTindakLanjutStatus = item?.user_permissions?.can_change_tindak_lanjut_status && item?.is_editable;
 
   // Field-specific permissions based on role and context (uses matriks-level status)
-  const getFieldPermissions = () => {
+  const getFieldPermissions = (): TindakLanjutFieldPermissions => {
     const currentStatus = item?.status_tindak_lanjut;
 
     // Admin can edit everything
@@ -442,108 +445,26 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
         </DialogContent>
       </Dialog>
 
-      {/* Status Change Confirmation Dialog */}
-      <ConfirmationDialog
+      <TindakLanjutStatusChangeConfirmDialog
         open={statusChangeConfirmOpen}
         onOpenChange={setStatusChangeConfirmOpen}
-        title="Konfirmasi Perubahan Status Tindak Lanjut"
-        description={`Apakah Anda yakin ingin mengubah status tindak lanjut ini${newStatusToSet === 'DRAFTING' ? ' kembali ke Draft' : ''}? Tindakan ini akan mempengaruhi alur kerja tindak lanjut.`}
-        confirmText="Ya, Ubah Status"
-        cancelText="Batal"
+        newStatus={newStatusToSet}
         onConfirm={confirmStatusChange}
         loading={isChangingStatus}
-        variant={newStatusToSet === 'DRAFTING' ? 'destructive' : 'default'}
       />
 
-      {/* Form Input Dialog */}
-      <Dialog open={formDialogOpen} onOpenChange={setFormDialogOpen}>
-        <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>
-              Edit Tindak Lanjut {editingIndex !== null ? `Temuan ${editingIndex + 1}` : ''}
-            </DialogTitle>
-          </DialogHeader>
-
-          {(() => {
-            if (editingIndex === null) return null;
-
-            const fieldPermissions = getFieldPermissions();
-
-            return (
-              <div className="grid grid-cols-1 gap-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="form-tindak-lanjut">
-                    Tindak Lanjut
-                  </Label>
-                  <Textarea
-                    id="form-tindak-lanjut"
-                    value={formData.tindak_lanjut}
-                    onChange={(e) => setFormData({ ...formData, tindak_lanjut: e.target.value })}
-                    placeholder="Masukkan tindak lanjut yang akan dilakukan..."
-                    rows={4}
-                    disabled={isSaving || (fieldPermissions ? !fieldPermissions.canEditTindakLanjut : false)}
-                    className={fieldPermissions && !fieldPermissions.canEditTindakLanjut ? "bg-muted" : ""}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="form-dokumen">
-                    Dokumen Pendukung (URL)
-
-                  </Label>
-                  <Textarea
-                    id="form-dokumen"
-                    value={formData.dokumen_pendukung_tindak_lanjut}
-                    onChange={(e) => setFormData({ ...formData, dokumen_pendukung_tindak_lanjut: e.target.value })}
-                    placeholder="Masukkan URL dokumen pendukung..."
-                    rows={2}
-                    disabled={isSaving || (fieldPermissions ? !fieldPermissions.canEditDokumen : false)}
-                    className={fieldPermissions && !fieldPermissions.canEditDokumen ? "bg-muted" : ""}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="form-catatan">
-                    Catatan Evaluator
-                  </Label>
-                  <Textarea
-                    id="form-catatan"
-                    value={formData.catatan_evaluator}
-                    onChange={(e) => setFormData({ ...formData, catatan_evaluator: e.target.value })}
-                    placeholder="Masukkan catatan evaluator..."
-                    rows={3}
-                    disabled={isSaving || (fieldPermissions ? !fieldPermissions.canEditCatatan : false)}
-                    className={fieldPermissions && !fieldPermissions.canEditCatatan ? "bg-muted" : ""}
-                  />
-                </div>
-              </div>
-            );
-          })()}
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={handleFormCancel}
-              disabled={isSaving}
-            >
-              Batal
-            </Button>
-            <Button
-              onClick={handleFormSubmit}
-              disabled={isSaving}
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Menyimpan...
-                </>
-              ) : (
-                'Simpan'
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Modular Dialog Components */}
+      <TindakLanjutFormDialog
+        open={formDialogOpen}
+        onOpenChange={setFormDialogOpen}
+        editingIndex={editingIndex}
+        formData={formData}
+        onFormDataChange={setFormData}
+        onSubmit={handleFormSubmit}
+        onCancel={handleFormCancel}
+        fieldPermissions={getFieldPermissions()}
+        isSaving={isSaving}
+      />
     </>
   );
 };
