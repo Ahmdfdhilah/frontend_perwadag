@@ -7,8 +7,6 @@ import {
   DialogTitle,
 } from '@workspace/ui/components/dialog';
 import { Button } from '@workspace/ui/components/button';
-import { Label } from '@workspace/ui/components/label';
-import { Textarea } from '@workspace/ui/components/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/components/card';
 import {
   Table,
@@ -24,9 +22,12 @@ import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import ActionDropdown from '@/components/common/ActionDropdown';
-import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 import { matriksService } from '@/services/matriks';
 import { useToast } from '@workspace/ui/components/sonner';
+import TemuanFormDialog, { type TemuanFormData } from './TemuanFormDialog';
+import TemuanDeleteConfirmDialog from './TemuanDeleteConfirmDialog';
+import { Label } from '@workspace/ui/components/label';
+import StatusChangeConfirmDialog from './StatusChangeConfirmDialog';
 
 interface MatriksDialogProps {
   open: boolean;
@@ -82,7 +83,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   // Form dialog states
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [formData, setFormData] = useState({ kondisi: '', kriteria: '', rekomendasi: '' });
+  const [formData, setFormData] = useState<TemuanFormData>({ kondisi: '', kriteria: '', rekomendasi: '' });
 
   // Get status badge with background colors
   const getStatusBadge = (status?: MatriksStatus) => {
@@ -746,115 +747,34 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
         loading={deletingFile}
       />
 
-      {/* Temuan Delete Confirmation Dialog */}
-      <ConfirmationDialog
+      <TemuanDeleteConfirmDialog
         open={deleteTemuanConfirmOpen}
         onOpenChange={setDeleteTemuanConfirmOpen}
-        title="Hapus Temuan Rekomendasi"
-        description={`Apakah Anda yakin ingin menghapus temuan rekomendasi nomor ${(temuanIndexToDelete ?? 0) + 1}? Tindakan ini tidak dapat dibatalkan.`}
-        confirmText="Hapus"
-        cancelText="Batal"
+        temuanIndex={temuanIndexToDelete}
         onConfirm={confirmDeleteTemuan}
-        variant="destructive"
       />
 
-      {/* Status Change Confirmation Dialog */}
-      <ConfirmationDialog
+      <StatusChangeConfirmDialog
         open={statusChangeConfirmOpen}
         onOpenChange={setStatusChangeConfirmOpen}
-        title="Konfirmasi Perubahan Status"
-        description={`Apakah Anda yakin ingin mengubah status matriks ini${newStatusToSet === 'DRAFTING' ? ' kembali ke Draft' : ''}? Tindakan ini akan mempengaruhi alur kerja matriks.`}
-        confirmText="Ya, Ubah Status"
-        cancelText="Batal"
+        newStatus={newStatusToSet}
         onConfirm={confirmStatusChange}
         loading={isChangingStatus}
-        variant={newStatusToSet === 'DRAFTING' ? 'destructive' : 'default'}
       />
 
 
-      {/* Form Input Dialog */}
-      <Dialog open={formDialogOpen} onOpenChange={setFormDialogOpen}>
-        <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>
-              {editingIndex !== null ? `Edit Temuan ${editingIndex + 1}` : 'Tambah Temuan Rekomendasi'}
-            </DialogTitle>
-          </DialogHeader>
-
-          <div className="grid grid-cols-1 gap-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="form-kondisi">Kondisi <span className="text-red-500">*</span></Label>
-              <Textarea
-                id="form-kondisi"
-                value={formData.kondisi}
-                onChange={(e) => setFormData({ ...formData, kondisi: e.target.value })}
-                placeholder="Masukkan kondisi yang ditemukan..."
-                rows={4}
-                disabled={isSaving}
-                className={validationErrors[editingIndex ?? temuanRekomendasi.length]?.kondisi ? "border-red-500 focus-visible:ring-red-500" : ""}
-              />
-              {validationErrors[editingIndex ?? temuanRekomendasi.length]?.kondisi && (
-                <p className="text-red-500 text-xs mt-1">{validationErrors[editingIndex ?? temuanRekomendasi.length].kondisi}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="form-kriteria">Kriteria <span className="text-red-500">*</span></Label>
-              <Textarea
-                id="form-kriteria"
-                value={formData.kriteria}
-                onChange={(e) => setFormData({ ...formData, kriteria: e.target.value })}
-                placeholder="Masukkan kriteria/standar yang harus dipenuhi..."
-                rows={4}
-                disabled={isSaving}
-                className={validationErrors[editingIndex ?? temuanRekomendasi.length]?.kriteria ? "border-red-500 focus-visible:ring-red-500" : ""}
-              />
-              {validationErrors[editingIndex ?? temuanRekomendasi.length]?.kriteria && (
-                <p className="text-red-500 text-xs mt-1">{validationErrors[editingIndex ?? temuanRekomendasi.length].kriteria}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="form-rekomendasi">Rekomendasi <span className="text-red-500">*</span></Label>
-              <Textarea
-                id="form-rekomendasi"
-                value={formData.rekomendasi}
-                onChange={(e) => setFormData({ ...formData, rekomendasi: e.target.value })}
-                placeholder="Masukkan rekomendasi perbaikan..."
-                rows={4}
-                disabled={isSaving}
-                className={validationErrors[editingIndex ?? temuanRekomendasi.length]?.rekomendasi ? "border-red-500 focus-visible:ring-red-500" : ""}
-              />
-              {validationErrors[editingIndex ?? temuanRekomendasi.length]?.rekomendasi && (
-                <p className="text-red-500 text-xs mt-1">{validationErrors[editingIndex ?? temuanRekomendasi.length].rekomendasi}</p>
-              )}
-            </div>
-          </div>
-
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={handleFormCancel}
-              disabled={isSaving}
-            >
-              Batal
-            </Button>
-            <Button
-              onClick={handleFormSubmit}
-              disabled={isSaving}
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Menyimpan...
-                </>
-              ) : (
-                editingIndex !== null ? 'Update' : 'Simpan'
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Modular Dialog Components */}
+      <TemuanFormDialog
+        open={formDialogOpen}
+        onOpenChange={setFormDialogOpen}
+        editingIndex={editingIndex}
+        formData={formData}
+        onFormDataChange={setFormData}
+        onSubmit={handleFormSubmit}
+        onCancel={handleFormCancel}
+        validationErrors={validationErrors[editingIndex ?? temuanRekomendasi.length]}
+        isSaving={isSaving}
+      />
     </Dialog>
   );
 };
