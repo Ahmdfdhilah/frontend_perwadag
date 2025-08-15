@@ -127,7 +127,7 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
                   <span className="font-medium text-muted-foreground">File Surat Tugas:</span>
                   <div className="ml-2">
                     <FileViewLink
-                      hasFile={true}
+                      hasFile={item.has_file}
                       fileUrls={{
                         view_url: item.file_surat_tugas_url,
                         file_url: item.file_surat_tugas_url

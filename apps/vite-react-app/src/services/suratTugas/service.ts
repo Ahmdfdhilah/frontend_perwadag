@@ -19,50 +19,40 @@ class SuratTugasService extends BaseService {
     super("/evaluasi/surat-tugas");
   }
 
-  // Create surat tugas
+  // Create surat tugas with optional file
   async createSuratTugas(
     data: SuratTugasCreate & { file?: File | null }
   ): Promise<SuratTugasCreateResponse> {
-    // If file is provided, send as FormData
-    if (data.file) {
-      const formData = new FormData();
-      
-      // Add all the regular fields
-      formData.append("user_perwadag_id", data.user_perwadag_id);
-      formData.append("tanggal_evaluasi_mulai", data.tanggal_evaluasi_mulai);
-      formData.append("tanggal_evaluasi_selesai", data.tanggal_evaluasi_selesai);
-      formData.append("no_surat", data.no_surat);
-      
-      // Add assignment fields if provided
-      if (data.pengedali_mutu_id) {
-        formData.append("pengedali_mutu_id", data.pengedali_mutu_id);
-      }
-      if (data.pengendali_teknis_id) {
-        formData.append("pengendali_teknis_id", data.pengendali_teknis_id);
-      }
-      if (data.ketua_tim_id) {
-        formData.append("ketua_tim_id", data.ketua_tim_id);
-      }
-      if (data.anggota_tim_ids && data.anggota_tim_ids.length > 0) {
-        data.anggota_tim_ids.forEach(id => {
-          formData.append("anggota_tim_ids", id);
-        });
-      }
-      
-      // Add the file
-      formData.append("file", data.file);
-      
-      return this.post("/", formData);
+    // Backend endpoint now always expects FormData to handle optional file
+    const formData = new FormData();
+    
+    // Add all the required fields
+    formData.append("user_perwadag_id", data.user_perwadag_id);
+    formData.append("tanggal_evaluasi_mulai", data.tanggal_evaluasi_mulai);
+    formData.append("tanggal_evaluasi_selesai", data.tanggal_evaluasi_selesai);
+    formData.append("no_surat", data.no_surat);
+    
+    // Add assignment fields if provided (can be empty strings for optional fields)
+    formData.append("pengedali_mutu_id", data.pengedali_mutu_id || "");
+    formData.append("pengendali_teknis_id", data.pengendali_teknis_id || "");
+    formData.append("ketua_tim_id", data.ketua_tim_id || "");
+    
+    // Handle anggota_tim_ids - convert array to comma-separated string
+    if (data.anggota_tim_ids && data.anggota_tim_ids.length > 0) {
+      formData.append("anggota_tim_ids", data.anggota_tim_ids.join(","));
     } else {
-      // Send as JSON without file
-      const { file, ...createData } = data;
-      
-      
-      return this.post("/", createData);
+      formData.append("anggota_tim_ids", "");
     }
+    
+    // Add the file only if provided (backend handles null file gracefully)
+    if (data.file && data.file.size > 0) {
+      formData.append("file", data.file);
+    }
+    
+    return this.post("/", formData);
   }
 
-  // Get all surat tugas with filters
+  // Get all surat tugas with filters (supports new completion filters)
   async getSuratTugasList(
     params?: SuratTugasFilterParams
   ): Promise<SuratTugasListResponse> {
@@ -70,7 +60,12 @@ class SuratTugasService extends BaseService {
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
-          queryParams.append(key, value.toString());
+          // Handle boolean values properly
+          if (typeof value === 'boolean') {
+            queryParams.append(key, value.toString());
+          } else {
+            queryParams.append(key, value.toString());
+          }
         }
       });
     }
@@ -86,59 +81,23 @@ class SuratTugasService extends BaseService {
     return this.get(`/${suratTugasId}`);
   }
 
-  // Update surat tugas
+  // Update surat tugas (NOTE: Backend update endpoint doesn't handle file upload)
   async updateSuratTugas(
     suratTugasId: string,
-    data: SuratTugasUpdate & { file?: File | null }
+    data: SuratTugasUpdate
   ): Promise<SuratTugasResponse> {
-    // If file is provided, send as FormData
-    if (data.file) {
-      const formData = new FormData();
-      
-      // Add all the regular fields
-      if (data.tanggal_evaluasi_mulai) {
-        formData.append("tanggal_evaluasi_mulai", data.tanggal_evaluasi_mulai);
+    // Backend update endpoint only handles JSON data, not file upload
+    // File upload should be done separately via uploadFile method
+    
+    // Filter out undefined and null values, keep arrays as arrays
+    const cleanData = Object.entries(data).reduce((acc, [key, value]) => {
+      if (value !== undefined && value !== null) {
+        acc[key] = value;
       }
-      if (data.tanggal_evaluasi_selesai) {
-        formData.append("tanggal_evaluasi_selesai", data.tanggal_evaluasi_selesai);
-      }
-      if (data.no_surat) {
-        formData.append("no_surat", data.no_surat);
-      }
-      
-      // Add assignment fields if provided
-      if (data.pengedali_mutu_id) {
-        formData.append("pengedali_mutu_id", data.pengedali_mutu_id);
-      }
-      if (data.pengendali_teknis_id) {
-        formData.append("pengendali_teknis_id", data.pengendali_teknis_id);
-      }
-      if (data.ketua_tim_id) {
-        formData.append("ketua_tim_id", data.ketua_tim_id);
-      }
-      if (data.anggota_tim_ids && data.anggota_tim_ids.length > 0) {
-        data.anggota_tim_ids.forEach(id => {
-          formData.append("anggota_tim_ids", id);
-        });
-      }
-      
-      // Add the file
-      formData.append("file", data.file);
-      
-      return this.put(`/${suratTugasId}`, formData);
-    } else {
-      // Send as JSON without file
-      const { file, ...updateData } = data;
-      
-      // Filter out only undefined and null values, keep arrays as arrays
-      const cleanData = Object.entries(updateData).reduce((acc, [key, value]) => {
-        if (value !== undefined && value !== null) {
-          acc[key] = value;
-        }
-        return acc;
-      }, {} as any);
-      return this.put(`/${suratTugasId}`, cleanData);
-    }
+      return acc;
+    }, {} as any);
+    
+    return this.put(`/${suratTugasId}`, cleanData);
   }
 
   // Upload file for surat tugas  

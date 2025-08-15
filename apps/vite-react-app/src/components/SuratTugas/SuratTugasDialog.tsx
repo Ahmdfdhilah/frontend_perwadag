@@ -134,11 +134,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       return;
     }
 
-    // For create mode, file upload is required
-    // For edit mode, file is only required if there's no existing file
-    if (mode === 'create' && uploadFiles.length === 0) {
-      return;
-    }
+    // File upload is now optional in both create and edit modes
 
     setIsSaving(true);
     try {
@@ -248,8 +244,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
   const isFormValid = formData.no_surat && 
     formData.user_perwadag_id && 
     formData.tanggal_evaluasi_mulai && 
-    formData.tanggal_evaluasi_selesai &&
-    (mode !== 'create' || uploadFiles.length > 0);
+    formData.tanggal_evaluasi_selesai;
   const isEditable = mode !== 'view';
   const canEdit = canEditForm('surat_tugas') && isEditable;
   
@@ -409,7 +404,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
             <div className="space-y-2">
               <Label>Informasi Upload Surat Tugas</Label>
               <div className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
-                Silakan upload file surat tugas. File yang didukung: PDF, DOC, DOCX.
+                Silakan upload file surat tugas (opsional). File yang didukung: PDF, DOC, DOCX.
               </div>
             </div>
 
@@ -499,7 +494,7 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
             )}
 
             <FileUpload
-              label="File Surat Tugas *"
+              label="File Surat Tugas"
               accept=".pdf,.doc,.docx"
               multiple={false}
               maxSize={10 * 1024 * 1024} // 10MB

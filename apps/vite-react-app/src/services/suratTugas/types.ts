@@ -63,6 +63,7 @@ export interface SuratTugas {
 }
 
 export interface SuratTugasProgress {
+  surat_tugas_completed?: boolean;
   surat_pemberitahuan_completed: boolean;
   entry_meeting_completed: boolean;
   konfirmasi_meeting_completed: boolean;
@@ -111,9 +112,12 @@ export interface SuratTugasResponse {
   tanggal_evaluasi_selesai: string;
   no_surat: string;
   assignment_info: AssignmentInfo;
-  file_surat_tugas: string;
+  file_surat_tugas?: string | null;
   file_urls?: FileUrls;
   file_metadata?: FileMetadata;
+  is_completed: boolean;
+  has_file: boolean;
+  completion_percentage: number;
   tahun_evaluasi?: number;
   durasi_evaluasi?: number;
   is_evaluation_active?: boolean;
@@ -199,6 +203,9 @@ export interface SuratTugasFilterParams {
   tanggal_mulai_to?: string;
   tanggal_selesai_from?: string;
   tanggal_selesai_to?: string;
+  is_active?: boolean;
+  has_file?: boolean;
+  is_completed?: boolean;
 }
 
 // File Upload Types
