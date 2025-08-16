@@ -10,6 +10,7 @@ import { Button } from '@workspace/ui/components/button';
 import { Label } from '@workspace/ui/components/label';
 import { Textarea } from '@workspace/ui/components/textarea';
 import { Loader2 } from 'lucide-react';
+import { isValidUrl, URL_VALIDATION_MESSAGES } from '@/utils/urlValidation';
 
 export interface TindakLanjutFormData {
   tindak_lanjut: string;
@@ -53,6 +54,10 @@ const TindakLanjutFormDialog: React.FC<TindakLanjutFormDialogProps> = ({
     });
   };
 
+  const isFormValid = () => {
+    return isValidUrl(formData.dokumen_pendukung_tindak_lanjut);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
@@ -92,13 +97,24 @@ const TindakLanjutFormDialog: React.FC<TindakLanjutFormDialogProps> = ({
                 id="form-dokumen"
                 value={formData.dokumen_pendukung_tindak_lanjut}
                 onChange={(e) => handleInputChange('dokumen_pendukung_tindak_lanjut', e.target.value)}
-                placeholder="Masukkan dokumen pendukung tindak lanjut..."
+                placeholder={URL_VALIDATION_MESSAGES.PLACEHOLDER}
                 rows={4}
                 disabled={isSaving || !fieldPermissions.canEditDokumen}
                 className={!fieldPermissions.canEditDokumen ? 'bg-muted cursor-not-allowed' : ''}
               />
-              {!fieldPermissions.canEditDokumen && (
+              {!fieldPermissions.canEditDokumen ? (
                 <p className="text-xs text-muted-foreground">Anda tidak memiliki izin untuk mengedit field ini</p>
+              ) : (
+                <>
+                  {formData.dokumen_pendukung_tindak_lanjut && !isValidUrl(formData.dokumen_pendukung_tindak_lanjut) && (
+                    <p className="text-xs text-red-500">
+                      {URL_VALIDATION_MESSAGES.INVALID}
+                    </p>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    {URL_VALIDATION_MESSAGES.EXAMPLE}
+                  </p>
+                </>
               )}
             </div>
 
@@ -133,7 +149,7 @@ const TindakLanjutFormDialog: React.FC<TindakLanjutFormDialogProps> = ({
           </Button>
           <Button
             onClick={onSubmit}
-            disabled={isSaving || (!fieldPermissions.canEditTindakLanjut && !fieldPermissions.canEditDokumen && !fieldPermissions.canEditCatatan)}
+            disabled={isSaving || !isFormValid() || (!fieldPermissions.canEditTindakLanjut && !fieldPermissions.canEditDokumen && !fieldPermissions.canEditCatatan)}
           >
             {isSaving ? (
               <>

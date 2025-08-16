@@ -19,6 +19,7 @@ import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { meetingService } from '@/services/meeting';
 import { useToast } from '@workspace/ui/components/sonner';
+import { isValidUrl, URL_VALIDATION_MESSAGES } from '@/utils/urlValidation';
 
 interface ExitMeetingDialogProps {
   open: boolean;
@@ -87,6 +88,25 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
 
   const handleSave = async () => {
     if (isSaving) return;
+    
+    // Validate URLs before saving
+    if (formData.link_zoom && !isValidUrl(formData.link_zoom)) {
+      toast({
+        title: 'URL tidak valid',
+        description: 'Link Zoom: ' + URL_VALIDATION_MESSAGES.INVALID,
+        variant: 'destructive'
+      });
+      return;
+    }
+    
+    if (formData.link_daftar_hadir && !isValidUrl(formData.link_daftar_hadir)) {
+      toast({
+        title: 'URL tidak valid',
+        description: 'Link Daftar Hadir: ' + URL_VALIDATION_MESSAGES.INVALID,
+        variant: 'destructive'
+      });
+      return;
+    }
     
     setIsSaving(true);
     try {
@@ -258,14 +278,15 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
             <div className="space-y-2">
               <Label htmlFor="link_zoom">Link Zoom</Label>
               {canEditAllFields ? (
-                <div className="flex gap-2">
-                  <Input
-                    id="link_zoom"
-                    value={formData.link_zoom || ''}
-                    onChange={(e) => setFormData({ ...formData, link_zoom: e.target.value })}
-                    placeholder="https://zoom.us/j/..."
-                    disabled={isSaving}
-                    className={isSaving ? "bg-muted" : ""}
+                <>
+                  <div className="flex gap-2">
+                    <Input
+                      id="link_zoom"
+                      value={formData.link_zoom || ''}
+                      onChange={(e) => setFormData({ ...formData, link_zoom: e.target.value })}
+                      placeholder={URL_VALIDATION_MESSAGES.PLACEHOLDER}
+                      disabled={isSaving}
+                      className={isSaving ? "bg-muted" : ""}
                   />
                   {formData.link_zoom && (
                     <Button
@@ -279,6 +300,17 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
                     </Button>
                   )}
                 </div>
+                {formData.link_zoom && !isValidUrl(formData.link_zoom) && (
+                  <p className="text-xs text-red-500">
+                    {URL_VALIDATION_MESSAGES.INVALID}
+                  </p>
+                )}
+                {!isSaving && (
+                  <p className="text-xs text-muted-foreground">
+                    {URL_VALIDATION_MESSAGES.EXAMPLE}
+                  </p>
+                )}
+                </>
               ) : (
                 <div className="flex gap-2">
                   <div className="p-3 bg-muted rounded-md flex-1">
@@ -302,14 +334,15 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
             <div className="space-y-2">
               <Label htmlFor="link_daftar_hadir">Link Daftar Hadir </Label>
               {canEditAllFields ? (
-                <div className="flex gap-2">
-                  <Input
-                    id="link_daftar_hadir"
-                    value={formData.link_daftar_hadir || ''}
-                    onChange={(e) => setFormData({ ...formData, link_daftar_hadir: e.target.value })}
-                    placeholder="https://forms.google.com/..."
-                    disabled={isSaving}
-                    className={isSaving ? "bg-muted" : ""}
+                <>
+                  <div className="flex gap-2">
+                    <Input
+                      id="link_daftar_hadir"
+                      value={formData.link_daftar_hadir || ''}
+                      onChange={(e) => setFormData({ ...formData, link_daftar_hadir: e.target.value })}
+                      placeholder={URL_VALIDATION_MESSAGES.PLACEHOLDER}
+                      disabled={isSaving}
+                      className={isSaving ? "bg-muted" : ""}
                   />
                   {formData.link_daftar_hadir && (
                     <Button
@@ -323,6 +356,17 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
                     </Button>
                   )}
                 </div>
+                {formData.link_daftar_hadir && !isValidUrl(formData.link_daftar_hadir) && (
+                  <p className="text-xs text-red-500">
+                    {URL_VALIDATION_MESSAGES.INVALID}
+                  </p>
+                )}
+                {!isSaving && (
+                  <p className="text-xs text-muted-foreground">
+                    {URL_VALIDATION_MESSAGES.EXAMPLE}
+                  </p>
+                )}
+                </>
               ) : (
                 <div className="flex gap-2">
                   <div className="p-3 bg-muted rounded-md flex-1">
@@ -372,7 +416,10 @@ const ExitMeetingDialog: React.FC<ExitMeetingDialogProps> = ({
           {(canEditAllFields || canEditBuktiHadir) && (
             <Button 
               onClick={handleSave}
-              disabled={isSaving}
+              disabled={isSaving || 
+                (formData.link_zoom && !isValidUrl(formData.link_zoom)) ||
+                (formData.link_daftar_hadir && !isValidUrl(formData.link_daftar_hadir))
+              }
             >
               {isSaving ? (
                 <>

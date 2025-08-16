@@ -20,6 +20,7 @@ import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog
 import { kuisionerService } from '@/services/kuisioner';
 import { useToast } from '@workspace/ui/components/sonner';
 import { Loader2 } from 'lucide-react';
+import { isValidUrl, URL_VALIDATION_MESSAGES } from '@/utils/urlValidation';
 
 interface KuesionerDialogProps {
   open: boolean;
@@ -89,6 +90,16 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
 
   const handleSave = async () => {
     if (isSaving) return;
+
+    // Validate URL before saving
+    if (formData.link_dokumen_data_dukung && !isValidUrl(formData.link_dokumen_data_dukung)) {
+      toast({
+        title: 'URL tidak valid',
+        description: URL_VALIDATION_MESSAGES.INVALID,
+        variant: 'destructive'
+      });
+      return;
+    }
 
     setIsSaving(true);
     try {
@@ -241,8 +252,18 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
                 onChange={(e) => setFormData({ ...formData, link_dokumen_data_dukung: e.target.value })}
                 disabled={!canEdit || isSaving}
                 className={(!canEdit || isSaving) ? "bg-muted" : ""}
-                placeholder="https://example.com/dokumen"
+                placeholder={URL_VALIDATION_MESSAGES.PLACEHOLDER}
               />
+              {formData.link_dokumen_data_dukung && !isValidUrl(formData.link_dokumen_data_dukung) && (
+                <p className="text-xs text-red-500">
+                  {URL_VALIDATION_MESSAGES.INVALID}
+                </p>
+              )}
+              {!(!canEdit || isSaving) && (
+                <p className="text-xs text-muted-foreground">
+                  {URL_VALIDATION_MESSAGES.EXAMPLE}
+                </p>
+              )}
             </div>
 
             {/* Upload File Kuisioner */}
@@ -275,7 +296,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
           {canEdit && (
             <Button
               onClick={handleSave}
-              disabled={isSaving}
+              disabled={isSaving || (formData.link_dokumen_data_dukung && !isValidUrl(formData.link_dokumen_data_dukung))}
             >
               {isSaving ? (
                 <>

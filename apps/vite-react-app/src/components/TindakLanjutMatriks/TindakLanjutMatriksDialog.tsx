@@ -16,13 +16,15 @@ import {
   TableHeader,
   TableRow,
 } from '@workspace/ui/components/table';
-import { Loader2, ExternalLink } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { MatriksResponse, TindakLanjutStatus } from '@/services/matriks/types';
 import { formatIndonesianDateRange } from '@/utils/timeFormat';
 import { matriksService } from '@/services/matriks';
 import { useToast } from '@workspace/ui/components/sonner';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import FileViewLink from '@/components/common/FileViewLink';
 import { useRole } from '@/hooks/useRole';
+import { formatDokumenUrl, URL_VALIDATION_MESSAGES } from '@/utils/urlValidation';
 import TindakLanjutFormDialog, { 
   type TindakLanjutFormData, 
   type TindakLanjutFieldPermissions 
@@ -50,6 +52,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
   const { toast } = useToast();
   const { isAdmin, isPerwadag, isInspektorat, isPimpinan } = useRole();
   const isEditable = mode === 'edit';
+
 
   // Loading states for different operations
   const [isSaving, setIsSaving] = useState(false);
@@ -189,6 +192,19 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
 
   const handleFormSubmit = async () => {
     if (!item?.temuan_rekomendasi_summary?.data || editingIndex === null) return;
+
+    // Validate URL before saving
+    if (formData.dokumen_pendukung_tindak_lanjut) {
+      const validUrl = formatDokumenUrl(formData.dokumen_pendukung_tindak_lanjut);
+      if (!validUrl) {
+        toast({
+          title: 'URL tidak valid',
+          description: URL_VALIDATION_MESSAGES.INVALID,
+          variant: 'destructive'
+        });
+        return;
+      }
+    }
 
     setIsSaving(true);
     try {
@@ -347,19 +363,26 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                                 </div>
                               </TableCell>
                               <TableCell className="max-w-xs">
-                                {tr.dokumen_pendukung_tindak_lanjut ? (
-                                  <a
-                                    href={tr.dokumen_pendukung_tindak_lanjut}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
-                                  >
-                                    <ExternalLink className="h-3 w-3" />
-                                    Lihat Dokumen
-                                  </a>
-                                ) : (
-                                  <span className="text-sm text-muted-foreground">-</span>
-                                )}
+                                {(() => {
+                                  const validUrl = formatDokumenUrl(tr.dokumen_pendukung_tindak_lanjut);
+                                  
+                                  if (validUrl) {
+                                    return (
+                                      <FileViewLink
+                                        hasFile={true}
+                                        fileUrls={{ 
+                                          view_url: validUrl,
+                                          file_url: validUrl 
+                                        }}
+                                        linkText="Lihat Dokumen"
+                                        showIcon={true}
+                                        className="text-sm text-blue-600 hover:text-blue-800"
+                                      />
+                                    );
+                                  }
+                                  
+                                  return <span className="text-sm text-muted-foreground">-</span>;
+                                })()}
                               </TableCell>
                               <TableCell className="max-w-xs">
                                 <div className="text-sm whitespace-pre-wrap break-words">
