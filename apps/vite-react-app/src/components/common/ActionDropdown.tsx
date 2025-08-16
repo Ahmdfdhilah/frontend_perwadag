@@ -26,6 +26,8 @@ interface ActionDropdownProps {
   isActivating?: boolean;
   deleteDisabled?: boolean;
   deleteTooltip?: string;
+  editLabel?: string;
+  viewLabel?: string;
 }
 
 const ActionDropdown: React.FC<ActionDropdownProps> = ({
@@ -46,6 +48,8 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
   isActivating = false,
   deleteDisabled = false,
   deleteTooltip,
+  editLabel = 'Edit',
+  viewLabel = 'Lihat',
 }) => {
   return (
     <DropdownMenu>
@@ -58,13 +62,13 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
         {showView && onView && (
           <DropdownMenuItem onClick={onView}>
             <Eye className="mr-2 h-4 w-4" />
-            Lihat
+            {viewLabel}
           </DropdownMenuItem>
         )}
         {showEdit && onEdit && (
           <DropdownMenuItem onClick={onEdit}>
             <Edit className="mr-2 h-4 w-4" />
-            Edit
+            {editLabel}
           </DropdownMenuItem>
         )}
         {showActivate && onActivate && (

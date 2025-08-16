@@ -30,6 +30,29 @@ const TindakLanjutMatriksCards: React.FC<TindakLanjutMatriksCardsProps> = ({
   itemsPerPage = 10,
 }) => {
 
+  // Get appropriate action label based on user role and item status
+  const getActionLabel = (item: MatriksResponse): { editLabel: string; viewLabel: string } => {
+    const canUserEdit = canEdit?.(item);
+    
+    if (!canUserEdit) {
+      return { editLabel: 'Edit', viewLabel: 'Lihat' };
+    }
+
+    // For tindak lanjut, determine action based on status
+    switch (item.status_tindak_lanjut) {
+      case 'DRAFTING':
+        return { editLabel: 'Edit', viewLabel: 'Lihat' };
+      case 'CHECKING':
+        return { editLabel: 'Review', viewLabel: 'Lihat' };
+      case 'VALIDATING':
+        return { editLabel: 'Review', viewLabel: 'Lihat' };
+      case 'FINISHED':
+        return { editLabel: 'Edit', viewLabel: 'Lihat' };
+      default:
+        return { editLabel: 'Edit', viewLabel: 'Lihat' };
+    }
+  };
+
   const getTindakLanjutStatusBadge = (status?: TindakLanjutStatus) => {
     switch (status) {
       case 'DRAFTING':
@@ -133,15 +156,22 @@ const TindakLanjutMatriksCards: React.FC<TindakLanjutMatriksCardsProps> = ({
               <CardTitle className="text-lg font-semibold">
                 {item.nama_perwadag}
               </CardTitle>
-              <ActionDropdown
-                onView={() => onView?.(item)}
-                onEdit={canEdit?.(item) ? () => onEdit?.(item) : undefined}
-                onExport={() => onExport?.(item)}
-                showView={true}
-                showEdit={canEdit?.(item) && !!onEdit}
-                showExport={!!onExport}
-                showDelete={false}
-              />
+              {(() => {
+                const { editLabel, viewLabel } = getActionLabel(item);
+                return (
+                  <ActionDropdown
+                    onView={!canEdit?.(item) ? () => onView?.(item) : undefined}
+                    onEdit={canEdit?.(item) ? () => onEdit?.(item) : undefined}
+                    onExport={() => onExport?.(item)}
+                    showView={!canEdit?.(item) && !!onView}
+                    showEdit={canEdit?.(item) && !!onEdit}
+                    showExport={!!onExport}
+                    showDelete={false}
+                    editLabel={editLabel}
+                    viewLabel={viewLabel}
+                  />
+                );
+              })()} 
             </div>
           </CardHeader>
           <CardContent className="pt-0">

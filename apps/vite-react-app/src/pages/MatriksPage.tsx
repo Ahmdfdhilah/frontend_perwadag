@@ -287,7 +287,7 @@ const MatriksPage: React.FC = () => {
 
   // Check if user can edit matriks content (temuan-rekomendasi)
   const canEdit = (item: MatriksResponse) => {
-    return item.user_permissions?.can_edit_temuan && item.is_editable;
+    return item.user_permissions?.can_edit_temuan || item.is_editable;
   };
   
   // Filter handlers

@@ -39,6 +39,31 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
   itemsPerPage = 10,
 }) => {
 
+  // Get appropriate action label based on user role and item status
+  const getActionLabel = (item: MatriksResponse): { editLabel: string; viewLabel: string } => {
+    const canUserEdit = canEdit?.(item);
+    
+    if (!canUserEdit) {
+      return { editLabel: 'Edit', viewLabel: 'Lihat' };
+    }
+
+    // For users who can edit, determine action based on role and status
+    switch (item.status) {
+      case 'DRAFTING':
+        return { editLabel: 'Edit', viewLabel: 'Lihat' };
+      case 'CHECKING':
+        return { editLabel: 'Review', viewLabel: 'Lihat' };
+      case 'VALIDATING':
+        return { editLabel: 'Review', viewLabel: 'Lihat' };
+      case 'APPROVING':
+        return { editLabel: 'Review', viewLabel: 'Lihat' };
+      case 'FINISHED':
+        return { editLabel: 'Edit', viewLabel: 'Lihat' };
+      default:
+        return { editLabel: 'Edit', viewLabel: 'Lihat' };
+    }
+  };
+
   const getStatusBadge = (matriks: MatriksResponse) => {
     const status = matriks.status;
     switch (status) {
@@ -138,17 +163,24 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
                   {getStatusBadge(item)}
                 </TableCell>
                 <TableCell>
-                  <ActionDropdown
-                    onView={() => onView?.(item)}
-                    onEdit={canEdit?.(item) ? () => onEdit?.(item) : undefined}
-                    onExport={() => onExport?.(item)}
-                    onDownloadPdf={item.status === 'FINISHED' && userRole != 'perwadag' ? () => onDownloadPdf?.(item) : undefined}
-                    showView={true}
-                    showEdit={canEdit?.(item) && !!onEdit}
-                    showExport={!!onExport}
-                    showDownloadPdf={item.status === 'FINISHED' && userRole != 'perwadag' && !!onDownloadPdf}
-                    showDelete={false}
-                  />
+                  {(() => {
+                    const { editLabel, viewLabel } = getActionLabel(item);
+                    return (
+                      <ActionDropdown
+                        onView={!canEdit?.(item) ? () => onView?.(item) : undefined}
+                        onEdit={canEdit?.(item) ? () => onEdit?.(item) : undefined}
+                        onExport={() => onExport?.(item)}
+                        onDownloadPdf={item.status === 'FINISHED' && userRole != 'perwadag' ? () => onDownloadPdf?.(item) : undefined}
+                        showView={!canEdit?.(item) && !!onView}
+                        showEdit={canEdit?.(item) && !!onEdit}
+                        showExport={!!onExport}
+                        showDownloadPdf={item.status === 'FINISHED' && userRole != 'perwadag' && !!onDownloadPdf}
+                        showDelete={false}
+                        editLabel={editLabel}
+                        viewLabel={viewLabel}
+                      />
+                    );
+                  })()} 
                 </TableCell>
               </TableRow>
             ))

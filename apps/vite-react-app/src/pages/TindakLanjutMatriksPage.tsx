@@ -190,7 +190,7 @@ const TindakLanjutMatriksPage: React.FC = () => {
 
   // Check if user can edit tindak lanjut content
   const canEdit = (item: MatriksResponse) => {
-    return item.user_permissions?.can_edit_tindak_lanjut && item.is_editable;
+    return item.user_permissions?.can_edit_tindak_lanjut || item.is_editable;
   };
 
   // Filter handlers
