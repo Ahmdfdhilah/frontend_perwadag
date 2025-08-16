@@ -41,6 +41,21 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
   itemsPerPage = 10,
 }) => {
 
+  const getStatusBadge = (suratTugas: SuratTugasResponse) => {
+    const isCompleted = suratTugas.is_completed;
+    return (
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium
+    ${isCompleted
+            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+          }`}
+      >
+        {isCompleted ? 'Lengkap' : 'Belum Lengkap'}
+      </span>
+    );
+  };
+
   return (
     <div className="space-y-4">
       <div className="rounded-md border">
@@ -52,6 +67,7 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
               <TableHead>Tanggal Pelaksanaan Evaluasi</TableHead>
               <TableHead>No. Surat Tugas</TableHead>
               <TableHead>File Surat Tugas</TableHead>
+              <TableHead>Status</TableHead>
               {!isDashboard && <TableHead className="w-[80px]">Aksi</TableHead>}
             </TableRow>
           </TableHeader>
@@ -64,12 +80,13 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
                   <TableCell><Skeleton className="h-4 w-32" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-20" /></TableCell>
                   <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-16" /></TableCell>
                   {!isDashboard && <TableCell className="text-right"><Skeleton className="h-8 w-24 ml-auto" /></TableCell>}
                 </TableRow>
               ))
             ) : data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={isDashboard ? 5 : 6} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={isDashboard ? 6 : 7} className="text-center py-8 text-muted-foreground">
                   Tidak ada data surat tugas
                 </TableCell>
               </TableRow>
@@ -89,8 +106,11 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
                       }}
                       fileName="Surat Tugas"
                       linkText="Lihat File"
-                      className="text-sm truncate max-w-48 text-primary hover:text-primary/80 underline"
+                      className="text-sm text-primary hover:text-primary/80 underline"
                     />
+                  </TableCell>
+                  <TableCell>
+                    {getStatusBadge(item)}
                   </TableCell>
                   {!isDashboard && (
                     <TableCell>

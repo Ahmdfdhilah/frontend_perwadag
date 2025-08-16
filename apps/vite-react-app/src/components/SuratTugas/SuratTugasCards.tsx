@@ -34,6 +34,21 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
   itemsPerPage = 10,
 }) => {
 
+  const getStatusBadge = (suratTugas: SuratTugasResponse) => {
+    const isCompleted = suratTugas.is_completed;
+    return (
+      <span
+        className={`px-2 py-1 rounded-full text-xs font-medium
+    ${isCompleted
+            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+          }`}
+      >
+        {isCompleted ? 'Lengkap' : 'Belum Lengkap'}
+      </span>
+    );
+  };
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -137,6 +152,13 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
                       className="text-sm truncate max-w-48 text-primary hover:text-primary/80 underline"
                     />
                   </div>
+                </div>
+
+                <div>
+                  <span className="font-medium text-muted-foreground">Status:</span>
+                  <span className="ml-2">
+                    {getStatusBadge(item)}
+                  </span>
                 </div>
               </div>
             </CardContent>

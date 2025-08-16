@@ -56,11 +56,11 @@ const configureInterceptors = (api: AxiosInstance) => {
         originalRequest._retry = true;
 
         // Don't try to refresh token for auth endpoints (login, logout, refresh, etc.)
-        const isAuthEndpoint = originalRequest.url?.includes('/auth/') ||
-          originalRequest.url?.includes('/login') ||
-          originalRequest.url?.includes('/logout') ||
-          originalRequest.url?.includes('/refresh') ||
-          originalRequest.url?.includes('/verify-token');
+        const isAuthEndpoint = originalRequest.url?.includes('/auth/login') ||
+          originalRequest.url?.includes('/auth/logout') ||
+          originalRequest.url?.includes('/auth/refresh') ||
+          originalRequest.url?.includes('/auth/verify-token') ||
+          originalRequest.url?.includes('/auth/password');
 
         if (!isAuthEndpoint) {
           // If we're already refreshing, add the request to the queue

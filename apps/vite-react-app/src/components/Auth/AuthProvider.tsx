@@ -161,10 +161,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         dispatch(clearAuth());
         return;
       }
-      // Session looks valid, try refresh first to ensure freshness
-      dispatch(refreshTokenAsync()).catch(() => {
-        // If refresh fails, clear auth
-        dispatch(clearAuth());
+      // Session looks valid, just verify without forcing refresh
+      dispatch(verifySessionAsync()).catch(() => {
+        // If verification fails, try refresh as fallback
+        dispatch(refreshTokenAsync()).catch(() => {
+          dispatch(clearAuth());
+        });
       });
     } else if (user && !isAuthenticated) {
       // If we have user data but not authenticated, try to restore session
@@ -192,17 +194,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [sessionExpiry, isAuthenticated, dispatch]);
 
-  // Periodic session validation and refresh (every 10 minutes)
+  // Periodic session validation (every 15 minutes) - less aggressive
   useEffect(() => {
     if (isAuthenticated) {
       const interval = setInterval(() => {
         if (!isSessionValid()) {
-          // Try to refresh token if session is close to expiry
-          dispatch(refreshTokenAsync()).catch(() => {
+          // Try to verify session first, let interceptor handle refresh if needed
+          dispatch(verifySessionAsync()).catch(() => {
+            // Only clear auth if verification completely fails
             dispatch(clearAuth());
           });
         }
-      }, 10 * 60 * 1000); // Check every 10 minutes
+      }, 15 * 60 * 1000); // Check every 15 minutes (less aggressive)
 
       return () => clearInterval(interval);
     }
