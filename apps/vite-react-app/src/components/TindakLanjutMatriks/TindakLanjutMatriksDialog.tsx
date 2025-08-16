@@ -317,6 +317,8 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                             <TableHead>Kriteria</TableHead>
                             <TableHead>Rekomendasi</TableHead>
                             <TableHead>Tindak Lanjut</TableHead>
+                            <TableHead>Dokumen Pendukung</TableHead>
+                            <TableHead>Catatan Evaluator</TableHead>
                             {canEditTindakLanjut && <TableHead className="w-[80px]">Aksi</TableHead>}
                           </TableRow>
                         </TableHeader>
@@ -343,19 +345,26 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                                 <div className="text-sm whitespace-pre-wrap break-words">
                                   {tr.tindak_lanjut || '-'}
                                 </div>
-                                {tr.dokumen_pendukung_tindak_lanjut && (
-                                  <div className="mt-1">
-                                    <a
-                                      href={tr.dokumen_pendukung_tindak_lanjut}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1"
-                                    >
-                                      <ExternalLink className="h-3 w-3" />
-                                      Lihat Dokumen
-                                    </a>
-                                  </div>
+                              </TableCell>
+                              <TableCell className="max-w-xs">
+                                {tr.dokumen_pendukung_tindak_lanjut ? (
+                                  <a
+                                    href={tr.dokumen_pendukung_tindak_lanjut}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                                  >
+                                    <ExternalLink className="h-3 w-3" />
+                                    Lihat Dokumen
+                                  </a>
+                                ) : (
+                                  <span className="text-sm text-muted-foreground">-</span>
                                 )}
+                              </TableCell>
+                              <TableCell className="max-w-xs">
+                                <div className="text-sm whitespace-pre-wrap break-words">
+                                  {tr.catatan_evaluator || '-'}
+                                </div>
                               </TableCell>
                               {canEditTindakLanjut && (
                                 <TableCell>
