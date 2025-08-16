@@ -106,6 +106,12 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
             Review Pengendali
           </span>
         );
+      case 'APPROVING':
+        return (
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100">
+            Review Pengedali Mutu
+          </span>
+        );
       case 'FINISHED':
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">
@@ -126,7 +132,8 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     switch (currentStatus) {
       case 'DRAFTING': return { next: 'CHECKING' as MatriksStatus, label: 'Kirim ke Review' };
       case 'CHECKING': return { next: 'VALIDATING' as MatriksStatus, label: 'Setujui & Lanjutkan' };
-      case 'VALIDATING': return { next: 'FINISHED' as MatriksStatus, label: 'Finalisasi' };
+      case 'VALIDATING': return { next: 'APPROVING' as MatriksStatus, label: 'Kirim ke Pengedali Mutu' };
+      case 'APPROVING': return { next: 'FINISHED' as MatriksStatus, label: 'Finalisasi' };
       default: return null;
     }
   };
@@ -627,7 +634,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
             )}
 
             {/* Status Action Buttons */}
-            {(canChangeStatus && (nextAction || (activeItem?.status === 'CHECKING' || activeItem?.status === 'VALIDATING'))) && (
+            {(canChangeStatus && (nextAction || (activeItem?.status === 'CHECKING' || activeItem?.status === 'VALIDATING' || activeItem?.status === 'APPROVING'))) && (
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Aksi</CardTitle>
@@ -647,7 +654,8 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                     <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1 list-disc list-inside">
                       <li><strong>Draft:</strong> Anggota Tim input temuan → kirim ke Review Ketua Tim</li>
                       <li><strong>Review Ketua Tim:</strong> Ketua Tim review → setujui atau kembalikan ke Draft</li>
-                      <li><strong>Review Pengendali:</strong> Pengendali Teknis review → finalisasi atau kembalikan ke Draft</li>
+                      <li><strong>Review Pengendali:</strong> Pengendali Teknis review → kirim ke Pengedali Mutu atau kembalikan ke Draft</li>
+                      <li><strong>Review Pengedali Mutu:</strong> Pengedali Mutu review → finalisasi atau kembalikan ke Draft</li>
                       <li><strong>Selesai:</strong> Matriks selesai, dapat diakses untuk tindak lanjut</li>
                     </ul>
                   </div>
@@ -664,8 +672,8 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
 
                   {/* Action Buttons */}
                   <div className="flex flex-wrap gap-2">
-                    {/* Rollback button - show for CHECKING and VALIDATING status */}
-                    {canChangeStatus && (activeItem?.status === 'CHECKING' || activeItem?.status === 'VALIDATING') && (
+                    {/* Rollback button - show for CHECKING, VALIDATING, and APPROVING status */}
+                    {canChangeStatus && (activeItem?.status === 'CHECKING' || activeItem?.status === 'VALIDATING' || activeItem?.status === 'APPROVING') && (
                       <Button
                         variant="destructive"
                         onClick={handleRollback}

@@ -266,6 +266,7 @@ const MatriksPage: React.FC = () => {
         'DRAFTING': 'Draft',
         'CHECKING': 'Review Ketua Tim', 
         'VALIDATING': 'Review Pengendali',
+        'APPROVING': 'Review Pengedali Mutu',
         'FINISHED': 'Selesai'
       };
 

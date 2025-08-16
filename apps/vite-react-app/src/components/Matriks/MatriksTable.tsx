@@ -60,6 +60,12 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
             Review Pengendali
           </span>
         );
+      case 'APPROVING':
+        return (
+          <span className="px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-100">
+            Review Pengedali Mutu
+          </span>
+        );
       case 'FINISHED':
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100">

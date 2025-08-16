@@ -51,8 +51,8 @@ export interface MatriksStatistics {
   last_updated: string;
 }
 
-// Status enums
-export type MatriksStatus = 'DRAFTING' | 'CHECKING' | 'VALIDATING' | 'FINISHED';
+// Status enums - Updated to match backend exactly
+export type MatriksStatus = 'DRAFTING' | 'CHECKING' | 'VALIDATING' | 'APPROVING' | 'FINISHED';
 export type TindakLanjutStatus = 'DRAFTING' | 'CHECKING' | 'VALIDATING' | 'FINISHED';
 
 // User permissions
@@ -65,7 +65,7 @@ export interface UserPermissions {
   allowed_tindak_lanjut_status_changes: TindakLanjutStatus[];
 }
 
-// Temuan Rekomendasi Types - Updated with tindak lanjut fields
+// Temuan Rekomendasi Types - Updated to match backend schema
 export interface TemuanRekomendasi {
   id?: number;
   kondisi: string;
@@ -74,7 +74,7 @@ export interface TemuanRekomendasi {
   tindak_lanjut?: string;
   dokumen_pendukung_tindak_lanjut?: string;
   catatan_evaluator?: string;
-  status_tindak_lanjut?: TindakLanjutStatus;
+  // Note: individual status_tindak_lanjut removed, now using global status only
 }
 
 // Request Types
@@ -130,9 +130,8 @@ export interface MatriksResponse {
   temuan_rekomendasi_summary: TemuanRekomendasiSummary | null;
   has_temuan_rekomendasi: boolean;
   temuan_version: number;
-  status_tindak_lanjut?: TindakLanjutStatus;
-  // New fields from backend update
   status: MatriksStatus;
+  status_tindak_lanjut?: TindakLanjutStatus;
   is_editable: boolean;
   user_permissions: UserPermissions;
   user_perwadag_id?: string;
@@ -166,6 +165,11 @@ export interface MatriksFilterParams {
   is_completed?: boolean;
   tahun_evaluasi?: number;
   status?: MatriksStatus;
+  status_tindak_lanjut?: TindakLanjutStatus;
+  created_from?: string;
+  created_to?: string;
+  tanggal_evaluasi_from?: string;
+  tanggal_evaluasi_to?: string;
 }
 
 // Message Response

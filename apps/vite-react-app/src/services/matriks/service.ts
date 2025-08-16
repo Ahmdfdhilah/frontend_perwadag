@@ -104,8 +104,8 @@ class MatriksService extends BaseService {
     return this.put(`/${matriksId}/tindak-lanjut/${itemId}`, data);
   }
 
-  // Update tindak lanjut status (global)
-  async updateTindakLanjutStatus(
+  // Update global tindak lanjut status for entire matrix
+  async updateGlobalTindakLanjutStatus(
     matriksId: string,
     data: TindakLanjutStatusUpdate
   ): Promise<MatriksResponse> {
