@@ -19,7 +19,7 @@ import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { kuisionerService } from '@/services/kuisioner';
 import { useToast } from '@workspace/ui/components/sonner';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ExternalLink } from 'lucide-react';
 import { isValidUrl, URL_VALIDATION_MESSAGES } from '@/utils/urlValidation';
 
 interface KuesionerDialogProps {
@@ -87,6 +87,12 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
     setIsSaving(false);
     setIsDownloading(false);
   }, [item, open]);
+
+  const handleOpenLink = (url: string) => {
+    if (url && isValidUrl(url)) {
+      window.open(url.startsWith('http') ? url : `https://${url}`, '_blank');
+    }
+  };
 
   const handleSave = async () => {
     if (isSaving) return;
@@ -246,14 +252,27 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
 
             <div className="space-y-2">
               <Label htmlFor="link_dokumen_data_dukung">Link Dokumen Data Dukung</Label>
-              <Input
-                id="link_dokumen_data_dukung"
-                value={formData.link_dokumen_data_dukung || ''}
-                onChange={(e) => setFormData({ ...formData, link_dokumen_data_dukung: e.target.value })}
-                disabled={!canEdit || isSaving}
-                className={(!canEdit || isSaving) ? "bg-muted" : ""}
-                placeholder={URL_VALIDATION_MESSAGES.PLACEHOLDER}
-              />
+              <div className="flex gap-2">
+                <Input
+                  id="link_dokumen_data_dukung"
+                  value={formData.link_dokumen_data_dukung || ''}
+                  onChange={(e) => setFormData({ ...formData, link_dokumen_data_dukung: e.target.value })}
+                  disabled={!canEdit || isSaving}
+                  className={`flex-1 ${(!canEdit || isSaving) ? "bg-muted" : ""}`}
+                  placeholder={URL_VALIDATION_MESSAGES.PLACEHOLDER}
+                />
+                {formData.link_dokumen_data_dukung && isValidUrl(formData.link_dokumen_data_dukung) && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleOpenLink(formData.link_dokumen_data_dukung)}
+                    disabled={isSaving}
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
               {formData.link_dokumen_data_dukung && !isValidUrl(formData.link_dokumen_data_dukung) && (
                 <p className="text-xs text-red-500">
                   {URL_VALIDATION_MESSAGES.INVALID}

@@ -9,7 +9,7 @@ import {
 import { Button } from '@workspace/ui/components/button';
 import { Label } from '@workspace/ui/components/label';
 import { Textarea } from '@workspace/ui/components/textarea';
-import { Loader2 } from 'lucide-react';
+import { Loader2, ExternalLink } from 'lucide-react';
 import { isValidUrl, URL_VALIDATION_MESSAGES } from '@/utils/urlValidation';
 
 export interface TindakLanjutFormData {
@@ -58,6 +58,12 @@ const TindakLanjutFormDialog: React.FC<TindakLanjutFormDialogProps> = ({
     return isValidUrl(formData.dokumen_pendukung_tindak_lanjut);
   };
 
+  const handleOpenLink = (url: string) => {
+    if (url && isValidUrl(url)) {
+      window.open(url.startsWith('http') ? url : `https://${url}`, '_blank');
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[95vw] max-w-2xl max-h-[90vh] flex flex-col">
@@ -93,15 +99,29 @@ const TindakLanjutFormDialog: React.FC<TindakLanjutFormDialogProps> = ({
               <Label htmlFor="form-dokumen">
                 Dokumen Pendukung Tindak Lanjut {fieldPermissions.canEditDokumen && <span className="text-red-500">*</span>}
               </Label>
-              <Textarea
-                id="form-dokumen"
-                value={formData.dokumen_pendukung_tindak_lanjut}
-                onChange={(e) => handleInputChange('dokumen_pendukung_tindak_lanjut', e.target.value)}
-                placeholder={URL_VALIDATION_MESSAGES.PLACEHOLDER}
-                rows={4}
-                disabled={isSaving || !fieldPermissions.canEditDokumen}
-                className={!fieldPermissions.canEditDokumen ? 'bg-muted cursor-not-allowed' : ''}
-              />
+              <div className="flex gap-2">
+                <Textarea
+                  id="form-dokumen"
+                  value={formData.dokumen_pendukung_tindak_lanjut}
+                  onChange={(e) => handleInputChange('dokumen_pendukung_tindak_lanjut', e.target.value)}
+                  placeholder={URL_VALIDATION_MESSAGES.PLACEHOLDER}
+                  rows={4}
+                  disabled={isSaving || !fieldPermissions.canEditDokumen}
+                  className={`flex-1 ${!fieldPermissions.canEditDokumen ? 'bg-muted cursor-not-allowed' : ''}`}
+                />
+                {formData.dokumen_pendukung_tindak_lanjut && isValidUrl(formData.dokumen_pendukung_tindak_lanjut) && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleOpenLink(formData.dokumen_pendukung_tindak_lanjut)}
+                    disabled={isSaving}
+                    className="self-start mt-1"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
               {!fieldPermissions.canEditDokumen ? (
                 <p className="text-xs text-muted-foreground">Anda tidak memiliki izin untuk mengedit field ini</p>
               ) : (
