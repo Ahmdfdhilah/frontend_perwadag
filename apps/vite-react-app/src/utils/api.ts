@@ -88,8 +88,15 @@ const configureInterceptors = (api: AxiosInstance) => {
 
             // If token refresh succeeds, retry the original request
             return api.request(originalRequest);
-          } catch (refreshError) {
+          } catch (refreshError: any) {
             console.error('Token refresh failed:', refreshError);
+            
+            // Check if role changed
+            const errorMessage = refreshError?.response?.data?.detail || refreshError?.message || '';
+            if (errorMessage.includes('Role berubah') || errorMessage.includes('Sesi telah berakhir')) {
+              console.log('User role changed, forcing re-login');
+              // Could show a toast here explaining why user was logged out
+            }
 
             // Process queue with error
             processQueue(refreshError, null);
@@ -99,7 +106,7 @@ const configureInterceptors = (api: AxiosInstance) => {
           }
         } else {
           // For auth endpoints, just clear auth on 401
-          console.log('Auth endpoint failed with 401, clearing auth');
+          console.log('Auth endpoint failed with 401:', originalRequest.url, 'clearing auth');
           if (!originalRequest.url?.includes('/logout')) {
             store.dispatch(clearAuth());
           }

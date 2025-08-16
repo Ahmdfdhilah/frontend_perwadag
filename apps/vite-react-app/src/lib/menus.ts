@@ -79,13 +79,6 @@ export const appMenuItems: SidebarItem[] = [
     allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG'],
   },
 
-  // Tindak Lanjut Matriks - All roles
-  {
-    title: 'Tindak Lanjut Matriks',
-    href: '/tindak-lanjut-matriks',
-    icon: ListTodo,
-    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG'],
-  },
 
   // Exit Meeting - All roles
   {
@@ -102,6 +95,14 @@ export const appMenuItems: SidebarItem[] = [
     title: 'Laporan Hasil',
     href: '/laporan-hasil',
     icon: FileInput,
+    allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG'],
+  },
+
+  // Tindak Lanjut Matriks - All roles
+  {
+    title: 'Tindak Lanjut',
+    href: '/tindak-lanjut',
+    icon: ListTodo,
     allowedRoles: ['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG'],
   },
 

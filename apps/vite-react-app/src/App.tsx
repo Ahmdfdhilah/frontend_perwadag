@@ -116,7 +116,7 @@ function App() {
                         <MatriksPage />
                       </RoleProtectedRoute>
                     } />
-                    <Route path="tindak-lanjut-matriks" element={
+                    <Route path="tindak-lanjut" element={
                       <RoleProtectedRoute allowedRoles={['ADMIN', 'INSPEKTORAT', 'PIMPINAN', 'PERWADAG']}>
                         <TindakLanjutMatriksPage />
                       </RoleProtectedRoute>

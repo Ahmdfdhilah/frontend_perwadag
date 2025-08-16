@@ -224,7 +224,7 @@ const TindakLanjutMatriksPage: React.FC = () => {
 
   // Generate composite title
   const getCompositeTitle = () => {
-    let title = "Daftar Tindak Lanjut Matriks";
+    let title = "Daftar Tindak Lanjut";
     const activeFilters = [];
 
     if (filters.inspektorat !== 'all') {
@@ -273,7 +273,7 @@ const TindakLanjutMatriksPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Tindak Lanjut Matriks"
+        title="Tindak Lanjut"
         description={isPerwadag() ? "Kelola tindak lanjut evaluasi matriks Anda" : "Monitor dan kelola tindak lanjut evaluasi matriks"}
       />
 

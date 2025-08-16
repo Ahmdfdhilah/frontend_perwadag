@@ -17,11 +17,19 @@ export abstract class BaseService {
       return response.data;
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || error.message || "Terjadi kesalahan";
+      const statusCode = error.response?.status;
 
-      // Show error toast to user
-      toast.error("Error", {
-        description: errorMessage,
-      });
+      // Don't show toast for auth-related errors (handled by interceptor)
+      const isAuthError = statusCode === 401;
+      const isAuthRefreshError = error.config?.url?.includes('/auth/refresh');
+      const isAuthVerifyError = error.config?.url?.includes('/auth/verify-token');
+      
+      if (!isAuthError && !isAuthRefreshError && !isAuthVerifyError) {
+        // Show error toast only for non-auth errors
+        toast.error("Error", {
+          description: errorMessage,
+        });
+      }
       
       throw error; // Throw original error to preserve status codes
     }

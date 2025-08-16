@@ -290,7 +290,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
         <DialogContent className="w-[95vw] h-[90vh] !max-w-none !max-h-none flex flex-col">
           <DialogHeader className="flex-shrink-0 border-b pb-4">
             <DialogTitle>
-              {mode === 'view' ? 'Detail Tindak Lanjut Matriks' : 'Edit Tindak Lanjut Matriks'}
+              {mode === 'view' ? 'Detail Tindak Lanjut' : 'Edit Tindak Lanjut'}
             </DialogTitle>
           </DialogHeader>
 

@@ -199,22 +199,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [sessionExpiry, isAuthenticated, dispatch]);
 
-  // Periodic session validation (every 15 minutes) - less aggressive
+  // Periodic session validation - adaptive interval based on session expiry
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && sessionExpiry) {
+      // Calculate appropriate check interval based on session duration
+      const sessionDuration = sessionExpiry - Date.now();
+      // Check every 1/6 of session duration, but min 30 seconds, max 10 minutes
+      const adaptiveInterval = Math.max(30000, Math.min(600000, sessionDuration / 6));
+      
       const interval = setInterval(() => {
-        if (!isSessionValid()) {
+        if (!isSessionValid() && !loading) {
           // Try to verify session first, let interceptor handle refresh if needed
           dispatch(verifySessionAsync()).catch(() => {
             // Only clear auth if verification completely fails
             dispatch(clearAuth());
           });
         }
-      }, 15 * 60 * 1000); // Check every 15 minutes (less aggressive)
+      }, adaptiveInterval);
 
       return () => clearInterval(interval);
     }
-  }, [isAuthenticated, dispatch]);
+  }, [isAuthenticated, sessionExpiry, loading, dispatch]);
 
   const value: AuthContextType = {
     // State
