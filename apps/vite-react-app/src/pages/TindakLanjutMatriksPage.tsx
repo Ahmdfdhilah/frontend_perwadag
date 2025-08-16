@@ -102,10 +102,7 @@ const TindakLanjutMatriksPage: React.FC = () => {
       // Apply additional tindak lanjut status filter if specified
       if (filters.status_tindak_lanjut !== 'all') {
         const filteredMatriks = matriksWithTindakLanjut.filter(item => {
-          const hasStatus = item.temuan_rekomendasi_summary?.data?.some(tr =>
-            tr.status_tindak_lanjut === filters.status_tindak_lanjut
-          );
-          return hasStatus;
+          return item.status_tindak_lanjut === filters.status_tindak_lanjut;
         });
         setMatriks(filteredMatriks);
         setTotalItems(filteredMatriks.length);
