@@ -120,6 +120,23 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
   // Check if user can change tindak lanjut status
   const canChangeTindakLanjutStatus = item?.user_permissions?.can_change_tindak_lanjut_status && item?.is_editable;
 
+  // Check if there are any local changes that haven't been saved
+  const hasLocalChanges = React.useMemo(() => {
+    if (!formDialogOpen || editingIndex === null || !item?.temuan_rekomendasi_summary?.data) {
+      return false;
+    }
+
+    const originalItem = item.temuan_rekomendasi_summary.data[editingIndex];
+    if (!originalItem) return false;
+
+    // Compare current form data with original data
+    return (
+      formData.tindak_lanjut !== (originalItem.tindak_lanjut || '') ||
+      formData.dokumen_pendukung_tindak_lanjut !== (originalItem.dokumen_pendukung_tindak_lanjut || '') ||
+      formData.catatan_evaluator !== (originalItem.catatan_evaluator || '')
+    );
+  }, [formDialogOpen, editingIndex, item?.temuan_rekomendasi_summary?.data, formData]);
+
   // Field-specific permissions based on role and context (uses matriks-level status)
   const getFieldPermissions = (): TindakLanjutFieldPermissions => {
     const currentStatus = item?.status_tindak_lanjut;
@@ -385,6 +402,16 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                       </ul>
                     </div>
 
+                    {/* Local Changes Warning */}
+                    {hasLocalChanges && (
+                      <div className="flex items-start gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg dark:bg-orange-950 dark:border-orange-800">
+                        <div className="w-4 h-4 rounded-full bg-orange-400 dark:bg-orange-500 flex-shrink-0 mt-0.5"></div>
+                        <p className="text-sm text-orange-800 dark:text-orange-200">
+                          Ada perubahan tindak lanjut yang belum disimpan. Simpan perubahan terlebih dahulu sebelum mengubah status.
+                        </p>
+                      </div>
+                    )}
+
                     {/* Action Buttons */}
                     {(() => {
                       const nextAction = getNextTindakLanjutAction(item?.status_tindak_lanjut);
@@ -395,7 +422,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                             <Button
                               variant="destructive"
                               onClick={handleRollback}
-                              disabled={isChangingStatus}
+                              disabled={isChangingStatus || hasLocalChanges}
                             >
                               {isChangingStatus ? (
                                 <>
@@ -412,7 +439,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                           {canChangeTindakLanjutStatus && nextAction && (
                             <Button
                               onClick={() => handleStatusChangeClick(nextAction.next)}
-                              disabled={isChangingStatus}
+                              disabled={isChangingStatus || hasLocalChanges}
                             >
                               {isChangingStatus ? (
                                 <>

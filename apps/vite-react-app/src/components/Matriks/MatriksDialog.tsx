@@ -150,6 +150,35 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   // Use backend permissions instead of role-based check
   const canEdit = canEditTemuan;
 
+  // Check if there are any local changes that haven't been saved
+  const hasLocalChanges = React.useMemo(() => {
+    if (!activeItem) return false;
+    
+    // Check for unsaved temuan rekomendasi changes
+    const originalTemuan = activeItem.temuan_rekomendasi_summary?.data || [];
+    const currentTemuan = temuanRekomendasi;
+    
+    // Check if arrays have different lengths
+    if (originalTemuan.length !== currentTemuan.length) return true;
+    
+    // Check if any content is different
+    for (let i = 0; i < originalTemuan.length; i++) {
+      const original = originalTemuan[i];
+      const current = currentTemuan[i];
+      
+      if (
+        original?.kondisi !== current?.kondisi ||
+        original?.kriteria !== current?.kriteria ||
+        original?.rekomendasi !== current?.rekomendasi
+      ) {
+        return true;
+      }
+    }
+    
+    // Check for unsaved file upload
+    return uploadFile !== null;
+  }, [activeItem, temuanRekomendasi, uploadFile]);
+
   // Function to update dialog with fresh data
   const updateDialogWithFreshData = (freshItem: MatriksResponse) => {
     setCurrentItem(freshItem);
@@ -547,7 +576,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Add Button Section */}
-                {canEdit && (
+                {canEdit && activeItem?.status !== 'VALIDATING' && (
                   <Button
                     type="button"
                     variant="outline"
@@ -602,7 +631,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                                   onEdit={() => handleEditTemuanRekomendasi(index)}
                                   onDelete={() => handleRemoveTemuanRekomendasi(index)}
                                   showEdit={!isSaving}
-                                  showDelete={!isSaving}
+                                  showDelete={!isSaving && activeItem?.status !== 'VALIDATING'}
                                 />
                               </TableCell>
                             )}
@@ -670,6 +699,16 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                     </div>
                   )}
 
+                  {/* Local Changes Warning */}
+                  {hasLocalChanges && (
+                    <div className="flex items-start gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg dark:bg-orange-950 dark:border-orange-800">
+                      <div className="w-4 h-4 rounded-full bg-orange-400 dark:bg-orange-500 flex-shrink-0 mt-0.5"></div>
+                      <p className="text-sm text-orange-800 dark:text-orange-200">
+                        Ada perubahan yang belum disimpan. Simpan perubahan terlebih dahulu sebelum mengubah status.
+                      </p>
+                    </div>
+                  )}
+
                   {/* Action Buttons */}
                   <div className="flex flex-wrap gap-2">
                     {/* Rollback button - show for CHECKING, VALIDATING, and APPROVING status */}
@@ -677,7 +716,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                       <Button
                         variant="destructive"
                         onClick={handleRollback}
-                        disabled={isChangingStatus}
+                        disabled={isChangingStatus || hasLocalChanges}
                       >
                         {isChangingStatus ? (
                           <>
@@ -694,7 +733,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                     {canChangeStatus && nextAction && (
                       <Button
                         onClick={() => handleStatusChangeClick(nextAction.next)}
-                        disabled={isChangingStatus || (temuanRekomendasi.length === 0)}
+                        disabled={isChangingStatus || (temuanRekomendasi.length === 0) || hasLocalChanges}
                       >
                         {isChangingStatus ? (
                           <>
