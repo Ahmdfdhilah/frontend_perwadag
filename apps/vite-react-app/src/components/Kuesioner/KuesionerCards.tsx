@@ -142,18 +142,11 @@ const KuesionerCards: React.FC<KuesionerCardsProps> = ({
               <div>
                 <span className="font-medium text-muted-foreground">Link Data Dukung:</span>
                 <span className="ml-2">
-                  {item.link_dokumen_data_dukung ? (
-                    <a
-                      href={item.link_dokumen_data_dukung}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 underline dark:text-blue-300 dark:hover:text-blue-100"
-                    >
-                      Lihat Data Dukung
-                    </a>
-                  ) : (
-                    <span className="text-muted-foreground">-</span>
-                  )}
+                  <FileViewLink
+                    externalUrl={item.link_dokumen_data_dukung}
+                    emptyText="Belum ada dukung"
+                    className="text-sm truncate max-w-48"
+                  />
                 </span>
               </div>
               <div>

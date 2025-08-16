@@ -9,6 +9,7 @@ import {
 } from '@workspace/ui/components/table';
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import FileViewLink from '@/components/common/FileViewLink';
 import { MeetingResponse } from '@/services/meeting/types';
 import { formatIndonesianDateRange, formatDateWithHoursFromAPI } from '@/utils/timeFormat';
 
@@ -92,32 +93,18 @@ const KonfirmasiMeetingTable: React.FC<KonfirmasiMeetingTableProps> = ({
                   <TableCell>{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</TableCell>
                   <TableCell>{item.tanggal_meeting ? formatDateWithHoursFromAPI(item.tanggal_meeting) : '-'}</TableCell>
                   <TableCell>
-                    {item.link_zoom ? (
-                      <a
-                        href={item.link_zoom}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 underline dark:text-blue-300 dark:hover:text-blue-100"
-                      >
-                        Join Meeting
-                      </a>
-                    ) : (
-                      <span className="text-muted-foreground">-</span>
-                    )}
+                    <FileViewLink
+                      externalUrl={item.link_zoom}
+                      emptyText="Belum ada link zoom"
+                      className="text-sm"
+                    />
                   </TableCell>
                   <TableCell>
-                    {item.link_daftar_hadir ? (
-                      <a
-                        href={item.link_daftar_hadir}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 underline dark:text-blue-300 dark:hover:text-blue-100"
-                      >
-                        Lihat Daftar Hadir
-                      </a>
-                    ) : (
-                      <span className="text-muted-foreground">-</span>
-                    )}
+                    <FileViewLink
+                      externalUrl={item.link_daftar_hadir}
+                      emptyText="Belum ada link daftar hadir"
+                      className="text-sm"
+                    />
                   </TableCell>
                   <TableCell>
                     {getStatusBadge(item)}

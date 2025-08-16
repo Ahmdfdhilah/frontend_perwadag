@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@workspace/ui/componen
 import { Skeleton } from '@workspace/ui/components/skeleton';
 import { MeetingResponse } from '@/services/meeting/types';
 import ActionDropdown from '@/components/common/ActionDropdown';
+import FileViewLink from '@/components/common/FileViewLink';
 import { formatIndonesianDateRange, formatDateWithHoursFromAPI } from '@/utils/timeFormat';
 
 interface EntryMeetingCardsProps {
@@ -131,33 +132,23 @@ const EntryMeetingCards: React.FC<EntryMeetingCardsProps> = ({
                 </div>
                 <div>
                   <span className="font-medium text-muted-foreground">Link Zoom:</span>
-                  {item.link_zoom ? (
-                    <a
-                      href={item.link_zoom}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-2 text-blue-600 hover:text-blue-800 underline dark:text-blue-300 dark:hover:text-blue-100"
-                    >
-                      Join Meeting
-                    </a>
-                  ) : (
-                    <span className="ml-2 text-muted-foreground">-</span>
-                  )}
+                  <span className="ml-2">
+                    <FileViewLink
+                      externalUrl={item.link_zoom}
+                      emptyText="Belum ada zoom"
+                      className="text-sm truncate max-w-48"
+                    />
+                  </span>
                 </div>
                 <div>
                   <span className="font-medium text-muted-foreground">Daftar Hadir:</span>
-                  {item.link_daftar_hadir ? (
-                    <a
-                      href={item.link_daftar_hadir}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-2 text-blue-600 hover:text-blue-800 underline dark:text-blue-300 dark:hover:text-blue-100"
-                    >
-                      Lihat Daftar Hadir
-                    </a>
-                  ) : (
-                    <span className="ml-2 text-muted-foreground">-</span>
-                  )}
+                  <span className="ml-2">
+                    <FileViewLink
+                      externalUrl={item.link_daftar_hadir}
+                      emptyText="Belum ada daftar hadir"
+                      className="text-sm truncate max-w-48"
+                    />
+                  </span>
                 </div>
                 <div>
                   <span className="font-medium text-muted-foreground">Status:</span>
