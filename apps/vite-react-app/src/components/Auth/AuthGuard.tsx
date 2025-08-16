@@ -18,7 +18,7 @@ interface LoadingSpinnerProps {
   message?: string;
 }
 
-const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ message = "Loading..." }) => (
+const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ message = "Memuat..." }) => (
   <div className="flex items-center justify-center min-h-screen bg-background">
     <div className="flex flex-col items-center space-y-4">
       <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -27,7 +27,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ message = "Loading..." 
   </div>
 );
 
-const AuthLoadingOverlay: React.FC<LoadingSpinnerProps> = ({ message = "Verifying..." }) => (
+const AuthLoadingOverlay: React.FC<LoadingSpinnerProps> = ({ message = "Memverifikasi..." }) => (
   <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
     <div className="flex flex-col items-center space-y-4 bg-card p-6 rounded-lg border shadow-lg">
       <Loader2 className="h-6 w-6 animate-spin text-primary" />
@@ -66,11 +66,11 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
       return (
         <>
           {children}
-          <AuthLoadingOverlay message="Verifying authentication..." />
+          <AuthLoadingOverlay message="Memverifikasi autentikasi..." />
         </>
       );
     }
-    return <LoadingSpinner message="Verifying authentication..." />;
+    return <LoadingSpinner message="Memverifikasi autentikasi..." />;
   }
 
   // If unauthenticated access is allowed, render children
@@ -97,9 +97,9 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
     return (
       <div className="flex items-center justify-center min-h-screen bg-background">
         <div className="text-center space-y-4">
-          <h2 className="text-2xl font-bold text-destructive">Account Inactive</h2>
+          <h2 className="text-2xl font-bold text-destructive">Akun Tidak Aktif</h2>
           <p className="text-muted-foreground">
-            Your account has been deactivated. Please contact support for assistance.
+            Akun Anda telah dinonaktifkan. Silakan hubungi administrator untuk bantuan.
           </p>
         </div>
       </div>
@@ -121,12 +121,12 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({
       return (
         <div className="flex items-center justify-center min-h-screen bg-background">
           <div className="text-center space-y-4">
-            <h2 className="text-2xl font-bold text-destructive">Access Denied</h2>
+            <h2 className="text-2xl font-bold text-destructive">Akses Ditolak</h2>
             <p className="text-muted-foreground">
-              You don't have the required permissions to access this page.
+              Anda tidak memiliki izin yang diperlukan untuk mengakses halaman ini.
             </p>
             <p className="text-sm text-muted-foreground">
-              Required roles: {requireRoles.join(', ')}
+              Role yang diperlukan: {requireRoles.join(', ')}
             </p>
           </div>
         </div>
@@ -177,19 +177,20 @@ export const PublicRoute: React.FC<{ children: ReactNode; redirectTo?: string }>
 }) => {
   const { isAuthenticated, loading, user, isSessionValid, checkAuth } = useAuth();
 
-  // Only check authentication on mount if user appears to be authenticated
+  // Only check authentication on mount if user appears to be authenticated but session might be invalid
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && user && !isSessionValid()) {
+      // Only check auth if session appears to be expired
       checkAuth();
     }
-  }, []);
+  }, []); // Remove isAuthenticated from deps to prevent loops
 
   if (loading) {
     // For auth pages, use overlay that preserves the page layout
     return (
       <>
         {children}
-        <AuthLoadingOverlay message="Checking authentication..." />
+        <AuthLoadingOverlay message="Memeriksa autentikasi..." />
       </>
     );
   }

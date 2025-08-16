@@ -95,6 +95,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const checkAuth = async (): Promise<void> => {
     try {
+      // Prevent multiple concurrent checkAuth calls
+      if (loading) {
+        return;
+      }
+
       // Check if session is expired
       if (sessionExpiry && sessionExpiry < Date.now()) {
         // Session is expired, try to refresh token
