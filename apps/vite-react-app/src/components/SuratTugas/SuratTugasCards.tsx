@@ -117,7 +117,7 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
                     <span className="ml-2">{formatIndonesianDateRange(item.tanggal_evaluasi_mulai, item.tanggal_evaluasi_selesai)}</span>
                   </div>
                 </div>
-                
+
                 <div>
                   <span className="font-medium text-muted-foreground">No. Surat Tugas:</span>
                   <span className="ml-2">{item.no_surat}</span>
@@ -134,6 +134,7 @@ const SuratTugasCards: React.FC<SuratTugasCardsProps> = ({
                       }}
                       fileName="Surat Tugas"
                       linkText="Lihat File"
+                      className="text-sm truncate max-w-48 text-primary hover:text-primary/80 underline"
                     />
                   </div>
                 </div>

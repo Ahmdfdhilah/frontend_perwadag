@@ -96,14 +96,14 @@ const EntryMeetingTable: React.FC<EntryMeetingTableProps> = ({
                     <FileViewLink
                       externalUrl={item.link_zoom}
                       emptyText="Belum ada link zoom"
-                      className="text-sm"
+                      className="text-sm text-primary hover:text-primary/80 underline"
                     />
                   </TableCell>
                   <TableCell>
                     <FileViewLink
                       externalUrl={item.link_daftar_hadir}
                       emptyText="Belum ada link daftar hadir"
-                      className="text-sm"
+                      className="text-sm text-primary hover:text-primary/80 underline"
                     />
                   </TableCell>
                   <TableCell>

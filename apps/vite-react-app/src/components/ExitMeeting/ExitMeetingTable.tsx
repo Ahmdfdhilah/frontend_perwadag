@@ -37,15 +37,14 @@ const ExitMeetingTable: React.FC<ExitMeetingTableProps> = ({
     const isCompleted = meeting.is_completed;
     return (
       <span
-  className={`px-2 py-1 rounded-full text-xs font-medium
-    ${
-      isCompleted
-        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-        : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
-    }`}
->
-  {isCompleted ? 'Lengkap' : 'Belum Lengkap'}
-</span>
+        className={`px-2 py-1 rounded-full text-xs font-medium
+    ${isCompleted
+            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+          }`}
+      >
+        {isCompleted ? 'Lengkap' : 'Belum Lengkap'}
+      </span>
     );
   };
 
@@ -96,14 +95,14 @@ const ExitMeetingTable: React.FC<ExitMeetingTableProps> = ({
                     <FileViewLink
                       externalUrl={item.link_zoom}
                       emptyText="Belum ada link zoom"
-                      className="text-sm"
+                      className="text-sm truncate max-w-48 text-primary hover:text-primary/80 underline"
                     />
                   </TableCell>
                   <TableCell>
                     <FileViewLink
                       externalUrl={item.link_daftar_hadir}
                       emptyText="Belum ada link daftar hadir"
-                      className="text-sm"
+                      className="text-sm truncate max-w-48 text-primary hover:text-primary/80 underline"
                     />
                   </TableCell>
                   <TableCell>

@@ -134,7 +134,7 @@ const KonfirmasiMeetingCards: React.FC<KonfirmasiMeetingCardsProps> = ({
                     <FileViewLink
                       externalUrl={item.link_zoom}
                       emptyText="Belum ada zoom"
-                      className="text-sm truncate max-w-48"
+                     className="text-sm truncate max-w-48 text-primary hover:text-primary/80 underline"
                     />
                   </span>
                 </div>
@@ -144,7 +144,7 @@ const KonfirmasiMeetingCards: React.FC<KonfirmasiMeetingCardsProps> = ({
                     <FileViewLink
                       externalUrl={item.link_daftar_hadir}
                       emptyText="Belum ada daftar hadir"
-                      className="text-sm truncate max-w-48"
+                     className="text-sm truncate max-w-48 text-primary hover:text-primary/80 underline"
                     />
                   </span>
                 </div>

@@ -89,6 +89,7 @@ const SuratTugasTable: React.FC<SuratTugasTableProps> = ({
                       }}
                       fileName="Surat Tugas"
                       linkText="Lihat File"
+                      className="text-sm truncate max-w-48 text-primary hover:text-primary/80 underline"
                     />
                   </TableCell>
                   {!isDashboard && (

@@ -25,9 +25,9 @@ import ActionDropdown from '@/components/common/ActionDropdown';
 import FileViewLink from '@/components/common/FileViewLink';
 import { useRole } from '@/hooks/useRole';
 import { formatDokumenUrl, URL_VALIDATION_MESSAGES } from '@/utils/urlValidation';
-import TindakLanjutFormDialog, { 
-  type TindakLanjutFormData, 
-  type TindakLanjutFieldPermissions 
+import TindakLanjutFormDialog, {
+  type TindakLanjutFormData,
+  type TindakLanjutFieldPermissions
 } from './TindakLanjutFormDialog';
 import TindakLanjutStatusChangeConfirmDialog from './TindakLanjutStatusChangeConfirmDialog';
 import { Label } from '@workspace/ui/components/label';
@@ -66,7 +66,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
     dokumen_pendukung_tindak_lanjut: '',
     catatan_evaluator: ''
   });
-  
+
   // Status change confirmation state
   const [statusChangeConfirmOpen, setStatusChangeConfirmOpen] = useState(false);
   const [newStatusToSet, setNewStatusToSet] = useState<TindakLanjutStatus | null>(null);
@@ -365,22 +365,22 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                               <TableCell className="max-w-xs">
                                 {(() => {
                                   const validUrl = formatDokumenUrl(tr.dokumen_pendukung_tindak_lanjut);
-                                  
+
                                   if (validUrl) {
                                     return (
                                       <FileViewLink
                                         hasFile={true}
-                                        fileUrls={{ 
+                                        fileUrls={{
                                           view_url: validUrl,
-                                          file_url: validUrl 
+                                          file_url: validUrl
                                         }}
                                         linkText="Lihat Dokumen"
                                         showIcon={true}
-                                        className="text-sm text-blue-600 hover:text-blue-800"
+                                        className="text-sm truncate max-w-48 text-primary hover:text-primary/80 underline"
                                       />
                                     );
                                   }
-                                  
+
                                   return <span className="text-sm text-muted-foreground">-</span>;
                                 })()}
                               </TableCell>

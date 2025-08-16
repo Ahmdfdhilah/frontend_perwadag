@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Video, FileText, Users, Calendar, Link as LinkIcon } from 'lucide-react';
 import { API_BASE_URL } from '@/config/api';
 import { isValidUrl } from '@/utils/urlValidation';
 
@@ -28,7 +28,7 @@ const FileViewLink: React.FC<FileViewLinkProps> = ({
   hasFile = false,
   fileUrls,
   fileName,
-  className = "text-blue-600 hover:text-blue-800 underline dark:text-blue-300 dark:hover:text-blue-100",
+  className = "text-primary hover:text-primary/80 underline",
   linkText,
   showIcon = true,
   externalUrl,
@@ -45,7 +45,7 @@ const FileViewLink: React.FC<FileViewLinkProps> = ({
     // Handle external URL
     if (!externalUrl || !isValidUrl(externalUrl)) {
       return (
-        <span className="text-muted-foreground">
+        <span className={getEmptyStateClasses(className)}>
           {emptyText || "Tidak ada link"}
         </span>
       );
@@ -53,24 +53,25 @@ const FileViewLink: React.FC<FileViewLinkProps> = ({
 
     const finalUrl = externalUrl.startsWith('http') ? externalUrl : `https://${externalUrl}`;
     const finalLinkText = linkText || getDefaultLinkText(externalUrl);
+    const IconComponent = getIconForUrl(externalUrl);
 
     return (
       <a
         href={finalUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className={`inline-flex items-center gap-1 ${className}`}
+        className={`inline-flex items-center gap-1.5 ${className}`}
         title={`Buka ${finalLinkText}`}
       >
+        {showIcon && <IconComponent className="w-3.5 h-3.5 flex-shrink-0" />}
         {finalLinkText}
-        {showIcon && <ExternalLink className="w-3 h-3" />}
       </a>
     );
   } else {
     // Handle file URL (original behavior)
     if (!hasFile || !fileUrls?.view_url) {
       return (
-        <span className="text-muted-foreground">
+        <span className={getEmptyStateClasses(className)}>
           {emptyText || "Tidak ada file"}
         </span>
       );
@@ -83,14 +84,53 @@ const FileViewLink: React.FC<FileViewLinkProps> = ({
         href={`${API_BASE_URL}${fileUrls.file_url}`}
         target="_blank"
         rel="noopener noreferrer"
-        className={`inline-flex items-center gap-1 ${className}`}
+        className={`inline-flex items-center gap-1.5 ${className}`}
         title={fileName ? `Lihat ${fileName}` : finalLinkText}
       >
+        {showIcon && <FileText className="w-3.5 h-3.5 flex-shrink-0" />}
         {finalLinkText}
-        {showIcon && <ExternalLink className="w-3 h-3" />}
       </a>
     );
   }
+};
+
+// Helper function to get empty state classes (removes link-specific styling)
+const getEmptyStateClasses = (className: string): string => {
+  return className
+    .split(' ')
+    .filter(cls => 
+      !cls.includes('text-primary') &&
+      !cls.includes('hover:') &&
+      !cls.includes('underline') &&
+      !cls.includes('text-blue')
+    )
+    .concat(['text-muted-foreground'])
+    .join(' ');
+};
+
+// Helper function to get appropriate icon based on URL
+const getIconForUrl = (url: string) => {
+  if (!url) return LinkIcon;
+  
+  const lowerUrl = url.toLowerCase();
+  
+  if (lowerUrl.includes('zoom.us') || lowerUrl.includes('meet.google.com') || lowerUrl.includes('teams.microsoft.com')) {
+    return Video;
+  }
+  if (lowerUrl.includes('forms.google.com') || lowerUrl.includes('daftar') || lowerUrl.includes('attendance')) {
+    return Users;
+  }
+  if (lowerUrl.includes('drive.google.com') || lowerUrl.includes('docs.google.com')) {
+    return FileText;
+  }
+  if (lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be')) {
+    return Video;
+  }
+  if (lowerUrl.includes('calendar') || lowerUrl.includes('event')) {
+    return Calendar;
+  }
+  
+  return ExternalLink;
 };
 
 // Helper function to get appropriate link text based on URL

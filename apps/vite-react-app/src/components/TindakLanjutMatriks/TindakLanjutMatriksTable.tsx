@@ -77,6 +77,7 @@ const TindakLanjutMatriksTable: React.FC<TindakLanjutMatriksTableProps> = ({
         fileUrls={matriks.file_urls}
         fileName={matriks.file_metadata?.original_filename}
         linkText="Lihat Dokumen"
+        className="text-sm truncate max-w-48 text-primary hover:text-primary/80 underline"
       />
     );
   };

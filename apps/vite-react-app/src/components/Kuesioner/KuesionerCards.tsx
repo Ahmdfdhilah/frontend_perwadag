@@ -30,15 +30,14 @@ const KuesionerCards: React.FC<KuesionerCardsProps> = ({
     const isCompleted = kuisioner.is_completed;
     return (
       <span
-  className={`px-2 py-1 rounded-full text-xs font-medium
-    ${
-      isCompleted
-        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-        : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
-    }`}
->
-  {isCompleted ? 'Lengkap' : 'Belum Lengkap'}
-</span>
+        className={`px-2 py-1 rounded-full text-xs font-medium
+    ${isCompleted
+            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+          }`}
+      >
+        {isCompleted ? 'Lengkap' : 'Belum Lengkap'}
+      </span>
     );
   };
 
@@ -136,6 +135,7 @@ const KuesionerCards: React.FC<KuesionerCardsProps> = ({
                     fileUrls={item.file_urls}
                     fileName={item.file_metadata?.original_filename}
                     linkText="Lihat Dokumen"
+                    className="text-sm truncate max-w-48 text-primary hover:text-primary/80 underline"
                   />
                 </span>
               </div>
@@ -145,7 +145,7 @@ const KuesionerCards: React.FC<KuesionerCardsProps> = ({
                   <FileViewLink
                     externalUrl={item.link_dokumen_data_dukung}
                     emptyText="Belum ada dukung"
-                    className="text-sm truncate max-w-48"
+                    className="text-sm truncate max-w-48 text-primary hover:text-primary/80 underline"
                   />
                 </span>
               </div>

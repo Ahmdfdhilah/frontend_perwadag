@@ -52,8 +52,8 @@ export const FormatKuisionerTable: React.FC<FormatKuisionerTableProps> = ({
   const getStatusSpan = (template: FormatKuisionerResponse) => {
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${template.is_active
-          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+        : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
         }`}>
         {template.is_active ? 'Aktif' : 'Tidak Aktif'}
       </span>
@@ -67,6 +67,7 @@ export const FormatKuisionerTable: React.FC<FormatKuisionerTableProps> = ({
         fileUrls={template.file_urls}
         fileName={template.file_metadata?.original_filename}
         linkText="Lihat Template"
+        className="text-sm truncate max-w-48 text-primary hover:text-primary/80 underline"
       />
     );
   };
