@@ -11,6 +11,7 @@ import {
   clearError,
   setUser,
   extendSession,
+  resetTransientState,
   selectIsAuthenticated,
   selectUser,
   selectAuthLoading,
@@ -158,6 +159,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Check auth on mount to restore session after refresh
   useEffect(() => {
+    // Reset loading and error states after rehydration
+    dispatch(resetTransientState());
+    
     // If we have user data and authenticated state persisted, verify session is still valid
     if (user && isAuthenticated) {
       // Check if session is expired before making API call

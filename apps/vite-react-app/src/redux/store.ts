@@ -4,12 +4,11 @@ import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, 
 import storage from 'redux-persist/lib/storage';
 import { rootReducer } from './reducers';
 
-// Persist configuration - persist user data but exclude sensitive tokens
+// Persist configuration - persist essential data only
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth', 'theme', 'role'], // Include auth for user data
-  blacklist: [] // Remove blacklist, we'll handle this at slice level
+  whitelist: ['auth', 'theme'] // Include auth and theme data
 };
 
 // Create persisted reducer

@@ -1,6 +1,4 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
 import type { RootState } from '../store';
 import { authService } from '@/services/auth';
 import { userService } from '@/services/users';
@@ -169,10 +167,13 @@ const authSlice = createSlice({
       state.user = null;
       state.sessionExpiry = null;
       state.error = null;
+      state.isLoading = false;
     },
     setUser: (state, action: PayloadAction<UserResponse>) => {
       state.user = action.payload;
       state.isAuthenticated = true;
+      state.isLoading = false;
+      state.error = null;
     },
     updateUser: (state, action: PayloadAction<Partial<UserResponse>>) => {
       if (state.user) {
@@ -181,6 +182,11 @@ const authSlice = createSlice({
     },
     extendSession: (state) => {
       state.sessionExpiry = Date.now() + (30 * 60 * 1000); // Extend by 30 minutes
+    },
+    // Reset loading and error states after rehydration
+    resetTransientState: (state) => {
+      state.isLoading = false;
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -340,7 +346,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearError, clearAuth, setUser, updateUser, extendSession } = authSlice.actions;
+export const { clearError, clearAuth, setUser, updateUser, extendSession, resetTransientState } = authSlice.actions;
 
 export const selectAuth = (state: RootState) => state.auth;
 export const selectIsAuthenticated = (state: RootState) => state.auth?.isAuthenticated || false;
@@ -349,12 +355,4 @@ export const selectAuthLoading = (state: RootState) => state.auth?.isLoading || 
 export const selectAuthError = (state: RootState) => state.auth?.error || null;
 export const selectSessionExpiry = (state: RootState) => state.auth?.sessionExpiry || null;
 
-// Persist config for auth - persist user data, session expiry, and auth state
-const authPersistConfig = {
-  key: 'auth',
-  storage,
-  whitelist: ['user', 'sessionExpiry', 'isAuthenticated'], // Persist essential auth data
-  blacklist: ['isLoading', 'error'] // Don't persist loading and error states
-};
-
-export default persistReducer(authPersistConfig, authSlice.reducer);
+export default authSlice.reducer;
