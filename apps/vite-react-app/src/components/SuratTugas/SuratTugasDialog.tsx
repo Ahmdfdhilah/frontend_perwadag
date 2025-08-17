@@ -19,7 +19,7 @@ import { useFormPermissions } from '@/hooks/useFormPermissions';
 import { useRole } from '@/hooks/useRole';
 import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
-import { formatDateForAPI } from '@/utils/timeFormat';
+import { formatDateForAPI, parseDateStringToDate } from '@/utils/timeFormat';
 import { suratTugasService } from '@/services/suratTugas';
 import { useToast } from '@workspace/ui/components/sonner';
 
@@ -69,8 +69,8 @@ const SuratTugasDialog: React.FC<SuratTugasDialogProps> = ({
       setFormData({
         no_surat: editingItem.no_surat,
         user_perwadag_id: editingItem.user_perwadag_id,
-        tanggal_evaluasi_mulai: new Date(editingItem.tanggal_evaluasi_mulai),
-        tanggal_evaluasi_selesai: editingItem.tanggal_evaluasi_selesai ? new Date(editingItem.tanggal_evaluasi_selesai) : undefined,
+        tanggal_evaluasi_mulai: parseDateStringToDate(editingItem.tanggal_evaluasi_mulai),
+        tanggal_evaluasi_selesai: editingItem.tanggal_evaluasi_selesai ? parseDateStringToDate(editingItem.tanggal_evaluasi_selesai) : undefined,
         pengedali_mutu_id: editingItem.assignment_info?.pengedali_mutu?.id || '',
         pengendali_teknis_id: editingItem.assignment_info?.pengendali_teknis?.id || '',
         ketua_tim_id: editingItem.assignment_info?.ketua_tim?.id || '',

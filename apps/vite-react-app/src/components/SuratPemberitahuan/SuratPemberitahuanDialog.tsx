@@ -11,7 +11,7 @@ import { Label } from '@workspace/ui/components/label';
 import DatePicker from '@/components/common/DatePicker';
 import { SuratPemberitahuanResponse } from '@/services/suratPemberitahuan/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
-import { formatIndonesianDateRange, formatDateForAPI } from '@/utils/timeFormat';
+import { formatIndonesianDateRange, formatDateForAPI, parseDateStringToDate } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { suratPemberitahuanService } from '@/services/suratPemberitahuan';
@@ -54,7 +54,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
       setFormData({
         tanggal_surat_pemberitahuan: item.tanggal_surat_pemberitahuan,
       });
-      setSelectedDate(item.tanggal_surat_pemberitahuan ? new Date(item.tanggal_surat_pemberitahuan) : undefined);
+      setSelectedDate(item.tanggal_surat_pemberitahuan ? parseDateStringToDate(item.tanggal_surat_pemberitahuan) : undefined);
 
       // Set existing files for display
       if (item.has_file && item.file_metadata) {
@@ -225,7 +225,7 @@ const SuratPemberitahuanDialog: React.FC<SuratPemberitahuanDialogProps> = ({
                 />
               ) : (
                 <div className="p-3 bg-muted rounded-md">
-                  {item?.tanggal_surat_pemberitahuan ? format(new Date(item.tanggal_surat_pemberitahuan), "dd MMMM yyyy", { locale: id }) : '-'}
+                  {item?.tanggal_surat_pemberitahuan ? format(parseDateStringToDate(item.tanggal_surat_pemberitahuan), "dd MMMM yyyy", { locale: id }) : '-'}
                 </div>
               )}
             </div>

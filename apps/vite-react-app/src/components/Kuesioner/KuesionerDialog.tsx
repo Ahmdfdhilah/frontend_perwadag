@@ -14,7 +14,7 @@ import DatePicker from '@/components/common/DatePicker';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { KuisionerResponse } from '@/services/kuisioner/types';
-import { formatIndonesianDateRange, formatDateForAPI } from '@/utils/timeFormat';
+import { formatIndonesianDateRange, formatDateForAPI, parseDateStringToDate } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { kuisionerService } from '@/services/kuisioner';
@@ -57,7 +57,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
         tanggal_kuisioner: item.tanggal_kuisioner,
         link_dokumen_data_dukung: item.link_dokumen_data_dukung || '',
       });
-      setSelectedDate(item.tanggal_kuisioner ? new Date(item.tanggal_kuisioner) : undefined);
+      setSelectedDate(item.tanggal_kuisioner ? parseDateStringToDate(item.tanggal_kuisioner) : undefined);
 
       // Set existing files for display
       if (item.has_file && item.file_metadata) {
@@ -245,7 +245,7 @@ const KuesionerDialog: React.FC<KuesionerDialogProps> = ({
                 />
               ) : (
                 <div className="p-3 bg-muted rounded-md">
-                  {item?.tanggal_kuisioner ? format(new Date(item.tanggal_kuisioner), "dd MMMM yyyy", { locale: id }) : '-'}
+                  {item?.tanggal_kuisioner ? format(parseDateStringToDate(item.tanggal_kuisioner), "dd MMMM yyyy", { locale: id }) : '-'}
                 </div>
               )}
             </div>

@@ -15,7 +15,7 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { LaporanHasilResponse } from '@/services/laporanHasil/types';
 import { useFormPermissions } from '@/hooks/useFormPermissions';
-import { formatIndonesianDateRange, formatDateForAPI } from '@/utils/timeFormat';
+import { formatIndonesianDateRange, formatDateForAPI, parseDateStringToDate } from '@/utils/timeFormat';
 import FileUpload from '@/components/common/FileUpload';
 import FileDeleteConfirmDialog from '@/components/common/FileDeleteConfirmDialog';
 import { laporanHasilService } from '@/services/laporanHasil';
@@ -56,7 +56,7 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
         nomor_laporan: item.nomor_laporan || '',
         tanggal_laporan: item.tanggal_laporan,
       });
-      setSelectedDate(item.tanggal_laporan ? new Date(item.tanggal_laporan) : undefined);
+      setSelectedDate(item.tanggal_laporan ? parseDateStringToDate(item.tanggal_laporan) : undefined);
 
       // Set existing files for display
       if (item.has_file && item.file_metadata) {
@@ -248,7 +248,7 @@ const LaporanHasilEvaluasiDialog: React.FC<LaporanHasilEvaluasiDialogProps> = ({
                 />
               ) : (
                 <div className="p-3 bg-muted rounded-md">
-                  {item?.tanggal_laporan ? format(new Date(item.tanggal_laporan), "dd MMMM yyyy", { locale: id }) : '-'}
+                  {item?.tanggal_laporan ? format(parseDateStringToDate(item.tanggal_laporan), "dd MMMM yyyy", { locale: id }) : '-'}
                 </div>
               )}
             </div>

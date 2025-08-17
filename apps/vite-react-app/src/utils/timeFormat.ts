@@ -129,6 +129,23 @@ export const formatIndonesianDateRange = (startDate: string, endDate: string): s
     }
 };
 
+// Convert date-only string to Date object without timezone issues
+export const parseDateStringToDate = (dateString: string): Date => {
+    if (!dateString) {
+        throw new Error('Date string is required');
+    }
+    
+    // Check if it's a date-only string (YYYY-MM-DD) or datetime string
+    if (dateString.includes('T') || dateString.includes(' ')) {
+        // It's a datetime string, use Date constructor normally
+        return new Date(dateString);
+    } else {
+        // It's a date-only string, parse manually and create Date at local midnight
+        const parsed = parseDateSafe(dateString);
+        return new Date(parsed.year, parsed.month, parsed.day);
+    }
+};
+
 // Format date for API requests without timezone issues
 export const formatDateForAPI = (date: Date): string => {
     const year = date.getFullYear();
