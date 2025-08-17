@@ -39,6 +39,10 @@ const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const { isAdmin } = useRole();
 
+  // Use optimized year options hook and filter out 'all' option for dashboard
+  const { yearOptions: allYearOptions } = useYearOptions();
+  const yearOptions = allYearOptions.filter(option => option.value !== 'all');
+
   // URL Filters configuration
   const { updateURL, getCurrentFilters } = useURLFilters<DashboardPageFilters>({
     defaults: {
@@ -54,9 +58,6 @@ const DashboardPage: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<DashboardSummaryResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  // Use optimized year options hook and filter out 'all' option for dashboard
-  const { yearOptions: allYearOptions } = useYearOptions();
-  const yearOptions = allYearOptions.filter(option => option.value !== 'all');
 
   const fetchDashboardData = async (year?: number | null) => {
     try {
@@ -71,6 +72,20 @@ const DashboardPage: React.FC = () => {
       setIsRefreshing(false);
     }
   };
+
+  // Update to latest available year when options are loaded and current year is not available
+  useEffect(() => {
+    if (yearOptions.length > 0) {
+      const currentFilterYear = filters.tahun_evaluasi;
+      const isCurrentYearAvailable = yearOptions.some(option => option.value === currentFilterYear);
+      
+      if (!isCurrentYearAvailable) {
+        // Set to the latest available year (first in sorted desc order)
+        const latestYear = yearOptions[0].value;
+        updateURL({ tahun_evaluasi: latestYear });
+      }
+    }
+  }, [yearOptions]); // Only depend on yearOptions
 
   useEffect(() => {
     const year = parseInt(filters.tahun_evaluasi);
@@ -175,7 +190,9 @@ const DashboardPage: React.FC = () => {
             disabled={isLoading}
           >
             <SelectTrigger id="year-filter">
-              <SelectValue placeholder="Pilih tahun" />
+              <SelectValue>
+                {yearOptions.find(option => option.value === filters.tahun_evaluasi)?.label || filters.tahun_evaluasi}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent>
               {yearOptions.map(option => (
