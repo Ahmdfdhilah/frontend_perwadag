@@ -32,7 +32,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export function LoginPage() {
   const { isDarkMode } = useTheme();
   const { login, isAuthenticated, loading: authLoading, error, clearAuthError } = useAuth();
-  const { executeRecaptcha, isLoading: captchaLoading, isEnabled: captchaEnabled, error: captchaError } = useCaptcha();
+  const { executeRecaptcha, isLoading: captchaLoading, isLoaded: captchaLoaded, isEnabled: captchaEnabled, error: captchaError } = useCaptcha();
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState<string>('');
   const [successMessage, setSuccessMessage] = useState<string>('');
@@ -299,15 +299,18 @@ export function LoginPage() {
                       type="submit"
                       className="w-full"
                       loading={authLoading || captchaLoading}
+                      disabled={authLoading || captchaLoading || (captchaEnabled && !captchaLoaded)}
                       loadingText={captchaLoading ? "Memverifikasi keamanan..." : "Masuk..."}
                     >
-                      Masuk
+                      {captchaEnabled && !captchaLoaded ? "Memuat keamanan..." : "Masuk"}
                     </LoadingButton>
                     
                     {/* CAPTCHA Status Indicator */}
                     {captchaEnabled && (
                       <div className="text-xs text-muted-foreground text-center">
-                        🛡️ Dilindungi dengan reCAPTCHA
+                        {captchaLoading ? "⏳ Memuat verifikasi keamanan..." : 
+                         !captchaLoaded ? "⏳ Memuat verifikasi keamanan..." :
+                         "🛡️ Dilindungi dengan reCAPTCHA"}
                       </div>
                     )}
                   </CardFooter>
@@ -463,15 +466,18 @@ export function LoginPage() {
                     type="submit"
                     className="w-full"
                     loading={authLoading || captchaLoading}
+                    disabled={authLoading || captchaLoading || (captchaEnabled && !captchaLoaded)}
                     loadingText={captchaLoading ? "Memverifikasi keamanan..." : "Masuk..."}
                   >
-                    Masuk
+                    {captchaEnabled && !captchaLoaded ? "Memuat keamanan..." : "Masuk"}
                   </LoadingButton>
                   
                   {/* CAPTCHA Status Indicator */}
                   {captchaEnabled && (
                     <div className="text-xs text-muted-foreground text-center">
-                      🛡️ Dilindungi dengan reCAPTCHA
+                      {captchaLoading ? "⏳ Memuat verifikasi keamanan..." : 
+                       !captchaLoaded ? "⏳ Memuat verifikasi keamanan..." :
+                       "🛡️ Dilindungi dengan reCAPTCHA"}
                     </div>
                   )}
                 </CardFooter>

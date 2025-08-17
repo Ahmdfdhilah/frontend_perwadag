@@ -37,7 +37,7 @@ type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 
 export function ResetPasswordPage() {
   const { isDarkMode } = useTheme();
-  const { executeRecaptcha, isLoading: captchaLoading, isEnabled: captchaEnabled, error: captchaError } = useCaptcha();
+  const { executeRecaptcha, isLoading: captchaLoading, isLoaded: captchaLoaded, isEnabled: captchaEnabled, error: captchaError } = useCaptcha();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [showPassword, setShowPassword] = useState(false);
@@ -266,9 +266,10 @@ export function ResetPasswordPage() {
                       type="submit"
                       className="w-full"
                       loading={loading || captchaLoading}
+                      disabled={loading || captchaLoading || (captchaEnabled && !captchaLoaded)}
                       loadingText={captchaLoading ? "Memverifikasi keamanan..." : "Menyimpan..."}
                     >
-                      Reset Password
+                      {captchaEnabled && !captchaLoaded ? "Memuat keamanan..." : "Reset Password"}
                     </LoadingButton>
                     
                     {/* CAPTCHA Status Indicator */}
@@ -411,9 +412,10 @@ export function ResetPasswordPage() {
                     type="submit"
                     className="w-full"
                     loading={loading || captchaLoading}
+                    disabled={loading || captchaLoading || (captchaEnabled && !captchaLoaded)}
                     loadingText={captchaLoading ? "Memverifikasi keamanan..." : "Menyimpan..."}
                   >
-                    Reset Password
+                    {captchaEnabled && !captchaLoaded ? "Memuat keamanan..." : "Reset Password"}
                   </LoadingButton>
                   
                   {/* CAPTCHA Status Indicator */}

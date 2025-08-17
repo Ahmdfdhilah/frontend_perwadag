@@ -31,7 +31,7 @@ type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 
 export function ForgotPasswordPage() {
   const { isDarkMode } = useTheme();
-  const { executeRecaptcha, isLoading: captchaLoading, isEnabled: captchaEnabled, error: captchaError } = useCaptcha();
+  const { executeRecaptcha, isLoading: captchaLoading, isLoaded: captchaLoaded, isEnabled: captchaEnabled, error: captchaError } = useCaptcha();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const dispatch = useDispatch<AppDispatch>();
@@ -186,9 +186,10 @@ export function ForgotPasswordPage() {
                       type="submit"
                       className="w-full"
                       loading={loading || captchaLoading}
+                      disabled={loading || captchaLoading || (captchaEnabled && !captchaLoaded)}
                       loadingText={captchaLoading ? "Memverifikasi keamanan..." : "Mengirim..."}
                     >
-                      Kirim Link Reset Password
+                      {captchaEnabled && !captchaLoaded ? "Memuat keamanan..." : "Kirim Link Reset Password"}
                     </LoadingButton>
                     
                 
@@ -281,9 +282,10 @@ export function ForgotPasswordPage() {
                     type="submit"
                     className="w-full"
                     loading={loading || captchaLoading}
+                    disabled={loading || captchaLoading || (captchaEnabled && !captchaLoaded)}
                     loadingText={captchaLoading ? "Memverifikasi keamanan..." : "Mengirim..."}
                   >
-                    Kirim Link Reset Password
+                    {captchaEnabled && !captchaLoaded ? "Memuat keamanan..." : "Kirim Link Reset Password"}
                   </LoadingButton>
                   
                   {/* CAPTCHA Status Indicator */}

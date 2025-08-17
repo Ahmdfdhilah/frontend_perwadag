@@ -18,7 +18,7 @@ import logoSielang from '@/assets/logo-sielang.png';
 
 export function EmailSentSuccessPage() {
   const { isDarkMode } = useTheme();
-  const { executeRecaptcha, isLoading: captchaLoading, isEnabled: captchaEnabled, error: captchaError } = useCaptcha();
+  const { executeRecaptcha, isLoading: captchaLoading, isLoaded: captchaLoaded, isEnabled: captchaEnabled, error: captchaError } = useCaptcha();
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
@@ -173,13 +173,15 @@ export function EmailSentSuccessPage() {
                   variant="outline"
                   className="w-full"
                   onClick={handleResendEmail}
-                  disabled={resending || captchaLoading}
+                  disabled={resending || captchaLoading || (captchaEnabled && !captchaLoaded)}
                 >
                   {resending || captchaLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       {captchaLoading ? "Memverifikasi keamanan..." : "Mengirim..."}
                     </>
+                  ) : captchaEnabled && !captchaLoaded ? (
+                    'Memuat keamanan...'
                   ) : (
                     'Kirim Ulang Email'
                   )}
@@ -188,7 +190,9 @@ export function EmailSentSuccessPage() {
                 {/* CAPTCHA Status Indicator */}
                 {captchaEnabled && (
                   <div className="text-xs text-muted-foreground text-center">
-                    🛡️ Dilindungi dengan reCAPTCHA
+                    {captchaLoading ? "⏳ Memuat verifikasi keamanan..." : 
+                     !captchaLoaded ? "⏳ Memuat verifikasi keamanan..." :
+                     "🛡️ Dilindungi dengan reCAPTCHA"}
                   </div>
                 )}
               </CardFooter>
@@ -275,13 +279,15 @@ export function EmailSentSuccessPage() {
                 variant="outline"
                 className="w-full"
                 onClick={handleResendEmail}
-                disabled={resending || captchaLoading}
+                disabled={resending || captchaLoading || (captchaEnabled && !captchaLoaded)}
               >
                 {resending || captchaLoading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     {captchaLoading ? "Memverifikasi keamanan..." : "Mengirim..."}
                   </>
+                ) : captchaEnabled && !captchaLoaded ? (
+                  'Memuat keamanan...'
                 ) : (
                   'Kirim Ulang Email'
                 )}
@@ -290,7 +296,9 @@ export function EmailSentSuccessPage() {
               {/* CAPTCHA Status Indicator */}
               {captchaEnabled && (
                 <div className="text-xs text-muted-foreground text-center">
-                  🛡️ Dilindungi dengan reCAPTCHA
+                  {captchaLoading ? "⏳ Memuat verifikasi keamanan..." : 
+                   !captchaLoaded ? "⏳ Memuat verifikasi keamanan..." :
+                   "🛡️ Dilindungi dengan reCAPTCHA"}
                 </div>
               )}
             </CardFooter>
