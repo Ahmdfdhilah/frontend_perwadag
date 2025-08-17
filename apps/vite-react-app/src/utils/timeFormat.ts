@@ -2,18 +2,32 @@
 // Format tanggal ke bahasa Indonesia
 export const formatIndonesianDate = (dateString: string): string => {
     try {
-        const date = new Date(dateString);
-        
-        const months = [
-            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-        ];
-        
-        const day = date.getDate();
-        const month = months[date.getMonth()];
-        const year = date.getFullYear();
-        
-        return `${day} ${month} ${year}`;
+        // Check if it's a date-only string (YYYY-MM-DD) or datetime string
+        if (dateString.includes('T') || dateString.includes(' ')) {
+            // It's a datetime string, use Date constructor
+            const date = new Date(dateString);
+            
+            const months = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+            
+            const day = date.getDate();
+            const month = months[date.getMonth()];
+            const year = date.getFullYear();
+            
+            return `${day} ${month} ${year}`;
+        } else {
+            // It's a date-only string, use manual parsing to avoid timezone issues
+            const parsed = parseDateSafe(dateString);
+            
+            const months = [
+                'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+            
+            return `${parsed.day} ${months[parsed.month]} ${parsed.year}`;
+        }
     } catch {
         return 'Tanggal tidak valid';
     }
@@ -59,32 +73,52 @@ export const formatDateWithHoursFromAPI = (dateString: string): string => {
 };
 
 
+// Parse date string safely without timezone issues
+const parseDateSafe = (dateString: string): { day: number; month: number; year: number } => {
+    // Manually parse YYYY-MM-DD format to avoid timezone issues
+    const parts = dateString.split('-');
+    if (parts.length !== 3) {
+        throw new Error('Invalid date format');
+    }
+    
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // Month is 0-based
+    const day = parseInt(parts[2], 10);
+    
+    if (isNaN(year) || isNaN(month) || isNaN(day)) {
+        throw new Error('Invalid date values');
+    }
+    
+    return { day, month, year };
+};
+
 // Format range tanggal ke bahasa Indonesia
 export const formatIndonesianDateRange = (startDate: string, endDate: string): string => {
     try {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
+        // Parse dates manually to avoid timezone issues completely
+        const start = parseDateSafe(startDate);
+        const end = parseDateSafe(endDate);
         
         const months = [
             'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
             'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
         ];
         
-        const startDay = start.getDate();
-        const startMonth = months[start.getMonth()];
-        const startYear = start.getFullYear();
+        const startDay = start.day;
+        const startMonth = months[start.month];
+        const startYear = start.year;
         
-        const endDay = end.getDate();
-        const endMonth = months[end.getMonth()];
-        const endYear = end.getFullYear();
+        const endDay = end.day;
+        const endMonth = months[end.month];
+        const endYear = end.year;
         
         // Same month and year
-        if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
+        if (start.month === end.month && start.year === end.year) {
             return `${startDay} - ${endDay} ${startMonth} ${startYear}`;
         }
         
         // Same year, different months
-        if (start.getFullYear() === end.getFullYear()) {
+        if (start.year === end.year) {
             return `${startDay} ${startMonth} - ${endDay} ${endMonth} ${startYear}`;
         }
         
