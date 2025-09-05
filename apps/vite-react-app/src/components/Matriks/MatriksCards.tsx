@@ -35,7 +35,7 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
   // Get appropriate action label based on user role and item status
   const getActionLabel = (item: MatriksResponse): { editLabel: string; viewLabel: string } => {
     const canUserEdit = canEdit?.(item);
-    
+
     if (!canUserEdit) {
       return { editLabel: 'Edit', viewLabel: 'Lihat' };
     }
@@ -44,8 +44,7 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
     switch (item.status) {
       case 'DRAFTING':
         return { editLabel: 'Edit', viewLabel: 'Lihat' };
-      case 'CHECKING':
-        return { editLabel: 'Review', viewLabel: 'Lihat' };
+
       case 'VALIDATING':
         return { editLabel: 'Review', viewLabel: 'Lihat' };
       case 'APPROVING':
@@ -64,12 +63,6 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-100">
             Draft
-          </span>
-        );
-      case 'CHECKING':
-        return (
-          <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
-            Review Ketua Tim
           </span>
         );
       case 'VALIDATING':
@@ -188,7 +181,7 @@ const MatriksCards: React.FC<MatriksCardsProps> = ({
                     viewLabel={viewLabel}
                   />
                 );
-              })()} 
+              })()}
             </div>
           </CardHeader>
           <CardContent className="pt-0">

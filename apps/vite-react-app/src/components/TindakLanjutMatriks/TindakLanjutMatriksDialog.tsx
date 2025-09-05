@@ -117,6 +117,15 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
     }
   };
 
+  const getPreviousStatusAction = (currentStatus?: TindakLanjutStatus) => {
+    switch (currentStatus) {
+      case 'CHECKING': return { prev: 'DRAFTING' as TindakLanjutStatus, label: 'Kembalikan ke Draft' };
+      case 'VALIDATING': return { prev: 'CHECKING' as TindakLanjutStatus, label: 'Kembalikan ke Review Ketua Tim' };
+      case 'FINISHED': return { prev: 'VALIDATING' as TindakLanjutStatus, label: 'Kembalikan ke Review Pengendali' };
+      default: return null;
+    }
+  };
+
   // Check if user can edit tindak lanjut based on permissions
   const canEditTindakLanjut = item?.user_permissions?.can_edit_tindak_lanjut && item?.is_editable && isEditable;
 
@@ -272,8 +281,18 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
   };
 
   const handleRollback = async () => {
-    const rollbackStatus: TindakLanjutStatus = 'DRAFTING';
-    handleStatusChangeClick(rollbackStatus);
+    if (!item?.status_tindak_lanjut) return;
+    const previousAction = getPreviousStatusAction(item.status_tindak_lanjut);
+
+    if (previousAction) {
+      handleStatusChangeClick(previousAction.prev);
+    } else {
+      toast({
+        title: 'Tidak Dapat Dikembalikan',
+        description: 'Tindak lanjut sudah dalam status awal atau tidak dapat dikembalikan lebih jauh.',
+        variant: 'warning'
+      });
+    }
   };
 
   const handleCancel = () => {
@@ -450,21 +469,26 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                       return (
                         <div className="flex flex-wrap gap-2">
                           {/* Rollback button - show for CHECKING and VALIDATING status */}
-                          {canChangeTindakLanjutStatus && (item?.status_tindak_lanjut === 'CHECKING' || item?.status_tindak_lanjut === 'VALIDATING') && (
-                            <Button
-                              variant="destructive"
-                              onClick={handleRollback}
-                              disabled={isChangingStatus || hasLocalChanges}
-                            >
-                              {isChangingStatus ? (
-                                <>
-                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                  Mengembalikan...
-                                </>
-                              ) : (
-                                'Kembalikan ke Draft'
-                              )}
-                            </Button>
+                          {canChangeTindakLanjutStatus && (item?.status_tindak_lanjut === 'CHECKING' || item?.status_tindak_lanjut === 'VALIDATING' || item?.status_tindak_lanjut === 'FINISHED') && (
+                            (() => {
+                              const rollbackAction = getPreviousStatusAction(item?.status_tindak_lanjut);
+                              return rollbackAction ? (
+                                <Button
+                                  variant="destructive"
+                                  onClick={handleRollback}
+                                  disabled={isChangingStatus || hasLocalChanges}
+                                >
+                                  {isChangingStatus ? (
+                                    <>
+                                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                      Memproses...
+                                    </>
+                                  ) : (
+                                    rollbackAction.label
+                                  )}
+                                </Button>
+                              ) : null;
+                            })()
                           )}
 
                           {/* Status change button */}

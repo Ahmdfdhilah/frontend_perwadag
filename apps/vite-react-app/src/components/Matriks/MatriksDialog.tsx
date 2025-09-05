@@ -56,11 +56,11 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [fileToDelete, setFileToDelete] = useState<{ name: string; filename: string } | null>(null);
   const [deletingFile, setDeletingFile] = useState(false);
-  
+
   // Temuan deletion confirmation state
   const [deleteTemuanConfirmOpen, setDeleteTemuanConfirmOpen] = useState(false);
   const [temuanIndexToDelete, setTemuanIndexToDelete] = useState<number | null>(null);
-  
+
   // Status change confirmation state
   const [statusChangeConfirmOpen, setStatusChangeConfirmOpen] = useState(false);
   const [newStatusToSet, setNewStatusToSet] = useState<MatriksStatus | null>(null);
@@ -94,12 +94,6 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
             Draft
           </span>
         );
-      case 'CHECKING':
-        return (
-          <span className="px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100">
-            Review Ketua Tim
-          </span>
-        );
       case 'VALIDATING':
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100">
@@ -130,10 +124,18 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   // Get next status and button label
   const getNextStatusAction = (currentStatus?: MatriksStatus) => {
     switch (currentStatus) {
-      case 'DRAFTING': return { next: 'CHECKING' as MatriksStatus, label: 'Kirim ke Review' };
-      case 'CHECKING': return { next: 'VALIDATING' as MatriksStatus, label: 'Setujui & Lanjutkan' };
+      case 'DRAFTING': return { next: 'VALIDATING' as MatriksStatus, label: 'Kirim ke Review' };
       case 'VALIDATING': return { next: 'APPROVING' as MatriksStatus, label: 'Kirim ke Pengedali Mutu' };
       case 'APPROVING': return { next: 'FINISHED' as MatriksStatus, label: 'Finalisasi' };
+      default: return null;
+    }
+  };
+
+  const getPreviousStatusAction = (currentStatus?: MatriksStatus) => {
+    switch (currentStatus) {
+      case 'VALIDATING': return { prev: 'DRAFTING' as MatriksStatus, label: 'Kembalikan ke Draft' };
+      case 'APPROVING': return { prev: 'VALIDATING' as MatriksStatus, label: 'Kembalikan ke Review Pengendali' };
+      // Tambahkan case lain jika diperlukan, misalnya jika ada status lain yang perlu di-rollback
       default: return null;
     }
   };
@@ -153,19 +155,19 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   // Check if there are any local changes that haven't been saved
   const hasLocalChanges = React.useMemo(() => {
     if (!activeItem) return false;
-    
+
     // Check for unsaved temuan rekomendasi changes
     const originalTemuan = activeItem.temuan_rekomendasi_summary?.data || [];
     const currentTemuan = temuanRekomendasi;
-    
+
     // Check if arrays have different lengths
     if (originalTemuan.length !== currentTemuan.length) return true;
-    
+
     // Check if any content is different
     for (let i = 0; i < originalTemuan.length; i++) {
       const original = originalTemuan[i];
       const current = currentTemuan[i];
-      
+
       if (
         original?.kondisi !== current?.kondisi ||
         original?.kriteria !== current?.kriteria ||
@@ -174,7 +176,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
         return true;
       }
     }
-    
+
     // Check for unsaved file upload
     return uploadFile !== null;
   }, [activeItem, temuanRekomendasi, uploadFile]);
@@ -345,22 +347,22 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
       // Step 1: Check version before submitting (preventive check)
       if (onRefetch && activeItem?.id) {
         const latestData = await onRefetch(activeItem.id);
-        
+
         // Check if version has changed
         if (latestData.temuan_version !== currentTemuanVersion) {
           // Save user's current changes before any updates
           const userTemuan = [...temuanRekomendasi];
           const userFile = uploadFile;
-          
+
           // Merge server data with user's additional changes based on ID
           const serverTemuan = latestData.temuan_rekomendasi_summary?.data || [];
-          
+
           // Find user additions (items without ID - these are new items user created locally)
           const userAdditions = userTemuan.filter(item => !item.id);
-          
+
           // Final merged data: All server items + user's new additions (without ID)
           const finalMergedTemuan = [...serverTemuan, ...userAdditions];
-          
+
           // Create modified latestData with merged temuan for updateDialog
           const modifiedLatestData = {
             ...latestData,
@@ -369,17 +371,17 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
               data: finalMergedTemuan
             }
           };
-          
+
           // Update dialog with merged data (this will update version, metadata, etc)
           updateDialogWithFreshData(modifiedLatestData);
           setUploadFile(userFile);
-          
+
           toast({
             title: 'Data diperbarui',
             description: 'Data telah diubah oleh user lain. Sistem telah memuat versi terbaru dan perubahan Anda tetap dipertahankan. Silakan simpan kembali.',
             variant: 'warning'
           });
-          
+
           setIsSaving(false);
           return; // Don't proceed with save, let user save again
         }
@@ -405,10 +407,10 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
         try {
           const freshData = await onRefetch(activeItem.id);
           updateDialogWithFreshData(freshData);
-          
+
           // Clear upload file after successful save
           setUploadFile(null);
-          
+
           toast({
             title: 'Berhasil disimpan',
             description: 'Data matriks telah diperbarui dengan versi terbaru.',
@@ -464,11 +466,20 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
 
   const handleRollback = async () => {
     if (!activeItem?.status) return;
+    const previousAction = getPreviousStatusAction(activeItem.status);
 
-    const rollbackStatus: MatriksStatus = 'DRAFTING';
-    handleStatusChangeClick(rollbackStatus);
+    if (previousAction) {
+      handleStatusChangeClick(previousAction.prev);
+    } else {
+      // Jika tidak ada status sebelumnya yang ditentukan (misal, jika statusnya DRAFTING)
+      // Anda bisa memilih untuk melakukan sesuatu di sini, atau membiarkan tombol tidak aktif.
+      toast({
+        title: 'Tidak Dapat Dikembalikan',
+        description: 'Matriks sudah dalam status awal atau tidak dapat dikembalikan lebih jauh.',
+        variant: 'warning'
+      });
+    }
   };
-
   const handleFileDownload = async (file: { name: string; url?: string; viewUrl?: string }) => {
     if (!activeItem?.id || isDownloading) return;
 
@@ -663,7 +674,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
             )}
 
             {/* Status Action Buttons */}
-            {(canChangeStatus && (nextAction || (activeItem?.status === 'CHECKING' || activeItem?.status === 'VALIDATING' || activeItem?.status === 'APPROVING'))) && (
+            {(canChangeStatus && (nextAction || (activeItem?.status === 'VALIDATING' || activeItem?.status === 'APPROVING'))) && (
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg">Aksi</CardTitle>
@@ -681,8 +692,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                   <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg dark:bg-blue-950 dark:border-blue-800">
                     <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">Alur Kerja Matriks:</h4>
                     <ul className="text-xs text-blue-700 dark:text-blue-300 space-y-1 list-disc list-inside">
-                      <li><strong>Draft:</strong> Anggota Tim input temuan → kirim ke Review Ketua Tim</li>
-                      <li><strong>Review Ketua Tim:</strong> Ketua Tim review → setujui atau kembalikan ke Draft</li>
+                      <li><strong>Draft:</strong> Anggota Tim input temuan dan kirim ke Review Ketua Tim</li>
                       <li><strong>Review Pengendali:</strong> Pengendali Teknis review → kirim ke Pengedali Mutu atau kembalikan ke Draft</li>
                       <li><strong>Review Pengedali Mutu:</strong> Pengedali Mutu review → finalisasi atau kembalikan ke Draft</li>
                       <li><strong>Selesai:</strong> Matriks selesai, dapat diakses untuk tindak lanjut</li>
@@ -711,22 +721,27 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
 
                   {/* Action Buttons */}
                   <div className="flex flex-wrap gap-2">
-                    {/* Rollback button - show for CHECKING, VALIDATING, and APPROVING status */}
-                    {canChangeStatus && (activeItem?.status === 'CHECKING' || activeItem?.status === 'VALIDATING' || activeItem?.status === 'APPROVING') && (
-                      <Button
-                        variant="destructive"
-                        onClick={handleRollback}
-                        disabled={isChangingStatus || hasLocalChanges}
-                      >
-                        {isChangingStatus ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Mengembalikan...
-                          </>
-                        ) : (
-                          'Kembalikan ke Draft'
-                        )}
-                      </Button>
+                    {/* Rollback button - show for VALIDATING and APPROVING status */}
+                    {canChangeStatus && (activeItem?.status === 'VALIDATING' || activeItem?.status === 'APPROVING') && (
+                      (() => {
+                        const rollbackAction = getPreviousStatusAction(activeItem?.status);
+                        return rollbackAction ? (
+                          <Button
+                            variant="destructive"
+                            onClick={handleRollback}
+                            disabled={isChangingStatus || hasLocalChanges}
+                          >
+                            {isChangingStatus ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Memproses...
+                              </>
+                            ) : (
+                              rollbackAction.label // Menggunakan label dari getPreviousStatusAction
+                            )}
+                          </Button>
+                        ) : null;
+                      })()
                     )}
 
                     {/* Status change button */}

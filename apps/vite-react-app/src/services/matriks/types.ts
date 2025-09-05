@@ -52,7 +52,7 @@ export interface MatriksStatistics {
 }
 
 // Status enums - Updated to match backend exactly
-export type MatriksStatus = 'DRAFTING' | 'CHECKING' | 'VALIDATING' | 'APPROVING' | 'FINISHED';
+export type MatriksStatus = 'DRAFTING' | 'VALIDATING' | 'APPROVING' | 'FINISHED';
 export type TindakLanjutStatus = 'DRAFTING' | 'CHECKING' | 'VALIDATING' | 'FINISHED';
 
 // User permissions
