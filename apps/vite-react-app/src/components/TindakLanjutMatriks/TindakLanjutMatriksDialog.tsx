@@ -56,7 +56,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
 
   // Loading states for different operations
   const [isSaving, setIsSaving] = useState(false);
-  const [isChangingStatus, setIsChangingStatus] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState<TindakLanjutStatus | null>(null);
 
   // Form dialog states
   const [formDialogOpen, setFormDialogOpen] = useState(false);
@@ -183,7 +183,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
 
     // Reset loading states when dialog opens/closes
     setIsSaving(false);
-    setIsChangingStatus(false);
+    setLoadingStatus(null);
   }, [item, open]);
 
   const handleEditTindakLanjut = (index: number) => {
@@ -260,15 +260,15 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
   };
 
   const handleStatusChangeClick = (newStatus: TindakLanjutStatus) => {
-    if (!onStatusChange || isChangingStatus) return;
+    if (!onStatusChange || loadingStatus) return;
     setNewStatusToSet(newStatus);
     setStatusChangeConfirmOpen(true);
   };
 
   const confirmStatusChange = async () => {
-    if (!onStatusChange || !newStatusToSet || isChangingStatus) return;
+    if (!onStatusChange || !newStatusToSet || loadingStatus) return;
 
-    setIsChangingStatus(true);
+    setLoadingStatus(newStatusToSet);
     try {
       await onStatusChange(newStatusToSet);
       setStatusChangeConfirmOpen(false);
@@ -276,9 +276,10 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
     } catch (error) {
       console.error('Error changing tindak lanjut status:', error);
     } finally {
-      setIsChangingStatus(false);
+      setLoadingStatus(null);
     }
   };
+
 
   const handleRollback = async () => {
     if (!item?.status_tindak_lanjut) return;
@@ -296,12 +297,10 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
   };
 
   const handleCancel = () => {
-    if (isSaving || isChangingStatus) return;
+    if (isSaving || loadingStatus) return;
     onOpenChange(false);
   };
 
-  // Determine if any operation is in progress
-  const isOperationInProgress = isSaving || isChangingStatus;
 
   return (
     <>
@@ -412,7 +411,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                                 <TableCell>
                                   <ActionDropdown
                                     onEdit={() => handleEditTindakLanjut(index)}
-                                    showEdit={!isOperationInProgress}
+                                    showEdit={!isSaving}
                                     showView={false}
                                     showDelete={false}
                                   />
@@ -476,9 +475,9 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                                 <Button
                                   variant="destructive"
                                   onClick={handleRollback}
-                                  disabled={isChangingStatus || hasLocalChanges}
+                                  disabled={loadingStatus !== null || hasLocalChanges}
                                 >
-                                  {isChangingStatus ? (
+                                  {loadingStatus === rollbackAction.prev ? (
                                     <>
                                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                                       Memproses...
@@ -494,18 +493,18 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
                           {/* Status change button */}
                           {canChangeTindakLanjutStatus && nextAction && (
                             <Button
-                              onClick={() => handleStatusChangeClick(nextAction.next)}
-                              disabled={isChangingStatus || hasLocalChanges}
-                            >
-                              {isChangingStatus ? (
-                                <>
-                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                  Memproses...
-                                </>
-                              ) : (
-                                nextAction.label
-                              )}
-                            </Button>
+                            onClick={() => handleStatusChangeClick(nextAction.next)}
+                            disabled={loadingStatus !== null || hasLocalChanges}
+                          >
+                            {loadingStatus === nextAction.next ? (
+                              <>
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                Memproses...
+                              </>
+                            ) : (
+                              nextAction.label
+                            )}
+                          </Button>
                           )}
                         </div>
                       );
@@ -520,7 +519,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
             <Button
               variant="outline"
               onClick={handleCancel}
-              disabled={isOperationInProgress}
+              disabled={isSaving || loadingStatus !== null}
             >
               {mode === 'view' ? 'Tutup' : 'Batal'}
             </Button>
@@ -533,7 +532,7 @@ const TindakLanjutMatriksDialog: React.FC<TindakLanjutMatriksDialogProps> = ({
         onOpenChange={setStatusChangeConfirmOpen}
         newStatus={newStatusToSet}
         onConfirm={confirmStatusChange}
-        loading={isChangingStatus}
+        loading={loadingStatus !== null}
       />
 
       {/* Modular Dialog Components */}

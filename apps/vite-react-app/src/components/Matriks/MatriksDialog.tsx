@@ -69,7 +69,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   // Loading states for different operations
   const [isSaving, setIsSaving] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [isChangingStatus, setIsChangingStatus] = useState(false);
+  const [loadingStatus, setLoadingStatus] = useState<MatriksStatus | null>(null);
 
   // Store current temuan_version for conflict detection
   const [currentTemuanVersion, setCurrentTemuanVersion] = useState<number>(0);
@@ -221,7 +221,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
     // Reset loading states when dialog opens/closes
     setIsSaving(false);
     setIsDownloading(false);
-    setIsChangingStatus(false);
+    setLoadingStatus(null);
   }, [item, open]);
 
   const handleUploadFileChange = (files: File[]) => {
@@ -435,34 +435,34 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
 
 
   const handleCancel = () => {
-    // Prevent closing if operations are in progress
-    if (isSaving || isDownloading || deletingFile || isChangingStatus) {
+    if (isSaving || isDownloading || deletingFile || loadingStatus) {
       return;
     }
     onOpenChange(false);
   };
 
   const handleStatusChangeClick = (newStatus: MatriksStatus) => {
-    if (!onStatusChange || !activeItem?.id || isChangingStatus) return;
+    if (!onStatusChange || !activeItem?.id || loadingStatus) return;
     setNewStatusToSet(newStatus);
     setStatusChangeConfirmOpen(true);
   };
 
-  const confirmStatusChange = async () => {
-    if (!onStatusChange || !newStatusToSet || isChangingStatus) return;
 
-    setIsChangingStatus(true);
+  const confirmStatusChange = async () => {
+    if (!onStatusChange || !newStatusToSet || loadingStatus) return;
+
+    setLoadingStatus(newStatusToSet);
     try {
       await onStatusChange(newStatusToSet);
       setStatusChangeConfirmOpen(false);
       setNewStatusToSet(null);
     } catch (error) {
       console.error('Error changing status:', error);
-      // Error toast is handled by parent component
     } finally {
-      setIsChangingStatus(false);
+      setLoadingStatus(null);
     }
   };
+
 
   const handleRollback = async () => {
     if (!activeItem?.status) return;
@@ -546,7 +546,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
   };
 
   // Determine if any operation is in progress
-  const isOperationInProgress = isSaving || isDownloading || deletingFile || isChangingStatus;
+  const isOperationInProgress = isSaving || isDownloading || deletingFile || loadingStatus !== null;
 
   // Get next status action
   const nextAction = getNextStatusAction(activeItem?.status);
@@ -729,15 +729,15 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                           <Button
                             variant="destructive"
                             onClick={handleRollback}
-                            disabled={isChangingStatus || hasLocalChanges}
+                            disabled={loadingStatus !== null || hasLocalChanges}
                           >
-                            {isChangingStatus ? (
+                            {loadingStatus === rollbackAction.prev ? (
                               <>
                                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                                 Memproses...
                               </>
                             ) : (
-                              rollbackAction.label // Menggunakan label dari getPreviousStatusAction
+                              rollbackAction.label
                             )}
                           </Button>
                         ) : null;
@@ -748,9 +748,9 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
                     {canChangeStatus && nextAction && (
                       <Button
                         onClick={() => handleStatusChangeClick(nextAction.next)}
-                        disabled={isChangingStatus || (temuanRekomendasi.length === 0) || hasLocalChanges}
+                        disabled={loadingStatus !== null || (temuanRekomendasi.length === 0) || hasLocalChanges}
                       >
-                        {isChangingStatus ? (
+                        {loadingStatus === nextAction.next ? (
                           <>
                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                             Memproses...
@@ -821,7 +821,7 @@ const MatriksDialog: React.FC<MatriksDialogProps> = ({
         onOpenChange={setStatusChangeConfirmOpen}
         newStatus={newStatusToSet}
         onConfirm={confirmStatusChange}
-        loading={isChangingStatus}
+        loading={loadingStatus !== null}
       />
 
 
