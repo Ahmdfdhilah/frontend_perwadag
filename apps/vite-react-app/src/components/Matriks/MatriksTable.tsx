@@ -74,7 +74,7 @@ const MatriksTable: React.FC<MatriksTableProps> = ({
       case 'VALIDATING':
         return (
           <span className="px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100">
-            Review Pengendali
+            Review Pengendali Teknis
           </span>
         );
       case 'APPROVING':

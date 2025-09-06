@@ -264,7 +264,7 @@ const MatriksPage: React.FC = () => {
 
       const statusLabels = {
         'DRAFTING': 'Draft',
-        'VALIDATING': 'Review Pengendali',
+        'VALIDATING': 'Review Pengendali Teknis',
         'APPROVING': 'Review Pengedali Mutu',
         'FINISHED': 'Selesai'
       };
